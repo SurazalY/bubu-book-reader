@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as Lucide from 'lucide-react'
-import { genreMeta } from '../data/books.js'
+
+const genreMeta = {
+  故事: { color: '#FF8A3D', soft: '#FFF1E6' },
+  经典名著: { color: '#3B66F5', soft: '#EEF2FF' },
+  科普: { color: '#2FA38C', soft: '#EAF7F4' },
+  '国学·传统': { color: '#8B5CF6', soft: '#F3EEFF' },
+  '红色·人物': { color: '#E25555', soft: '#FFF0F0' },
+}
 
 export const cx = (...a) => a.filter(Boolean).join(' ')
 
@@ -42,9 +49,9 @@ export function SectionHead({ eyebrow, title, desc, center, className }) {
 
 // 书封：优先真实封面图 /covers/<id>.jpg，加载失败回退渐变文字封（无图也美观）
 export function BookCover({ book, className }) {
-  const [c1, c2] = book.cover || ['#4C7DFF', '#3B66F5']
+  const [c1, c2] = Array.isArray(book.cover) ? book.cover : ['#4C7DFF', '#3B66F5']
   const [imgOk, setImgOk] = useState(true)
-  const src = `${import.meta.env.BASE_URL}covers/${book.id}.jpg`
+  const src = book.coverUrl || book.cover?.url || `${import.meta.env.BASE_URL}covers/${book.id}.jpg`
   return (
     <div
       className={cx('relative aspect-[3/4] rounded-xl overflow-hidden shadow-e2', className)}
@@ -74,10 +81,10 @@ export function BookCover({ book, className }) {
   )
 }
 
-// 书目卡（封面 + 信息），点击进阅读页
+// 书目卡（封面 + 信息），统一先进入书籍详情页。
 export function BookCard({ book }) {
   return (
-    <Link to={`/reader/${book.id}`} className="group block">
+    <Link to={`/student/books/${book.id}`} className="group block">
       <BookCover book={book} className="transition-shadow duration-220 group-hover:shadow-e3" />
       <div className="mt-3 px-0.5">
         <h3 className="font-serif text-title font-bold text-ink-900 transition-colors group-hover:text-brand-600">

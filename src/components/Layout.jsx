@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom'
-import { Search, BookOpen, ArrowRight, Sparkles, X, Send, Compass } from 'lucide-react'
+import { AlertCircle, Search, BookOpen, ArrowRight, Sparkles, X, Send, Compass } from 'lucide-react'
 import { site, nav, footer } from '../data/site.js'
-import { getBook } from '../data/books.js'
 import { cx } from './ui.jsx'
 import { useAIChat } from '../lib/useAIChat.js'
 
@@ -36,7 +35,13 @@ function TopBar({ aiOpen, onToggleAi }) {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
-            <button className="grid place-items-center w-9 h-9 rounded-lg text-ink-500 hover:bg-ink-50 transition-colors">
+            <button
+              type="button"
+              disabled
+              title="搜索暂未开放"
+              aria-label="搜索暂未开放"
+              className="grid place-items-center w-9 h-9 rounded-lg text-ink-500 transition-colors disabled:cursor-not-allowed disabled:opacity-55"
+            >
               <Search className="w-5 h-5" />
             </button>
             <button
@@ -100,10 +105,9 @@ function navContextOf(pathname) {
 function AINavSidebar({ onClose }) {
   const { pathname } = useLocation()
   const hint = navHints[pathname] || navHints['/']
-  const recs = ['andersen', 'shiwange-weishenme', 'xiyouji-shaoer'].map(getBook)
 
-  // 初始欢迎消息：保留「找书推荐书卡」作为第一条 AI 消息（kind:'welcome' 特殊渲染），之后走真对话
-  const { messages, loading, send } = useAIChat({
+  // 初始欢迎消息只提供真实书架入口，避免用旧壳书目冒充正式推荐。
+  const { messages, loading, error, send } = useAIChat({
     initial: [{ role: 'assistant', kind: 'welcome', content: hint.welcome }],
     getContext: () => navContextOf(pathname),
   })
@@ -115,7 +119,7 @@ function AINavSidebar({ onClose }) {
   useEffect(() => {
     const el = scrollRef.current
     if (el) el.scrollTop = el.scrollHeight
-  }, [messages, loading])
+  }, [messages, loading, error])
 
   const submit = () => {
     if (!input.trim() || loading) return
@@ -159,25 +163,21 @@ function AINavSidebar({ onClose }) {
               </span>
               <div className="rounded-2xl rounded-tl-md bg-surface-soft border border-hair px-3.5 py-2.5 text-sm text-ink-700 leading-relaxed whitespace-pre-wrap">
                 {m.content}
-                {/* 欢迎消息附带「找书推荐书卡」 */}
+                {/* 欢迎消息只提供真实书架入口，不渲染旧壳静态书目。 */}
                 {m.kind === 'welcome' && (
                   <div className="mt-2.5 space-y-1.5">
-                    {recs.map((b) => (
-                      <Link
-                        key={b.id}
-                        to={`/reader/${b.id}`}
-                        className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl bg-surface border border-hair hover:border-brand-300 transition group"
-                      >
-                        <span
-                          className="w-6 h-8 rounded shrink-0"
-                          style={{ backgroundImage: `linear-gradient(150deg, ${b.cover[0]}, ${b.cover[1]})` }}
-                        />
-                        <span className="min-w-0">
-                          <span className="block text-xs font-semibold text-ink-800 group-hover:text-brand-600 truncate">{b.title}</span>
-                          <span className="block text-[11px] text-ink-400">{b.author} · {b.grade}</span>
-                        </span>
-                      </Link>
-                    ))}
+                    <Link
+                      to="/student/shelf"
+                      className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl bg-surface border border-hair hover:border-brand-300 transition group"
+                    >
+                      <span className="grid h-8 w-6 place-items-center rounded bg-brand-50 text-brand-600 shrink-0">
+                        <BookOpen className="h-4 w-4" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-xs font-semibold text-ink-800 group-hover:text-brand-600 truncate">进入真实书架</span>
+                        <span className="block text-[11px] text-ink-400">从当前账号可阅读的书目中选择</span>
+                      </span>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -199,6 +199,17 @@ function AINavSidebar({ onClose }) {
                   <span className="w-1 h-1 rounded-full bg-ink-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                 </span>
               </span>
+            </div>
+          </div>
+        )}
+        {error && (
+          <div className="flex gap-2.5" role="alert">
+            <span className="grid place-items-center w-7 h-7 rounded-lg bg-amber-50 text-amber-700 shrink-0 mt-0.5">
+              <AlertCircle className="w-4 h-4" />
+            </span>
+            <div className="rounded-2xl rounded-tl-md bg-amber-50 border border-amber-200 px-3.5 py-2.5 text-sm text-amber-900 leading-relaxed">
+              <p>{error.message}</p>
+              {error.requestId && <p className="mt-1 text-[11px] text-amber-700">请求编号：{error.requestId}</p>}
             </div>
           </div>
         )}
@@ -264,7 +275,7 @@ function Footer() {
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l}>
-                    <span className="text-sm text-ink-400 hover:text-white transition-colors cursor-pointer">{l}</span>
+                    <span className="text-sm text-ink-400">{l}</span>
                   </li>
                 ))}
               </ul>

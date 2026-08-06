@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "description": "整书阅读 AI 后端：serve 前端 dist + 代理 LLM（页面感知 + fallback/retry）",
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js"

@@ -1,0 +1,37 @@
+{
+  "id": "codex-neko",
+  "displayName": "竹娃",
+  "assetNote": "当前使用 Codex 宠物 Neko 作为示意素材，等待学校提供正式「竹娃」形象与名称。替换时只需换 spritesheet 与本文件的 layout/states，页面代码不改。",
+  "spritesheet": "codex-neko.webp",
+  "layout": {
+    "columns": 8,
+    "rows": 11,
+    "cellWidth": 192,
+    "cellHeight": 208,
+    "renderSizes": [48, 96, 192],
+    "renderNote": "像素素材只按能整除 192 的尺寸渲染（48 / 96 / 192），一个源像素对应整数个屏幕像素，并配合 image-rendering: pixelated，避免发虚。192 = 探出与面板头像，96 = 收叠在页面边缘，48 = 对话里每条回复前的小头像。"
+  },
+  "states": {
+    "idle": { "row": 0, "frames": 7, "fps": 6, "loop": true, "use": "收叠在阅读器边缘时的静态待机" },
+    "runningRight": { "row": 1, "frames": 8, "fps": 10, "loop": true, "use": "备用，前端壳暂不使用" },
+    "runningLeft": { "row": 2, "frames": 8, "fps": 10, "loop": true, "use": "备用，前端壳暂不使用" },
+    "waving": { "row": 3, "frames": 4, "fps": 6, "loop": false, "use": "第一次点击后探出并打招呼" },
+    "jumping": { "row": 4, "frames": 5, "fps": 8, "loop": false, "use": "新的课堂广播到达提醒" },
+    "failed": { "row": 5, "frames": 8, "fps": 6, "loop": false, "use": "AI 暂时不可用 / 额度耗尽 / 网络中断" },
+    "waiting": { "row": 6, "frames": 6, "fps": 5, "loop": true, "use": "等待 AI 回复生成" },
+    "running": { "row": 7, "frames": 6, "fps": 10, "loop": true, "use": "备用，前端壳暂不使用" },
+    "review": { "row": 8, "frames": 6, "fps": 5, "loop": true, "use": "正在读当前书页 / 处理选文引用" }
+  },
+  "lookDirections": {
+    "count": 16,
+    "stepDegrees": 22.5,
+    "rows": [9, 10],
+    "neutral": { "row": 0, "column": 6 },
+    "use": "让 AI 伙伴看向学生当前选中的段落；0° 起按 22.5° 递增，第 9 行 8 格（0°～157.5°）、第 10 行 8 格（180°～337.5°）"
+  },
+  "source": {
+    "from": "~/.codex/pet-runs/codex-neko-v2-20260801-131731/final/spritesheet-extended.webp",
+    "spriteVersionNumber": 2,
+    "license": "内部示意素材，授权状态未确认，不随正式交付物发布"
+  }
+}

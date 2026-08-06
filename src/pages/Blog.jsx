@@ -307,17 +307,24 @@ export default function Blog() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex items-center gap-2.5 flex-1 px-4 py-3 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25">
                   <Mail className="w-4.5 h-4.5 text-white/80 shrink-0" />
-                  <input
-                    type="email"
-                    placeholder="输入你的邮箱"
-                    className="bg-transparent outline-none text-white placeholder:text-white/60 text-sm w-full"
-                  />
-                </div>
-                <button className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-brand-600 text-title font-semibold shadow-e2 transition hover:brightness-95 active:scale-[0.98] shrink-0">
+                    <input
+                      type="email"
+                      disabled
+                      title="订阅服务暂未开放，当前不会收集邮箱"
+                      placeholder="输入你的邮箱"
+                      className="bg-transparent outline-none text-white placeholder:text-white/60 text-sm w-full disabled:cursor-not-allowed disabled:opacity-65"
+                    />
+                  </div>
+                <button
+                  type="button"
+                  disabled
+                  title="订阅服务暂未开放，当前不会收集邮箱"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-brand-600 text-title font-semibold shadow-e2 shrink-0 disabled:cursor-not-allowed disabled:opacity-65"
+                >
                   订阅 <ArrowRight className="w-4.5 h-4.5" />
                 </button>
               </div>
-              <p className="text-white/65 text-caption mt-3">每月 1-2 封，随时可退订。</p>
+              <p className="text-white/65 text-caption mt-3">订阅服务暂未开放，当前不会收集邮箱。</p>
             </div>
           </div>
         </div>

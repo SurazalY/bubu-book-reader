@@ -2,12 +2,21 @@
   "name": "book-reader-app",
   "private": true,
   "version": "0.1.0",
-  "description": "整书阅读 · 展示型阅读站（电子屏幕整书阅读项目）",
+  "description": "读伴前后端一体化阅读与学校权限应用",
   "type": "module",
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "seed:identity": "node server/db/import-seed.js",
+    "import:catalog": "node server/db/import-public-domain-catalog.js",
+    "bootstrap:internal": "node server/db/bootstrap-internal-demo.js",
+    "test:frontend": "node --test tests/frontend/*.mjs",
+    "test:server": "node --test tests/server/**/*.test.js"
   },
   "dependencies": {
     "lucide-react": "^0.460.0",

@@ -9,6 +9,7 @@ import { askAI } from './ai.js'
 export function useAIChat({ initial = [], getContext } = {}) {
   const [messages, setMessages] = useState(initial)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
   // 用 ref 同步持有最新消息列表：避免在 async 里依赖 setState updater 取历史（会拿到空/旧值）
   const messagesRef = useRef(initial)
   const loadingRef = useRef(false)
@@ -19,6 +20,7 @@ export function useAIChat({ initial = [], getContext } = {}) {
       if (!text || loadingRef.current) return
       loadingRef.current = true
       setLoading(true)
+      setError(null)
 
       const userMsg = { role: 'user', content: text }
       // 含本次 user 消息的完整历史（从 ref 取，保证是最新的）
@@ -29,20 +31,27 @@ export function useAIChat({ initial = [], getContext } = {}) {
       const context = typeof getContext === 'function' ? getContext() : {}
       // 只发后端约定的 role/content（剥离 kind 等 UI 专用字段）
       const wire = history.map((m) => ({ role: m.role, content: m.content }))
-      const res = await askAI({ context, messages: wire })
-      const reply = {
-        role: 'assistant',
-        content: (res && res.content) || '我这会儿没接上，稍后再问问我吧～',
+      try {
+        const res = await askAI({ context, messages: wire })
+        if (!res?.content) throw new Error('AI 服务返回了无效响应')
+        const reply = { role: 'assistant', content: res.content }
+        const next = [...messagesRef.current, reply]
+        messagesRef.current = next
+        setMessages(next)
+      } catch (cause) {
+        setError({
+          code: cause?.code || 'DEPENDENCY_UNAVAILABLE',
+          message: cause?.message || 'AI 服务暂时不可用，请稍后重试',
+          retryable: cause?.retryable ?? true,
+          requestId: cause?.requestId,
+        })
+      } finally {
+        loadingRef.current = false
+        setLoading(false)
       }
-      const next = [...messagesRef.current, reply]
-      messagesRef.current = next
-      setMessages(next)
-
-      loadingRef.current = false
-      setLoading(false)
     },
     [getContext],
   )
 
-  return { messages, loading, send }
+  return { messages, loading, error, send }
 }

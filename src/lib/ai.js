@@ -5,15 +5,19 @@ const API_BASE = import.meta.env.VITE_AI_BASE || ''
 // context: { page, pageName, book, chapter, pageNo, totalPages, pageText, selection }
 // messages: [{ role:'user'|'assistant', content }]
 export async function askAI({ context = {}, messages = [] }) {
-  try {
-    const res = await fetch(`${API_BASE}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ context, messages }),
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return await res.json() // { ok, content, model }
-  } catch (e) {
-    return { ok: false, content: '网络好像不太通，待会儿再问问我吧～', model: 'neterror', errors: [String(e)] }
+  const res = await fetch(`${API_BASE}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ context, messages }),
+  })
+  const payload = await res.json().catch(() => null)
+  if (!res.ok) {
+    const error = new Error(payload?.error?.message || `AI 服务请求失败（HTTP ${res.status}）`)
+    error.code = payload?.error?.code || 'DEPENDENCY_UNAVAILABLE'
+    error.status = res.status
+    error.retryable = payload?.error?.retryable ?? res.status >= 500
+    error.requestId = payload?.error?.requestId
+    throw error
   }
+  return payload?.data ?? payload
 }
