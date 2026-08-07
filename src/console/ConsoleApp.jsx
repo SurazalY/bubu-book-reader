@@ -17,8 +17,11 @@ import Community from './pages/Community.jsx'
 import ClassOverview from './pages/ClassOverview.jsx'
 import EyeCare from './pages/classes/EyeCare.jsx'
 import StudentDetail from './pages/accounts/StudentDetail.jsx'
+import StudentDirectory from './pages/accounts/StudentDirectory.jsx'
 import Privacy from './pages/usage/Privacy.jsx'
 import Sessions from './pages/usage/Sessions.jsx'
+import UsageOverview from './pages/usage/UsageOverview.jsx'
+import Templates from './pages/reports/Templates.jsx'
 import { PagePanel } from './components/PagePanel.jsx'
 import { EmptyState } from './components/Controls.jsx'
 import useStage4ConsoleData from './state/useStage4ConsoleData.js'
@@ -54,13 +57,16 @@ function ConsoleRuntime() {
           <Route path="community" element={<Community />} />
           <Route path="classes/overview" element={<ClassOverview />} />
           <Route path="classes/eyecare" element={<EyeCare />} />
+          <Route path="accounts/students" element={<StudentDirectory />} />
           <Route path="accounts/students/:studentId" element={<StudentDetail />} />
           <Route path="classes" element={<Navigate to="/console/classes/overview" replace />} />
+          <Route path="usage/overview" element={<UsageOverview />} />
           <Route path="usage/sessions" element={<Sessions />} />
           <Route path="usage/privacy" element={<Privacy />} />
-          <Route path="usage" element={<Navigate to="/console/usage/sessions" replace />} />
+          <Route path="usage" element={<Navigate to="/console/usage/overview" replace />} />
           <Route path="reports" element={<ReportCenter />} />
           <Route path="reports/parents" element={<ParentSend />} />
+          <Route path="reports/templates" element={<Templates />} />
           <Route path="reports/:reportId" element={<ReportDetail />} />
           <Route path="safety/:eventId" element={<SafetyDetail />} />
           <Route path="safety" element={<SafetyIndex />} />

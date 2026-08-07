@@ -115,5 +115,5 @@ test('Stage 4 生产适配层不引用 fixture、mock、demo 或本地业务存�
   for (const source of sources) {
     assert.doesNotMatch(source, /data\/fixtures|\bmocks?\b|\bfixtures?\b|localStorage|sessionStorage|indexedDB/i)
   }
-  assert.equal(Object.keys(STAGE4_CONSOLE_SURFACES).length, 10)
+  assert.equal(Object.keys(STAGE4_CONSOLE_SURFACES).length, 11)
 })

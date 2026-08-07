@@ -109,7 +109,7 @@ export default function ReportDetail() {
             返回报告中心
           </Btn>
           {student && (
-            <Btn icon="UserRound" onClick={() => navigate(`/console/accounts/students/${student.id}`)}>
+            <Btn icon="UserRound" onClick={() => navigate(`/console/accounts/students/${student.id}`, { state: { from: `/console/reports/${reportId}` } })}>
               学生详情
             </Btn>
           )}

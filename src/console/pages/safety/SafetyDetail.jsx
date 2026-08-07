@@ -467,7 +467,7 @@ export default function SafetyDetail() {
             <Field label="学生" labelWidth="w-[68px]">
               <button
                 type="button"
-                onClick={() => navigate(`/console/accounts/students/${student.id}`)}
+                onClick={() => navigate(`/console/accounts/students/${student.id}`, { state: { from: `/console/safety/${eventId}` } })}
                 className="text-brand-700 hover:underline"
               >
                 {student?.name}

@@ -201,7 +201,7 @@ export default function ClassOverview() {
                   <button
                     key={student.id}
                     type="button"
-                    onClick={() => navigate(`/console/accounts/students/${student.id}`)}
+                    onClick={() => navigate(`/console/accounts/students/${student.id}`, { state: { from: '/console/classes/overview' } })}
                     className="text-left"
                   >
                     <GlassCard className="p-3 hover:shadow-e2 transition h-full">

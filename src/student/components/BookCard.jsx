@@ -53,10 +53,13 @@ export default function BookCard({ book, layout = 'grid', index = 0 }) {
         {/* 爱心：加入或移出「我喜欢的书」，不冒充其它书单操作 */}
         <button
           type="button"
-          disabled
           aria-pressed={liked}
-          aria-label={liked ? `《${book.title}》已在我喜欢的书中，收藏写入接口尚未接入` : `收藏《${book.title}》的写入接口尚未接入`}
-          title="收藏写入接口尚未接入，未修改任何本地或服务端数据"
+          aria-label={`前往《${book.title}》详情管理收藏`}
+          title="前往书籍详情管理「我喜欢的书」"
+          onClick={(event) => {
+            event.stopPropagation()
+            open()
+          }}
           className="student-like absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full"
         >
           <Icon

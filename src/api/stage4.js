@@ -17,6 +17,7 @@ const UNAVAILABLE_SURFACES = Object.freeze({
 
 const SURFACE_LOADERS = Object.freeze({
   safetyList: { method: 'listSafetyEvents', collection: true },
+  studentList: { method: 'listStudents', collection: true },
   classList: { method: 'listClasses', collection: true },
   classDetail: { method: 'getClass', resource: true },
   studentDetail: { method: 'getStudent', resource: true },

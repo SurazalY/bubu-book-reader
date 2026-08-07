@@ -11,6 +11,7 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const fixtureImportPattern = /(?:import|export)\s+(?:[^;'"`]*?\s+from\s+)?['"]([^'"]*\/data\/fixtures\/[^'"]+)['"]/g
 
 const EXPECTED_FIXTURE_IMPORTS = {
+  studentList: [],
   safetyList: [
     '../../data/fixtures/classes.js',
     '../../data/fixtures/safety.js',
@@ -39,12 +40,10 @@ const LEGACY_FIXTURE_MODULES = [
   'src/console/pages/accounts/RoleConfig.jsx',
   'src/console/pages/auth/AuthViews.jsx',
   'src/console/pages/ops/Ops.jsx',
-  'src/console/pages/reports/Templates.jsx',
   'src/console/pages/safety/SafetyList.jsx',
   'src/console/pages/teaching/BookImport.jsx',
   'src/console/pages/usage/Models.jsx',
   'src/console/pages/usage/QuotaManage.jsx',
-  'src/console/pages/usage/UsageOverview.jsx',
 ]
 
 function readProjectFile(relativePath) {
@@ -100,6 +99,13 @@ test('历史 fixture 页面和旧导航不在三个生产入口的可达模块�
   ])
   const reachableLegacyModules = LEGACY_FIXTURE_MODULES.filter((file) => reachableModules.has(file))
   assert.deepEqual(reachableLegacyModules, [])
+})
+
+test('家长发送页不保留只改本地状态的模拟开关', () => {
+  const source = readProjectFile('src/console/pages/reports/ParentSend.jsx')
+  assert.doesNotMatch(source, /scheduledOff|模拟产品默认|setScheduledOff/)
+  assert.match(source, /产品默认：定时发送关闭/)
+  assert.match(source, /当前发送规则以服务端返回为准/)
 })
 
 test('真实登录页不导入旧找回壳，也不展示固定邮箱', () => {

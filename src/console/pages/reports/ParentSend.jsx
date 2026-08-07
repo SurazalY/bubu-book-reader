@@ -58,10 +58,6 @@ export default function ParentSend() {
   const [queue, setQueue] = useState({ reportId: '', parentContactId: '' })
   const [sessionDeliveries, setSessionDeliveries] = useState([])
   const [actionError, setActionError] = useState(null)
-  // 关闭态壳子（Plan_2 P8）：实际开关在学校配置里，这里只是让人看到
-  // “产品默认关闭”时这块版面长什么样，不会塌也不会变空白。
-  const [scheduledOff, setScheduledOff] = useState(false)
-
   const contacts = useMemo(() => [...new Map([...apiContacts, ...sessionContacts].map((item) => [item.id, item])).values()], [apiContacts, sessionContacts])
   const all = useMemo(() => [...new Map([...apiDeliveries, ...sessionDeliveries].map((item) => [item.id, item])).values()], [apiDeliveries, sessionDeliveries])
   const rows = useMemo(() => {
@@ -201,16 +197,12 @@ export default function ParentSend() {
         <div className="min-w-0 flex-1">
           <p className="text-[12px] text-ink-700 leading-relaxed">{SEND_DEFAULT_NOTE}</p>
           <div className="mt-2 flex items-center gap-2 flex-wrap">
-            <Btn
-              size="sm"
-              tone={scheduledOff ? 'primary' : 'ghost'}
-              icon={scheduledOff ? 'ToggleLeft' : 'ToggleRight'}
-              onClick={() => setScheduledOff((v) => !v)}
-            >
-              {scheduledOff ? '已模拟产品默认（定时发送关闭）' : '模拟产品默认（定时发送关闭）'}
-            </Btn>
+            <span className="inline-flex h-7 items-center gap-1.5 rounded-lg border border-ink-150 bg-white/70 px-2.5 text-[11.5px] font-medium text-ink-600">
+              <Icon name="ToggleLeft" className="h-3.5 w-3.5" strokeWidth={1.9} />
+              产品默认：定时发送关闭
+            </span>
             <span className="text-[11px] text-ink-400">
-              只切本页预览，不修改学校配置；真实开关在报告模板与规则页
+              此处只读，不修改学校配置；当前发送规则以服务端返回为准
             </span>
           </div>
         </div>
@@ -219,12 +211,9 @@ export default function ParentSend() {
       {/* 规则概览：四张卡，前两张是本校可开关的，后两张是产品内置与强制项 */}
       <div className="mt-3.5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3.5">
         {SEND_RULES.map((r) => {
-          // 关闭态只影响 source==='school' 的卡；产品内置项不跟着变，
-          // 手动发送反而要在关闭时保持可用，否则就成了“关了就发不了”的错误印象。
-          const off = scheduledOff && r.off ? r.off : null
-          const state = off ? off.state : r.state
-          const tone = off ? off.tone : r.tone
-          const lines = off ? off.lines : r.lines
+          const state = r.state
+          const tone = r.tone
+          const lines = r.lines
           const src = SOURCE_LABEL[r.source]
           return (
             <GlassCard key={r.key} className="console-enter p-3.5 rounded-xl flex flex-col">

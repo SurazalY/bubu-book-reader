@@ -326,7 +326,7 @@ export default function EyeCare() {
                     <td className="px-2 py-2.5">
                       <button
                         type="button"
-                        onClick={() => navigate(`/console/accounts/students/${s.id}?section=eye-care`)}
+                        onClick={() => navigate(`/console/accounts/students/${s.id}?section=eye-care`, { state: { from: '/console/classes/eyecare' } })}
                         className="text-[13px] font-medium text-ink-900 hover:text-brand-600 transition"
                       >
                         {s.name}
@@ -385,7 +385,7 @@ export default function EyeCare() {
                       <IconBtn
                         icon="ArrowRight"
                         title="进入学生详情的护眼区"
-                        onClick={() => navigate(`/console/accounts/students/${s.id}?section=eye-care`)}
+                        onClick={() => navigate(`/console/accounts/students/${s.id}?section=eye-care`, { state: { from: '/console/classes/eyecare' } })}
                       />
                     </td>
                   </tr>

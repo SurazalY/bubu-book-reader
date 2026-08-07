@@ -241,9 +241,15 @@ export default function AiPanel({ open, onClose, book, bookId, currentPageNo, bl
               <Icon name={voice === 'listening' ? 'Square' : 'Mic'} className="h-4 w-4" strokeWidth={2} />
             </button>
             {generating ? (
-              <button type="button" onClick={ai.stop} className="student-ai-sendbtn student-ai-sendbtn--stop" data-reader-ui="">
-                <Icon name="Square" className="h-4 w-4" strokeWidth={2.4} />
-                停止
+              <button
+                type="button"
+                disabled
+                title="回答正在由服务端完整生成并校验引用，暂不支持中途停止"
+                className="student-ai-sendbtn student-ai-sendbtn--stop cursor-not-allowed opacity-65"
+                data-reader-ui=""
+              >
+                <Icon name="LoaderCircle" className="h-4 w-4 animate-spin" strokeWidth={2.1} />
+                生成中
               </button>
             ) : (
               <button

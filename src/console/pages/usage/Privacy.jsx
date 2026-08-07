@@ -173,7 +173,7 @@ export default function Privacy() {
                       <td className="px-3 py-2.5">
                         <button
                           type="button"
-                          onClick={() => navigate(`/console/accounts/students/${a.studentId}`)}
+                          onClick={() => navigate(`/console/accounts/students/${a.studentId}`, { state: { from: '/console/usage/privacy' } })}
                           className="text-[13px] font-medium text-ink-900 hover:text-brand-600 transition"
                         >
                           {a.studentName}

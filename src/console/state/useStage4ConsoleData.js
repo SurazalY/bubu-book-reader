@@ -4,6 +4,12 @@ import { createStage4ConsoleApi } from '../../api/stage4.js'
 import { useApiResource } from '../../api/useApiResource.js'
 
 export const STAGE4_CONSOLE_SURFACES = Object.freeze({
+  studentList: {
+    route: '/console/accounts/students',
+    routePath: 'accounts/students',
+    page: 'src/console/pages/accounts/StudentDirectory.jsx',
+    apiStatus: 'ready',
+  },
   safetyList: {
     route: '/console/safety',
     routePath: 'safety',

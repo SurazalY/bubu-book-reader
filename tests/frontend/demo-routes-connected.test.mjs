@@ -15,16 +15,19 @@ test('学生四个底栏入口连接冻结页面且书架个人主页不导入�
 test('权限端栏目根路径进入真实页面且安全入口不加载 fixture 列表', async () => {
   const app = await readFile(new URL('../../src/console/ConsoleApp.jsx', import.meta.url), 'utf8')
   const context = await readFile(new URL('../../src/console/state/ConsoleContext.jsx', import.meta.url), 'utf8')
+  const navigation = await readFile(new URL('../../src/console/state/navigation.js', import.meta.url), 'utf8')
   const access = await readFile(new URL('../../src/console/state/consoleAccess.js', import.meta.url), 'utf8')
-  for (const route of ['teaching/arrangements', 'classes/overview', 'classes/eyecare', 'usage/sessions', 'usage/privacy', 'community', 'reports', 'safety']) {
+  for (const route of ['accounts/students', 'teaching/arrangements', 'teaching/books', 'classes/overview', 'classes/eyecare', 'usage/overview', 'usage/sessions', 'usage/privacy', 'community', 'reports', 'reports/templates', 'safety']) {
     assert.match(app, new RegExp(`path="${route}"`))
   }
   assert.match(app, /function SafetyIndex/)
   assert.match(app, /path="platform\/audit"/)
   assert.match(app, /workspace\?\.scopeType === 'platform'/)
   assert.doesNotMatch(app, /SafetyList/)
-  const visibleNav = context.slice(context.indexOf('const NAV_ITEMS'), context.indexOf('const PLATFORM_NAV_ITEMS'))
-  assert.doesNotMatch(visibleNav, /key: 'accounts'|usage\/overview|usage\/quota|usage\/models|reports\/templates/)
+  assert.match(navigation, /key: 'accounts'[\s\S]*\/console\/accounts\/students/)
+  assert.match(navigation, /\/console\/usage\/overview/)
+  assert.match(navigation, /\/console\/reports\/templates/)
+  assert.doesNotMatch(navigation, /usage\/quota|usage\/models|teaching\/books\/import/)
   assert.match(access, /'\/console\/teaching\/books'/)
-  assert.match(context, /PLATFORM_NAV_ITEMS[\s\S]*\/console\/platform\/audit/)
+  assert.match(navigation, /PLATFORM_NAV_ITEMS[\s\S]*\/console\/platform\/audit/)
 })

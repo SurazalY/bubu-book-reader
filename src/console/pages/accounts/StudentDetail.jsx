@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { cx, Icon } from '../../../components/ui.jsx'
 import { GlassCard } from '../../components/Glass.jsx'
 import { PagePanel } from '../../components/PagePanel.jsx'
@@ -37,7 +37,23 @@ export default function StudentDetail() {
   const anchorEyeCare = searchParams.get('section') === 'eye-care'
   const eyeRef = useRef(null)
   const navigate = useNavigate()
-  const { workspace } = useConsole()
+  const location = useLocation()
+  const { workspace, canAccessPath } = useConsole()
+  const requestedReturnPath = location.state?.from
+  const returnPath = typeof requestedReturnPath === 'string' && requestedReturnPath.startsWith('/console/') && canAccessPath(requestedReturnPath)
+    ? requestedReturnPath
+    : '/console/classes/overview'
+  const returnLabel = returnPath === '/console/accounts/students'
+    ? '学生目录'
+    : returnPath === '/console/classes/eyecare'
+      ? '护眼管理'
+      : returnPath === '/console/usage/privacy'
+        ? '隐私访问'
+        : returnPath.startsWith('/console/reports/')
+          ? '报告详情'
+          : returnPath.startsWith('/console/safety/')
+            ? '安全事件'
+            : '学生总览'
   const studentResource = useStage4ConsoleData('studentDetail', { workspaceId: workspace?.id, resourceId: studentId })
   const eyeCareResource = usePrivacyEyeCareData({ workspaceId: workspace?.id, studentId })
   const readingResource = useReadingStatistics(workspace?.id, { studentId })
@@ -61,7 +77,7 @@ export default function StudentDetail() {
           icon={studentResource.status === 'empty' ? 'UserSearch' : 'ShieldX'}
           title={studentResource.status === 'empty' ? '找不到这名学生' : '暂时无法查看这名学生'}
           desc={studentResource.error?.message || studentResource.reason?.message || '请回到班级学生总览重新选择，或切换到有权限的工作空间。'}
-          action={<Btn tone="primary" icon="ArrowLeft" onClick={() => navigate('/console/classes/overview')}>回到班级学生总览</Btn>}
+          action={<Btn tone="primary" icon="ArrowLeft" onClick={() => navigate(returnPath)}>回到{returnLabel}</Btn>}
         />
       </PagePanel>
     )
@@ -87,7 +103,7 @@ export default function StudentDetail() {
       desc={`稳定账号 ${student.id} · 当前状态 ${student.status === 'active' ? '在读' : text(student.status, '服务端未返回')}`}
       toolbar={
         <>
-          <Btn icon="ArrowLeft" onClick={() => navigate('/console/classes/overview')}>返回学生总览</Btn>
+          <Btn icon="ArrowLeft" onClick={() => navigate(returnPath)}>返回{returnLabel}</Btn>
           <Btn icon="MessageSquare" onClick={() => navigate(`/console/usage/sessions?student=${encodeURIComponent(student.id)}`)}>查看会话</Btn>
           <Btn tone="primary" icon="Send" onClick={() => navigate('/console/reports/parents')}>发送报告</Btn>
         </>

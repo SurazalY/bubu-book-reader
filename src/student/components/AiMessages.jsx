@@ -58,7 +58,13 @@ function StudentMessage({ m, studentName, onJumpPage, onRetry }) {
           <div className="student-ai-failed">
             <Icon name="WifiOff" className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
             <span className="min-w-0 flex-1">没发出去，你写的字还在这里</span>
-            <button type="button" onClick={() => onRetry(m.id)} className="student-ai-mini" data-reader-ui="">
+            <button
+              type="button"
+              disabled
+              title="重新发送暂未开放；原问题仍保留在对话中"
+              className="student-ai-mini cursor-not-allowed opacity-55"
+              data-reader-ui=""
+            >
               <Icon name="RotateCcw" className="h-3.5 w-3.5" strokeWidth={2} />
               重新发送
             </button>
@@ -154,9 +160,9 @@ function AiMessage({ m, onJumpPage, onRetry, onFeedback }) {
             ) : (
               <button
                 type="button"
-                onClick={() => onRetry(m.id)}
-                className="student-ai-mini"
-                title="重新回答一次（重试不算今天的提问次数）"
+                disabled
+                className="student-ai-mini cursor-not-allowed opacity-55"
+                title="重新回答暂未开放；可以在输入框继续追问"
                 data-reader-ui=""
               >
                 <Icon name="RotateCcw" className="h-3.5 w-3.5" strokeWidth={2} />
@@ -166,10 +172,10 @@ function AiMessage({ m, onJumpPage, onRetry, onFeedback }) {
             <span className="flex-1" />
             <button
               type="button"
-              onClick={() => onFeedback(m.id, 'up')}
+              disabled
               aria-pressed={m.feedback === 'up'}
-              className={cx('student-ai-mini', m.feedback === 'up' && 'student-ai-mini--on')}
-              title="这条有帮助"
+              className={cx('student-ai-mini cursor-not-allowed opacity-55', m.feedback === 'up' && 'student-ai-mini--on')}
+              title="回答反馈暂未开放，不会伪造保存结果"
               data-reader-ui=""
             >
               <Icon name="ThumbsUp" className="h-3.5 w-3.5" strokeWidth={2} />
@@ -177,10 +183,10 @@ function AiMessage({ m, onJumpPage, onRetry, onFeedback }) {
             </button>
             <button
               type="button"
-              onClick={() => onFeedback(m.id, 'down')}
+              disabled
               aria-pressed={m.feedback === 'down'}
-              className={cx('student-ai-mini', m.feedback === 'down' && 'student-ai-mini--off')}
-              title="这条没说到点上"
+              className={cx('student-ai-mini cursor-not-allowed opacity-55', m.feedback === 'down' && 'student-ai-mini--off')}
+              title="回答反馈暂未开放，不会伪造保存结果"
               data-reader-ui=""
             >
               <Icon name="ThumbsDown" className="h-3.5 w-3.5" strokeWidth={2} />

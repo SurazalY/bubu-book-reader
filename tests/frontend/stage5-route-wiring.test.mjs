@@ -92,10 +92,12 @@ test('主站可见书籍入口先进入真实详情，AI 向导不再推荐旧�
 })
 
 test('可达的无后端控件必须明确禁用，不能留下看似可点击的假动作', async () => {
-  const [layout, blog, topBar] = await Promise.all([
+  const [layout, blog, topBar, aiPanel, aiMessages] = await Promise.all([
     source('../../src/components/Layout.jsx'),
     source('../../src/pages/Blog.jsx'),
     source('../../src/console/components/shell/TopBar.jsx'),
+    source('../../src/student/components/AiPanel.jsx'),
+    source('../../src/student/components/AiMessages.jsx'),
   ])
 
   assert.match(layout, /disabled\s+title="搜索暂未开放"/)
@@ -106,6 +108,11 @@ test('可达的无后端控件必须明确禁用，不能留下看似可点击�
   assert.match(topBar, /label="帮助与反馈"\s+disabled\s+title="帮助与反馈服务暂未开放"/)
   assert.match(topBar, /disabled=\{disabled\}/)
   assert.match(topBar, /暗色主题暂未接入/)
+  assert.match(aiPanel, /disabled\s+title="回答正在由服务端完整生成并校验引用，暂不支持中途停止"/)
+  assert.doesNotMatch(aiPanel, /onClick=\{ai\.stop\}/)
+  assert.match(aiMessages, /disabled\s+className="student-ai-mini cursor-not-allowed opacity-55"\s+title="重新回答暂未开放/)
+  assert.doesNotMatch(aiMessages, /onClick=\{\(\) => onFeedback/)
+  assert.match(aiMessages, /回答反馈暂未开放，不会伪造保存结果/)
 })
 
 test('学生和书目详情挂到真实权限端路由，旧详情 fixture 不得回流生产入口', async () => {
