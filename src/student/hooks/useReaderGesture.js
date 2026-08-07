@@ -101,7 +101,14 @@ function pageOf(node) {
   return holder ? Number(holder.getAttribute('data-page')) : null
 }
 
-function selectionEvidence(sel, stage) {
+function rawTextOffset(block, container, offset) {
+  const prefix = document.createRange()
+  prefix.selectNodeContents(block)
+  prefix.setEnd(container, offset)
+  return prefix.cloneContents().textContent?.length || 0
+}
+
+function selectionEvidence(sel, stage, maxLen) {
   if (!sel?.rangeCount) return { selectedBlockIds: [], selectionRange: null }
   const range = sel.getRangeAt(0)
   const blocks = [...stage.querySelectorAll('[data-block-id]')].filter((block) => {
@@ -121,19 +128,17 @@ function selectionEvidence(sel, stage) {
   if (!block.contains(startElement) || !block.contains(endElement)) {
     return { selectedBlockIds, selectionRange: null }
   }
-  const beforeStart = document.createRange()
-  beforeStart.selectNodeContents(block)
-  beforeStart.setEnd(range.startContainer, range.startOffset)
-  const beforeEnd = document.createRange()
-  beforeEnd.selectNodeContents(block)
-  beforeEnd.setEnd(range.endContainer, range.endOffset)
-  const rawText = sel.toString()
-  const leadingWhitespace = rawText.length - rawText.trimStart().length
-  const trailingWhitespace = rawText.length - rawText.trimEnd().length
-  const startOffset = beforeStart.toString().length + leadingWhitespace
-  const endOffset = beforeEnd.toString().length - trailingWhitespace
+  const rawStartOffset = rawTextOffset(block, range.startContainer, range.startOffset)
+  const rawEndOffset = rawTextOffset(block, range.endContainer, range.endOffset)
+  const blockText = block.textContent || ''
+  const selectedSource = blockText.slice(rawStartOffset, rawEndOffset)
+  const leadingWhitespace = selectedSource.length - selectedSource.trimStart().length
+  const text = selectedSource.trim().slice(0, maxLen)
+  const startOffset = rawStartOffset + leadingWhitespace
+  const endOffset = startOffset + text.length
   return {
     selectedBlockIds,
+    text,
     selectionRange: endOffset > startOffset
       ? { blockId: selectedBlockIds[0], startOffset, endOffset }
       : null,
@@ -317,9 +322,9 @@ export function useReaderGesture(
         const pages = [...new Set([s.anchor?.page, pageOf(sel.focusNode), pageOf(sel.anchorNode)].filter((p) => p != null))].sort(
           (a, b) => a - b,
         )
-        const evidence = selectionEvidence(sel, stage)
+        const evidence = selectionEvidence(sel, stage, cb.current.maxLen)
         cb.current.onSelectEnd?.({
-          text: text.slice(0, cb.current.maxLen),
+          text: evidence.text || text.slice(0, cb.current.maxLen),
           rect: rect
             ? { top: rect.top, left: rect.left, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height }
             : null,

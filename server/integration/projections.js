@@ -169,9 +169,13 @@ export function projectConversations(database, organizationId, ownerUserId) {
     ORDER BY created_at, id
   `)
   const evidenceStatement = database.prepare(`
-    SELECT evidence.*, page.page_no
+    SELECT evidence.*, COALESCE(evidence.page_number, page.page_no) AS page_no,
+      block.text_content AS evidence_text
     FROM ai_message_evidence AS evidence
     LEFT JOIN book_pages AS page ON page.id = evidence.page_id
+    LEFT JOIN book_blocks AS block
+      ON block.id = evidence.evidence_id
+     AND block.page_id = evidence.page_id
     WHERE evidence.ai_message_id = ? AND evidence.citation_verified = 1
     ORDER BY evidence.created_at, evidence.id
   `)
@@ -189,6 +193,7 @@ export function projectConversations(database, organizationId, ownerUserId) {
       refs: evidenceStatement.all(message.id).map((evidence) => ({
         id: evidence.evidence_id,
         pageNo: evidence.page_no,
+        text: evidence.evidence_text,
         coordinates: parseJson(evidence.coordinates_json, null),
       })),
     })),

@@ -35,15 +35,15 @@ cd server && npm start
 | 变量 | 说明 | 默认 |
 |---|---|---|
 | `PORT` | 服务端口 | `5191` |
-| `AI_BASE_URL` | OpenAI 兼容端点（带 `/v1`） | — |
-| `AI_API_KEY` | API key | — |
-| `AI_MODEL` | 主模型 | `gpt-5.4-mini` |
-| `AI_FALLBACK_MODELS` | 降级链（逗号分隔） | `gpt-5.4,gpt-5.5` |
-| `AI_MAX_RETRIES` | 每模型重试次数 | `2` |
-| `AI_TIMEOUT_MS` | 单请求超时(ms) | `30000` |
+| `OPENAI_BASE_URL` | 正式 OpenAI 兼容端点（带 `/v1`） | — |
+| `OPENAI_API_KEY` | 只保存在部署环境的 API key | — |
+| `MODEL_ID` | 问答与二次复核共用的模型 | — |
+| `OPENAI_TIMEOUT_MS` | 单请求超时(ms) | `30000` |
+| `OPENAI_PARSE_RETRIES` | 结构化响应解析重试次数 | `1` |
 | `DIST_DIR` | 前端产物目录（相对 `server/`） | `../dist` |
+| `PUBLIC_ASSET_DIR` | 运行时书籍素材目录 | `../public` |
 
-> AI 链路自带 fallback / retry / 友好兜底：主模型失败自动按链降级，全失败返回友好提示而非报错，不会阻断页面。
+> 正式问答和安全二次复核复用同一个外部 provider；未配置时会明确标为确定性降级，不能把降级结果当成外部 AI。
 
 ## 四、验证
 - `GET /api/health` → `{ok:true, ai:{...}}` 即后端 + AI 配置就绪

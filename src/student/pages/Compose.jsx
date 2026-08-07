@@ -131,7 +131,7 @@ export default function Compose({ community: injectedCommunity, reader: injected
             <SectionTitle n="2" icon="Users" title="发到哪个社区" note="两个社区的可见范围与显示的名字不一样" />
             <div className="mt-3 flex flex-wrap gap-2.5">
               {[
-                { key: 'class', label: '班级社区', desc: `${student.className}的同学` },
+                { key: 'class', label: '班级社区', desc: student.className ? `${student.className}的同学` : '本班同学' },
                 { key: 'school', label: '学校社区', desc: '全校同学' },
               ].map((s) => (
                 <button

@@ -111,7 +111,7 @@ export default function Footprint() {
       <GlassPanel tone="solid" className="student-enter rounded-2xl p-6">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label={`${data.label}有效阅读`} value={formatMinutes(data.minutes, { zero: '0 分钟' })} note={data.note} />
-          <Stat label="阅读天数" value={`${data.days} ${data.unit}`} note="产生过有效阅读的天数" />
+          <Stat label="阅读天数" value={`${data.days} 天`} note="产生过有效阅读的天数" />
           <Stat label="读完的书" value={`${data.finished} 本`} note="当前已经读到最后一页的书" />
           <Stat label="平均每次" value={formatMinutes(avg, { zero: '0 分钟' })} note="有阅读的那些天的平均值" />
         </div>

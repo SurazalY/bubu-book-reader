@@ -38,4 +38,4 @@ npm run build    # 产物 dist/，可部署到任意静态服务器 / nginx
 
 ## 页面效果
 
-各页效果图见 [`screenshots/`](screenshots/)。
+当前一体化版本的学生端、教师端与运营端效果图见 [`screenshots/`](screenshots/)。截图来自隔离演示数据，不含个人账号、浏览器栏或系统通知。

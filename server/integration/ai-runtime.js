@@ -127,7 +127,8 @@ function readScopeProvider(database, input) {
   `).get(input.userId, input.bookVersionId)
   const expectedVersion = progress ? String(progress.version) : '0'
   if (input.readRangeVersion !== expectedVersion) return null
-  const lastPageNo = Math.max(page.page_no, progress?.last_page_no ?? page.page_no)
+  const lastPageNo = progress ? Math.max(1, Number(progress.last_page_no) || 1) : 1
+  if (page.page_no > lastPageNo) return null
   const pageIds = database.prepare(`
     SELECT id FROM book_pages
     WHERE book_version_id = ? AND page_no <= ?
@@ -349,10 +350,12 @@ export function deriveAiRequestScope(database, { organizationId, ownerUserId, bo
   `).get(Number(currentPageNo) || 1, bookId, organizationId)
   if (!page) return null
   const progress = database.prepare(`
-    SELECT version FROM reading_progress
+    SELECT version, last_page_no FROM reading_progress
     WHERE actor_id = ? AND book_version_id = ?
     ORDER BY updated_at DESC LIMIT 1
   `).get(ownerUserId, page.book_version_id)
+  const lastPageNo = progress ? Math.max(1, Number(progress.last_page_no) || 1) : 1
+  if (page.page_no > lastPageNo) return null
   return {
     bookVersionId: page.book_version_id,
     currentPageId: page.page_id,

@@ -86,7 +86,8 @@ export default function Notes() {
   }
 
   const startNew = () => {
-    setNotice('请回到阅读器长按同一段真实正文，再创建新的批注。')
+    const firstBook = books.find((book) => book?.id)
+    navigate(firstBook ? `/student/reader/${firstBook.id}` : '/student/shelf')
   }
 
   const submit = async () => {
@@ -116,7 +117,7 @@ export default function Notes() {
           className="student-btn-primary inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-caption font-semibold"
         >
           <Icon name="Plus" className="h-4 w-4" strokeWidth={2.4} />
-          写一篇新的
+          去阅读器新建
         </button>
       </PageHead>
 

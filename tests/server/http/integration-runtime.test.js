@@ -1045,6 +1045,27 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
     ORDER BY block.char_start, block.id
     LIMIT 1
   `).get(book.versionId)
+  const unreadPage = application.database.prepare(`
+    SELECT page_no FROM book_pages
+    WHERE book_version_id = ? AND page_no > 1
+    ORDER BY page_no
+    LIMIT 1
+  `).get(book.versionId)
+  assert.ok(unreadPage)
+  const forgedUnreadPage = await requestJson(baseUrl, studentJar, '/ai/messages', {
+    method: 'POST',
+    workspaceId: fixture.workspaceId,
+    idempotencyKey: 'ai-message-forged-unread-page',
+    body: {
+      bookId: book.bookId,
+      currentPageNo: unreadPage.page_no,
+      text: '请说明还没有读到的页面内容。',
+      safeMode: true,
+    },
+  })
+  assert.equal(forgedUnreadPage.status, 404)
+  assert.equal(forgedUnreadPage.payload.error.code, 'RESOURCE_NOT_FOUND')
+  assert.equal(providerRequests.length, 0)
   let conversationId = null
   let lastAnswer
   for (let index = 1; index <= 3; index += 1) {
@@ -1079,6 +1100,10 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
   const conversationsAfterRefresh = await requestJson(baseUrl, studentJar, '/ai/conversations', { workspaceId: fixture.workspaceId })
   assert.equal(conversationsAfterRefresh.payload.data.items[0].messages.length, 6)
   assert.equal(conversationsAfterRefresh.payload.data.items[0].messages.filter((message) => message.refs.length > 0).length, 3)
+  assert.equal(
+    conversationsAfterRefresh.payload.data.items[0].messages.find((message) => message.refs.length > 0).refs[0].text,
+    selectedBlock.text_content,
+  )
   const eventId = lastAnswer.payload.data.safety.id
   const staffDetail = await requestJson(baseUrl, adminJar, `/safety/events/${eventId}`, { workspaceId: fixture.workspaceId })
   assert.equal(staffDetail.status, 200, JSON.stringify(staffDetail.payload))
