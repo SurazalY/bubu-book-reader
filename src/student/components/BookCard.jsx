@@ -6,12 +6,10 @@ import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 import { formatReadingMinutes } from '../../shared/format.js'
 import BookCover from './BookCover.jsx'
 import { GlassCard } from './Glass.jsx'
-import { BookProgress } from './Progress.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 
-// 书籍卡（规格 §4.2）：封面、书名、作者、有效阅读时间、个人进度。
-// 进度条与书签线一律走 BookProgress，颜色语义在那里统一：绿荧光已读 + 淡粉未读，
-// 书签是轨道内部的蓝色细线；完全未读不画进度条，只写「尚未开始阅读」。
+// 书籍卡只展示服务端明确返回的书籍事实、有效阅读时间和最近位置。
+// 最近页码只是继续阅读的位置，不能换算百分比或推断已经读完。
 // 班级共读书籍额外显示班级参与人数（学生有一次有效阅读才算已参与）。
 //
 // 所有书籍都先进详情页再开始阅读（规格 §5.4），所以卡片点击目标是 books/:id，
@@ -23,7 +21,9 @@ export default function BookCard({ book, layout = 'grid', index = 0 }) {
   const liked = isLiked(book.id)
   const progress = book.progress || {}
   const cls = book.classReading?.state ? book.classReading : null
-  const minutes = formatReadingMinutes(progress.effectiveMinutes)
+  const minutes = Number.isFinite(progress.effectiveMinutes)
+    ? formatReadingMinutes(progress.effectiveMinutes)
+    : null
 
   const open = useCallback(() => {
     if (coverRef.current && !prefs.reduceMotion) coverRef.current.getBoundingClientRect()
@@ -69,22 +69,12 @@ export default function BookCard({ book, layout = 'grid', index = 0 }) {
             strokeWidth={liked ? 0 : 2}
           />
         </button>
-        {/* 已读完与已下载都放封面左下角，纵向叠放；
-            放到卡内文字行会在 178px 窄卡里把时间行挤成两行（第一轮自检的返工点）*/}
-        {(book.finished || book.downloaded) && (
+        {book.downloaded && (
           <span className="absolute bottom-2 left-2 flex flex-col items-start gap-1">
-            {book.finished && (
-              <span className="student-chip inline-flex items-center gap-1 rounded-full px-2 py-[3px] text-micro font-semibold text-[#2FA38C]">
-                <Icon name="CheckCheck" className="h-3 w-3" strokeWidth={2.4} />
-                已读完
-              </span>
-            )}
-            {book.downloaded && (
               <span className="student-chip inline-flex items-center gap-1 rounded-full px-2 py-[3px] text-micro font-semibold text-ink-700">
                 <Icon name="Download" className="h-3 w-3" strokeWidth={2.2} />
                 已下载
               </span>
-            )}
           </span>
         )}
       </div>
@@ -96,8 +86,6 @@ export default function BookCard({ book, layout = 'grid', index = 0 }) {
         <p className="mt-0.5 truncate text-micro text-ink-500">{book.author || '服务端未返回作者'}</p>
       </div>
 
-      {/* 未读的书不重复写一次「尚未开始」：时间行只留占位不写字，
-          由下方进度区的「尚未开始阅读」一句话说完（第一轮自检的返工点）*/}
       <div className="mt-1.5 flex h-[18px] items-center gap-1.5 whitespace-nowrap text-micro text-ink-500">
         {minutes && (
           <>
@@ -106,15 +94,9 @@ export default function BookCard({ book, layout = 'grid', index = 0 }) {
           </>
         )}
       </div>
-
-      <BookProgress
-        className="mt-1.5"
-        percent={progress.percent}
-        page={progress.currentPage}
-        totalPages={progress.totalPages}
-        bookmarks={(progress.bookmarks || []).map((page) => ({ at: progress.totalPages ? (page / progress.totalPages) * 100 : 0, page }))}
-        size="sm"
-      />
+      <p className="mt-1.5 text-micro text-ink-400 tabular-nums">
+        {Number.isSafeInteger(progress.currentPage) ? `上次位置：第 ${progress.currentPage} 页` : '暂无最近阅读位置'}
+      </p>
 
       {cls && (
         <div className="mt-auto border-t border-ink-100 pt-2">

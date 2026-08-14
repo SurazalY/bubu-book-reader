@@ -7,10 +7,9 @@ import { useStudent } from '../state/StudentContext.jsx'
 const SHELF_FILTERS = [
   { key: 'all', label: '全部书籍', icon: 'Library', options: [{ key: 'all', label: '全部', match: () => true }] },
   {
-    key: 'state', label: '阅读状态', icon: 'BookOpen', options: [
+    key: 'state', label: '书架状态', icon: 'BookOpen', options: [
       { key: 'liked', label: '我喜欢', match: (book) => book.liked },
-      { key: 'reading', label: '正在阅读', match: (book) => (book.progress?.percent || 0) > 0 && (book.progress?.percent || 0) < 100 },
-      { key: 'finished', label: '已经读完', match: (book) => (book.progress?.percent || 0) >= 100 },
+      { key: 'downloaded', label: '已下载', match: (book) => book.downloaded },
     ],
   },
 ]

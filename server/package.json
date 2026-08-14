@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js"
+    "dev": "node --watch index.js",
+    "maintenance:reading-monitor-cleanup": "node scripts/reading-monitor-cleanup.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

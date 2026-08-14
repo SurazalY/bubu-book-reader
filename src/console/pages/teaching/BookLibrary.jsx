@@ -16,11 +16,6 @@ function pageCount(book) {
   return Number.isFinite(value) && value > 0 ? value : null
 }
 
-function readingProgress(book) {
-  const value = Number(book?.progress?.percent)
-  return Number.isFinite(value) ? Math.max(0, Math.min(100, Math.round(value))) : null
-}
-
 export default function BookLibrary() {
   const { workspace, prefs, setPref } = useConsole()
   const navigate = useNavigate()
@@ -97,7 +92,6 @@ export default function BookLibrary() {
                     <th className="px-3 py-2.5 font-medium">书目</th>
                     <th className="px-2 py-2.5 font-medium w-[132px]">作者</th>
                     <th className="px-2 py-2.5 font-medium w-[88px]">页数</th>
-                    <th className="px-2 py-2.5 font-medium w-[100px]">当前进度</th>
                     <th className="px-2 py-2.5 font-medium w-[112px]">素材用途</th>
                     <th className="px-2 py-2.5 font-medium w-[92px] text-right">操作</th>
                   </tr>
@@ -105,7 +99,6 @@ export default function BookLibrary() {
                 <tbody>
                   {rows.map((book) => {
                     const pages = pageCount(book)
-                    const progress = readingProgress(book)
                     return (
                       <tr key={book.id} className="border-t border-ink-150/70 hover:bg-white/70 transition">
                         <td className="px-3 py-2.5">
@@ -125,7 +118,6 @@ export default function BookLibrary() {
                         </td>
                         <td className="px-2 py-2.5 text-[12px] text-ink-600 truncate">{text(book.author, '服务端未返回作者')}</td>
                         <td className="px-2 py-2.5 text-[12px] text-ink-600 tabular-nums">{pages === null ? '—' : `${pages} 页`}</td>
-                        <td className="px-2 py-2.5 text-[12px] text-ink-600 tabular-nums">{progress === null ? '—' : `${progress}%`}</td>
                         <td className="px-2 py-2.5 text-[11.5px] text-ink-500 truncate">{text(book.usageLabel, '服务端未返回')}</td>
                         <td className="px-2 py-2.5">
                           <div className="flex items-center justify-end gap-0.5">
@@ -178,7 +170,6 @@ function Cover({ data, compact = false }) {
 
 function BookCard({ data, onOpen, onRead }) {
   const pages = pageCount(data)
-  const progress = readingProgress(data)
   return (
     <GlassCard className="p-3 flex flex-col hover:shadow-e2 transition duration-140">
       <button type="button" onClick={onOpen} className="text-left group">
@@ -195,8 +186,6 @@ function BookCard({ data, onOpen, onRead }) {
         <StatusTag tone="success" dot>已发布</StatusTag>
         <span className="text-[11px] text-ink-400 tabular-nums">{pages === null ? '页数未返回' : `${pages} 页`}</span>
       </div>
-      <p className="text-[11px] text-ink-400 tabular-nums mt-1">{progress === null ? '当前进度未返回' : `当前进度 ${progress}%`}</p>
-
       <div className="mt-2.5 pt-2 border-t border-ink-150/70 flex items-center gap-0.5">
         <IconBtn icon="BookOpen" title="教师阅读器" onClick={onRead} />
         <IconBtn icon="Info" title="书目详情" onClick={onOpen} />

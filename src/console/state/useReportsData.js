@@ -110,14 +110,38 @@ function normalizeSection(section, index) {
   }
 }
 
+const LEGACY_READING_METRIC_KEYS = new Set([
+  'pagesRead',
+  'pageCount',
+  'progress',
+  'progressPercent',
+  'completionPercent',
+  'finished',
+  'finishedBookCount',
+  'startedBookCount',
+])
+
+function isLegacyReadingMetric(metric) {
+  if (!metric || typeof metric !== 'object') return false
+  const key = firstText(metric.key, metric.id, metric.name)
+  if (LEGACY_READING_METRIC_KEYS.has(key)) return true
+  const label = firstText(metric.label, metric.title)
+  return /阅读进度|已读页|页数|读完|完成度|已读书目|开始阅读书目/.test(label)
+}
+
+export function sanitizeReportMetrics(metrics) {
+  return Array.isArray(metrics) ? metrics.filter((metric) => !isLegacyReadingMetric(metric)) : []
+}
+
 function normalizeReport(report, students) {
   const student = normalizeStudent(report.student || students.find((item) => item.id === report.studentId))
   const content = report.content && typeof report.content === 'object' && !Array.isArray(report.content) ? report.content : null
-  const derivedMetrics = content ? [
-    { label: '有效阅读', value: Number(content.effectiveMinutes || 0), unit: '分钟' },
-    { label: '阅读进度', value: Number(content.pagesRead || 0), unit: '页' },
-    { label: '已读书目', value: Number(content.startedBookCount || 0), unit: '本' },
-  ] : []
+  const effectiveMinutes = content && typeof content.effectiveMinutes === 'number' && Number.isFinite(content.effectiveMinutes)
+    ? content.effectiveMinutes
+    : null
+  const derivedMetrics = effectiveMinutes === null
+    ? []
+    : [{ label: '有效阅读', value: effectiveMinutes, unit: '分钟' }]
   const versionNumber = Number(report.versionNumber || report.version_number || 0)
   const derivedVersions = report.versionId ? [{
     v: versionNumber > 0 ? `v${versionNumber}` : '当前版本',
@@ -150,7 +174,7 @@ function normalizeReport(report, students) {
     version: firstText(report.version?.label, report.version, versionNumber > 0 ? `v${versionNumber}` : '', report.currentVersion?.label, report.currentVersion?.id, '——'),
     versionId: firstText(report.versionId, report.current_version_id, report.version?.id, report.currentVersion?.id),
     nextHandler: firstText(report.nextHandler, report.nextActor?.displayName, '待处理'),
-    metrics: Array.isArray(report.metrics) ? report.metrics : derivedMetrics,
+    metrics: Array.isArray(report.metrics) ? sanitizeReportMetrics(report.metrics) : derivedMetrics,
     sections,
     versions: Array.isArray(report.versions) ? report.versions : derivedVersions,
     sendSummary: report.sendSummary || { channel: 'link', scope: 'primary', mode: 'manual', hint: '尚未建立发送任务' },

@@ -50,8 +50,8 @@ test('阅读对象空态来自真实接口结果，不导入 fixture 或 localSt
   assert.doesNotMatch(source, /localStorage|fixture|mock|\.\.\/data\//i)
 })
 
-test('服务端空响应规范化为七个真实空集合', async () => {
-  const { normalizeReadingLibrary } = await loadLibraryHook()
+test('服务端空响应规范化为六个真实空集合，旧足迹不能把空资源变为 ready', async () => {
+  const { hasLibraryData, normalizeReadingLibrary } = await loadLibraryHook()
   assert.deepEqual(normalizeReadingLibrary(null), {
     shelf: [],
     favorites: [],
@@ -59,6 +59,14 @@ test('服务端空响应规范化为七个真实空集合', async () => {
     bookmarks: [],
     excerpts: [],
     annotations: [],
-    footprints: [],
   })
+  assert.deepEqual(normalizeReadingLibrary({ footprints: [{ pageNo: 1, eventType: 'page_stay' }] }), {
+    shelf: [],
+    favorites: [],
+    lists: [],
+    bookmarks: [],
+    excerpts: [],
+    annotations: [],
+  })
+  assert.equal(hasLibraryData({ footprints: [{ pageNo: 1, eventType: 'page_stay' }] }), false)
 })

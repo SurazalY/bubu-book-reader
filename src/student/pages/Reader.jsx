@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import HTMLFlipBook from 'react-pageflip'
 import { cx } from '../../shared/cx.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 import { GlassPanel } from '../components/Glass.jsx'
-import { BookProgress } from '../components/Progress.jsx'
 import BookPage from '../components/BookPage.jsx'
 import {
   NoteComposer,
@@ -22,6 +21,13 @@ import useStudentReaderPages from '../state/useStudentReaderPages.js'
 import useReadingTelemetry from '../state/useReadingTelemetry.js'
 import useReadingLibrary from '../state/useReadingLibrary.js'
 import useClassroomRuntime from '../state/useClassroomRuntime.js'
+import {
+  createStableView,
+  movement as assertMovementSource,
+  readerPageForResolvedLocation,
+  reconcileFlipBootstrap,
+  resolveReaderLocation,
+} from '../reading-monitor/index.js'
 
 const PAGE_DESIGN = Object.freeze({ width: 468, height: 636, padX: 36, padY: 42 })
 const AI_NAME = '竹娃'
@@ -43,23 +49,42 @@ const AI_NAME = '竹娃'
 // 换书时用 key 重挂，页码、托盘与选区都干净重置。
 export default function Reader() {
   const { bookId } = useParams()
+  const location = useLocation()
   const { runtime } = useStudent()
-  const book = runtime.data?.books?.find((item) => item.id === bookId) || null
-  const [pageNo, setPageNo] = useState(1)
-
-  useEffect(() => {
-    const initialPage = book?.progress?.currentPage
-    setPageNo(Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1)
-  }, [book?.id, book?.progress?.currentPage])
+  const resolution = useMemo(() => resolveReaderLocation({
+    pathBookId: bookId,
+    search: location.search,
+    books: runtime.data?.books || [],
+  }), [bookId, location.search, runtime.data?.books])
+  const book = resolution.ok ? resolution.book : null
+  const locationKey = resolution.ok
+    ? `${bookId}:${resolution.bookVersionId}:${location.search}`
+    : null
+  const [savedPosition, setSavedPosition] = useState({ locationKey: null, pageNo: 1 })
+  const pageNo = readerPageForResolvedLocation({ resolution, locationKey, savedPosition })
+  const setPageNo = useCallback((nextPageNo) => {
+    setSavedPosition({ locationKey, pageNo: nextPageNo })
+  }, [locationKey])
 
   const pageResource = useStudentReaderPages(book, pageNo, runtime.data?.workspaceId)
 
-  if (!book) {
-    const loading = runtime.status === 'loading'
-    const error = runtime.status === 'error' ? runtime.error : null
+  if (!resolution.ok) {
+    const loading = runtime.status === 'loading' || runtime.status === 'idle'
+    const error = runtime.status === 'error' ? runtime.error : loading ? null : resolution.error
     return <ReaderMissing loading={loading} error={error} onRetry={runtime.reload} />
   }
-  return <ReaderView key={bookId} book={book} bookId={bookId} pageNo={pageNo} setPageNo={setPageNo} pageResource={pageResource} workspaceId={runtime.data?.workspaceId} />
+  return (
+    <ReaderView
+      key={`${bookId}:${resolution.bookVersionId}:${resolution.pageNo}:${location.search}`}
+      book={book}
+      bookId={bookId}
+      pageNo={pageNo}
+      setPageNo={setPageNo}
+      pageResource={pageResource}
+      workspaceId={runtime.data?.workspaceId}
+      initialMovementSource={resolution.movementSource}
+    />
+  )
 }
 
 function ReaderMissing({ loading = false, error = null, onRetry }) {
@@ -88,9 +113,10 @@ function ReaderMissing({ loading = false, error = null, onRetry }) {
   )
 }
 
-function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId }) {
+function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId, initialMovementSource }) {
   const navigate = useNavigate()
   const {
+    student,
     prefs,
     setPref,
     aiQuotes,
@@ -106,7 +132,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   const step = spread ? 2 : 1
   const loadedPages = pageResource.data?.pages || []
   const totalPages = book.progress?.totalPages || loadedPages.reduce((max, page) => Math.max(max, page.no || 0), 0) || pageNo
-  const pageCount = Math.max(totalPages, pageNo + (spread ? 1 : 0), 1)
+  const pageCount = Math.max(totalPages, pageNo, 1)
   const loadedByNumber = useMemo(() => new Map(loadedPages.map((page) => [page.no, page])), [loadedPages])
   const pageState = pageResource.status === 'loading'
     ? { heading: '正在加载正文', text: `正在向服务端读取第 ${pageNo} 页。` }
@@ -141,7 +167,12 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   }, [book.progress?.currentPage, pageNo, pages, spread])
 
   const [leaf, setLeaf] = useState(initialLeaf)
-  useEffect(() => setLeaf(initialLeaf), [initialLeaf])
+  const latestLeaf = useRef(leaf)
+  latestLeaf.current = leaf
+  const previousSpread = useRef(spread)
+  const initialViewAligned = useRef(false)
+  const pendingFlip = useRef(null)
+  const [movementEvent, setMovementEvent] = useState({ sequence: 0, source: initialMovementSource || 'system_restore' })
   const [chrome, setChrome] = useState(true)
   const [toc, setToc] = useState(false)
   const [pane, setPane] = useState(false) // 阅读偏好小面板
@@ -164,9 +195,30 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
 
   const visible = spread ? [leaf, leaf + 1].filter((i) => i < pages.length) : [leaf]
   const currentPage = pages[leaf]?.no || first
-  const readPage = pages[visible[visible.length - 1]]?.no || currentPage
-  useReadingTelemetry({ bookVersionId: book.versionId, pageNo: readPage, workspaceId })
-  const percent = totalPages ? Math.min(100, Math.round((readPage / totalPages) * 100)) : book.progress?.percent
+  const visiblePageNos = visible.map((index) => pages[index]?.no).filter(Number.isSafeInteger)
+  const stableView = useMemo(() => createStableView({
+    layout: spread ? 'double' : 'single',
+    pageNos: visiblePageNos,
+  }), [spread, visiblePageNos.join(',')])
+  const readPage = stableView.mainPageNo
+  const monitor = useMemo(() => {
+    if (!student?.id || !workspaceId) return null
+    return {
+      scope: {
+        organizationId: student.organizationId || null,
+        studentId: student.id,
+        workspaceId,
+      },
+    }
+  }, [student?.id, student?.organizationId, workspaceId])
+  const telemetry = useReadingTelemetry({
+    bookVersionId: book.versionId,
+    stableView,
+    movementEvent,
+    workspaceId,
+    readerReady: pageResource.status === 'ready' && loadedPages.length > 0,
+    monitor,
+  })
   const session = classroom.data?.mode ? classroom.data : null
   const teacherMarks = Array.isArray(session?.teacherMarks) ? session.teacherMarks : []
   const excerptItems = library.excerpts.filter((item) => item.bookVersionId === book.versionId)
@@ -230,35 +282,74 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   // 页数、尺寸、单双页变化都要给 HTMLFlipBook 换 key，否则库内部状态会错乱（旧站踩过）
   const flipKey = `srd-${bookId}-${pageW}x${pageH}-${spread ? 'd' : 's'}-${prefs.flipStyle}`
   const curl = prefs.flipStyle === 'curl' && !prefs.reduceMotion
+  const flipBootstrap = useRef({ key: null, expectedLeaf: initialLeaf, pending: true })
+  const bindFlipBook = useCallback((instance) => {
+    if (!instance) {
+      flipRef.current = null
+      return
+    }
+    if (flipRef.current !== instance) {
+      flipBootstrap.current = { key: flipKey, expectedLeaf: latestLeaf.current, pending: true }
+    }
+    flipRef.current = instance
+  }, [flipKey])
+
+  const commitLeaf = useCallback((nextLeaf, source) => {
+    assertMovementSource(source)
+    setLeaf(nextLeaf)
+    setPageNo(pages[nextLeaf]?.no || nextLeaf + 1)
+    setMovementEvent((current) => ({ sequence: current.sequence + 1, source }))
+  }, [pages, setPageNo])
+
+  useEffect(() => {
+    if (initialViewAligned.current) return
+    initialViewAligned.current = true
+    const mainPageNo = pages[leaf]?.no || leaf + 1
+    if (pageNo !== mainPageNo) commitLeaf(leaf, initialMovementSource || 'system_restore')
+  }, [commitLeaf, initialMovementSource, leaf, pageNo, pages])
+
+  useEffect(() => {
+    if (previousSpread.current === spread) return
+    previousSpread.current = spread
+    const currentNo = pages[leaf]?.no || pageNo
+    const index = Math.max(0, pages.findIndex((page) => page.no === currentNo))
+    const aligned = spread ? index - (index % 2) : index
+    pendingFlip.current = null
+    commitLeaf(aligned, 'layout_change')
+  }, [commitLeaf, leaf, pageNo, pages, spread])
 
   const goTo = useCallback(
-    (target) => {
+    (target, source) => {
+      assertMovementSource(source)
       const max = pages.length - 1
       let t = Math.max(0, Math.min(max, target))
       if (spread) t -= t % 2
+      if (t === leaf) return
       setSelection(null)
       window.getSelection?.()?.removeAllRanges()
       const api = flipRef.current?.pageFlip?.()
       if (curl && api) {
         try {
+          pendingFlip.current = { target: t, source }
           api.flip(t)
           return
         } catch {
           /* 库内部状态异常时退回直接设页，绝不把学生卡在原地 */
         }
       }
-      setLeaf(t)
-      setPageNo(pages[t]?.no || t + 1)
+      pendingFlip.current = null
+      commitLeaf(t, source)
     },
-    [curl, pages, setPageNo, spread],
+    [commitLeaf, curl, leaf, pages, spread],
   )
 
-  const prev = useCallback(() => goTo(leaf - step), [goTo, leaf, step])
-  const next = useCallback(() => goTo(leaf + step), [goTo, leaf, step])
+  const prev = useCallback(() => goTo(leaf - step, 'student_adjacent'), [goTo, leaf, step])
+  const next = useCallback(() => goTo(leaf + step, 'student_adjacent'), [goTo, leaf, step])
   const goPageNo = useCallback(
-    (no) => {
+    (no, source) => {
+      assertMovementSource(source)
       const idx = pages.findIndex((p) => p.no === Number(no))
-      if (idx >= 0) goTo(idx)
+      if (idx >= 0) goTo(idx, source)
     },
     [goTo, pages],
   )
@@ -271,7 +362,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   // 学生翻走了就在状态条上给一个「回到第 N 页」的按钮（规格只要求全班跟随教师翻页）。
   const syncPage = session?.mode === 'sync' && session.connected ? session.page : null
   useEffect(() => {
-    if (syncPage) goPageNo(syncPage)
+    if (syncPage) goPageNo(syncPage, 'teacher_sync')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncPage])
 
@@ -358,7 +449,8 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     }
     setTray((list) => (list.some((it) => it.text === item.text) ? list : [...list, item]))
     setSelection({ ...sel, key: item.key })
-  }, [])
+    telemetry.confirmInteraction('selection')
+  }, [telemetry])
 
   const { mode } = useReaderGesture(stageRef, {
     onFlipPrev: prev,
@@ -499,6 +591,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         text: selection.text,
         selectionRange: selection.selectionRange,
       }, excerptItems.length))
+      telemetry.confirmInteraction('excerpt')
       flash(`已收藏摘录 · 第 ${pageOfSel(selection)} 页`, 'BookmarkCheck')
       clearSel(true)
     } catch (error) {
@@ -541,6 +634,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
           selectionRange: item.selectionRange,
         }, excerptItems.length + index))
       }
+      telemetry.confirmInteraction('excerpt')
       flash(`已收藏 ${tray.length} 条摘录`, 'BookmarkCheck')
       setTray([])
       clearSel(false)
@@ -564,6 +658,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         const input = writingInput(item, annotationItems.length + index)
         await library.createAnnotation({ ...input, body: text, color: 'violet' })
       }
+      telemetry.confirmInteraction('annotation')
       flash(`已保存 ${noteDraft.items.length} 条批注`, 'PenLine')
       setNoteDraft(null)
       setSelection(null)
@@ -600,6 +695,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
               })
               flash(`已添加第 ${no} 页书签`, 'BookmarkCheck')
             }
+            telemetry.confirmInteraction('bookmark')
           } catch (error) {
             flash(error?.message || '书签没有保存成功，请稍后重试。', 'CloudOff')
           }
@@ -627,7 +723,10 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
       <header className={cx('student-reader-bar', !chrome && 'student-reader-bar--off')}>
         <button
           type="button"
-          onClick={() => navigate(`/student/books/${bookId}`)}
+          onClick={async () => {
+            await telemetry.closeAndWait('reader_close')
+            navigate(`/student/books/${bookId}`)
+          }}
           className="student-reader-btn"
           title="回到书籍详情"
         >
@@ -650,6 +749,13 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
             <Icon name="RotateCcw" className="h-4 w-4" />
             重试正文
           </button>
+        )}
+
+        {telemetry.error && (
+          <span className="student-reader-chip" role="alert" title={telemetry.error.message}>
+            <Icon name="CloudOff" className="h-3.5 w-3.5" />
+            {telemetry.error.code || '阅读记录待重试'}
+          </span>
         )}
 
         <span
@@ -698,10 +804,10 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
           session={session}
           teacherMark={session.mode === 'sync' ? teacherMarks.find((mark) => mark.page === session.page) : null}
           offPage={session.mode === 'sync' && !visible.some((i) => pages[i]?.no === session.page)}
-          onBackToSyncPage={() => goPageNo(session.page)}
+          onBackToSyncPage={() => goPageNo(session.page, 'teacher_sync')}
           hasBroadcast={!!session.broadcast && !aiOpen}
           onOpenBroadcast={() => setAiOpen(true)}
-          onJumpMark={(no) => goPageNo(no)}
+          onJumpMark={(no) => goPageNo(no, 'student_jump')}
           onDismiss={() => setClassHidden(true)}
         />
       )}
@@ -713,7 +819,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
             <div className="student-flip-shell" style={{ width: spread ? pageW * 2 : pageW, height: pageH }}>
               <HTMLFlipBook
                 key={flipKey}
-                ref={flipRef}
+                ref={bindFlipBook}
                 className="student-flip"
                 width={pageW}
                 height={pageH}
@@ -732,11 +838,34 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
                 // 这是「翻页与长按选文不互相误触」的关键（§15.2 验收点）
                 useMouseEvents={false}
                 showCover={false}
-                startPage={initialLeaf}
+                startPage={leaf}
+                onInit={() => {
+                  const bootstrap = flipBootstrap.current
+                  const api = flipRef.current?.pageFlip?.()
+                  if (api && api.getCurrentPageIndex() !== bootstrap.expectedLeaf) {
+                    api.turnToPage(bootstrap.expectedLeaf)
+                  }
+                  bootstrap.pending = false
+                }}
                 onFlip={(e) => {
                   const nextLeaf = e?.data ?? 0
-                  setLeaf(nextLeaf)
-                  setPageNo(pages[nextLeaf]?.no || nextLeaf + 1)
+                  const bootstrap = flipBootstrap.current
+                  const decision = reconcileFlipBootstrap({
+                    expectedLeaf: bootstrap.expectedLeaf,
+                    reportedLeaf: nextLeaf,
+                    pending: bootstrap.pending,
+                  })
+                  if (!decision.accept) {
+                    const api = flipRef.current?.pageFlip?.()
+                    if (api && api.getCurrentPageIndex() !== decision.correctionLeaf) {
+                      api.turnToPage(decision.correctionLeaf)
+                    }
+                    return
+                  }
+                  bootstrap.pending = decision.pending
+                  const pending = pendingFlip.current
+                  pendingFlip.current = null
+                  commitLeaf(nextLeaf, pending?.target === nextLeaf ? pending.source : 'system_restore')
                 }}
               >
                 {pages.map((p, i) => renderPage(i, visible.includes(i)))}
@@ -790,7 +919,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
       <div className={cx('student-tray-slot', !chrome && 'student-tray-slot--low')}>
         <SelectionTray
           items={tray}
-          onJump={(no) => goPageNo(no)}
+          onJump={(no) => goPageNo(no, 'student_jump')}
           onRemove={(key) => {
             setTray((list) => list.filter((it) => it.key !== key))
             if (selection?.key === key) setSelection(null)
@@ -805,21 +934,15 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         />
       </div>
 
-      {/* 底栏：进度、页码、跳页、上次位置 */}
+      {/* 底栏只表达当前位置，不把最后停留页解释为完成度。 */}
       <footer className={cx('student-reader-foot', !chrome && 'student-reader-foot--off')}>
         <button type="button" onClick={prev} disabled={!canPrev} className="student-reader-btn">
           <Icon name="ChevronLeft" className="h-4 w-4" />
           上一页
         </button>
 
-        <div className="min-w-0 flex-1">
-          <BookProgress
-            percent={percent}
-            page={readPage}
-            totalPages={totalPages}
-            bookmarks={bookmarks.map((page) => ({ at: totalPages ? (page / totalPages) * 100 : 0, page }))}
-            size="sm"
-          />
+        <div className="min-w-0 flex-1 text-center text-caption font-semibold tabular-nums text-ink-600" aria-live="polite">
+          第 {readPage} 页 / 共 {totalPages} 页
         </div>
 
         <form
@@ -828,7 +951,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
             e.preventDefault()
             const no = Number(jump)
             if (no >= first && no <= last) {
-              goPageNo(no)
+              goPageNo(no, 'student_jump')
               setJump('')
             } else {
               flash(`服务端页码范围为第 ${first}–${last} 页`, 'Info')
@@ -855,7 +978,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         {/* 只在「上次读到的那一页不在眼前」时才提示回跳，
             否则正摊开着它还叫你回去，很奇怪 */}
         {book.progress?.currentPage > 0 && !visible.some((i) => pages[i]?.no === book.progress.currentPage) && pages.some((page) => page.no === book.progress.currentPage) && (
-          <button type="button" onClick={() => goPageNo(book.progress.currentPage)} className="student-reader-btn" title="回到上次读到的位置">
+          <button type="button" onClick={() => goPageNo(book.progress.currentPage, 'restore_position')} className="student-reader-btn" title="回到上次读到的位置">
             <Icon name="RotateCcw" className="h-4 w-4" />
             上次第 {book.progress.currentPage} 页
           </button>
@@ -875,7 +998,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
           bookmarks={bookmarks}
           marks={marksAll}
           onGo={(no) => {
-            goPageNo(no)
+            goPageNo(no, 'student_jump')
             setToc(false)
           }}
           onClose={() => setToc(false)}
@@ -892,12 +1015,13 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         blocker={blocker}
         safeMode={safeMode}
         classroom={session}
+        onConfirmedInteraction={() => telemetry.confirmInteraction('ai_submit')}
         onJumpPage={(no) => {
           if (!pages.some((page) => page.no === Number(no))) {
             flash(`服务端页码范围为第 ${first}–${last} 页`, 'Info')
             return
           }
-          goPageNo(no)
+          goPageNo(no, 'student_jump')
         }}
       />
 

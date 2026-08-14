@@ -4,6 +4,7 @@ export function createConsoleApi(client = createApiClient()) {
   return {
     getSession: (options = {}) => client.get('/session', options),
     listWorkspaces: (options = {}) => client.get('/workspaces', { ...options, query: { limit: 100, ...(options.query || {}) } }),
+    listStudents: (options = {}) => client.get('/students', { ...options, query: { limit: 100, ...(options.query || {}) } }),
     getUsageSummary: (options = {}) => client.get('/usage/summary', options),
     listBooks: (options = {}) => client.get('/books', { ...options, query: { limit: 100, ...(options.query || {}) } }),
     listAssignments: (options = {}) => client.get('/assignments', { ...options, query: { limit: 20, ...(options.query || {}) } }),
@@ -29,6 +30,10 @@ export function createConsoleApi(client = createApiClient()) {
     closeSafetyEvent: (eventId, body, options = {}) =>
       client.post(`/safety/events/${encodeURIComponent(eventId)}/close`, { ...options, body }),
     listAuditEvents: (options = {}) => client.get('/audit/events', options),
+    getReadingStatisticsScope: (input = {}, options = {}) => client.get('/reading/statistics/scope', {
+      ...options,
+      query: { classId: input.classId, statDate: input.statDate },
+    }),
     listCommunityPosts: (options = {}) => client.get('/community/posts', { ...options, query: { limit: 100, ...(options.query || {}) } }),
     reviewCommunityPost: (postId, body, options = {}) =>
       client.post(`/community/posts/${encodeURIComponent(postId)}/review`, { ...options, body }),

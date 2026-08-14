@@ -15,6 +15,7 @@
     "seed:identity": "node server/db/import-seed.js",
     "import:catalog": "node server/db/import-public-domain-catalog.js",
     "bootstrap:internal": "node server/db/bootstrap-internal-demo.js",
+    "maintenance:reading-monitor-cleanup": "node server/scripts/reading-monitor-cleanup.js",
     "test:frontend": "node --test tests/frontend/*.mjs",
     "test:server": "node --test tests/server/**/*.test.js"
   },

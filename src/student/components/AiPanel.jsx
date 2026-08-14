@@ -19,7 +19,7 @@ const AI_NAME = '竹娃'
 //   2. 额度只显示剩余提问次数、用量百分比与恢复时间，不出现 Token、价格与费用（红线 9）。
 //   3. 任何异常态下仍然能继续阅读、翻历史对话、批注与加书签，面板不会把人锁死（§7.4）。
 
-export default function AiPanel({ open, onClose, book, bookId, currentPageNo, blocker, safeMode, onJumpPage, classroom }) {
+export default function AiPanel({ open, onClose, book, bookId, currentPageNo, blocker, safeMode, onJumpPage, onConfirmedInteraction, classroom }) {
   const { student, aiQuotes, clearAiQuotes, removeAiQuote, ai } = useStudent()
   const [draft, setDraft] = useState('')
   const [historyOpen, setHistoryOpen] = useState(false)
@@ -55,6 +55,7 @@ export default function AiPanel({ open, onClose, book, bookId, currentPageNo, bl
       safe: safeMode,
       visible: true,
     })
+    onConfirmedInteraction?.()
     setDraft('')
     clearAiQuotes()
   }

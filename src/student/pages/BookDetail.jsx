@@ -1,14 +1,15 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BookCover, cx, GenreTag, Icon } from '../../components/ui.jsx'
+import { buildStudentReaderUrl } from '../../api/student.js'
 import { GlassCard, GlassPanel } from '../components/Glass.jsx'
-import { BookProgress } from '../components/Progress.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 import useReadingLibrary from '../state/useReadingLibrary.js'
 import { useStudentCommunity } from '../community/CommunityRuntimeContext.jsx'
 
 function formatMinutes(value, { zero = '0 分钟' } = {}) {
-  const minutes = Math.round(Number(value) || 0)
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null
+  const minutes = Math.round(value)
   if (minutes <= 0) return zero
   return minutes < 60 ? `${minutes} 分钟` : `${Math.floor(minutes / 60)} 小时 ${minutes % 60} 分钟`
 }
@@ -25,15 +26,13 @@ function toDetailBook(raw, { grade, library }) {
     genre: raw.genre || '阅读书目',
     grade: raw.grade || grade || '当前年级',
     subject: raw.subject || '整本书阅读',
-    blurb: raw.blurb || raw.description || '书籍资料与阅读进度由服务端真实书目和阅读事件返回。',
-    page: progress.currentPage || 0,
-    totalPages: progress.totalPages || 0,
-    percent: progress.percent || 0,
-    minutes: progress.effectiveMinutes || 0,
+    blurb: raw.blurb || raw.description || '书籍资料由服务端真实书目返回。',
+    page: Number.isSafeInteger(progress.currentPage) ? progress.currentPage : null,
+    totalPages: Number.isSafeInteger(progress.totalPages) ? progress.totalPages : null,
+    minutes: Number.isFinite(progress.effectiveMinutes) ? progress.effectiveMinutes : null,
     bookmarks: bookmarks.map((item) => item.pageNo).filter(Number.isFinite),
     highlights: excerpts.length,
     notes: annotations.length,
-    lastReadAt: progress.progressUpdatedAt || '',
     classReading: classroom
       ? {
           state: classroom.mode === 'ended' ? 'history' : 'current',
@@ -49,8 +48,7 @@ function toDetailBook(raw, { grade, library }) {
 }
 
 // 书籍详情（规格 §5.4）：所有书都先进这里，再由学生点「开始阅读」或「继续阅读」。
-// 四块内容：书籍资料 / 自己的阅读情况 / 班级共读安排 / 相关社区轻量入口。
-// 班级共读要把「教师当前建议读到的位置」和「学生实际进度」分开显示，不混成一条。
+// 最近页码只用于恢复位置；不换算完成百分比，也不与教师建议位置比较。
 export default function BookDetail() {
   const { bookId } = useParams()
   const navigate = useNavigate()
@@ -93,8 +91,15 @@ export default function BookDetail() {
   const cls = book.classReading
   // 直接读社区那一份帖子（Stage 5）：详情页列的就是社区里真实存在的内容，点进去必然是同一篇
   const posts = community.getBookPosts(book.id)
-  const started = book.minutes > 0
-  const teacherPercent = cls ? Math.round((cls.teacherPage / book.totalPages) * 100) : 0
+  const hasPosition = Number.isSafeInteger(book.page)
+  const readerUrl = hasPosition && book.versionId
+    ? buildStudentReaderUrl({
+        bookId: book.id,
+        bookVersionId: book.versionId,
+        lastPageNo: book.page,
+        totalPages: book.totalPages,
+      })
+    : `/student/reader/${encodeURIComponent(book.id)}`
 
   return (
     <div className="flex-1 space-y-4">
@@ -126,15 +131,15 @@ export default function BookDetail() {
             {/* 按钮底色是低饱和淡蓝淡紫渐变，白字对比度不够（第一轮自检的返工点），
                 所以文字用深墨色 */}
             <Link
-              to={`/student/reader/${book.id}`}
+              to={readerUrl}
               className="student-primary-btn mt-4 flex w-full items-center justify-center gap-2 rounded-full py-3 text-title font-semibold text-ink-900"
             >
-              <Icon name={started ? 'BookOpen' : 'Play'} className="h-[18px] w-[18px]" strokeWidth={2.1} />
-              {started ? '继续阅读' : '开始阅读'}
+              <Icon name="BookOpen" className="h-[18px] w-[18px]" strokeWidth={2.1} />
+              打开阅读器
             </Link>
-            {started && (
+            {hasPosition && (
               <p className="mt-2 text-center text-micro text-ink-500 tabular-nums">
-                上次读到第 {book.page} 页 · {book.lastReadAt}
+                上次位置：第 {book.page} 页
               </p>
             )}
             <button
@@ -167,29 +172,23 @@ export default function BookDetail() {
                 {book.subject}
               </span>
               <span className="rounded-full bg-white/70 px-2.5 py-1 text-micro text-ink-500 tabular-nums">
-                共 {book.totalPages} 页
+                {book.totalPages ? `全书 ${book.totalPages} 页` : '总页数未返回'}
               </span>
             </div>
             <p className="mt-4 text-base leading-relaxed text-ink-600">{book.blurb}</p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <GlassCard className="p-4">
-                <p className="text-micro text-ink-500">我的进度</p>
-                <BookProgress
-                  className="mt-2.5"
-                  percent={book.percent}
-                  page={book.page}
-                  totalPages={book.totalPages}
-                  bookmarks={book.bookmarks}
-                  size="lg"
-                />
+                <p className="text-micro text-ink-500">最近阅读位置</p>
+                <p className="mt-1.5 text-h2 font-bold text-ink-900 tabular-nums">
+                  {hasPosition ? `第 ${book.page} 页` : '暂无记录'}
+                </p>
+                <p className="mt-1 text-micro text-ink-400">页码只用于下次继续打开，不表示完成度。</p>
               </GlassCard>
               <GlassCard className="p-4">
                 <p className="text-micro text-ink-500">有效阅读时间</p>
-                {/* 未读的书这里写「0 分钟」，不再重复一句「尚未开始」
-                    （左边进度卡已经说了尚未开始阅读，第二轮自检的返工点）*/}
                 <p className="mt-1.5 text-h2 font-bold text-ink-900 tabular-nums">
-                  {formatMinutes(book.minutes, { zero: '0 分钟' })}
+                  {formatMinutes(book.minutes, { zero: '0 分钟' }) || '暂未返回'}
                 </p>
                 <p className="mt-1 text-micro text-ink-400">只统计真实翻页与停留，打开书不计入。</p>
               </GlassCard>
@@ -223,7 +222,7 @@ export default function BookDetail() {
         </div>
       </GlassPanel>
 
-      {/* 班级共读：教师建议位置与学生实际进度分开显示 */}
+      {/* 教师建议位置与学生最近位置都是事实，不换算比例或推断差距。 */}
       {cls && (
         <GlassPanel tone="card" className="student-enter rounded-2xl p-5">
           <div className="flex flex-wrap items-center gap-2.5">
@@ -250,36 +249,21 @@ export default function BookDetail() {
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
             <div className="rounded-xl bg-white/60 px-4 py-3.5">
               <p className="flex items-center justify-between text-micro text-ink-500">
-                <span>老师建议读到</span>
+                <span>老师建议位置</span>
                 <span className="font-semibold text-ink-700 tabular-nums">
-                  第 {cls.teacherPage} 页 · {teacherPercent}%
+                  {cls.teacherPage ? `第 ${cls.teacherPage} 页` : '暂未指定'}
                 </span>
               </p>
-              <div className="student-teacher-track mt-2 h-2 w-full rounded-full">
-                <div className="student-teacher-fill h-full rounded-full" style={{ width: `${teacherPercent}%` }} />
-              </div>
+              <p className="mt-2 text-micro text-ink-500">这是课堂安排的位置提示，不代表个人完成情况。</p>
             </div>
             <div className="rounded-xl bg-white/60 px-4 py-3.5">
               <p className="flex items-center justify-between text-micro text-ink-500">
-                <span>我实际读到</span>
+                <span>我的最近位置</span>
                 <span className="font-semibold text-ink-700 tabular-nums">
-                  {book.page ? `第 ${book.page} 页 · ${book.percent}%` : '还没开始'}
+                  {hasPosition ? `第 ${book.page} 页` : '暂无记录'}
                 </span>
               </p>
-              <BookProgress
-                className="mt-2"
-                percent={book.percent}
-                page={book.page}
-                totalPages={book.totalPages}
-                bookmarks={book.bookmarks}
-                size="md"
-                showText={false}
-              />
-              <p className="mt-2 text-micro text-ink-500">
-                {book.page >= cls.teacherPage
-                  ? '已经跟上老师的进度了。'
-                  : `离老师建议的位置还有 ${cls.teacherPage - book.page} 页。`}
-              </p>
+              <p className="mt-2 text-micro text-ink-500">继续阅读会从服务端保存的这一位置打开。</p>
             </div>
           </div>
 

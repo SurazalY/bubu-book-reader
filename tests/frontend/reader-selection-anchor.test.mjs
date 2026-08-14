@@ -15,7 +15,7 @@ test('reader quote text and offsets share the same raw DOM source', () => {
   assert.doesNotMatch(gestureSource, /before(?:Start|End)\.toString\(\)\.length/)
 })
 
-test('reading footprint renders a real day unit instead of an undefined DTO field', () => {
-  assert.match(footprintSource, /value={`\$\{data\.days\} 天`}/)
+test('reading footprint renders the strict streak day unit instead of an undefined DTO field', () => {
+  assert.match(footprintSource, /`\$\{data\.streakDays\} 天`/)
   assert.doesNotMatch(footprintSource, /data\.unit/)
 })

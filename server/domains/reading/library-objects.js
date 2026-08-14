@@ -317,7 +317,7 @@ export function createStudentLibraryDomain(dependencies = {}) {
     const scope = await authorizeScope()
     const shelf = all(context.db, `SELECT
         book.id AS book_id, book.title, version.id AS book_version_id, version.page_count,
-        progress.last_page_no, progress.valid_reading_seconds, progress.updated_from_event_at,
+        progress.last_page_no, progress.updated_from_event_at,
         favorite.id AS favorite_id, favorite.version AS favorite_version,
         (SELECT GROUP_CONCAT(assignment.id, char(31)) FROM reading_assignments assignment
           WHERE assignment.organization_id_at_creation = :organizationId
@@ -353,8 +353,7 @@ export function createStudentLibraryDomain(dependencies = {}) {
       favorite: row.favorite_id ? { id: row.favorite_id, version: row.favorite_version } : null,
       arrangementIds: row.arrangement_ids ? row.arrangement_ids.split(String.fromCharCode(31)) : [],
       progress: {
-        lastPageNo: row.last_page_no ?? 1,
-        validReadingSeconds: row.valid_reading_seconds ?? 0,
+        lastPageNo: row.last_page_no ?? null,
         updatedFromEventAt: row.updated_from_event_at ?? null,
       },
     }))
@@ -382,29 +381,7 @@ export function createStudentLibraryDomain(dependencies = {}) {
       ORDER BY object.position, object.updated_at DESC, object.id`, scope).map(mapExcerpt)
     const annotations = all(context.db, `${objectSelect('student_annotations')}
       ORDER BY object.position, object.updated_at DESC, object.id`, scope).map(mapAnnotation)
-    const footprints = all(context.db, `SELECT event.id AS event_id, event.book_version_id, version.book_id,
-        book.title, event.page_no, event.event_type, event.client_occurred_at,
-        event.valid_reading_seconds, event.valid_eye_seconds
-      FROM reading_events event
-      JOIN book_versions version ON version.id = event.book_version_id
-        AND version.organization_id_at_creation = event.organization_id_at_creation
-      JOIN books book ON book.id = version.book_id
-        AND book.organization_id_at_creation = event.organization_id_at_creation
-      WHERE event.organization_id_at_creation = :organizationId
-        AND event.workspace_id_at_creation = :workspaceId
-        AND event.actor_id_at_creation = :actorId
-      ORDER BY event.client_occurred_at DESC, event.id DESC LIMIT 200`, scope).map((row) => ({
-      eventId: row.event_id,
-      bookId: row.book_id,
-      bookVersionId: row.book_version_id,
-      title: row.title,
-      pageNo: row.page_no,
-      eventType: row.event_type,
-      occurredAt: row.client_occurred_at,
-      validReadingSeconds: row.valid_reading_seconds,
-      validEyeSeconds: row.valid_eye_seconds,
-    }))
-    return { shelf, favorites, lists, bookmarks, excerpts, annotations, footprints }
+    return { shelf, favorites, lists, bookmarks, excerpts, annotations }
   }
 
   async function createFavorite(input) {

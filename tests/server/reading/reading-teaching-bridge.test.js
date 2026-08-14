@@ -7,6 +7,7 @@ import test from 'node:test'
 import { DatabaseSync } from 'node:sqlite'
 import { createSchoolbagBridge, createSchoolbagSimulator } from '../../../server/domains/bridge/schoolbag.js'
 import { createReadingDomain, shanghaiWindowStart } from '../../../server/domains/reading/catalog.js'
+import { createReadingMonitoringDomain } from '../../../server/domains/reading/monitoring.js'
 import { transaction } from '../../../server/domains/reading/sql.js'
 import { createTeachingDomain } from '../../../server/domains/teaching/classroom.js'
 
@@ -132,7 +133,16 @@ test('书籍坐标、设备租约和离线阅读事件真实持久化且幂等',
   const replay = await reading.ingestEventsBatch({ events })
   assert.deepEqual(first, { accepted: events.map((event) => event.id), replayed: [] })
   assert.deepEqual(replay, { accepted: [], replayed: events.map((event) => event.id) })
-  assert.equal(fixture.db.prepare('SELECT valid_reading_seconds FROM reading_progress').get().valid_reading_seconds, 120)
+  assert.deepEqual(
+    fixture.db.prepare(`SELECT valid_reading_seconds, valid_eye_seconds FROM reading_events
+      ORDER BY offline_sequence`).all().map((row) => ({ ...row })),
+    [
+      { valid_reading_seconds: 0, valid_eye_seconds: 60 },
+      { valid_reading_seconds: 0, valid_eye_seconds: 60 },
+      { valid_reading_seconds: 0, valid_eye_seconds: 0 },
+    ],
+  )
+  assert.equal(fixture.db.prepare('SELECT COUNT(*) AS count FROM reading_progress').get().count, 0)
   const eyeCare = await reading.getEyeCareStatus()
   assert.equal(eyeCare.dailyValidEyeSeconds, 60)
   assert.equal(eyeCare.continuousEyeSeconds, 120)
@@ -193,24 +203,29 @@ test('真实书目资产同事务登记、校验并按组织范围提供查询�
   assert.equal(fixture.db.prepare("SELECT COUNT(*) AS count FROM book_assets WHERE book_version_id = 'half-version'").get().count, 0)
 })
 
-test('离线事件按时间并集重算，乱序上传不改变最新页且冲突不静默重放', async (t) => {
+test('离线事件按时间并集重算护眼，乱序上传不写阅读进度且冲突不静默重放', async (t) => {
   const fixture = createFixture()
   t.after(() => fixture.close())
   fixture.setNow('2026-08-04T20:00:00.000Z')
   const book = await createPublishedBook(fixture)
-  await book.reading.acquireLease({ deviceId: 'tablet-a', bookVersionId: book.versionId, ttlSeconds: 300 })
+  const lease = await book.reading.acquireLease({ deviceId: 'tablet-a', bookVersionId: book.versionId })
+  fixture.setNow('2026-08-04T20:01:00.000Z')
+  const monitoring = createReadingMonitoringDomain(fixture.dependencies)
+  await monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'tablet-a',
+    body: { schemaVersion: 1, bookVersionId: book.versionId },
+  })
   fixture.setNow('2026-08-04T20:20:00.000Z')
   const events = [
-    { id: 'latest-small-page', schemaVersion: 1, deviceId: 'tablet-a', bookVersionId: book.versionId, pageNo: 2, eventType: 'page_stay', clientOccurredAt: '2026-08-04T20:10:00.000Z', foreground: true, screenOn: true, offlineSequence: 3, durationMs: 60000, classSessionId: null, payload: {} },
+    { id: 'latest-small-page', schemaVersion: 1, deviceId: 'tablet-a', bookVersionId: book.versionId, pageNo: 2, eventType: 'page_stay', clientOccurredAt: '2026-08-04T20:02:00.000Z', foreground: true, screenOn: true, offlineSequence: 3, durationMs: 60000, classSessionId: null, payload: {} },
     { id: 'overlap-later', schemaVersion: 1, deviceId: 'tablet-a', bookVersionId: book.versionId, pageNo: 9, eventType: 'page_stay', clientOccurredAt: '2026-08-04T20:00:30.000Z', foreground: true, screenOn: true, offlineSequence: 2, durationMs: 60000, classSessionId: null, payload: {} },
     { id: 'overlap-earlier', schemaVersion: 1, deviceId: 'tablet-a', bookVersionId: book.versionId, pageNo: 8, eventType: 'page_stay', clientOccurredAt: '2026-08-04T20:00:00.000Z', foreground: true, screenOn: true, offlineSequence: 1, durationMs: 60000, classSessionId: null, payload: {} },
   ]
   await book.reading.ingestEventsBatch({ events })
-  const progress = fixture.db.prepare(`SELECT * FROM reading_progress
-    WHERE actor_id = 'student-1' AND workspace_id = 'class-1' AND book_version_id = ?`).get(book.versionId)
-  assert.equal(progress.valid_reading_seconds, 150)
-  assert.equal(progress.last_page_no, 2)
-  assert.equal(progress.updated_from_event_at, '2026-08-04T20:10:00.000Z')
+  assert.equal(fixture.db.prepare('SELECT COUNT(*) AS count FROM reading_events WHERE valid_reading_seconds = 0').get().count, 3)
+  assert.equal(fixture.db.prepare(`SELECT COUNT(*) AS count FROM reading_progress
+    WHERE actor_id = 'student-1' AND workspace_id = 'class-1' AND book_version_id = ?`).get(book.versionId).count, 0)
   assert.equal((await book.reading.getEyeCareStatus()).dailyValidEyeSeconds, 150)
   assert.deepEqual(await book.reading.ingestEventsBatch({ events: [events[0]] }), { accepted: [], replayed: ['latest-small-page'] })
 

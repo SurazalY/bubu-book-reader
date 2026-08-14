@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
@@ -100,7 +100,7 @@ function createFixture() {
   }
 }
 
-test('喜欢、书单、书签、摘录、批注和真实足迹同域持久化', async (t) => {
+test('喜欢、书单、书签、摘录和批注同域持久化，旧事件不作为页面证据返回', async (t) => {
   const fixture = createFixture()
   t.after(() => fixture.close())
   const { createStudentLibraryDomain } = await loadDomain()
@@ -120,14 +120,18 @@ test('喜欢、书单、书签、摘录、批注和真实足迹同域持久化',
 
   assert.equal(snapshot.shelf.length, 1)
   assert.equal(snapshot.shelf[0].bookVersionId, 'version-a')
-  assert.equal(snapshot.shelf[0].progress.validReadingSeconds, 45)
+  assert.equal(snapshot.shelf[0].progress.lastPageNo, 1)
+  assert.equal(Object.hasOwn(snapshot.shelf[0].progress, 'validReadingSeconds'), false)
   assert.deepEqual(snapshot.shelf[0].arrangementIds, ['assignment-a'])
   assert.deepEqual(snapshot.favorites.map((item) => item.id), [favorite.id])
   assert.equal(snapshot.lists[0].items[0].id, listItem.id)
   assert.equal(snapshot.bookmarks[0].id, bookmark.id)
   assert.equal(snapshot.excerpts[0].id, excerpt.id)
   assert.equal(snapshot.annotations[0].id, annotation.id)
-  assert.deepEqual(snapshot.footprints.map((item) => item.eventId), ['event-a'])
+  assert.equal(Object.hasOwn(snapshot, 'footprints'), false)
+  const source = readFileSync(new URL('../../../server/domains/reading/library-objects.js', import.meta.url), 'utf8')
+  assert.doesNotMatch(source, /\breading_events\b|\bfootprints\b/)
+  assert.equal(fixture.db.prepare("SELECT valid_eye_seconds FROM reading_events WHERE id = 'event-a'").get().valid_eye_seconds, 45)
   assert.equal(fixture.db.prepare('SELECT COUNT(*) AS count FROM audit_events').get().count, 6)
 })
 
@@ -234,7 +238,7 @@ test('排序修改删除要求当前版本与当前租户归属', async (t) => {
   assert.equal(fixture.db.prepare('SELECT COUNT(*) AS count FROM student_reading_lists WHERE id = ?').get(second.id).count, 0)
 })
 
-test('审计写入失败会回滚领域写入，跨组织足迹不会泄露', async (t) => {
+test('审计写入失败会回滚领域写入，跨组织数据不会泄露', async (t) => {
   const fixture = createFixture()
   t.after(() => fixture.close())
   const { createStudentLibraryDomain } = await loadDomain()
@@ -251,6 +255,6 @@ test('审计写入失败会回滚领域写入，跨组织足迹不会泄露', as
     workspace: { id: 'workspace-b', organizationId: 'org-b' },
   })
   const otherSnapshot = await otherTenant.getSnapshot()
-  assert.equal(otherSnapshot.footprints.length, 0)
+  assert.equal(Object.hasOwn(otherSnapshot, 'footprints'), false)
   assert.equal(otherSnapshot.shelf[0].bookVersionId, 'version-b')
 })

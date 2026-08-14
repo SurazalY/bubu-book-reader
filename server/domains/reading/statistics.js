@@ -1,7 +1,18 @@
-const ACTIVE_EVENT_TYPES = new Set([
-  'page_stay', 'page_turn', 'selection', 'bookmark', 'annotation', 'ai_question', 'class_sync',
+import {
+  addStatDates,
+  readingStatDateFor,
+  readingStatDateStart,
+} from './monitoring.js'
+
+const CHECK_IN_MS = 300_000
+const SCOPE_ROLE_CODES = new Set([
+  'teacher',
+  'class_teacher',
+  'grade_manager',
+  'grade_group',
+  'grade_admin',
+  'school_admin',
 ])
-const MAX_EVENT_SECONDS = 120
 
 function domainError(code, message) {
   const error = new Error(message)
@@ -9,10 +20,15 @@ function domainError(code, message) {
   return error
 }
 
+function validationError(message, details) {
+  const error = new TypeError(message)
+  error.code = 'VALIDATION_FAILED'
+  if (details !== undefined) error.details = details
+  return error
+}
+
 function requiredText(value, name) {
-  if (typeof value !== 'string' || !value.trim()) {
-    throw domainError('VALIDATION_FAILED', `${name} 不能为空`)
-  }
+  if (typeof value !== 'string' || value.trim() === '') throw validationError(`${name} 不能为空`)
   return value.trim()
 }
 
@@ -23,23 +39,110 @@ function requireDatabase(database) {
   return database
 }
 
-function normalizeDate(value, name) {
-  const date = value instanceof Date ? value : new Date(value)
-  if (Number.isNaN(date.getTime())) throw domainError('VALIDATION_FAILED', `${name} 必须是有效时间`)
-  return date
+function exactStatDate(value, name = 'statDate') {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    throw validationError(`${name} 格式无效`)
+  }
+  const parsed = new Date(`${value}T00:00:00.000Z`)
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) {
+    throw validationError(`${name} 必须是有效日期`)
+  }
+  return value
 }
 
-function windowStart(value, kind) {
-  const date = normalizeDate(value, '统计时间')
-  const shifted = new Date(date.getTime() + 4 * 60 * 60 * 1000)
-  if (kind === 'week') {
-    const day = shifted.getUTCDay() || 7
-    shifted.setUTCDate(shifted.getUTCDate() - day + 1)
+function safeDuration(value, name = 'effectiveReadingMs') {
+  if (!Number.isSafeInteger(value) || value < 0) throw validationError(`${name} 必须是非负安全整数`)
+  return value
+}
+
+export function isReadingCheckIn(effectiveReadingMs) {
+  return safeDuration(effectiveReadingMs) >= CHECK_IN_MS
+}
+
+export function readingComparisonState(todayEffectiveMs, lastWeekTotalMs) {
+  const today = safeDuration(todayEffectiveMs, 'todayEffectiveMs')
+  const baseline = safeDuration(lastWeekTotalMs, 'lastWeekTotalMs')
+  if (baseline === 0) return 'no_baseline'
+  const scaledToday = BigInt(today) * 70n
+  const scaledBaseline = BigInt(baseline)
+  if (scaledToday < scaledBaseline * 9n) return 'growth_space'
+  if (scaledToday > scaledBaseline * 11n) return 'more'
+  return 'close'
+}
+
+export function readingSevenStatDates(statDate) {
+  const normalized = exactStatDate(statDate)
+  return Array.from({ length: 7 }, (_, index) => addStatDates(normalized, index - 6))
+}
+
+export function readingLastCompleteWeekDates(statDate) {
+  const normalized = exactStatDate(statDate)
+  const weekday = new Date(`${normalized}T00:00:00.000Z`).getUTCDay() || 7
+  const previousMonday = addStatDates(normalized, -(weekday + 6))
+  return Array.from({ length: 7 }, (_, index) => addStatDates(previousMonday, index))
+}
+
+function totalMap(rows) {
+  const totals = new Map()
+  for (const row of rows) {
+    const statDate = exactStatDate(row.statDate ?? row.stat_date)
+    const value = safeDuration(
+      Number(row.effectiveReadingMs ?? row.effective_reading_ms ?? 0),
+      'daily effectiveReadingMs',
+    )
+    const next = (totals.get(statDate) || 0) + value
+    if (!Number.isSafeInteger(next)) throw validationError('每日累计超过安全整数范围')
+    totals.set(statDate, next)
   }
-  const localStart = Date.UTC(
-    shifted.getUTCFullYear(), shifted.getUTCMonth(), shifted.getUTCDate(), 4, 0, 0, 0,
-  )
-  return new Date(localStart - 8 * 60 * 60 * 1000)
+  return totals
+}
+
+export function readingStreakDays(rows, statDate) {
+  const normalized = exactStatDate(statDate)
+  const totals = rows instanceof Map ? rows : totalMap(rows)
+  let cursor = isReadingCheckIn(totals.get(normalized) || 0) ? normalized : addStatDates(normalized, -1)
+  if (!isReadingCheckIn(totals.get(cursor) || 0)) return 0
+  let streak = 0
+  while (isReadingCheckIn(totals.get(cursor) || 0)) {
+    streak += 1
+    cursor = addStatDates(cursor, -1)
+  }
+  return streak
+}
+
+export function fillReadingSevenDays(rows, statDate) {
+  const totals = rows instanceof Map ? rows : totalMap(rows)
+  return readingSevenStatDates(statDate).map((date) => ({
+    statDate: date,
+    effectiveReadingMs: totals.get(date) || 0,
+  }))
+}
+
+export function deriveClassReadingMetrics({ activeStudentCount, studentTotalsMs }) {
+  if (!Number.isInteger(activeStudentCount) || activeStudentCount < 0) {
+    throw validationError('activeStudentCount 必须是非负整数')
+  }
+  const totals = Array.from(studentTotalsMs || [], (value) => safeDuration(Number(value), 'student total'))
+  const checkedInStudentCount = totals.filter(isReadingCheckIn).length
+  const totalEffectiveReadingMs = totals.reduce((sum, value) => {
+    const next = sum + value
+    if (!Number.isSafeInteger(next)) throw validationError('班级累计超过安全整数范围')
+    return next
+  }, 0)
+  if (activeStudentCount === 0) {
+    return {
+      checkedInStudentCount,
+      checkInRateBasisPoints: null,
+      totalEffectiveReadingMs,
+      perCapitaEffectiveReadingMs: null,
+    }
+  }
+  return {
+    checkedInStudentCount,
+    checkInRateBasisPoints: Math.round(checkedInStudentCount * 10_000 / activeStudentCount),
+    totalEffectiveReadingMs,
+    perCapitaEffectiveReadingMs: Math.round(totalEffectiveReadingMs / activeStudentCount),
+  }
 }
 
 function requireAuthScope(database, authContext) {
@@ -47,15 +150,20 @@ function requireAuthScope(database, authContext) {
   const userId = requiredText(authContext?.userId, 'authContext.userId')
   const workspaceId = requiredText(authContext?.workspaceId, 'authContext.workspaceId')
   const row = database.prepare(`SELECT
-      actor.id AS user_id, actor.display_name,
-      workspace.id AS workspace_id, workspace.scope_type, workspace.scope_id
-    FROM users actor
-    JOIN organizations organization ON organization.id = actor.organization_id
-      AND organization.status = 'active'
-    JOIN workspace_memberships membership ON membership.user_id = actor.id
-      AND membership.status = 'active'
-    JOIN workspaces workspace ON workspace.id = membership.workspace_id
-      AND workspace.organization_id = actor.organization_id AND workspace.status = 'active'
+      actor.id AS user_id,
+      actor.display_name,
+      workspace.id AS workspace_id,
+      workspace.scope_type,
+      workspace.scope_id
+    FROM users AS actor
+    JOIN organizations AS organization
+      ON organization.id = actor.organization_id AND organization.status = 'active'
+    JOIN workspace_memberships AS membership
+      ON membership.user_id = actor.id AND membership.status = 'active'
+    JOIN workspaces AS workspace
+      ON workspace.id = membership.workspace_id
+      AND workspace.organization_id = actor.organization_id
+      AND workspace.status = 'active'
     WHERE actor.id = ? AND actor.organization_id = ? AND actor.status = 'active'
       AND workspace.id = ?`).get(userId, organizationId, workspaceId)
   if (!row) throw domainError('RESOURCE_NOT_FOUND', '当前身份或工作空间不存在')
@@ -86,401 +194,312 @@ async function requireAuthorized(authorize, action, scope, resource) {
   if (!allowed) throw domainError('PERMISSION_DENIED', '当前工作空间无权读取阅读统计')
 }
 
-function validInterval(row, secondsColumn = 'valid_reading_seconds') {
-  const seconds = Number(row[secondsColumn])
-  if (row.foreground !== 1 || row.screen_on !== 1) return null
-  if (!ACTIVE_EVENT_TYPES.has(row.event_type)) return null
-  if (!Number.isFinite(seconds) || seconds <= 0 || seconds > MAX_EVENT_SECONDS) return null
-  const start = new Date(row.client_occurred_at).getTime()
-  if (!Number.isFinite(start)) return null
-  return { start, end: start + seconds * 1000, row }
-}
-
-function mergeIntervals(intervals) {
-  const merged = []
-  const ordered = intervals
-    .filter(Boolean)
-    .sort((left, right) => left.start - right.start || left.end - right.end)
-  for (const interval of ordered) {
-    const previous = merged.at(-1)
-    if (!previous || interval.start > previous.end) {
-      merged.push({ start: interval.start, end: interval.end })
-    } else {
-      previous.end = Math.max(previous.end, interval.end)
-    }
-  }
-  return merged
-}
-
-function clipIntervals(intervals, from, to) {
-  const fromTime = from?.getTime() ?? Number.NEGATIVE_INFINITY
-  const toTime = to?.getTime() ?? Number.POSITIVE_INFINITY
-  return intervals
-    .map((interval) => ({ start: Math.max(interval.start, fromTime), end: Math.min(interval.end, toTime) }))
-    .filter((interval) => interval.end > interval.start)
-}
-
-function intervalSeconds(intervals) {
-  return Math.floor(intervals.reduce((total, interval) => total + interval.end - interval.start, 0) / 1000)
-}
-
-function groupBy(items, keyFor) {
-  const grouped = new Map()
-  for (const item of items) {
-    const key = keyFor(item)
-    const values = grouped.get(key) || []
-    values.push(item)
-    grouped.set(key, values)
-  }
-  return grouped
-}
-
-function allocateDailyIntervals(intervals) {
-  const buckets = new Map()
-  for (const interval of intervals) {
-    let cursor = interval.start
-    while (cursor < interval.end) {
-      const start = windowStart(new Date(cursor), 'day')
-      const next = start.getTime() + 24 * 60 * 60 * 1000
-      const end = Math.min(interval.end, next)
-      const key = start.toISOString()
-      const values = buckets.get(key) || []
-      values.push({ start: cursor, end })
-      buckets.set(key, values)
-      cursor = end
-    }
-  }
-  return buckets
-}
-
-function selectStudentEvents(database, scope) {
-  return database.prepare(`SELECT
-      event.*, version.book_id, book.title,
-      progress.last_page_no, progress.updated_from_event_at
-    FROM reading_events event
-    JOIN users actor ON actor.id = event.actor_id_at_creation
-      AND actor.organization_id = event.organization_id_at_creation AND actor.status = 'active'
-    JOIN workspaces workspace ON workspace.id = event.workspace_id_at_creation
-      AND workspace.organization_id = event.organization_id_at_creation AND workspace.status = 'active'
-    JOIN workspace_memberships membership ON membership.user_id = actor.id
-      AND membership.workspace_id = workspace.id AND membership.status = 'active'
-    JOIN book_versions version ON version.id = event.book_version_id
-      AND version.organization_id_at_creation = event.organization_id_at_creation
-    JOIN books book ON book.id = version.book_id
-      AND book.organization_id_at_creation = event.organization_id_at_creation
-      AND book.status = 'published'
-    LEFT JOIN reading_progress progress ON progress.actor_id = actor.id
-      AND progress.workspace_id = workspace.id AND progress.book_version_id = version.id
-    WHERE event.organization_id_at_creation = :organizationId
-      AND event.actor_id_at_creation = :userId
-      AND event.workspace_id_at_creation = :workspaceId
-    ORDER BY event.client_occurred_at, event.id`).all({
+function requireStudentSelf(database, scope) {
+  const row = database.prepare(`SELECT class.id AS class_id
+    FROM class_memberships AS membership
+    JOIN classes AS class
+      ON class.id = membership.class_id
+      AND class.organization_id = :organizationId
+      AND class.status = 'active'
+    JOIN workspaces AS workspace
+      ON workspace.id = :workspaceId
+      AND workspace.organization_id = :organizationId
+      AND workspace.scope_type = 'class'
+      AND workspace.scope_id = class.id
+    WHERE membership.user_id = :userId
+      AND membership.membership_role = 'student'
+      AND membership.status = 'active'`).get({
     organizationId: scope.organizationId,
-    userId: scope.userId,
     workspaceId: scope.workspaceId,
+    userId: scope.userId,
   })
+  if (!row) throw domainError('PERMISSION_DENIED', '只有当前班级学生可以读取本人阅读简报')
+  return row.class_id
 }
 
-function eyeCareUsage(database, { organizationId, userId, workspaceId }, current) {
-  const dayStart = windowStart(current, 'day').toISOString()
-  const weekStart = windowStart(current, 'week').toISOString()
-  const usage = database.prepare(`SELECT usage.window_kind, usage.window_start_at, usage.valid_eye_seconds
-    FROM eye_care_usage usage
-    JOIN users actor ON actor.id = usage.actor_id AND actor.organization_id = ? AND actor.status = 'active'
-    JOIN workspaces workspace ON workspace.id = usage.workspace_id
-      AND workspace.organization_id = ? AND workspace.status = 'active'
-    JOIN workspace_memberships membership ON membership.user_id = actor.id
-      AND membership.workspace_id = workspace.id AND membership.status = 'active'
-    WHERE usage.actor_id = ? AND usage.workspace_id = ?
-      AND ((usage.window_kind = 'day' AND usage.window_start_at = ?)
-        OR (usage.window_kind = 'week' AND usage.window_start_at = ?))`)
-    .all(organizationId, organizationId, userId, workspaceId, dayStart, weekStart)
-  const state = database.prepare(`SELECT state.continuous_eye_seconds, state.last_active_at,
-      enforcement.status, enforcement.forced_rest_until
-    FROM users actor
-    JOIN workspaces workspace ON workspace.id = ?
-      AND workspace.organization_id = ? AND workspace.status = 'active'
-    JOIN workspace_memberships membership ON membership.user_id = actor.id
-      AND membership.workspace_id = workspace.id AND membership.status = 'active'
-    LEFT JOIN eye_care_states state ON state.actor_id = actor.id AND state.workspace_id = workspace.id
-    LEFT JOIN eye_care_enforcement_states enforcement
-      ON enforcement.organization_id = actor.organization_id
-      AND enforcement.actor_user_id = actor.id AND enforcement.workspace_id = workspace.id
-    WHERE actor.id = ? AND actor.organization_id = ? AND actor.status = 'active'`)
-    .get(workspaceId, organizationId, userId, organizationId)
+function normalizeScopeInput(input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    throw validationError('scope query 必须是对象')
+  }
+  const allowed = new Set(['classId', 'statDate'])
+  const unknown = Object.keys(input).filter((key) => !allowed.has(key))
+  if (unknown.length > 0) throw validationError('scope query 包含未知字段', { fields: unknown })
+  if (!Object.hasOwn(input, 'classId') || !Object.hasOwn(input, 'statDate')) {
+    throw validationError('scope query 必须同时提供 classId 和 statDate')
+  }
   return {
-    continuousEyeSeconds: Number(state?.continuous_eye_seconds || 0),
-    todayValidEyeSeconds: Number(usage.find((row) => row.window_kind === 'day')?.valid_eye_seconds || 0),
-    weekValidEyeSeconds: Number(usage.find((row) => row.window_kind === 'week')?.valid_eye_seconds || 0),
-    lastActiveAt: state?.last_active_at || null,
-    status: state?.status || 'normal',
-    forcedRestUntil: state?.forced_rest_until || null,
+    classId: requiredText(input.classId, 'classId'),
+    statDate: exactStatDate(input.statDate),
   }
 }
 
-function studentSummary(database, scope, current) {
-  const rows = selectStudentEvents(database, scope)
-  const currentTime = current.getTime()
-  const activeIntervals = rows.map((row) => validInterval(row)).map((interval) => {
-    if (!interval || interval.start >= currentTime) return null
-    return { ...interval, end: Math.min(interval.end, currentTime) }
-  }).filter((interval) => interval && interval.end > interval.start)
-  const allIntervals = mergeIntervals(activeIntervals)
-  const dayStart = windowStart(current, 'day')
-  const weekStart = windowStart(current, 'week')
-  const byVersion = groupBy(activeIntervals, (interval) => interval.row.book_version_id)
-  const byBook = [...byVersion].map(([bookVersionId, intervals]) => {
-    const latest = [...intervals].sort((left, right) => right.start - left.start)[0].row
-    return {
-      bookId: latest.book_id,
-      bookVersionId,
-      title: latest.title,
-      effectiveReadingSeconds: intervalSeconds(mergeIntervals(intervals)),
-      lastReadAt: latest.client_occurred_at,
-      lastPageNo: Number(latest.last_page_no || latest.page_no || 1),
-      progressUpdatedAt: latest.updated_from_event_at || null,
-    }
-  }).sort((left, right) => right.effectiveReadingSeconds - left.effectiveReadingSeconds
-    || right.lastReadAt.localeCompare(left.lastReadAt))
-  const recentReading = [...byBook]
-    .sort((left, right) => right.lastReadAt.localeCompare(left.lastReadAt))
-    .slice(0, 12)
-  const readingDays = [...allocateDailyIntervals(allIntervals).values()]
-    .filter((intervals) => intervalSeconds(mergeIntervals(intervals)) > 0).length
-  const totalEffectiveReadingSeconds = intervalSeconds(allIntervals)
-  return {
-    generatedAt: current.toISOString(),
-    totalEffectiveReadingSeconds,
-    todayEffectiveReadingSeconds: intervalSeconds(clipIntervals(allIntervals, dayStart, current)),
-    weekEffectiveReadingSeconds: intervalSeconds(clipIntervals(allIntervals, weekStart, current)),
-    readingDays,
-    byBook,
-    recentReading,
-    levelInput: {
-      totalEffectiveReadingSeconds,
-      readingDays,
-      startedBookCount: byBook.length,
-    },
-    eyeCare: eyeCareUsage(database, scope, current),
+function requireScopeClass(database, scope, classId) {
+  const classRow = database.prepare(`SELECT id, name, grade_id, organization_id
+    FROM classes WHERE id = ? AND organization_id = ? AND status = 'active'`)
+    .get(classId, scope.organizationId)
+  if (!classRow) throw domainError('RESOURCE_NOT_FOUND', '班级不属于当前组织或不存在')
+  const roleRows = database.prepare(`SELECT role_code FROM role_assignments
+    WHERE organization_id = ? AND user_id = ? AND workspace_id = ? AND status = 'active'`)
+    .all(scope.organizationId, scope.userId, scope.workspaceId)
+  if (!roleRows.some((row) => SCOPE_ROLE_CODES.has(row.role_code))) {
+    throw domainError('PERMISSION_DENIED', '当前账号角色无权查看教师阅读统计')
   }
+  const inWorkspaceScope = (scope.scopeType === 'class' && scope.scopeId === classId)
+    || (scope.scopeType === 'grade' && scope.scopeId === classRow.grade_id)
+    || (scope.scopeType === 'school' && scope.scopeId === scope.organizationId)
+  if (!inWorkspaceScope) throw domainError('PERMISSION_DENIED', '班级不在当前工作空间权限范围内')
+  return classRow
 }
 
-function scopedStudentTargets(database, scope) {
-  const clauses = [
-    `student.organization_id = :organizationId`,
-    `student.status = 'active'`,
-    `membership.membership_role = 'student'`,
-    `membership.status = 'active'`,
-    `class.status = 'active'`,
-    `class.organization_id = :organizationId`,
-    `student_workspace.organization_id = :organizationId`,
-    `student_workspace.scope_type = 'class'`,
-    `student_workspace.scope_id = class.id`,
-    `student_workspace.status = 'active'`,
-    `workspace_membership.status = 'active'`,
-  ]
-  if (scope.scopeType === 'class') clauses.push('class.id = :scopeId')
-  else if (scope.scopeType === 'grade') clauses.push('class.grade_id = :scopeId')
-  else if (scope.scopeType === 'school') clauses.push('class.organization_id = :scopeId')
-  else if (scope.scopeType === 'own') clauses.push('student.id = :userId')
-  else return []
-  return database.prepare(`SELECT DISTINCT
-      student.id AS student_id, student.display_name,
-      class.id AS class_id, class.name AS class_name,
-      student_workspace.id AS workspace_id
-    FROM users student
-    JOIN class_memberships membership ON membership.user_id = student.id
-    JOIN classes class ON class.id = membership.class_id
-    JOIN workspaces student_workspace ON student_workspace.scope_id = class.id
-    JOIN workspace_memberships workspace_membership
-      ON workspace_membership.user_id = student.id
-      AND workspace_membership.workspace_id = student_workspace.id
-    WHERE ${clauses.join(' AND ')}
-    ORDER BY class.id, student.id, student_workspace.id`).all({
-    organizationId: scope.organizationId,
-    scopeId: scope.scopeId,
-    ...(scope.scopeType === 'own' ? { userId: scope.userId } : {}),
-  }).map((row) => ({
-    studentId: row.student_id,
-    studentDisplayName: row.display_name,
-    classId: row.class_id,
-    className: row.class_name,
-    workspaceId: row.workspace_id,
-  }))
+function selectSelfRows(database, scope, throughStatDate) {
+  return database.prepare(`SELECT * FROM reading_daily_book_summaries
+    WHERE organization_id_at_creation = ?
+      AND actor_id_at_creation = ?
+      AND workspace_id_at_creation = ?
+      AND stat_date <= ?
+    ORDER BY stat_date, last_read_at, id`).all(
+    scope.organizationId,
+    scope.userId,
+    scope.workspaceId,
+    throughStatDate,
+  )
 }
 
-function normalizeFilters(filters = {}) {
-  const from = filters.from ? normalizeDate(filters.from, 'filters.from') : null
-  const to = filters.to ? normalizeDate(filters.to, 'filters.to') : null
-  if (from && to && from >= to) throw domainError('VALIDATION_FAILED', 'filters.to 必须晚于 filters.from')
-  return {
-    classId: filters.classId ? requiredText(filters.classId, 'filters.classId') : null,
-    studentId: filters.studentId ? requiredText(filters.studentId, 'filters.studentId') : null,
-    bookVersionId: filters.bookVersionId ? requiredText(filters.bookVersionId, 'filters.bookVersionId') : null,
-    from,
-    to,
-  }
-}
-
-function filterTargets(database, scope, filters) {
-  let targets = scopedStudentTargets(database, scope)
-  if (filters.classId) {
-    if (!targets.some((target) => target.classId === filters.classId)) {
-      throw domainError('RESOURCE_NOT_FOUND', '班级不在当前工作空间的有效范围内')
-    }
-    targets = targets.filter((target) => target.classId === filters.classId)
-  }
-  if (filters.studentId) {
-    if (!targets.some((target) => target.studentId === filters.studentId)) {
-      throw domainError('RESOURCE_NOT_FOUND', '学生不在当前工作空间的有效范围内')
-    }
-    targets = targets.filter((target) => target.studentId === filters.studentId)
-  }
-  if (filters.bookVersionId) {
-    const book = database.prepare(`SELECT version.id FROM book_versions version
-      JOIN books book ON book.id = version.book_id
-        AND book.organization_id_at_creation = version.organization_id_at_creation
-      WHERE version.id = ? AND version.organization_id_at_creation = ? AND book.status = 'published'`)
-      .get(filters.bookVersionId, scope.organizationId)
-    if (!book) throw domainError('RESOURCE_NOT_FOUND', '书籍不在当前组织的有效范围内')
-  }
-  return targets
-}
-
-function selectScopedEvents(database, scope, targets, filters) {
-  if (targets.length === 0) return []
-  const values = [scope.organizationId]
-  const targetSql = targets.map((target) => {
-    values.push(target.studentId, target.workspaceId, target.classId)
-    return '(event.actor_id_at_creation = ? AND event.workspace_id_at_creation = ? AND class.id = ?)'
-  }).join(' OR ')
-  let filterSql = ''
-  if (filters.bookVersionId) {
-    filterSql += ' AND event.book_version_id = ?'
-    values.push(filters.bookVersionId)
-  }
-  if (filters.to) {
-    filterSql += ' AND event.client_occurred_at < ?'
-    values.push(filters.to.toISOString())
-  }
-  if (filters.from) {
-    filterSql += ' AND event.client_occurred_at >= ?'
-    values.push(new Date(filters.from.getTime() - MAX_EVENT_SECONDS * 1000).toISOString())
-  }
-  return database.prepare(`SELECT event.*, actor.display_name, class.id AS class_id,
-      class.name AS class_name, version.book_id, book.title
-    FROM reading_events event
-    JOIN users actor ON actor.id = event.actor_id_at_creation
-      AND actor.organization_id = event.organization_id_at_creation AND actor.status = 'active'
-    JOIN workspaces workspace ON workspace.id = event.workspace_id_at_creation
-      AND workspace.organization_id = event.organization_id_at_creation
-      AND workspace.scope_type = 'class' AND workspace.status = 'active'
-    JOIN workspace_memberships workspace_membership
-      ON workspace_membership.user_id = actor.id
-      AND workspace_membership.workspace_id = workspace.id
-      AND workspace_membership.status = 'active'
-    JOIN classes class ON class.id = workspace.scope_id
-      AND class.organization_id = event.organization_id_at_creation AND class.status = 'active'
-    JOIN class_memberships class_membership ON class_membership.class_id = class.id
-      AND class_membership.user_id = actor.id
-      AND class_membership.membership_role = 'student' AND class_membership.status = 'active'
-    JOIN book_versions version ON version.id = event.book_version_id
-      AND version.organization_id_at_creation = event.organization_id_at_creation
-    JOIN books book ON book.id = version.book_id
-      AND book.organization_id_at_creation = event.organization_id_at_creation
+function selectLastReading(database, { organizationId, actorId, workspaceId, classId = null, statDate }) {
+  const params = [organizationId, actorId]
+  const workspaceClause = workspaceId === null || workspaceId === undefined
+    ? ''
+    : ' AND summary.workspace_id_at_creation = ?'
+  if (workspaceClause) params.push(workspaceId)
+  params.push(statDate)
+  const classClause = classId === null ? '' : ' AND summary.class_id_at_creation = ?'
+  if (classId !== null) params.push(classId)
+  const row = database.prepare(`SELECT
+      version.book_id,
+      summary.book_version_id,
+      book.title,
+      summary.last_page_no,
+      version.page_count,
+      summary.last_read_at
+    FROM reading_daily_book_summaries AS summary
+    JOIN book_versions AS version
+      ON version.id = summary.book_version_id
+      AND version.organization_id_at_creation = summary.organization_id_at_creation
+    JOIN books AS book
+      ON book.id = version.book_id
+      AND book.organization_id_at_creation = summary.organization_id_at_creation
       AND book.status = 'published'
-    WHERE event.organization_id_at_creation = ? AND (${targetSql})${filterSql}
-    ORDER BY event.actor_id_at_creation, event.client_occurred_at, event.id`).all(...values)
+    WHERE summary.organization_id_at_creation = ?
+      AND summary.actor_id_at_creation = ?
+      ${workspaceClause}
+      AND summary.stat_date <= ?${classClause}
+      AND summary.last_read_at IS NOT NULL
+    ORDER BY summary.last_read_at DESC, summary.last_page_no DESC, summary.id DESC
+    LIMIT 1`).get(...params)
+  if (!row) return null
+  return {
+    bookId: row.book_id,
+    bookVersionId: row.book_version_id,
+    title: row.title,
+    lastPageNo: Number(row.last_page_no),
+    totalPages: Number(row.page_count),
+    lastReadAt: row.last_read_at,
+  }
 }
 
-function aggregateScopedRows(rows, targets, filters, current, database, organizationId) {
-  const active = rows.map((row) => validInterval(row)).filter(Boolean)
-  const upperBound = filters.to && filters.to < current ? filters.to : current
-  const clipped = active.map((interval) => {
-    const values = clipIntervals([interval], filters.from, upperBound)
-    return values[0] ? { ...values[0], row: interval.row } : null
-  }).filter(Boolean)
-  const byStudent = groupBy(clipped, (interval) => interval.row.actor_id_at_creation)
-  const participantCount = [...byStudent.values()]
-    .filter((intervals) => intervalSeconds(mergeIntervals(intervals)) > 0).length
-  const effectiveReadingSeconds = [...byStudent.values()]
-    .reduce((total, intervals) => total + intervalSeconds(mergeIntervals(intervals)), 0)
+function maxUpdatedAt(rows) {
+  return rows.reduce((latest, row) => !latest || row.updated_at > latest ? row.updated_at : latest, null)
+}
 
-  const trendBuckets = new Map()
-  for (const [studentId, intervals] of byStudent) {
-    for (const [key, slices] of allocateDailyIntervals(mergeIntervals(intervals))) {
-      const bucket = trendBuckets.get(key) || { effectiveReadingSeconds: 0, participants: new Set() }
-      bucket.effectiveReadingSeconds += intervalSeconds(mergeIntervals(slices))
-      bucket.participants.add(studentId)
-      trendBuckets.set(key, bucket)
-    }
-  }
-  const trend = [...trendBuckets].sort(([left], [right]) => left.localeCompare(right)).map(([key, bucket]) => ({
-    windowStartAt: key,
-    effectiveReadingSeconds: bucket.effectiveReadingSeconds,
-    participantCount: bucket.participants.size,
-  }))
+function sumDates(totals, dates) {
+  return dates.reduce((sum, date) => {
+    const next = sum + (totals.get(date) || 0)
+    if (!Number.isSafeInteger(next)) throw validationError('统计累计超过安全整数范围')
+    return next
+  }, 0)
+}
 
-  const byBook = [...groupBy(clipped, (interval) => interval.row.book_version_id)]
-    .map(([bookVersionId, intervals]) => {
-      const byBookStudent = groupBy(intervals, (interval) => interval.row.actor_id_at_creation)
-      const effectiveSeconds = [...byBookStudent.values()]
-        .reduce((total, values) => total + intervalSeconds(mergeIntervals(values)), 0)
-      const row = intervals[0].row
-      return {
-        bookId: row.book_id,
-        bookVersionId,
-        title: row.title,
-        effectiveReadingSeconds: effectiveSeconds,
-        participantCount: byBookStudent.size,
-      }
-    })
-    .sort((left, right) => right.effectiveReadingSeconds - left.effectiveReadingSeconds
-      || left.bookVersionId.localeCompare(right.bookVersionId))
-
-  const anomalousStays = rows
-    .filter((row) => row.event_type === 'page_stay'
-      && row.foreground === 1 && row.screen_on === 1
-      && Number(row.valid_reading_seconds) > MAX_EVENT_SECONDS
-      && new Date(row.client_occurred_at) < upperBound
-      && (!filters.from || new Date(row.client_occurred_at) >= filters.from))
-    .map((row) => ({
-      eventId: row.id,
-      studentId: row.actor_id_at_creation,
-      studentDisplayName: row.display_name,
-      classId: row.class_id,
-      bookId: row.book_id,
-      bookVersionId: row.book_version_id,
-      title: row.title,
-      pageNo: row.page_no,
-      occurredAt: row.client_occurred_at,
-      observedSeconds: Number(row.valid_reading_seconds),
-      reason: 'page_stay_exceeds_interaction_window',
-    }))
-
-  const eyeCareStatuses = targets.map((target) => {
-    const usage = eyeCareUsage(database, {
-      organizationId,
-      userId: target.studentId,
-      workspaceId: target.workspaceId,
-    }, current)
-    return {
-      studentId: target.studentId,
-      studentDisplayName: target.studentDisplayName,
-      classId: target.classId,
-      workspaceId: target.workspaceId,
-      ...usage,
-    }
+function selfStatistics(database, scope, current) {
+  const statDate = readingStatDateFor(current)
+  const rows = selectSelfRows(database, scope, statDate)
+  const totals = totalMap(rows)
+  const todayMs = totals.get(statDate) || 0
+  const lastWeekTotalMs = sumDates(totals, readingLastCompleteWeekDates(statDate))
+  const lastReading = selectLastReading(database, {
+    organizationId: scope.organizationId,
+    actorId: scope.userId,
+    workspaceId: scope.workspaceId,
+    statDate,
   })
-
   return {
     generatedAt: current.toISOString(),
-    participantCount,
-    effectiveReadingSeconds,
+    dataUpdatedAt: maxUpdatedAt(rows),
+    statDate,
+    todayEffectiveReadingSeconds: Math.floor(todayMs / 1000),
+    checkIn: {
+      checked: isReadingCheckIn(todayMs),
+      thresholdSeconds: CHECK_IN_MS / 1000,
+      remainingSeconds: Math.ceil(Math.max(0, CHECK_IN_MS - todayMs) / 1000),
+    },
+    streakDays: readingStreakDays(totals, statDate),
+    comparisonState: readingComparisonState(todayMs, lastWeekTotalMs),
+    lastReading,
+  }
+}
+
+function activeClassStudents(database, organizationId, classId) {
+  return database.prepare(`SELECT DISTINCT actor.id AS student_id, actor.display_name
+    FROM class_memberships AS membership
+    JOIN users AS actor
+      ON actor.id = membership.user_id
+      AND actor.organization_id = :organizationId
+      AND actor.status = 'active'
+    JOIN classes AS class
+      ON class.id = membership.class_id
+      AND class.organization_id = :organizationId
+      AND class.status = 'active'
+    WHERE membership.class_id = :classId
+      AND membership.membership_role = 'student'
+      AND membership.status = 'active'`).all({ organizationId, classId })
+}
+
+function selectClassRows(database, organizationId, classId, statDate) {
+  return database.prepare(`SELECT * FROM reading_daily_book_summaries
+    WHERE organization_id_at_creation = ? AND class_id_at_creation = ? AND stat_date <= ?
+    ORDER BY actor_id_at_creation, stat_date, last_read_at, id`)
+    .all(organizationId, classId, statDate)
+}
+
+function groupRows(rows, keyFor) {
+  const groups = new Map()
+  for (const row of rows) {
+    const key = keyFor(row)
+    const values = groups.get(key) || []
+    values.push(row)
+    groups.set(key, values)
+  }
+  return groups
+}
+
+function normalizedDisplayName(value) {
+  return String(value).normalize('NFKC').trim().toLocaleLowerCase('zh-CN')
+}
+
+function factsForDate(rows, statDate) {
+  const dateRows = rows.filter((row) => row.stat_date === statDate)
+  const byStudent = groupRows(dateRows, (row) => row.actor_id_at_creation)
+  const totals = new Map()
+  for (const [studentId, studentRows] of byStudent) {
+    totals.set(studentId, totalMap(studentRows).get(statDate) || 0)
+  }
+  return { dateRows, byStudent, totals }
+}
+
+function studentDto(database, scope, classId, student, rows, statDate) {
+  const totals = totalMap(rows)
+  const todayRows = rows.filter((row) => row.stat_date === statDate)
+  const todayMs = totals.get(statDate) || 0
+  const lastWeekTotalMs = sumDates(totals, readingLastCompleteWeekDates(statDate))
+  const averageMs = Math.round(lastWeekTotalMs / 7)
+  const lastReadAt = rows.reduce(
+    (latest, row) => !latest || row.last_read_at > latest ? row.last_read_at : latest,
+    null,
+  )
+  const lastReading = selectLastReading(database, {
+    organizationId: scope.organizationId,
+    actorId: student.student_id,
+    workspaceId: null,
+    classId,
+    statDate,
+  })
+  if (lastReading) delete lastReading.lastReadAt
+  return {
+    studentId: student.student_id,
+    displayName: student.display_name,
+    todayEffectiveReadingSeconds: Math.floor(todayMs / 1000),
+    checkedIn: isReadingCheckIn(todayMs),
+    streakDays: readingStreakDays(totals, statDate),
+    hadSkip: todayRows.some((row) => Number(row.had_skip) === 1),
+    hadReread: todayRows.some((row) => Number(row.had_reread) === 1),
+    lastReadAt,
+    lastWeek: {
+      totalEffectiveReadingSeconds: Math.floor(lastWeekTotalMs / 1000),
+      dailyAverageEffectiveReadingSeconds: Math.floor(averageMs / 1000),
+      todayDeltaSeconds: lastWeekTotalMs === 0 ? null : Math.trunc((todayMs - averageMs) / 1000),
+      comparisonState: readingComparisonState(todayMs, lastWeekTotalMs),
+    },
+    recentDays: fillReadingSevenDays(totals, statDate).map((day) => ({
+      statDate: day.statDate,
+      effectiveReadingSeconds: Math.floor(day.effectiveReadingMs / 1000),
+      checkedIn: isReadingCheckIn(day.effectiveReadingMs),
+    })),
+    lastReading,
+  }
+}
+
+function scopeStatistics(database, scope, classRow, statDate, current) {
+  const students = activeClassStudents(database, scope.organizationId, classRow.id)
+  const rows = selectClassRows(database, scope.organizationId, classRow.id, statDate)
+  const currentStudentIds = new Set(students.map((student) => student.student_id))
+  const rowsByStudent = groupRows(
+    rows.filter((row) => currentStudentIds.has(row.actor_id_at_creation)),
+    (row) => row.actor_id_at_creation,
+  )
+  const today = factsForDate(rows, statDate)
+  const todayMetrics = deriveClassReadingMetrics({
+    activeStudentCount: students.length,
+    studentTotalsMs: students.length === 0 ? [] : [...today.totals.values()],
+  })
+  const trend = readingSevenStatDates(statDate).map((date) => {
+    const facts = factsForDate(rows, date)
+    const metrics = deriveClassReadingMetrics({
+      activeStudentCount: students.length,
+      studentTotalsMs: students.length === 0 ? [] : [...facts.totals.values()],
+    })
+    return {
+      statDate: date,
+      checkedInStudentCount: metrics.checkedInStudentCount,
+      activeStudentCount: students.length,
+      checkInRateBasisPoints: metrics.checkInRateBasisPoints,
+      perCapitaEffectiveReadingSeconds: metrics.perCapitaEffectiveReadingMs === null
+        ? null
+        : Math.floor(metrics.perCapitaEffectiveReadingMs / 1000),
+    }
+  })
+  const studentDtos = students.map((student) => studentDto(
+    database,
+    scope,
+    classRow.id,
+    student,
+    rowsByStudent.get(student.student_id) || [],
+    statDate,
+  )).sort((left, right) => normalizedDisplayName(left.displayName).localeCompare(
+    normalizedDisplayName(right.displayName),
+    'zh-CN',
+  ) || left.studentId.localeCompare(right.studentId))
+  return {
+    generatedAt: current.toISOString(),
+    dataUpdatedAt: maxUpdatedAt(rows),
+    statDate,
+    class: {
+      classId: classRow.id,
+      displayName: classRow.name,
+      activeStudentCount: students.length,
+    },
+    summary: {
+      checkedInStudentCount: todayMetrics.checkedInStudentCount,
+      checkInRateBasisPoints: todayMetrics.checkInRateBasisPoints,
+      totalEffectiveReadingSeconds: Math.floor(todayMetrics.totalEffectiveReadingMs / 1000),
+      perCapitaEffectiveReadingSeconds: todayMetrics.perCapitaEffectiveReadingMs === null
+        ? null
+        : Math.floor(todayMetrics.perCapitaEffectiveReadingMs / 1000),
+      skipStudentCount: students.length === 0 || today.byStudent.size === 0 ? 0 : [...today.byStudent.values()]
+        .filter((studentRows) => studentRows.some((row) => Number(row.had_skip) === 1)).length,
+      rereadStudentCount: students.length === 0 || today.byStudent.size === 0 ? 0 : [...today.byStudent.values()]
+        .filter((studentRows) => studentRows.some((row) => Number(row.had_reread) === 1)).length,
+    },
     trend,
-    byBook,
-    anomalousStays,
-    eyeCareStatuses,
+    students: studentDtos,
   }
 }
 
@@ -500,7 +519,11 @@ export function createReadingStatisticsDomain(dependencies = {}) {
         scopeType: scope.scopeType,
         scopeId: scope.scopeId,
       })
-      const result = studentSummary(database, scope, normalizeDate(now(), 'now'))
+      requireStudentSelf(database, scope)
+      const suppliedNow = now()
+      const current = suppliedNow instanceof Date ? suppliedNow : new Date(suppliedNow)
+      if (Number.isNaN(current.getTime())) throw validationError('now 必须是有效时间')
+      const result = selfStatistics(database, scope, current)
       await audit({
         eventType: 'reading.statistics.self_viewed',
         resourceType: 'student',
@@ -509,30 +532,30 @@ export function createReadingStatisticsDomain(dependencies = {}) {
       return result
     },
 
-    async getScopedSummary(authContext, input = {}) {
+    async getScopedSummary(authContext, input) {
       const scope = requireAuthScope(database, authContext)
-      const filters = normalizeFilters(input)
+      const query = normalizeScopeInput(input)
+      const classRow = requireScopeClass(database, scope, query.classId)
       await requireAuthorized(authorize, 'reading.read_scope', scope, {
         organizationId: scope.organizationId,
         workspaceId: scope.workspaceId,
         scopeType: scope.scopeType,
         scopeId: scope.scopeId,
-        classId: filters.classId,
-        studentId: filters.studentId,
-        bookVersionId: filters.bookVersionId,
+        classId: query.classId,
       })
-      const targets = filterTargets(database, scope, filters)
-      const current = normalizeDate(now(), 'now')
-      const rows = selectScopedEvents(database, scope, targets, filters)
-      const result = aggregateScopedRows(rows, targets, filters, current, database, scope.organizationId)
+      const suppliedNow = now()
+      const current = suppliedNow instanceof Date ? suppliedNow : new Date(suppliedNow)
+      if (Number.isNaN(current.getTime())) throw validationError('now 必须是有效时间')
+      const result = scopeStatistics(database, scope, classRow, query.statDate, current)
       await audit({
         eventType: 'reading.statistics.scope_viewed',
         resourceType: 'reading_statistics_scope',
-        resourceId: filters.studentId || filters.classId || scope.scopeId,
+        resourceId: query.classId,
       })
       return result
     },
   }
 }
 
-export { windowStart as readingStatisticsWindowStart }
+export { readingStatDateFor }
+export const readingStatisticsWindowStart = readingStatDateStart

@@ -50,7 +50,7 @@ test('没有服务端设置契约时，个人主页保留原卡片内的诚实�
   assert.doesNotMatch(app, /import Settings/)
   assert.doesNotMatch(me, /to="\/student\/settings"/)
   assert.match(me, /设置服务端接入中/)
-  assert.match(level, /useReadingStatistics/)
+  assert.doesNotMatch(level, /useReadingStatistics|totalEffectiveReadingSeconds/)
   assert.doesNotMatch(level, /\.\.\/data\//)
 })
 
@@ -67,7 +67,8 @@ test('阅读器和个人内容写入走正式阅读对象接口，不再声明�
   assert.doesNotMatch(reader, /unavailable\('收藏摘录'\)|unavailable\('添加批注'\)/)
   assert.match(detail, /library\.createFavorite/)
   assert.match(detail, /library\.deleteFavorite/)
-  assert.match(adapter, /Number\.isFinite\(statisticsMinutes\)/)
+  assert.match(adapter, /buildPersonalBookCollection/)
+  assert.doesNotMatch(adapter, /validReadingSeconds|progress\?\.percent|\bfinished\b|statisticsData\.byBook/)
 })
 
 test('主站可见书籍入口先进入真实详情，AI 向导不再推荐旧壳静态书目', async () => {
@@ -115,7 +116,7 @@ test('可达的无后端控件必须明确禁用，不能留下看似可点击�
   assert.match(aiMessages, /回答反馈暂未开放，不会伪造保存结果/)
 })
 
-test('学生和书目详情挂到真实权限端路由，旧详情 fixture 不得回流生产入口', async () => {
+test('学生和书目详情挂到真实权限端路由，班级总览接入新阅读统计状态', async () => {
   const [app, context, access, studentDetail, library, bookDetail, overview] = await Promise.all([
     source('../../src/console/ConsoleApp.jsx'),
     source('../../src/console/state/ConsoleContext.jsx'),
@@ -138,8 +139,13 @@ test('学生和书目详情挂到真实权限端路由，旧详情 fixture 不�
   assert.match(studentDetail, /useStage4ConsoleData\('studentDetail'/)
   assert.match(library, /useStage4ConsoleData\('bookLibrary'/)
   assert.match(bookDetail, /useStage4ConsoleData\('bookDetail'/)
-  assert.match(overview, /\/console\/teaching\/books\/\$\{c\.bookId\}/)
-  assert.doesNotMatch(overview, /\/console\/library\/books/)
+  assert.match(overview, /import ReadingStatisticsView/)
+  assert.match(overview, /<ReadingStatisticsView/)
+  assert.match(overview, /useReadingStatistics\(workspace\?\.id\)/)
+  assert.match(overview, /resource=\{statistics\.scopeResource\}/)
+  assert.doesNotMatch(overview, /resource = null|data\/fixtures|useNavigate/)
+  assert.doesNotMatch(overview, /\bbyBook\b|\banomalousStays\b/)
+  assert.doesNotMatch(overview, /\/console\/(?:teaching|library)\/books/)
 })
 
 test('权限端只读或缺契约的动作必须局部禁用，不能弹出假成功确认框', async () => {

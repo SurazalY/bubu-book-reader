@@ -20,9 +20,13 @@ function groupByBook(items) {
   }, {})
 }
 
-function buildBookCollection(runtimeBooks, libraryData, statisticsData) {
+function finiteNumber(...values) {
+  const value = values.find((item) => typeof item === 'number' && Number.isFinite(item))
+  return value ?? null
+}
+
+export function buildPersonalBookCollection(runtimeBooks, libraryData) {
   const shelfByBookId = new Map((libraryData.shelf || []).map((item) => [item.bookId, item]))
-  const statisticsByBookId = new Map((statisticsData.byBook || []).map((item) => [item.bookId, item]))
   const bookmarksByBookId = groupByBook(libraryData.bookmarks || [])
   const favorites = new Set((libraryData.favorites || []).map((item) => item.bookId))
   const runtimeByBookId = new Map((runtimeBooks || []).map((book) => [book.id, book]))
@@ -34,42 +38,33 @@ function buildBookCollection(runtimeBooks, libraryData, statisticsData) {
   return orderedIds.map((bookId) => {
     const runtime = runtimeByBookId.get(bookId) || {}
     const shelf = shelfByBookId.get(bookId) || {}
-    const statistics = statisticsByBookId.get(bookId) || {}
-    const totalPages = Number(runtime.progress?.totalPages || runtime.totalPages || shelf.pageCount) || 0
-    const currentPage = Number(runtime.progress?.currentPage || runtime.page || shelf.progress?.lastPageNo) || 1
-    const runtimeMinutes = Number(runtime.progress?.effectiveMinutes ?? runtime.minutes)
-    const shelfMinutes = Number(shelf.progress?.validReadingSeconds) / 60
-    const statisticsMinutes = Number(statistics.effectiveReadingSeconds) / 60
-    const effectiveMinutes = Math.round(
-      Number.isFinite(runtimeMinutes) ? runtimeMinutes
-        : Number.isFinite(shelfMinutes) ? shelfMinutes
-          : Number.isFinite(statisticsMinutes) ? statisticsMinutes
-            : 0,
-    )
-    const percent = Number(runtime.progress?.percent ?? runtime.percent ?? (totalPages ? (currentPage / totalPages) * 100 : 0)) || 0
+    const totalPages = finiteNumber(runtime.progress?.totalPages, runtime.totalPages, shelf.pageCount)
+    const currentPage = finiteNumber(runtime.progress?.currentPage, runtime.page, shelf.progress?.lastPageNo)
+    const effectiveMinutesValue = finiteNumber(runtime.progress?.effectiveMinutes, runtime.minutes)
+    const effectiveMinutes = effectiveMinutesValue === null ? null : Math.max(0, Math.round(effectiveMinutesValue))
 
     return {
-      ...runtime,
       id: bookId,
-      versionId: runtime.versionId || shelf.bookVersionId || statistics.bookVersionId || null,
-      title: runtime.title || shelf.title || statistics.title || '服务端未返回书名',
+      versionId: runtime.versionId || shelf.bookVersionId || null,
+      title: runtime.title || shelf.title || '服务端未返回书名',
       author: runtime.author || '服务端未返回作者',
       genre: runtime.genre || '整书阅读',
       subject: runtime.subject || '未分类',
       coverUrl: runtime.coverUrl || null,
       cover: runtime.cover || null,
+      assets: Array.isArray(runtime.assets) ? runtime.assets : [],
+      access: runtime.access || {},
+      downloaded: runtime.downloaded === true,
+      classReading: runtime.classReading || null,
+      lists: Array.isArray(runtime.lists) ? runtime.lists : [],
       liked: favorites.has(bookId),
-      finished: Boolean(runtime.finished) || percent >= 100,
       progress: {
-        ...(runtime.progress || {}),
         currentPage,
         totalPages,
-        percent,
         effectiveMinutes,
         bookmarks: (bookmarksByBookId[bookId] || []).map((item) => item.pageNo),
       },
       minutes: effectiveMinutes,
-      percent,
       page: currentPage,
       totalPages,
     }
@@ -82,8 +77,8 @@ export default function usePersonalReadingAdapter({ workspaceId, books: runtimeB
   const [flash, setFlash] = useState(null)
   const libraryData = library.data || {}
   const books = useMemo(
-    () => buildBookCollection(runtimeBooks, libraryData, statistics.data || {}),
-    [libraryData, runtimeBooks, statistics.data],
+    () => buildPersonalBookCollection(runtimeBooks, libraryData),
+    [libraryData, runtimeBooks],
   )
   const bookMap = useMemo(() => new Map(books.map((book) => [book.id, book])), [books])
   const lists = useMemo(
@@ -101,11 +96,11 @@ export default function usePersonalReadingAdapter({ workspaceId, books: runtimeB
   const systemListBooks = useCallback((list) => {
     if (list?.id === 'liked') return books.filter((book) => book.liked)
     if (list?.id === 'recent') {
-      const recentIds = (statistics.data?.recentReading || []).map((item) => item.bookId)
+      const recentIds = statistics.data?.lastReading?.bookId ? [statistics.data.lastReading.bookId] : []
       return recentIds.map((bookId) => bookMap.get(bookId)).filter(Boolean)
     }
     return books
-  }, [bookMap, books, statistics.data?.recentReading])
+  }, [bookMap, books, statistics.data?.lastReading?.bookId])
   const notify = useCallback(async (operation, successText) => {
     try {
       const result = await operation()

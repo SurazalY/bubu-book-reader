@@ -1,123 +1,62 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { BookCover, cx, Icon } from '../../components/ui.jsx'
+
+import { BookCover, Icon } from '../../components/ui.jsx'
 import { formatReadingMinutes } from '../../shared/format.js'
 import { GlassPanel } from '../components/Glass.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 
-// 我的读书排行（规格 §4.2）：只比较同一学生读过的不同书籍。
-// 红线：不出现同学排名、班级百分位或人气榜；Codex 第 85 轮拍板口径是「个人听歌排行」那种。
+const titleCollator = new Intl.Collator('zh-CN', { sensitivity: 'base', numeric: true })
+
+// 旧路由保留兼容，但页面不再按阅读时长、页码或完成情况做竞争式排序。
 export default function Ranking() {
   const { runtime } = useStudent()
-  const loading = runtime.status === 'loading'
-  const failed = runtime.status === 'error'
   const rows = useMemo(() => (runtime.data?.books || [])
-    .map((book) => ({
-      ...book,
-      effectiveMinutes: Number(book?.progress?.effectiveMinutes) || 0,
-    }))
-    .filter((book) => book.effectiveMinutes > 0)
-    .sort((left, right) => right.effectiveMinutes - left.effectiveMinutes), [runtime.data?.books])
-  const top = rows[0]
-  const minutesOf = (book) => book.effectiveMinutes
+    .slice()
+    .sort((left, right) =>
+      titleCollator.compare(String(left.title || ''), String(right.title || ''))
+      || String(left.id || '').localeCompare(String(right.id || ''), 'en')), [runtime.data?.books])
 
   return (
     <div className="flex-1 space-y-4">
       <div className="student-enter flex items-center gap-3">
-        <Link
-          to="/student/home"
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/72 px-4 py-2 text-caption font-semibold text-ink-600 transition hover:bg-white/90 hover:text-ink-900"
-        >
-          <Icon name="ArrowLeft" className="h-4 w-4" />
-          返回主页
+        <Link to="/student/home" className="inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/72 px-4 py-2 text-caption font-semibold text-ink-600 transition hover:bg-white/90 hover:text-ink-900">
+          <Icon name="ArrowLeft" className="h-4 w-4" />返回主页
         </Link>
       </div>
 
       <GlassPanel tone="solid" sheen className="student-enter rounded-2xl p-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-h1 font-bold text-ink-900">我的读书排行</h1>
-            <p className="mt-1.5 text-caption text-ink-500">
-              只排你自己读过的书，按服务端返回的累计有效阅读时间。这里不和同学比较，也没有班级名次。
-            </p>
-          </div>
-          <div className="student-segment inline-flex rounded-full p-1" aria-label="当前统计范围">
-            <span className="student-segment--on rounded-full px-4 py-2 text-caption font-semibold text-ink-900">累计</span>
-          </div>
-        </div>
-        <p className="mt-3 text-micro text-ink-400">当前接口只返回累计口径；有效阅读只统计真实翻页与停留。</p>
+        <h1 className="font-serif text-h1 font-bold text-ink-900">我的阅读书目</h1>
+        <p className="mt-1.5 text-caption text-ink-500">书目按规范化书名和 ID 稳定排列，不按时长、完成情况或页码评出名次。</p>
 
-        {loading ? (
-          <div className="mt-6 rounded-xl bg-white/58 px-6 py-10 text-center">
-            <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/75 text-ink-300">
-              <Icon name="LoaderCircle" className="h-6 w-6 animate-spin" strokeWidth={1.8} />
-            </span>
-            <p className="mt-3 text-title font-semibold text-ink-800">正在读取个人阅读统计</p>
-          </div>
-        ) : rows.length > 0 ? (
-          <ol className="mt-5 space-y-2.5">
-            {rows.map((book, i) => {
-              const minutes = minutesOf(book)
-              const ratio = top ? Math.max(6, Math.round((minutes / minutesOf(top)) * 100)) : 0
+        {runtime.status === 'loading' ? (
+          <p className="mt-6 rounded-xl bg-white/58 px-6 py-10 text-center text-caption text-ink-500">正在读取书目…</p>
+        ) : runtime.status === 'error' ? (
+          <p className="mt-6 rounded-xl bg-white/58 px-6 py-10 text-center text-caption text-ink-500">书目请求失败，本页不会回退到演示排行。</p>
+        ) : rows.length ? (
+          <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">
+            {rows.map((book, index) => {
+              const minutes = formatReadingMinutes(book.progress?.effectiveMinutes)
               return (
-                <li key={book.id} className="student-stagger" style={{ '--i': i }}>
-                  <Link
-                    to={`/student/books/${book.id}`}
-                    className="group flex items-center gap-3.5 rounded-xl bg-white/62 px-3.5 py-3 transition hover:bg-white/88"
-                  >
-                    <span
-                      className={cx(
-                        'w-6 shrink-0 text-center font-serif text-title font-bold tabular-nums',
-                        i === 0 ? 'text-[#2FA38C]' : 'text-ink-400',
-                      )}
-                    >
-                      {i + 1}
-                    </span>
+                <li key={book.id} className="student-stagger" style={{ '--i': index }}>
+                  <Link to={`/student/books/${book.id}`} className="group flex items-center gap-3.5 rounded-xl bg-white/62 px-3.5 py-3 transition hover:bg-white/88">
                     <BookCover book={book} className="w-[44px] shrink-0 rounded-md shadow-e1" />
                     <span className="min-w-0 flex-1">
-                      <span className="flex items-baseline gap-2">
-                        <span className="truncate font-serif text-title font-bold text-ink-900">{book.title}</span>
-                        <span className="shrink-0 text-micro text-ink-400">{book.author}</span>
-                      </span>
-                      <span className="student-rank-track mt-2 block h-1.5 w-full rounded-full">
-                        <span className="student-rank-fill block h-full rounded-full" style={{ width: `${ratio}%` }} />
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-right">
-                      <span className="block text-caption font-semibold text-ink-800 tabular-nums">
-                        {formatReadingMinutes(minutes) || '0 分钟'}
-                      </span>
-                      <span className="mt-0.5 block text-micro text-ink-400 tabular-nums">
-                        {Number.isFinite(Number(book.progress?.percent)) ? `已读 ${book.progress.percent}%` : '进度由服务端计算'}
+                      <span className="block truncate font-serif text-title font-bold text-ink-900">{book.title || '服务端未返回书名'}</span>
+                      <span className="mt-0.5 block truncate text-micro text-ink-500">{book.author || '服务端未返回作者'}</span>
+                      <span className="mt-1 block text-micro text-ink-400 tabular-nums">
+                        {Number.isSafeInteger(book.progress?.currentPage) ? `最近位置：第 ${book.progress.currentPage} 页` : '暂无最近阅读位置'}
+                        {minutes ? ` · 有效阅读 ${minutes}` : ''}
                       </span>
                     </span>
-                    <Icon
-                      name="ChevronRight"
-                      className="h-4 w-4 shrink-0 text-ink-300 transition group-hover:translate-x-0.5"
-                    />
+                    <Icon name="ChevronRight" className="h-4 w-4 shrink-0 text-ink-300 transition group-hover:translate-x-0.5" />
                   </Link>
                 </li>
               )
             })}
-          </ol>
+          </ul>
         ) : (
-          <div className="mt-6 rounded-xl bg-white/58 px-6 py-10 text-center">
-            <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/75 text-ink-300">
-              <Icon name="BarChart3" className="h-6 w-6" strokeWidth={1.8} />
-            </span>
-            <p className="mt-3 text-title font-semibold text-ink-800">
-              {failed ? '阅读统计暂不可用' : '还没有有效阅读记录'}
-            </p>
-            <p className="mt-1.5 text-caption text-ink-500">
-              {failed ? '请求失败时不会回退到本地演示排行。' : '读过的书会按累计有效阅读时间自动排进来。'}
-            </p>
-            <Link
-              to="/student/shelf"
-              className="mt-4 inline-block rounded-full border border-white/70 bg-white/75 px-4 py-2 text-caption font-semibold text-ink-700 transition hover:bg-white"
-            >
-              去书架挑一本
-            </Link>
-          </div>
+          <p className="mt-6 rounded-xl bg-white/58 px-6 py-10 text-center text-caption text-ink-500">当前书架还没有可展示的书目。</p>
         )}
       </GlassPanel>
     </div>

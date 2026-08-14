@@ -10,7 +10,6 @@ const EMPTY_LIBRARY = Object.freeze({
   bookmarks: Object.freeze([]),
   excerpts: Object.freeze([]),
   annotations: Object.freeze([]),
-  footprints: Object.freeze([]),
 })
 
 export function normalizeReadingLibrary(value) {
@@ -22,7 +21,6 @@ export function normalizeReadingLibrary(value) {
     bookmarks: Array.isArray(source.bookmarks) ? source.bookmarks : [],
     excerpts: Array.isArray(source.excerpts) ? source.excerpts : [],
     annotations: Array.isArray(source.annotations) ? source.annotations : [],
-    footprints: Array.isArray(source.footprints) ? source.footprints : [],
   }
 }
 

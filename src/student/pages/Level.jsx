@@ -2,23 +2,15 @@ import { Icon } from '../../components/ui.jsx'
 import { GlassPanel } from '../components/Glass.jsx'
 import PageHead from '../components/PageHead.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
-import useReadingStatistics from '../state/useReadingStatistics.js'
-
-function formatMinutes(value) {
-  const minutes = Math.max(0, Math.round(Number(value) || 0))
-  if (minutes < 60) return `${minutes} 分钟`
-  return `${Math.floor(minutes / 60)} 小时 ${minutes % 60} 分钟`
-}
 
 // 阅读等级与徽章（规格 §10.4）：只表达自己的成长。
 // 红线：没有同学排行、没有每日签到、没有付费特权，也不给任何诊断性标签。
 export default function Level() {
-  const { student: studentValue, runtime } = useStudent()
-  const statistics = useReadingStatistics(runtime.data?.workspaceId)
+  const { student: studentValue } = useStudent()
   const student = studentValue || { level: {} }
-  const current = Number(student.level?.value) || 0
+  const levelValue = Number(student.level?.value)
+  const current = Number.isFinite(levelValue) ? levelValue : null
   const title = student.level?.title || '等级正在读取'
-  const total = Math.round((statistics.data?.totalEffectiveReadingSeconds || 0) / 60)
 
   return (
     <div className="flex-1 space-y-4">
@@ -27,16 +19,16 @@ export default function Level() {
       <GlassPanel tone="solid" className="student-enter rounded-2xl p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="font-serif text-h3 font-bold text-ink-900">
-            现在是 Lv.{current} · {title}
+            {current === null ? '当前等级暂未返回' : `现在是 Lv.${current} · ${title}`}
           </h2>
-          <span className="text-caption text-ink-500 tabular-nums">累计有效阅读 {formatMinutes(total)}</span>
+          <span className="text-caption text-ink-500">等级由学生资料接口下发</span>
         </div>
 
         {/* 等级阶梯：当前一级同时加粗、加深并写「现在在这里」，不只靠颜色区分 */}
         <ol className="mt-5 space-y-2.5">
           <li className="student-stagger student-level-now flex items-center gap-3.5 rounded-xl px-4 py-3.5" style={{ '--i': 0 }}>
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#DFF3EC] font-serif text-caption font-bold text-[#2C8B76]">
-              {current}
+              {current ?? '—'}
             </span>
             <span className="min-w-0 flex-1">
               <span className="flex flex-wrap items-baseline gap-2">
@@ -44,7 +36,7 @@ export default function Level() {
                 <span className="student-badge">现在在这里</span>
               </span>
               <span className="mt-0.5 block text-micro text-ink-500 tabular-nums">
-                已有累计有效阅读 {formatMinutes(total)}；下一等级阈值尚未由服务端下发。
+                当前接口没有下发等级阈值或累计阅读条件，本页不会自行推算。
               </span>
             </span>
           </li>

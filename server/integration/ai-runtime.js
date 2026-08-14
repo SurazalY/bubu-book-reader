@@ -120,21 +120,9 @@ function readScopeProvider(database, input) {
       AND book.status = 'published'
   `).get(input.currentPageId, input.bookVersionId, input.organizationId, input.organizationId)
   if (!page) return null
-  const progress = database.prepare(`
-    SELECT * FROM reading_progress
-    WHERE actor_id = ? AND book_version_id = ?
-    ORDER BY updated_at DESC LIMIT 1
-  `).get(input.userId, input.bookVersionId)
-  const expectedVersion = progress ? String(progress.version) : '0'
+  const expectedVersion = `current-page:${page.id}`
   if (input.readRangeVersion !== expectedVersion) return null
-  const lastPageNo = progress ? Math.max(1, Number(progress.last_page_no) || 1) : 1
-  if (page.page_no > lastPageNo) return null
-  const pageIds = database.prepare(`
-    SELECT id FROM book_pages
-    WHERE book_version_id = ? AND page_no <= ?
-    ORDER BY page_no
-  `).all(input.bookVersionId, lastPageNo).map((row) => row.id)
-  return { currentPageId: page.id, pageIds, readRangeVersion: expectedVersion }
+  return { currentPageId: page.id, pageIds: [page.id], readRangeVersion: expectedVersion }
 }
 
 function evidenceBlockProvider(database, input) {
@@ -339,6 +327,8 @@ export function createConversation(database, { id, organizationId, ownerUserId, 
 }
 
 export function deriveAiRequestScope(database, { organizationId, ownerUserId, bookId, currentPageNo }) {
+  const normalizedPageNo = Number(currentPageNo)
+  if (!Number.isSafeInteger(normalizedPageNo) || normalizedPageNo <= 0) return null
   const page = database.prepare(`
     SELECT page.id AS page_id, page.book_version_id, page.page_no
     FROM books AS book
@@ -347,19 +337,12 @@ export function deriveAiRequestScope(database, { organizationId, ownerUserId, bo
     WHERE book.id = ? AND book.organization_id_at_creation = ? AND book.status = 'published'
     ORDER BY version.created_at DESC, version.id DESC
     LIMIT 1
-  `).get(Number(currentPageNo) || 1, bookId, organizationId)
+  `).get(normalizedPageNo, bookId, organizationId)
   if (!page) return null
-  const progress = database.prepare(`
-    SELECT version, last_page_no FROM reading_progress
-    WHERE actor_id = ? AND book_version_id = ?
-    ORDER BY updated_at DESC LIMIT 1
-  `).get(ownerUserId, page.book_version_id)
-  const lastPageNo = progress ? Math.max(1, Number(progress.last_page_no) || 1) : 1
-  if (page.page_no > lastPageNo) return null
   return {
     bookVersionId: page.book_version_id,
     currentPageId: page.page_id,
     currentPageNo: page.page_no,
-    readRangeVersion: progress ? String(progress.version) : '0',
+    readRangeVersion: `current-page:${page.page_id}`,
   }
 }

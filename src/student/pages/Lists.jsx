@@ -4,7 +4,7 @@ import { BookCover, cx, Icon } from '../../components/ui.jsx'
 import { GlassCard, GlassPanel } from '../components/Glass.jsx'
 import PageHead from '../components/PageHead.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
-import usePersonalReadingAdapter, { formatMinutes } from '../state/usePersonalReadingAdapter.js'
+import usePersonalReadingAdapter from '../state/usePersonalReadingAdapter.js'
 
 // 全部书单（规格 §5.2）：
 // - 三个系统书单「我喜欢的书／最近阅读／本地下载」由系统自动维护，不能删也不能手动加书；
@@ -125,7 +125,6 @@ export default function Lists() {
           <ul className="mt-4 space-y-2.5">
             {me.lists.map((l, i) => {
               const books = l.bookIds.map((bookId) => bookMap.get(bookId)).filter(Boolean)
-              const minutes = books.reduce((s, b) => s + b.minutes, 0)
               return (
                 <li key={l.id} className="student-stagger" style={{ '--i': i }}>
                   <div className="rounded-xl bg-white/62 px-4 py-3.5">
@@ -159,11 +158,7 @@ export default function Lists() {
                       <div className="flex flex-wrap items-center gap-3">
                         <Link to={`/student/lists/${l.id}`} className="min-w-0 flex-1">
                           <span className="block truncate font-serif text-title font-bold text-ink-900">{l.name}</span>
-                          <span className="mt-0.5 block text-micro text-ink-400 tabular-nums">
-                            {books.length} 本
-                            <span className="mx-1.5 text-ink-300">·</span>
-                            已读 {formatMinutes(minutes, { zero: '0 分钟' })}
-                          </span>
+                          <span className="mt-0.5 block text-micro text-ink-400 tabular-nums">{books.length} 本</span>
                         </Link>
                         <div className="flex shrink-0 items-center gap-1.5">
                           <IconBtn

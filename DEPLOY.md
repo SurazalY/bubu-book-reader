@@ -8,30 +8,30 @@
 - **生产同源**：后端 serve dist，前端相对 `/api` 直达，无需跨域 / 代理
 
 ## 一、环境要求
-- Node.js ≥ 18（用到 `node --watch`、原生 fetch）
+- Node.js ≥ 22.16（与仓库 `engines` 和内置 SQLite 运行方式一致）
 - 一个 OpenAI 兼容的 LLM 端点 + key
 
 ## 二、部署步骤
 ```bash
 # 1. 装依赖（前端 + 后端各一次）
 npm install
-cd server && npm install && cd ..
+npm --prefix server install
 
-# 2. 配置 AI（复制模板填 key）
-cp server/.env.example server/.env
-#    编辑 server/.env：填 AI_BASE_URL / AI_API_KEY，按需调 AI_MODEL
+# 2. 配置运行环境（复制模板并只在部署环境填写密钥）
+cp .env.example .env
+#    编辑 .env：填写 OPENAI_BASE_URL / OPENAI_API_KEY / MODEL_ID
 
 # 3. 构建前端
 npm run build            # 生成 dist/
 
 # 4. 启动（默认 5191，serve dist + /api）
-cd server && npm start
+npm run server
 #    浏览器访问 http://<服务器IP>:5191
 ```
 
-> 已 build 的部署包可跳过第 1、3 步的前端部分（dist 已在包内）：只需 `cd server && npm install`、配 `.env`、`npm start`。
+> 已 build 的部署包可跳过第 3 步；仍需安装服务端依赖、配置环境变量并执行 `npm run server`。
 
-## 三、环境变量（server/.env）
+## 三、环境变量（项目根目录 `.env`）
 | 变量 | 说明 | 默认 |
 |---|---|---|
 | `PORT` | 服务端口 | `5191` |
@@ -60,5 +60,5 @@ npm run dev                      # 5190
 访问 http://127.0.0.1:5190
 
 ## 备注
-- `server/.env` 含密钥，已 gitignore，**切勿提交**；每个部署各自填本地 `.env`
+- `.env` 含密钥，已 gitignore，**切勿提交**；每个部署各自维护运行环境变量
 - 前端 js 单包约 1 MB（含 3D 翻页引擎），演示足够；如需优化可做 code-split

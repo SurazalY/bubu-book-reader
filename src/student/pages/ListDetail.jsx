@@ -5,7 +5,7 @@ import { GlassPanel } from '../components/Glass.jsx'
 import BookCard from '../components/BookCard.jsx'
 import PageHead from '../components/PageHead.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
-import usePersonalReadingAdapter, { formatMinutes } from '../state/usePersonalReadingAdapter.js'
+import usePersonalReadingAdapter from '../state/usePersonalReadingAdapter.js'
 
 // 书单详情（规格 §5.2）：
 // - 系统书单只读，页面上直接说明它是怎么自动来的；
@@ -62,7 +62,6 @@ export default function ListDetail() {
   }
 
   const name = system ? system.name : custom.name
-  const minutes = books.reduce((s, b) => s + b.minutes, 0)
   const toggleCheck = (id) => {
     setChecked((prev) => {
       const next = new Set(prev)
@@ -103,12 +102,6 @@ export default function ListDetail() {
       <GlassPanel tone="solid" className="student-enter flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl px-6 py-4">
         <span className="text-caption text-ink-600 tabular-nums">
           共 <b className="text-ink-900">{books.length}</b> 本
-        </span>
-        <span className="text-caption text-ink-600 tabular-nums">
-          已读 <b className="text-ink-900">{formatMinutes(minutes, { zero: '0 分钟' })}</b>
-        </span>
-        <span className="text-caption text-ink-600 tabular-nums">
-          读完 <b className="text-ink-900">{books.filter((b) => b.finished).length}</b> 本
         </span>
         <span className="ml-auto text-micro text-ink-400">
           {system ? '系统书单，内容自动更新' : '自己建的书单，顺序按加入先后'}
@@ -218,8 +211,7 @@ export default function ListDetail() {
             // h-full + mt-auto：有班级共读的卡更高，不贴底的话同一行的「移出」会高低不齐
             <div key={b.id} className="student-stagger flex h-full flex-col gap-2" style={{ '--i': i }}>
               <BookCard book={b} />
-              {/* 「移出」放卡片下面，不叠在封面右上角：
-                  那里已经有爱心与「已读完／已下载」角标，压上去会互相盖住（逐张自检抓到）。 */}
+              {/* 「移出」放卡片下面，不叠在封面的收藏与下载状态上。 */}
               {custom && (
                 <button
                   type="button"

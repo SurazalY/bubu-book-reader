@@ -1,21 +1,25 @@
-import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { cx } from '../../shared/cx.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
-import { formatReadingMinutes } from '../../shared/format.js'
 import { GlassCard, GlassPanel } from '../components/Glass.jsx'
 import BookCard from '../components/BookCard.jsx'
 import BookCover from '../components/BookCover.jsx'
 import Clock from '../components/Clock.jsx'
+import DailyReadingBrief from '../components/reading-monitor/DailyReadingBrief.jsx'
+import { formatReadingDuration } from '../components/reading-monitor/dailyReadingBriefModel.js'
 import { HOME_LIST_LIMIT, useStudent } from '../state/StudentContext.jsx'
+import useReadingStatistics from '../state/useReadingStatistics.js'
 
 // 主页（规格 §4）：时钟 → 五快捷入口 → 「我喜欢的书」→ 自定义书单。
-// 红线：不放教师通知、AI 额度、护眼状态、最近心得与社区推荐，它们各归个人主页与社区；
-// 读书排行只比自己的书，不出现任何同学比较或班级百分位（Codex 第 85 轮拍板）。
+// 红线：不放教师通知、AI 额度、护眼状态、最近心得与社区推荐；
+// 个人首页也不从页码、本数或学生间比较推导阅读进度。
 //
 export default function Home() {
   const { student, runtime } = useStudent()
+  const navigate = useNavigate()
+  const readingStatistics = useReadingStatistics(runtime.data?.workspaceId)
   const books = runtime.data?.books || []
   const lists = runtime.data?.homeLists || []
   const summary = runtime.data?.readingSummary || {}
@@ -29,74 +33,102 @@ export default function Home() {
     () => books.filter((book) => book.liked),
     [books],
   )
-  const topBook = useMemo(
-    () => [...books]
-      .filter((book) => Number.isFinite(book.progress?.effectiveMinutes))
-      .sort((left, right) => (right.progress.effectiveMinutes || 0) - (left.progress.effectiveMinutes || 0))[0],
-    [books],
-  )
   const shown = lists.slice(0, HOME_LIST_LIMIT)
   const folded = lists.length - shown.length
+  const briefResource = readingStatistics.dailyReadingBriefResource
+  const briefData = ['ready', 'stale'].includes(briefResource.status) ? briefResource.data : null
+  const briefValue = (render) => {
+    if (briefResource.status === 'loading') return '正在读取'
+    if (!briefData) return '暂不可用'
+    return render(briefData)
+  }
+  const downloadValue = loading
+    ? '正在读取'
+    : ready && summary.downloadedBookCount != null
+      ? `${summary.downloadedBookCount} 本`
+      : '暂不可用'
+  const levelValue = loading
+    ? '正在读取'
+    : level.value != null
+      ? `Lv.${level.value}${level.title ? ` ${level.title}` : ''}`
+      : '暂不可用'
+
+  const handleContinueReading = useCallback((lastReading) => {
+    if (!readingStatistics.continueReadingUrl) return
+    const target = readingStatistics.buildContinueReadingUrl(lastReading)
+    if (target === readingStatistics.continueReadingUrl) navigate(target)
+  }, [navigate, readingStatistics.buildContinueReadingUrl, readingStatistics.continueReadingUrl])
+
+  const handleOpenShelf = useCallback(() => navigate('/student/shelf'), [navigate])
 
   const shortcuts = [
     {
       key: 'time',
-      label: '有效阅读总时间',
-      value: loading ? '正在读取' : formatReadingMinutes(summary.effectiveMinutes) || '服务端未返回',
-      hint: '由服务端按有效阅读规则计算。',
+      label: '今日有效阅读',
+      value: briefValue((data) => formatReadingDuration(data.todayEffectiveReadingSeconds)),
+      hint: '由服务端按今日有效阅读规则汇总。',
       icon: 'Timer',
       tint: '#2FA38C',
       soft: 'rgba(214, 242, 232, 0.9)',
       to: '/student/me/footprint',
     },
     {
-      key: 'level',
-      label: '阅读等级',
-      value: loading ? '正在读取' : level.value != null ? `Lv.${level.value}${level.title ? ` ${level.title}` : ''}` : '服务端未返回',
-      hint: '等级只表达服务端返回的个人成长数据。',
-      icon: 'Sparkles',
+      key: 'check-in',
+      label: '今日打卡',
+      value: briefValue((data) => (data.checkIn.checked
+        ? '已打卡'
+        : `还需 ${formatReadingDuration(data.checkIn.remainingSeconds)}`)),
+      hint: '只展示服务端返回的五分钟打卡状态。',
+      icon: 'CalendarCheck2',
       tint: '#8B7BE0',
       soft: 'rgba(232, 228, 250, 0.9)',
-      to: '/student/me/level',
+      to: '/student/me/footprint',
+    },
+    {
+      key: 'streak',
+      label: '连续积累',
+      value: briefValue((data) => (data.streakDays > 0 ? `${data.streakDays} 天` : '尚未形成')),
+      hint: '只展示服务端返回的连续积累天数。',
+      icon: 'Flame',
+      tint: '#3B77E8',
+      soft: 'rgba(220, 233, 252, 0.9)',
+      to: '/student/me/footprint',
     },
     {
       key: 'download',
       label: '本地下载',
-      value: loading ? '正在读取' : summary.downloadedBookCount != null ? `${summary.downloadedBookCount} 本` : '服务端未返回',
+      value: downloadValue,
       hint: '仅根据书架 API 中可用的下载状态显示。',
       icon: 'Download',
-      tint: '#3B77E8',
-      soft: 'rgba(220, 233, 252, 0.9)',
-      to: '/student/shelf',
-    },
-    {
-      key: 'recent',
-      label: '最近阅读',
-      value: loading ? '正在读取' : summary.startedBookCount != null ? `${summary.startedBookCount} 本` : '服务端未返回',
-      hint: '由服务端阅读进度汇总返回。',
-      icon: 'Clock',
       tint: '#4E9BD8',
       soft: 'rgba(219, 238, 250, 0.9)',
       to: '/student/shelf',
     },
     {
-      key: 'ranking',
-      label: '读书排行 · 本周最多',
-      value: loading ? '正在读取' : topBook?.title || '暂无可比较数据',
-      hint: '只排自己读过的书，按有效阅读时间，不和同学比较。',
-      icon: 'BarChart3',
+      key: 'level',
+      label: '阅读等级',
+      value: levelValue,
+      hint: '等级只表达服务端返回的个人成长数据。',
+      icon: 'Sparkles',
       tint: '#2FA38C',
       soft: 'rgba(216, 241, 231, 0.9)',
-      to: '/student/home/ranking',
+      to: '/student/me/level',
     },
   ]
 
   return (
     <div className="space-y-6 pb-2">
+      <DailyReadingBrief
+        resource={briefResource}
+        onRetry={readingStatistics.retry}
+        onContinueReading={readingStatistics.continueReadingUrl ? handleContinueReading : undefined}
+        onOpenShelf={handleOpenShelf}
+      />
+
       <Clock className="student-enter px-1 pt-1" />
 
       {/* 五快捷入口：母版是一行五张等宽玻璃卡，数值旁必须能看到口径说明或详情入口 */}
-      <section className="student-enter grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+      <section className="student-enter grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5 max-[479px]:grid-cols-1">
         {shortcuts.map((s, i) => (
           <Link
             key={s.key}
@@ -234,21 +266,12 @@ function SectionHead({ icon, title, count, to, moreLabel, hideMore }) {
 function ListCard({ list, index, canUp, canDown }) {
   const books = list.books || []
   const preview = books.slice(0, 3)
-  const minutes = books.reduce((sum, book) => sum + (book.progress?.effectiveMinutes || 0), 0)
   return (
     <GlassCard className="student-stagger group relative flex items-center gap-3 p-3" style={{ '--i': index }}>
       <Link to={`/student/lists/${list.id}`} className="flex min-w-0 flex-1 items-center gap-3">
         <span className="min-w-0 flex-1">
           <span className="block truncate text-title font-semibold text-ink-900">{list.name}</span>
-          <span className="mt-1 block text-micro text-ink-500 tabular-nums">
-            {books.length} 本
-            {minutes > 0 && (
-              <>
-                <span className="mx-1.5 text-ink-300">·</span>
-                已读 {formatReadingMinutes(minutes)}
-              </>
-            )}
-          </span>
+          <span className="mt-1 block text-micro text-ink-500 tabular-nums">{books.length} 本</span>
         </span>
         <span className="flex shrink-0 items-center">
           {preview.map((b, i) => (

@@ -5,37 +5,110 @@ import { withTransaction } from '../../db/database.js'
 
 const aiNotice = '本报告包含 AI 生成内容，仅供参考，不能替代教师、学校或专业人员的判断。'
 
+const forbiddenReadingCompletionMetrics = new Set([
+  'startedbookcount',
+  'startedbooks',
+  'booksstarted',
+  'finishedbookcount',
+  'finishedbooks',
+  'booksfinished',
+  'completedbookcount',
+  'completedbooks',
+  'bookscompleted',
+  'readbookcount',
+  'readbooks',
+  'booksread',
+  'pagesread',
+  'readpagecount',
+  'readingpages',
+  'pagecount',
+  'progress',
+  'readingprogress',
+  'progresspercent',
+  'percent',
+  'percentage',
+  'finished',
+  'completion',
+  'completionpercent',
+  '阅读页数',
+  '已读页数',
+  '阅读进度',
+  '阅读完成比例',
+  '完成度',
+  '开始阅读书目',
+  '已读书目',
+  '读完书籍数',
+])
+
+function isCompletionMetric(key) {
+  const normalized = String(key).replaceAll(/[_\s-]/g, '').toLowerCase()
+  if (forbiddenReadingCompletionMetrics.has(normalized)) return true
+  const hasReadingSubject = normalized.includes('reading')
+    || normalized.includes('book')
+    || normalized.includes('page')
+  const hasCompletionMeaning = normalized.includes('progress')
+    || normalized.includes('completion')
+    || normalized.includes('finished')
+    || normalized.includes('completed')
+    || normalized.includes('percent')
+    || normalized.includes('percentage')
+  if (hasReadingSubject && hasCompletionMeaning) return true
+  return (normalized.includes('阅读') && (
+    normalized.includes('进度')
+    || normalized.includes('完成')
+    || normalized.includes('页数')
+    || normalized.includes('比例')
+  )) || (normalized.includes('已读') && (
+    normalized.includes('页') || normalized.includes('书')
+  )) || normalized.includes('读完书')
+}
+
+function sanitizeReportContent(content) {
+  if (Array.isArray(content)) return content.map(sanitizeReportContent)
+  if (!content || typeof content !== 'object') return content
+  return Object.fromEntries(Object.entries(content)
+    .filter(([key]) => !isCompletionMetric(key))
+    .map(([key, value]) => [key, sanitizeReportContent(value)]))
+}
+
 function buildReadingSnapshot(db, current, studentId) {
   const rows = db.prepare(`
-    SELECT progress.book_version_id, progress.last_page_no, progress.valid_reading_seconds,
-      progress.updated_from_event_at, progress.version, book.title
-    FROM reading_progress AS progress
-    JOIN book_versions AS book_version ON book_version.id = progress.book_version_id
+    SELECT summary.book_version_id, SUM(summary.effective_reading_ms) AS effective_reading_ms,
+      MAX(summary.last_read_at) AS last_read_at, MAX(summary.updated_at) AS updated_at,
+      MAX(summary.version) AS latest_version, book.title
+    FROM reading_daily_book_summaries AS summary
+    JOIN book_versions AS book_version ON book_version.id = summary.book_version_id
     JOIN books AS book ON book.id = book_version.book_id
-    WHERE progress.actor_id = ? AND progress.workspace_id = ?
+    WHERE summary.actor_id_at_creation = ? AND summary.workspace_id_at_creation = ?
+      AND summary.organization_id_at_creation = ?
       AND book_version.organization_id_at_creation = ?
       AND book.organization_id_at_creation = ?
-    ORDER BY progress.updated_from_event_at DESC, progress.book_version_id
-  `).all(studentId, current.workspace.id, current.workspace.organizationId, current.workspace.organizationId)
-  const validReadingSeconds = rows.reduce((total, row) => total + Number(row.valid_reading_seconds || 0), 0)
-  const latestReadingAt = rows[0]?.updated_from_event_at || null
+    GROUP BY summary.book_version_id, book.title
+    ORDER BY last_read_at DESC, summary.book_version_id
+  `).all(
+    studentId,
+    current.workspace.id,
+    current.workspace.organizationId,
+    current.workspace.organizationId,
+    current.workspace.organizationId,
+  )
+  const effectiveReadingMs = rows.reduce((total, row) => total + Number(row.effective_reading_ms || 0), 0)
+  const latestReadingAt = rows[0]?.last_read_at || null
   const fingerprint = createHash('sha256').update(JSON.stringify(rows.map((row) => ({
     bookVersionId: row.book_version_id,
-    lastPageNo: row.last_page_no,
-    validReadingSeconds: row.valid_reading_seconds,
-    updatedFromEventAt: row.updated_from_event_at,
-    version: row.version,
+    effectiveReadingMs: row.effective_reading_ms,
+    lastReadAt: row.last_read_at,
+    updatedAt: row.updated_at,
+    latestVersion: row.latest_version,
   })))).digest('hex')
   return {
-    snapshotKey: `reading-progress:${studentId}:${fingerprint}`,
+    snapshotKey: `reading-daily:${studentId}:${fingerprint}`,
     content: {
-      effectiveMinutes: Math.floor(validReadingSeconds / 60),
-      pagesRead: rows.reduce((total, row) => total + Number(row.last_page_no || 0), 0),
-      startedBookCount: rows.length,
+      ...(rows.length ? { effectiveMinutes: Math.floor(effectiveReadingMs / 60_000) } : {}),
       latestReadingAt,
       highlights: rows.length
-        ? rows.slice(0, 3).map((row) => `${row.title}：读到第 ${row.last_page_no} 页，有效阅读 ${Math.floor(Number(row.valid_reading_seconds || 0) / 60)} 分钟`)
-        : ['当前工作空间尚无有效阅读进度'],
+        ? rows.slice(0, 3).map((row) => `${row.title}：有效阅读 ${Math.floor(Number(row.effective_reading_ms || 0) / 60_000)} 分钟`)
+        : ['当前工作空间尚无有效阅读记录'],
     },
   }
 }
@@ -56,7 +129,7 @@ export function createReportsDomain({ db, actor, workspace, outbox, audit, clock
         ? buildReadingSnapshot(db, current, safeStudentId)
         : null
       const safeSnapshotKey = requireText(snapshotKey ?? readingSnapshot?.snapshotKey, 'snapshotKey', 300)
-      const reportContent = content ?? readingSnapshot?.content
+      const reportContent = sanitizeReportContent(content ?? readingSnapshot?.content)
       const reportAiGenerated = aiGenerated ?? readingSnapshot === null
       const report = db.prepare('SELECT * FROM reports WHERE organization_id_at_creation = ? AND workspace_id_at_creation = ? AND student_id = ? AND generated_from_snapshot_key = ?').get(current.workspace.organizationId, current.workspace.id, safeStudentId, safeSnapshotKey)
       const authorizeStudent = () => {
@@ -103,7 +176,7 @@ export function createReportsDomain({ db, actor, workspace, outbox, audit, clock
         snapshotKey: row.generated_from_snapshot_key,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
-        content: row.content_json ? JSON.parse(row.content_json) : null,
+        content: row.content_json ? sanitizeReportContent(JSON.parse(row.content_json)) : null,
         aiGenerated: Boolean(row.ai_generated),
         aiNotice: row.ai_notice,
         reviewedAt: row.reviewed_at,
@@ -114,7 +187,11 @@ export function createReportsDomain({ db, actor, workspace, outbox, audit, clock
       const current = context()
       requirePermission(current, 'report.generate')
       const report = assertWorkspace(db.prepare('SELECT * FROM reports WHERE id = ?').get(reportId), current.workspace)
-      const versions = db.prepare('SELECT * FROM report_versions WHERE report_id = ? ORDER BY version_number').all(reportId).map((version) => ({ ...version, content: JSON.parse(version.content_json), ai_generated: Boolean(version.ai_generated) }))
+      const versions = db.prepare('SELECT * FROM report_versions WHERE report_id = ? ORDER BY version_number').all(reportId).map((version) => ({
+        ...version,
+        content: sanitizeReportContent(JSON.parse(version.content_json)),
+        ai_generated: Boolean(version.ai_generated),
+      }))
       return { ...report, versions }
     },
 

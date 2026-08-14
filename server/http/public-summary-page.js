@@ -1,10 +1,74 @@
 const labels = {
   effectiveMinutes: '有效阅读时长',
-  pagesRead: '阅读页数',
-  startedBookCount: '开始阅读书目',
   latestReadingAt: '最近有效阅读',
   highlights: '阅读亮点',
   teacherComment: '教师寄语',
+}
+
+const forbiddenCompletionMetrics = new Set([
+  'startedbookcount',
+  'startedbooks',
+  'booksstarted',
+  'finishedbookcount',
+  'finishedbooks',
+  'booksfinished',
+  'completedbookcount',
+  'completedbooks',
+  'bookscompleted',
+  'readbookcount',
+  'readbooks',
+  'booksread',
+  'pagesread',
+  'readpagecount',
+  'readingpages',
+  'pagecount',
+  'progress',
+  'readingprogress',
+  'progresspercent',
+  'percent',
+  'percentage',
+  'finished',
+  'completion',
+  'completionpercent',
+  '阅读页数',
+  '已读页数',
+  '阅读进度',
+  '阅读完成比例',
+  '完成度',
+  '开始阅读书目',
+  '已读书目',
+  '读完书籍数',
+])
+
+function isForbiddenCompletionMetric(key) {
+  const normalized = String(key).replaceAll(/[_\s-]/g, '').toLowerCase()
+  if (forbiddenCompletionMetrics.has(normalized)) return true
+  const hasReadingSubject = normalized.includes('reading')
+    || normalized.includes('book')
+    || normalized.includes('page')
+  const hasCompletionMeaning = normalized.includes('progress')
+    || normalized.includes('completion')
+    || normalized.includes('finished')
+    || normalized.includes('completed')
+    || normalized.includes('percent')
+    || normalized.includes('percentage')
+  if (hasReadingSubject && hasCompletionMeaning) return true
+  return (normalized.includes('阅读') && (
+    normalized.includes('进度')
+    || normalized.includes('完成')
+    || normalized.includes('页数')
+    || normalized.includes('比例')
+  )) || (normalized.includes('已读') && (
+    normalized.includes('页') || normalized.includes('书')
+  )) || normalized.includes('读完书')
+}
+
+function sanitizePublicContent(content) {
+  if (Array.isArray(content)) return content.map(sanitizePublicContent)
+  if (!content || typeof content !== 'object') return content
+  return Object.fromEntries(Object.entries(content)
+    .filter(([key]) => !isForbiddenCompletionMetric(key))
+    .map(([key, value]) => [key, sanitizePublicContent(value)]))
 }
 
 function escapeHtml(value) {
@@ -18,12 +82,21 @@ function escapeHtml(value) {
 
 function displayValue(key, value) {
   if (key === 'effectiveMinutes' && Number.isFinite(Number(value))) return `${Number(value)} 分钟`
-  if (Array.isArray(value)) return value.map((item) => String(item)).join('、')
+  if (Array.isArray(value)) return value.map((item) => item && typeof item === 'object' ? JSON.stringify(item) : String(item)).join('、')
   if (value && typeof value === 'object') return JSON.stringify(value)
   return String(value ?? '—')
 }
 
-export function renderPublicSummaryPage(summary) {
+export function sanitizePublicSummary(summary) {
+  const report = summary?.report || {}
+  const content = report.content && typeof report.content === 'object'
+    ? sanitizePublicContent(report.content)
+    : report.content
+  return { ...summary, report: { ...report, content } }
+}
+
+export function renderPublicSummaryPage(input) {
+  const summary = sanitizePublicSummary(input)
   const content = summary.report.content && typeof summary.report.content === 'object' && !Array.isArray(summary.report.content)
     ? summary.report.content
     : summary.report.content

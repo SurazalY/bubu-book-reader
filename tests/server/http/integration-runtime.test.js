@@ -10,6 +10,10 @@ import { hashPassword } from '../../../server/auth/password.js'
 import { createReadmateApplication } from '../../../server/app.js'
 import { bootstrapInternalDemo } from '../../../server/db/bootstrap-internal-demo.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
+import {
+  canonicalReadingSummaryFingerprint,
+  readingStatDateFor,
+} from '../../../server/domains/reading/monitoring.js'
 
 function identityFixture() {
   const suffix = randomUUID()
@@ -338,6 +342,10 @@ test('真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许�
   const books = await requestJson(baseUrl, studentJar, '/books', { workspaceId: fixture.workspaceId })
   assert.equal(books.status, 200)
   assert.equal(books.payload.data.items[0].id, book.bookId)
+  assert.equal(books.payload.data.items[0].progress.currentPage, null)
+  assert.equal(Object.hasOwn(books.payload.data.items[0].progress, 'percent'), false)
+  assert.equal(Object.hasOwn(books.payload.data.items[0].progress, 'effectiveMinutes'), false)
+  assert.equal(Object.hasOwn(books.payload.data.items[0], 'finished'), false)
   const page = await requestJson(baseUrl, studentJar, `/books/${book.bookId}/pages/1`, { workspaceId: fixture.workspaceId })
   assert.equal(page.payload.data.blocks[0].text.includes('爱丽丝'), true)
 
@@ -372,8 +380,58 @@ test('真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许�
     },
   })
   assert.equal(readingWrite.status, 200, JSON.stringify(readingWrite.payload))
+  const libraryAfterLegacyEvent = await requestJson(baseUrl, studentJar, '/reading/library', { workspaceId: fixture.workspaceId })
+  assert.equal(libraryAfterLegacyEvent.status, 200, JSON.stringify(libraryAfterLegacyEvent.payload))
+  assert.equal(Object.hasOwn(libraryAfterLegacyEvent.payload.data, 'footprints'), false)
+  application.database.prepare(`UPDATE reading_events SET valid_reading_seconds = 86400 WHERE id = 'reading-event-1'`).run()
+  const legacyOnlyProgress = await requestJson(baseUrl, studentJar, '/reading/progress', { workspaceId: fixture.workspaceId })
+  assert.deepEqual(legacyOnlyProgress.payload.data.items, [])
+  const legacyOnlyUsage = await requestJson(baseUrl, teacherJar, '/usage/summary', { workspaceId: fixture.workspaceId })
+  assert.equal(legacyOnlyUsage.payload.data.metrics.activeReaders, 0)
+
+  const leaseHistory = application.database.prepare(`SELECT valid_from, valid_until
+    FROM reading_device_lease_history WHERE lease_id = ? ORDER BY valid_from DESC LIMIT 1`)
+    .get(lease.payload.data.leaseId)
+  const summary = {
+    schemaVersion: 1,
+    sessionId: 'integration-reading-summary-1',
+    revision: 1,
+    leaseId: lease.payload.data.leaseId,
+    bookVersionId: book.versionId,
+    statDate: readingStatDateFor(leaseHistory.valid_from),
+    startedAt: leaseHistory.valid_from,
+    measuredThroughAt: new Date(Date.parse(leaseHistory.valid_from) + 60_000).toISOString(),
+    cumulativeEffectiveMs: 60_000,
+    hadSkip: false,
+    hadReread: false,
+    lastPageNo: 2,
+    endedAt: null,
+    endReason: null,
+    fingerprint: '',
+  }
+  assert.ok(summary.measuredThroughAt <= leaseHistory.valid_until)
+  summary.fingerprint = canonicalReadingSummaryFingerprint(summary)
+  const summaryWrite = await requestJson(baseUrl, studentJar, '/reading/session-summaries', {
+    method: 'POST',
+    workspaceId: fixture.workspaceId,
+    idempotencyKey: 'integration-reading-summary-1',
+    body: summary,
+  })
+  assert.equal(summaryWrite.status, 200, JSON.stringify(summaryWrite.payload))
+  application.database.prepare(`UPDATE reading_progress SET valid_reading_seconds = 86400
+    WHERE actor_id = ? AND workspace_id = ? AND book_version_id = ?`)
+    .run(fixture.studentId, fixture.workspaceId, book.versionId)
   const progressAfterRefresh = await requestJson(baseUrl, studentJar, '/reading/progress', { workspaceId: fixture.workspaceId })
   assert.equal(progressAfterRefresh.payload.data.items[0].effectiveMinutes, 1)
+  assert.equal(progressAfterRefresh.payload.data.items[0].currentPage, 2)
+  assert.equal(Object.hasOwn(progressAfterRefresh.payload.data.items[0], 'percent'), false)
+  assert.equal(Object.hasOwn(progressAfterRefresh.payload.data.items[0], 'readRangeVersion'), false)
+  assert.equal(Object.hasOwn(progressAfterRefresh.payload.data, 'startedBookCount'), false)
+  const booksAtLastPage = await requestJson(baseUrl, studentJar, '/books', { workspaceId: fixture.workspaceId })
+  assert.equal(booksAtLastPage.payload.data.items[0].progress.currentPage, 2)
+  assert.equal(booksAtLastPage.payload.data.items[0].progress.effectiveMinutes, 1)
+  assert.equal(Object.hasOwn(booksAtLastPage.payload.data.items[0].progress, 'percent'), false)
+  assert.equal(Object.hasOwn(booksAtLastPage.payload.data.items[0], 'finished'), false)
   const teacherUsage = await requestJson(baseUrl, teacherJar, '/usage/summary', { workspaceId: fixture.workspaceId })
   assert.equal(teacherUsage.payload.data.metrics.activeReaders, 1)
 
@@ -416,6 +474,10 @@ test('真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许�
   })
   assert.equal(generated.status, 201, JSON.stringify(generated.payload))
   assert.equal(generated.payload.data.versions[0].content.effectiveMinutes, 1)
+  assert.equal(Object.hasOwn(generated.payload.data.versions[0].content, 'startedBookCount'), false)
+  assert.equal(Object.hasOwn(generated.payload.data.versions[0].content, 'startedBooks'), false)
+  assert.equal(Object.hasOwn(generated.payload.data.versions[0].content, 'pagesRead'), false)
+  assert.equal(generated.payload.data.versions[0].content.highlights.some((item) => item.includes('读到第')), false)
   assert.equal(generated.payload.data.versions[0].ai_generated, false)
   const reportId = generated.payload.data.id
   const reviewedReport = await requestJson(baseUrl, teacherJar, `/reports/${reportId}/review`, {
@@ -888,8 +950,22 @@ test('真实 HTTP 家长触达确定失败后重试成功并保存安全链接�
     method: 'POST',
     workspaceId: fixture.workspaceId,
     idempotencyKey: 'delivery-report-generate-1',
-    body: { studentId: fixture.studentId, snapshotKey: 'delivery-snapshot-1', content: { effectiveMinutes: 12 } },
+    body: {
+      studentId: fixture.studentId,
+      snapshotKey: 'delivery-snapshot-1',
+      content: {
+        effectiveMinutes: 12,
+        startedBookCount: 2,
+        startedBooks: 3,
+        booksStarted: 4,
+        finishedBookCount: 5,
+        pagesRead: 999,
+        progressPercent: 100,
+        finished: true,
+      },
+    },
   })
+  assert.deepEqual(generated.payload.data.versions[0].content, { effectiveMinutes: 12 })
   const reportId = generated.payload.data.id
   const reviewed = await requestJson(baseUrl, teacherJar, `/reports/${reportId}/review`, {
     method: 'POST',
@@ -931,12 +1007,30 @@ test('真实 HTTP 家长触达确定失败后重试成功并保存安全链接�
   assert.equal(secondAttempt.payload.data.status, 'sent')
   assert.equal(adapterCalls, 2)
 
+  const legacyArrayContent = [{
+    percent: 64,
+    percentage: 63,
+    '阅读完成比例': '62%',
+    note: '公开链接顶层数组普通文字',
+    eyeCare: { restCompliancePercentage: 61 },
+  }, {
+    nested: [{ progressPercent: 60, label: '公开链接嵌套普通文字' }],
+    classSummary: { attendancePercentage: 98 },
+  }]
+  application.database.prepare('UPDATE report_versions SET content_json = ? WHERE id = ?')
+    .run(JSON.stringify(legacyArrayContent), reviewed.payload.data.current_version_id)
   const invalidOpen = await requestJson(baseUrl, new Map(), `${queued.payload.data.publicUrl.slice(0, -1)}x`)
   assert.equal(invalidOpen.status, 403)
   assert.equal(invalidOpen.payload.error.code, 'PERMISSION_DENIED')
   const receipt = await requestJson(baseUrl, new Map(), queued.payload.data.publicUrl)
   assert.equal(receipt.status, 200)
-  assert.equal(receipt.payload.data.report.content.effectiveMinutes, 12)
+  assert.deepEqual(receipt.payload.data.report.content, [{
+    note: '公开链接顶层数组普通文字',
+    eyeCare: { restCompliancePercentage: 61 },
+  }, {
+    nested: [{ label: '公开链接嵌套普通文字' }],
+    classSummary: { attendancePercentage: 98 },
+  }])
   assert.equal(receipt.payload.data.student.displayName, '联调学生')
   const replayedOpen = await requestJson(baseUrl, new Map(), queued.payload.data.publicUrl)
   assert.equal(replayedOpen.status, 409)
@@ -1052,7 +1146,7 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
     LIMIT 1
   `).get(book.versionId)
   assert.ok(unreadPage)
-  const forgedUnreadPage = await requestJson(baseUrl, studentJar, '/ai/messages', {
+  const explicitCurrentPage = await requestJson(baseUrl, studentJar, '/ai/messages', {
     method: 'POST',
     workspaceId: fixture.workspaceId,
     idempotencyKey: 'ai-message-forged-unread-page',
@@ -1063,9 +1157,16 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
       safeMode: true,
     },
   })
-  assert.equal(forgedUnreadPage.status, 404)
-  assert.equal(forgedUnreadPage.payload.error.code, 'RESOURCE_NOT_FOUND')
-  assert.equal(providerRequests.length, 0)
+  assert.equal(explicitCurrentPage.status, 200, JSON.stringify(explicitCurrentPage.payload))
+  assert.equal(providerRequests.length, 1)
+  assert.equal(providerRequests[0].sources.every((source) => source.pageNumber === unreadPage.page_no), true)
+  const positionAtLastPageAt = new Date().toISOString()
+  application.database.prepare(`INSERT INTO reading_progress (
+      id, actor_id, workspace_id, book_version_id, last_page_no, valid_reading_seconds,
+      updated_from_event_at, created_at, updated_at, version
+    ) VALUES (?, ?, ?, ?, 2, 86400, ?, ?, ?, 1)`)
+    .run(randomUUID(), fixture.studentId, fixture.workspaceId, book.versionId,
+      positionAtLastPageAt, positionAtLastPageAt, positionAtLastPageAt)
   let conversationId = null
   let lastAnswer
   for (let index = 1; index <= 3; index += 1) {
@@ -1089,8 +1190,9 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
     conversationId = lastAnswer.payload.data.conversationId
   }
   assert.equal(lastAnswer.payload.data.citations.length, 1)
-  assert.deepEqual(providerRequests[0].selectionRange, { blockId: selectedBlock.id, startOffset: 0, endOffset: 6 })
-  assert.equal(providerRequests[0].sources[0].evidenceId, selectedBlock.id)
+  assert.deepEqual(providerRequests[1].selectionRange, { blockId: selectedBlock.id, startOffset: 0, endOffset: 6 })
+  assert.equal(providerRequests[1].sources[0].evidenceId, selectedBlock.id)
+  assert.equal(providerRequests[1].sources.every((source) => source.pageNumber === 1), true)
   assert.equal(lastAnswer.payload.data.safety.threshold, 0.8)
   assert.equal(lastAnswer.payload.data.safety.qualifyingMessageCount, 3)
   assert.equal(lastAnswer.payload.data.safety.requiredQualifiedMessages, 3)
@@ -1167,7 +1269,7 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
   assert.equal(staffEvents.status, 200, JSON.stringify(staffEvents.payload))
   assert.equal(staffEvents.payload.data.items.length, 1)
   assert.equal(staffEvents.payload.data.items[0].pendingCount, 1)
-  assert.equal(application.database.prepare('SELECT COUNT(*) AS count FROM ai_usage_ledger').get().count, 3)
+  assert.equal(application.database.prepare('SELECT COUNT(*) AS count FROM ai_usage_ledger').get().count, 4)
   assert.equal(application.database.prepare('SELECT COUNT(*) AS count FROM safety_events').get().count, 1)
   assert.deepEqual(
     application.database.prepare(`
@@ -1183,8 +1285,8 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
     FROM outbox_events
     WHERE aggregate_id = ? AND topic = 'safety.notification.dispatch' AND status = 'delivered'
   `).get(eventId).count, 1)
-  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM audit_events WHERE event_type = 'ai.message.completed'").get().count, 3)
-  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM outbox_events WHERE topic = 'ai.message.completed'").get().count, 3)
+  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM audit_events WHERE event_type = 'ai.message.completed'").get().count, 4)
+  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM outbox_events WHERE topic = 'ai.message.completed'").get().count, 4)
   assert.deepEqual(
     { ...application.database.prepare(`
       SELECT status, resolution_note, closed_by_user_id, closed_at
@@ -1372,13 +1474,23 @@ test('Stage 4 真实 HTTP 多会话、私密申请、护眼与阅读统计刷新
     workspaceId: fixture.workspaceId,
   })
   assert.equal(selfStatistics.status, 200, JSON.stringify(selfStatistics.payload))
-  assert.equal(selfStatistics.payload.data.totalEffectiveReadingSeconds > 0, true)
+  assert.equal(selfStatistics.payload.data.todayEffectiveReadingSeconds, 0)
+  assert.deepEqual(selfStatistics.payload.data.checkIn, {
+    checked: false,
+    thresholdSeconds: 300,
+    remainingSeconds: 300,
+  })
+  assert.equal(selfStatistics.payload.data.lastReading, null)
+  assert.equal(Object.hasOwn(selfStatistics.payload.data, 'totalEffectiveReadingSeconds'), false)
 
-  const scopedStatistics = await requestJson(baseUrl, teacherJar, `/reading/statistics/scope?studentId=${encodeURIComponent(fixture.studentId)}`, {
+  const scopedStatistics = await requestJson(baseUrl, teacherJar, `/reading/statistics/scope?classId=${encodeURIComponent(fixture.classId)}&statDate=${encodeURIComponent(selfStatistics.payload.data.statDate)}`, {
     workspaceId: fixture.workspaceId,
   })
   assert.equal(scopedStatistics.status, 200, JSON.stringify(scopedStatistics.payload))
-  assert.equal(scopedStatistics.payload.data.participantCount, 1)
+  assert.equal(scopedStatistics.payload.data.class.activeStudentCount, 1)
+  assert.equal(scopedStatistics.payload.data.summary.checkedInStudentCount, 0)
+  assert.equal(scopedStatistics.payload.data.summary.totalEffectiveReadingSeconds, 0)
+  assert.equal(scopedStatistics.payload.data.students.length, 1)
 
   const studentEyeCare = await requestJson(baseUrl, studentJar, '/eyecare/status', {
     workspaceId: fixture.workspaceId,
@@ -1427,6 +1539,7 @@ test('Stage 5 真实 HTTP 学生阅读对象路由持久化喜欢、书单、书
   const initial = await requestLibrary('/reading/library')
   assert.equal(initial.status, 200, JSON.stringify(initial.payload))
   assert.equal(Array.isArray(initial.payload.data.shelf), true)
+  assert.equal(Object.hasOwn(initial.payload.data, 'footprints'), false)
   const readerPage = await requestLibrary(`/books/${encodeURIComponent(book.bookId)}/pages/1`)
   assert.equal(readerPage.status, 200, JSON.stringify(readerPage.payload))
   const anchorBlock = readerPage.payload.data.blocks.find((block) => typeof block.text === 'string' && block.text.trim().length >= 4)
@@ -1574,6 +1687,7 @@ test('Stage 5 真实 HTTP 学生阅读对象路由持久化喜欢、书单、书
   assert.equal(refreshed.payload.data.bookmarks.length, 1)
   assert.equal(refreshed.payload.data.excerpts.length, 1)
   assert.equal(refreshed.payload.data.annotations.length, 1)
+  assert.equal(Object.hasOwn(refreshed.payload.data, 'footprints'), false)
 
   const teacherJar = await login(baseUrl, fixture, teacher)
   const teacherRead = await requestJson(baseUrl, teacherJar, '/reading/library', { workspaceId: fixture.workspaceId })

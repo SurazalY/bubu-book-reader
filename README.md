@@ -1,41 +1,59 @@
-# 整书阅读 · Whole-book Reading
+# 读伴 · 整书阅读平台
 
-儿童整本书阅读平台的**前端展示原型**（React + Vite + Tailwind）。独立于「步步数字课堂」三端，作为整书阅读项目的对外展示站。
+面向学生、教师与学校管理角色的一体化整书阅读应用。仓库包含 React 前端、Node/Express 服务端、SQLite 数据模型、自动化测试和部署文档。
 
-## 技术栈
+## 工程结构
 
-React 18 + Vite 5 + Tailwind 3.4 + React Router(HashRouter)，**纯静态、零后端**。设计语言「书卷靛蓝」（配色/字体/圆角/阴影见 `tailwind.config.js`）。
+```text
+.
+├── src/           React 应用：主站、学生端、教师/管理控制台
+├── server/        API、领域服务、数据库迁移与运行时集成
+├── tests/         前端契约测试与服务端领域/HTTP测试
+├── public/        随应用发布的静态资源；运行时书籍资源不纳入Git
+├── docs/          架构、契约和验收记录
+├── screenshots/   脱敏后的产品效果图
+├── DEPLOY.md      部署说明
+└── package.json   前端开发、构建与仓库级测试命令
+```
 
-## 页面
+详细边界见 [`docs/WORKSPACE.md`](docs/WORKSPACE.md)。原始PDF、EPUB、交付压缩包和OCR中间文件必须保存在应用仓库之外。
 
-| 页面 | 路由 | 说明 |
-|---|---|---|
-| 首页 | `#/` | 项目门面、理念、三大阅读板块、五维评估概览 |
-| 书架 | `#/library` | 按学段分组 + 体裁筛选 + 书目卡 |
-| 阅读页 | `#/reader/:bookId` | 详情态 + 正文态滚动长页；右侧「AI 学伴」陪读 |
-| 关于 | `#/about` | 使命、理念、政策背景、脑科学依据 |
-| 资源 | `#/resources` | 五维评估、前中后测、教师赋能 |
-| 动态 | `#/blog` | 项目动态 / 书评卡片流 |
+## 环境要求
 
-主站各页右侧带可收叠「**AI 向导**」边栏（找书推荐 / 页面导航，内容随页面变化）；阅读页带「**AI 学伴**」陪读边栏。当前均为**前端展示壳**（无真实 AI / 后端）。
+- Node.js >= 22.16
+- npm
+- 可选：OpenAI兼容模型端点，用于真实AI能力
 
-## 开发
+## 本地开发
 
 ```bash
 npm install
-npm run dev      # http://127.0.0.1:5190
-npm run build    # 产物 dist/，可部署到任意静态服务器 / nginx
+npm --prefix server install
+
+# 终端A：API服务，默认 http://127.0.0.1:5191
+npm run server
+
+# 终端B：Vite开发服务，默认 http://127.0.0.1:5190
+npm run dev
 ```
 
-`vite.config.js` 的 `base` 为 `./`，支持子目录部署。
+Vite会把 `/api` 代理到本地API服务。生产环境由Express统一提供构建产物、书籍静态资源和API。
 
-## 数据与待办
+## 验证
 
-- 书目为**占位数据**（`src/data/books.js`，小学「快乐读书吧」经典书单 + 名著），**待真实书目/数据替换**。
-- 文案取自《电子屏幕整书阅读项目方案》（`src/data/site.js`）。
-- 阅读页样章为公版节选（《安徒生童话·丑小鸭》），待真实书源接入。
-- 待补：真实 logo / 主色微调（如需）。
+```bash
+npm run build
+npm run test:frontend
+npm run test:server
+```
 
-## 页面效果
+## 数据边界
 
-当前一体化版本的学生端、教师端与运营端效果图见 [`screenshots/`](screenshots/)。截图来自隔离演示数据，不含个人账号、浏览器栏或系统通知。
+- 书籍目录、版本、页面、文字块和资源索引保存在SQLite中。
+- 页面图片和原始书籍通过 `storage_key` 指向运行时资源目录；`public/books/` 不提交Git。
+- 用户、阅读记录、AI会话和统计数据属于运行时数据，不得打入源码或书籍解析产物。
+- 书籍解析在独立工作区离线完成；应用仓库只消费已经验收的固定书籍版本。
+
+## 产品效果
+
+学生端、教师端与运营端的脱敏效果图见 [`screenshots/`](screenshots/)。

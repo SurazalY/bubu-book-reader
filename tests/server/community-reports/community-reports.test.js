@@ -171,6 +171,80 @@ test('权限默认拒绝且跨工作空间操作被拒绝', async (context) => {
   await expectDomainError(() => unresolvedAsyncPermission.submitPost({ title: '异步权限未解析', body: '应拒绝' }), 'PERMISSION_DENIED')
 })
 
+test('内部报告递归拒绝阅读完成度同义键，并保留合法护眼比例和普通字段', (context) => {
+  const fixture = createFixture({ permissions: reportPermissions })
+  context.after(() => fixture.close())
+  const forbiddenAliases = {
+    startedBookCount: 2,
+    startedBooks: 3,
+    booksStarted: 4,
+    finishedBookCount: 5,
+    pagesRead: 99,
+    progressPercent: 100,
+    percent: 100,
+    percentage: 100,
+    '阅读完成比例': '100%',
+  }
+  const content = {
+    effectiveMinutes: 12,
+    teacherComment: '继续保持阅读与护眼节奏',
+    eyeCare: {
+      restCompliancePercentage: 75,
+      validEyeSeconds: 600,
+    },
+    classSummary: {
+      attendancePercentage: 98,
+    },
+    legacyReading: {
+      ...forbiddenAliases,
+      note: '这是可保留的普通文字',
+    },
+    sections: [{
+      label: '教师观察',
+      percent: 100,
+      finished: true,
+    }],
+    ...forbiddenAliases,
+  }
+  const expected = {
+    effectiveMinutes: 12,
+    teacherComment: '继续保持阅读与护眼节奏',
+    eyeCare: {
+      restCompliancePercentage: 75,
+      validEyeSeconds: 600,
+    },
+    classSummary: {
+      attendancePercentage: 98,
+    },
+    legacyReading: {
+      note: '这是可保留的普通文字',
+    },
+    sections: [{ label: '教师观察' }],
+  }
+
+  const generated = fixture.reports.generateReport({
+    studentId: 'student-1',
+    snapshotKey: 'recursive-reading-completion-sanitizer',
+    content,
+  })
+  assert.deepEqual(generated.versions[0].content, expected)
+  const persisted = JSON.parse(fixture.db.prepare('SELECT content_json FROM report_versions WHERE id = ?').get(generated.current_version_id).content_json)
+  assert.deepEqual(persisted, expected)
+  assert.deepEqual(fixture.reports.listReports().find((report) => report.id === generated.id).content, expected)
+  assert.deepEqual(fixture.reports.getReport(generated.id).versions[0].content, expected)
+
+  const legacyContent = { ...content, teacherComment: '历史报告不改写原始行' }
+  fixture.db.prepare('UPDATE report_versions SET content_json = ? WHERE id = ?')
+    .run(JSON.stringify(legacyContent), generated.current_version_id)
+  const expectedLegacy = { ...expected, teacherComment: '历史报告不改写原始行' }
+  assert.deepEqual(fixture.reports.listReports().find((report) => report.id === generated.id).content, expectedLegacy)
+  assert.deepEqual(fixture.reports.getReport(generated.id).versions[0].content, expectedLegacy)
+  assert.deepEqual(
+    JSON.parse(fixture.db.prepare('SELECT content_json FROM report_versions WHERE id = ?').get(generated.current_version_id).content_json),
+    legacyContent,
+  )
+})
+
 test('报告版本必须人工审核，失败重试真实落库，短信不产生打开或已读', async (context) => {
   const fixture = createFixture({ permissions: reportPermissions, adapterMode: 'failure' })
   context.after(() => fixture.close())

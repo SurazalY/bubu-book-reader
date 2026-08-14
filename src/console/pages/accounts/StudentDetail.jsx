@@ -7,7 +7,6 @@ import { Btn, EmptyState, Field, StatusTag, SubHead } from '../../components/Con
 import { BarProgress } from '../../components/Progress.jsx'
 import { useConsole } from '../../state/ConsoleContext.jsx'
 import usePrivacyEyeCareData from '../../state/usePrivacyEyeCareData.js'
-import useReadingStatistics from '../../state/useReadingStatistics.js'
 import useStage4ConsoleData from '../../state/useStage4ConsoleData.js'
 
 const EYE_STATE = {
@@ -56,7 +55,6 @@ export default function StudentDetail() {
             : '学生总览'
   const studentResource = useStage4ConsoleData('studentDetail', { workspaceId: workspace?.id, resourceId: studentId })
   const eyeCareResource = usePrivacyEyeCareData({ workspaceId: workspace?.id, studentId })
-  const readingResource = useReadingStatistics(workspace?.id, { studentId })
 
   useEffect(() => {
     if (anchorEyeCare && eyeRef.current) eyeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -94,8 +92,6 @@ export default function StudentDetail() {
   const dailyPercent = dailySeconds && dailyUsedSeconds !== null
     ? Math.min(100, Math.round((dailyUsedSeconds / dailySeconds) * 100))
     : null
-  const readingMinutes = minutes(readingResource.data?.effectiveReadingSeconds)
-  const readingBookCount = readingResource.status === 'ready' ? readingResource.data?.byBook?.length : null
 
   return (
     <PagePanel
@@ -132,20 +128,7 @@ export default function StudentDetail() {
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3.5">
-        <GlassCard className="p-3.5">
-          <SubHead icon="BookOpen" title="阅读" />
-          <div className="grid grid-cols-2 gap-y-2.5">
-            <Metric label="有效阅读" value={readingMinutes} unit="分钟" />
-            <Metric label="阅读书目" value={readingBookCount} unit="本" />
-            <Metric label="异常停留" value={readingResource.status === 'ready' ? readingResource.data?.anomalousStays?.length : null} unit="条" />
-            <Metric label="统计参与者" value={readingResource.status === 'ready' ? readingResource.data?.participantCount : null} unit="人" />
-          </div>
-          {readingResource.status !== 'ready' && (
-            <p className="text-[11.5px] text-ink-500 leading-relaxed mt-2.5">{readingResource.status === 'loading' ? '正在读取真实阅读统计。' : readingResource.error?.message || '当前账号无法读取这名学生的阅读统计。'}</p>
-          )}
-        </GlassCard>
-
+      <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3.5">
         <GlassCard
           ref={eyeRef}
           className={cx('p-3.5 transition', anchorEyeCare && 'ring-2 ring-[#4FBFB0] ring-offset-2 ring-offset-white/40')}
@@ -214,20 +197,5 @@ export default function StudentDetail() {
         </GlassCard>
       </div>
     </PagePanel>
-  )
-}
-
-function Metric({ label, value, unit, tone = 'ink' }) {
-  const number = numberOrNull(value)
-  return (
-    <div>
-      <div className="text-[11.5px] text-ink-400">{label}</div>
-      <div className="mt-0.5 flex items-baseline gap-1">
-        <span className={cx('text-[19px] font-semibold tabular-nums leading-none', tone === 'danger' ? 'text-danger-600' : 'text-ink-900')}>
-          {number === null ? '—' : number}
-        </span>
-        {unit && number !== null && <span className="text-[11px] text-ink-500">{unit}</span>}
-      </div>
-    </div>
   )
 }

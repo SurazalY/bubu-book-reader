@@ -64,12 +64,11 @@ function toBookmark(value) {
   return numberOrNull(value, source.pageNo, source.page, source.at)
 }
 
-function toBookProgress(raw) {
+function toBookPosition(raw) {
   const source = asRecord(raw)
   return {
     currentPage: numberOrNull(source.currentPage, source.pageNo, source.page),
     totalPages: numberOrNull(source.totalPages, source.pageCount, source.total),
-    percent: numberOrNull(source.percent, source.progressPercent, source.completionPercent),
     effectiveMinutes: numberOrNull(source.effectiveMinutes, source.readingMinutes, source.minutes),
     bookmarks: asArray(source.bookmarks).map(toBookmark).filter((value) => value !== null),
   }
@@ -119,7 +118,7 @@ function toClassReading(raw) {
 function toBook(raw) {
   const source = asRecord(raw)
   const cover = toAsset(source.cover || source.coverUrl)
-  const progress = toBookProgress(source.progress || source.readingProgress)
+  const progress = toBookPosition(source.progress || source.readingProgress)
   const classReading = toClassReading(source.classReading || source.classSession)
   return {
     id: firstValue(source.id, source.bookId),
@@ -131,14 +130,12 @@ function toBook(raw) {
     assets: asArray(source.assets).map(toAsset).filter(Boolean),
     progress,
     minutes: progress.effectiveMinutes,
-    percent: progress.percent,
     page: progress.currentPage,
     totalPages: progress.totalPages,
     bookmarks: progress.bookmarks,
     access: asRecord(source.access),
     liked: booleanValue(source.liked, source.isLiked),
     downloaded: booleanValue(source.downloaded, source.isDownloaded),
-    finished: booleanValue(source.finished, source.isFinished) || progress.percent === 100,
     lists: asArray(source.lists || source.collections).map(toBookListReference).filter((item) => item.id || item.name),
     classReading,
   }
@@ -173,11 +170,13 @@ function deriveListsFromBookMembership(books) {
 function toReadingSummary(raw, books) {
   const source = asRecord(raw)
   const summary = asRecord(source.summary)
-  const minutesFromBooks = books.reduce((total, book) => total + (book.progress.effectiveMinutes || 0), 0)
+  const knownBookMinutes = books.map((book) => book.progress.effectiveMinutes).filter(Number.isFinite)
+  const minutesFromBooks = knownBookMinutes.length
+    ? knownBookMinutes.reduce((total, minutes) => total + minutes, 0)
+    : null
   return {
     effectiveMinutes: numberOrNull(source.totalEffectiveMinutes, source.effectiveMinutes, summary.totalEffectiveMinutes, summary.effectiveMinutes, minutesFromBooks),
     downloadedBookCount: numberOrNull(source.downloadedBookCount, summary.downloadedBookCount, books.filter((book) => book.downloaded).length),
-    startedBookCount: numberOrNull(source.startedBookCount, summary.startedBookCount, books.filter((book) => (book.progress.percent || 0) > 0).length),
   }
 }
 

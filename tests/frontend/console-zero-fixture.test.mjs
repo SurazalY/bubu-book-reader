@@ -83,12 +83,14 @@ test('权限端生产入口模块图不加载 fixture、mock 或本地业务存�
   const graph = scanRuntimeGraph('src/console/ConsoleApp.jsx')
   assert.deepEqual(graph.forbiddenImports, [])
   assert.deepEqual(graph.storageReferences, [])
+  assert.deepEqual(graph.allowedStorageReferences, [])
 })
 
 test('学生端生产入口模块图不加载 fixture、mock 或本地业务存储', () => {
   const graph = scanRuntimeGraph('src/student/StudentApp.jsx')
   assert.deepEqual(graph.forbiddenImports, [])
   assert.deepEqual(graph.storageReferences, [])
+  assert.deepEqual(graph.allowedStorageReferences, ['src/student/reading-monitor/pendingStore.js'])
 })
 
 test('历史 fixture 页面和旧导航不在三个生产入口的可达模块图内', () => {

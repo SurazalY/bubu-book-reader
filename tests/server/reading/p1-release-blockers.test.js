@@ -164,7 +164,11 @@ test('P0: 事件按发生时间匹配已释放租约历史并拒绝租约前后�
     id: 'after-grace', clientOccurredAt: '2026-08-05T10:05:11.000Z', offlineSequence: 12,
   })] }), { code: 'READING_LEASE_REQUIRED' })
   assert.equal(fixture.db.prepare('SELECT COUNT(*) AS count FROM reading_events').get().count, 1)
-  assert.equal(fixture.db.prepare('SELECT valid_reading_seconds FROM reading_progress').get().valid_reading_seconds, 30)
+  assert.deepEqual(
+    { ...fixture.db.prepare('SELECT valid_reading_seconds, valid_eye_seconds FROM reading_events').get() },
+    { valid_reading_seconds: 0, valid_eye_seconds: 30 },
+  )
+  assert.equal(fixture.db.prepare('SELECT COUNT(*) AS count FROM reading_progress').get().count, 0)
 })
 
 test('P0: 过旧事件和越过配置硬上限均被拒绝', async (t) => {

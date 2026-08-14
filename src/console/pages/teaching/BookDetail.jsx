@@ -2,10 +2,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { GlassCard } from '../../components/Glass.jsx'
 import { PagePanel } from '../../components/PagePanel.jsx'
 import { Btn, EmptyState, Field, StatusTag, SubHead } from '../../components/Controls.jsx'
-import { BarProgress } from '../../components/Progress.jsx'
 import { useConsole } from '../../state/ConsoleContext.jsx'
 import useAssignmentsData from '../../state/useAssignmentsData.js'
-import useReadingStatistics from '../../state/useReadingStatistics.js'
 import useStage4ConsoleData from '../../state/useStage4ConsoleData.js'
 
 function text(value, fallback) {
@@ -17,18 +15,12 @@ function numberOrNull(value) {
   return Number.isFinite(number) && number >= 0 ? number : null
 }
 
-function minutesFromSeconds(value) {
-  const seconds = numberOrNull(value)
-  return seconds === null ? null : Math.floor(seconds / 60)
-}
-
 export default function BookDetail() {
   const { bookId } = useParams()
   const { workspace } = useConsole()
   const navigate = useNavigate()
   const bookResource = useStage4ConsoleData('bookDetail', { workspaceId: workspace?.id, resourceId: bookId })
   const assignmentsResource = useAssignmentsData(workspace?.id)
-  const statisticsResource = useReadingStatistics(workspace?.id, { bookVersionId: bookResource.data?.versionId })
 
   if (bookResource.status === 'loading') {
     return (
@@ -53,8 +45,6 @@ export default function BookDetail() {
 
   const book = bookResource.data
   const pages = numberOrNull(book.progress?.totalPages)
-  const personalProgress = numberOrNull(book.progress?.percent)
-  const readingMinutes = minutesFromSeconds(statisticsResource.data?.effectiveReadingSeconds)
   const relatedPlans = assignmentsResource.status === 'ready'
     ? (assignmentsResource.data?.arrangements || []).filter((plan) => plan.bookId === book.id)
     : []
@@ -98,7 +88,6 @@ export default function BookDetail() {
               <Field label="作者">{text(book.author, '服务端未返回')}</Field>
               <Field label="插图作者">{text(book.illustrator, '服务端未返回')}</Field>
               <Field label="篇幅">{pages === null ? '服务端未返回' : `${pages} 页`}</Field>
-              <Field label="当前账号进度">{personalProgress === null ? '服务端未返回' : `${personalProgress}%`}</Field>
             </div>
             <div>
               <Field label="版本标识">{text(book.versionId, '服务端未返回')}</Field>
@@ -115,25 +104,7 @@ export default function BookDetail() {
         <span className="text-[11.5px] text-ink-500">导入、下架、删除和版本回滚尚无已接入的写入契约，本页不伪造管理操作。</span>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3.5">
-        <GlassCard className="p-3.5 lg:col-span-2">
-          <SubHead icon="ChartNoAxesColumn" title="阅读数据" />
-          {statisticsResource.status === 'loading' ? (
-            <p className="text-[12.5px] text-ink-500 py-3">正在读取当前范围的真实阅读统计。</p>
-          ) : statisticsResource.status === 'ready' ? (
-            <>
-              <div className="grid grid-cols-3 gap-3">
-                <Metric label="参与学生" value={statisticsResource.data?.participantCount} unit="人" />
-                <Metric label="有效阅读" value={readingMinutes} unit="分钟" />
-                <Metric label="书目分项" value={statisticsResource.data?.byBook?.length} unit="项" />
-              </div>
-              {personalProgress !== null && <div className="mt-3"><BarProgress label="当前账号阅读进度" value={personalProgress} size="sm" /></div>}
-            </>
-          ) : (
-            <p className="text-[12.5px] text-ink-500 py-3">{statisticsResource.error?.message || '当前账号无法读取这本书的范围统计。'}</p>
-          )}
-        </GlassCard>
-
+      <div className="mt-4">
         <GlassCard className="p-3.5">
           <SubHead icon="CalendarDays" title={`关联阅读安排（${assignmentsResource.status === 'ready' ? relatedPlans.length : '—'}）`} />
           {assignmentsResource.status === 'loading' ? (
@@ -170,18 +141,5 @@ export default function BookDetail() {
         </GlassCard>
       </div>
     </PagePanel>
-  )
-}
-
-function Metric({ label, value, unit }) {
-  const number = numberOrNull(value)
-  return (
-    <div>
-      <div className="text-[11.5px] text-ink-400">{label}</div>
-      <div className="mt-0.5 flex items-baseline gap-1">
-        <span className="text-[19px] font-semibold text-ink-900 tabular-nums leading-none">{number === null ? '—' : number}</span>
-        {unit && number !== null && <span className="text-[11px] text-ink-500">{unit}</span>}
-      </div>
-    </div>
   )
 }

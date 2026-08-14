@@ -14,15 +14,15 @@ export const NAV_ITEMS = [
 
 export default function BottomNav() {
   return (
-    <nav className="shrink-0 px-8 pb-5 pt-1" aria-label="一级导航">
-      <div className="student-navbar mx-auto flex max-w-[900px] items-center gap-1.5 rounded-full p-2">
+    <nav className="shrink-0 px-3 pb-5 pt-1 sm:px-8" aria-label="一级导航">
+      <div className="student-navbar mx-auto flex max-w-[900px] items-center gap-0.5 rounded-full p-1.5 sm:gap-1.5 sm:p-2">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
               cx(
-                'group flex flex-1 items-center justify-center gap-2.5 rounded-full px-4 py-2.5 transition-colors duration-140',
+                'group flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full px-1.5 py-2.5 transition-colors duration-140 sm:gap-2.5 sm:px-4',
                 isActive ? 'student-nav-item--on' : 'hover:bg-white/55',
               )
             }
@@ -31,11 +31,11 @@ export default function BottomNav() {
               <>
                 <Icon
                   name={item.icon}
-                  className={cx('w-[19px] h-[19px]', isActive ? 'text-[#2FA38C]' : 'text-ink-400')}
+                  className={cx('h-[17px] w-[17px] shrink-0 sm:h-[19px] sm:w-[19px]', isActive ? 'text-[#2FA38C]' : 'text-ink-400')}
                   strokeWidth={isActive ? 2.2 : 1.8}
                 />
                 {/* 状态不只靠颜色：选中项文字同时加粗并变深 */}
-                <span className={cx('text-caption', isActive ? 'font-semibold text-ink-900' : 'text-ink-500')}>
+                <span className={cx('whitespace-nowrap text-[11px] leading-none sm:text-caption', isActive ? 'font-semibold text-ink-900' : 'text-ink-500')}>
                   {item.label}
                 </span>
               </>

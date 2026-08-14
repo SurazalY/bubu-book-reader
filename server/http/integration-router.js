@@ -12,13 +12,14 @@ import { createPrivacyDomain } from '../domains/privacy/index.js'
 import { createReadingDomain } from '../domains/reading/catalog.js'
 import { createEyeCareDomain } from '../domains/reading/eyecare.js'
 import { createStudentLibraryDomain } from '../domains/reading/library-objects.js'
+import { createReadingMonitoringDomain } from '../domains/reading/monitoring.js'
 import { createReadingStatisticsDomain } from '../domains/reading/statistics.js'
 import { createReportsDomain } from '../domains/reports/index.js'
 import { dispatchSafetyNotificationOutbox } from '../domains/safety/notifications.js'
 import { createTeachingDomain } from '../domains/teaching/classroom.js'
 import { createRequireSessionMiddleware, createRequireWorkspaceMiddleware, createRequestContextMiddleware, parseCookies } from '../middleware/request-context.js'
 import { sendData, sendFailure } from '../middleware/http.js'
-import { renderPublicSummaryPage } from './public-summary-page.js'
+import { renderPublicSummaryPage, sanitizePublicSummary } from './public-summary-page.js'
 import { createAiRuntime, createConversation, deriveAiRequestScope } from '../integration/ai-runtime.js'
 import { createRequestDomainDependencies, workspaceResourceScope } from '../integration/context.js'
 import {
@@ -62,6 +63,13 @@ const errorStatus = {
   SAFETY_MINIMUM_CONTEXT_AVAILABLE: 409,
   READING_LEASE_REQUIRED: 409,
   READING_LEASE_HELD: 409,
+  LEASE_REQUIRED: 409,
+  LEASE_CONFLICT: 409,
+  REVISION_GAP: 409,
+  REVISION_CONFLICT: 409,
+  SUMMARY_REGRESSION: 409,
+  STAT_DATE_MISMATCH: 409,
+  FUTURE_TIME_REJECTED: 422,
   CLASSROOM_CONTROL_REQUIRED: 409,
   CLASSROOM_CONTROL_HELD: 409,
   IDEMPOTENCY_LEASE_LOST: 409,
@@ -110,7 +118,10 @@ function asHttpError(error) {
   const code = error?.code || (error instanceof TypeError ? 'VALIDATION_FAILED' : 'DEPENDENCY_UNAVAILABLE')
   const status = errorStatus[code] || (error instanceof TypeError ? 422 : 503)
   const safeMessage = status >= 500 ? '服务暂时不可用，请稍后重试' : error.message
-  return new HttpError(status, code, safeMessage, { retryable: status >= 500 })
+  return new HttpError(status, code, safeMessage, {
+    retryable: status >= 500,
+    details: error?.details,
+  })
 }
 
 function requirePermission(identityService, action) {
@@ -264,6 +275,7 @@ function domainForRequest(req, database, identityService) {
     privacy: createPrivacyDomain(dependencies),
     eyeCare: createEyeCareDomain(dependencies),
     library: createStudentLibraryDomain(dependencies),
+    readingMonitoring: createReadingMonitoringDomain(dependencies),
     readingStatistics: createReadingStatisticsDomain(dependencies),
     teaching: createTeachingDomain(dependencies),
     community: createCommunityDomain(dependencies),
@@ -318,12 +330,12 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
   router.get('/public/summary-links/:deliveryId', route((req, res) => {
     res.set('Cache-Control', 'no-store')
     res.set('Referrer-Policy', 'no-referrer')
-    const result = openPublicSummaryLink({
+    const result = sanitizePublicSummary(openPublicSummaryLink({
       db: database,
       deliveryId: req.params.deliveryId,
       linkToken: req.query.token,
       summaryLinkSigningKey: summaryLinkSigningKey ?? process.env.SUMMARY_LINK_SIGNING_KEY,
-    })
+    }))
     if ((req.get('Accept') || '').includes('text/html')) {
       res.set('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
       return res.status(200).type('html').send(renderPublicSummaryPage(result))
@@ -550,6 +562,41 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
     })
     const confirmedDeviceId = outcome.payload?.data?.deviceId || deviceId
     res.cookie(DEVICE_COOKIE, signDeviceId(confirmedDeviceId, sessionSecret), { httpOnly: true, sameSite: 'lax', secure: Boolean(cookieSecure), path: '/' })
+    return sendOutcome(res, req, outcome)
+  }))
+
+  router.post('/reading/lease/:leaseId/renew', route(async (req, res) => {
+    const key = writeKey(req)
+    const deviceId = readDeviceId(req, sessionSecret)
+    if (!deviceId) throw new HttpError(409, 'LEASE_REQUIRED', '阅读设备绑定已失效，请重新获取阅读租约')
+    const { readingMonitoring } = domainForRequest(req, database, identityService)
+    const outcome = await executeIdempotentAsync(database, {
+      key,
+      scope: `reading.lease.renew:${req.workspace.organizationId}:${req.identitySession.user.id}:${req.workspace.id}:${deviceId}:${req.params.leaseId}`,
+      request: { leaseId: req.params.leaseId, body: req.body },
+      operation: () => domainWriteOutcome(200, () => readingMonitoring.renewLease({
+        leaseId: req.params.leaseId,
+        deviceId,
+        body: req.body,
+      })),
+    })
+    return sendOutcome(res, req, outcome)
+  }))
+
+  router.post('/reading/session-summaries', route(async (req, res) => {
+    const key = writeKey(req)
+    const deviceId = readDeviceId(req, sessionSecret)
+    if (!deviceId) throw new HttpError(409, 'LEASE_REQUIRED', '阅读设备绑定已失效，请重新获取阅读租约')
+    const { readingMonitoring } = domainForRequest(req, database, identityService)
+    const outcome = await executeIdempotentAsync(database, {
+      key,
+      scope: `reading.summary:${req.workspace.organizationId}:${req.identitySession.user.id}:${req.workspace.id}:${deviceId}`,
+      request: req.body,
+      operation: () => domainWriteOutcome(200, () => readingMonitoring.acceptSessionSummary({
+        deviceId,
+        body: req.body,
+      })),
+    })
     return sendOutcome(res, req, outcome)
   }))
 

@@ -18,9 +18,20 @@ function publicAsset(row) {
 
 export function projectBooks(database, actorId, workspaceId, rows) {
   const progressStatement = database.prepare(`
-    SELECT progress.*, version.page_count
+    SELECT progress.last_page_no, progress.updated_from_event_at, version.page_count,
+      daily.effective_reading_ms
     FROM reading_progress AS progress
     JOIN book_versions AS version ON version.id = progress.book_version_id
+    LEFT JOIN (
+      SELECT actor_id_at_creation, workspace_id_at_creation, book_version_id,
+        SUM(effective_reading_ms) AS effective_reading_ms
+      FROM reading_daily_book_summaries
+      WHERE actor_id_at_creation = ? AND workspace_id_at_creation = ? AND book_version_id = ?
+      GROUP BY actor_id_at_creation, workspace_id_at_creation, book_version_id
+    ) AS daily
+      ON daily.actor_id_at_creation = progress.actor_id
+     AND daily.workspace_id_at_creation = progress.workspace_id
+     AND daily.book_version_id = progress.book_version_id
     WHERE progress.actor_id = ? AND progress.workspace_id = ? AND progress.book_version_id = ?
   `)
   const classroomStatement = database.prepare(`
@@ -55,12 +66,23 @@ export function projectBooks(database, actorId, workspaceId, rows) {
     LIMIT 1
   `)
   return rows.map((row) => {
-    const progress = progressStatement.get(actorId, workspaceId, row.book_version_id)
+    const progress = progressStatement.get(
+      actorId, workspaceId, row.book_version_id,
+      actorId, workspaceId, row.book_version_id,
+    )
     const classroom = classroomStatement.get(actorId, workspaceId, actorId, workspaceId, row.book_version_id)
     const latestBroadcast = classroom ? broadcastStatement.get(classroom.id) : null
     const classroomMessage = parseJson(latestBroadcast?.message_json, {})
     const totalPages = row.page_count
-    const currentPage = progress?.last_page_no ?? 1
+    const currentPage = progress?.last_page_no ?? null
+    const projectedProgress = {
+      currentPage,
+      totalPages,
+      bookmarks: [],
+      ...(progress?.effective_reading_ms === null || progress?.effective_reading_ms === undefined
+        ? {}
+        : { effectiveMinutes: Math.floor(Number(progress.effective_reading_ms) / 60_000) }),
+    }
     return {
       id: row.id,
       versionId: row.book_version_id,
@@ -71,15 +93,8 @@ export function projectBooks(database, actorId, workspaceId, rows) {
       usageLabel: row.catalog_usage_label ?? row.cover?.usage_label ?? null,
       cover: publicAsset(row.cover),
       assets: row.cover ? [publicAsset(row.cover)] : [],
-      progress: {
-        currentPage,
-        totalPages,
-        percent: totalPages ? Math.min(100, Math.round((currentPage / totalPages) * 100)) : 0,
-        effectiveMinutes: Math.floor((progress?.valid_reading_seconds ?? 0) / 60),
-        bookmarks: [],
-      },
+      progress: projectedProgress,
       access: { readable: true },
-      finished: Boolean(totalPages && currentPage >= totalPages),
       lists: [],
       classReading: classroom ? {
         id: classroom.id,
@@ -132,28 +147,47 @@ export function projectBookPage(database, page) {
 
 export function projectReadingProgress(database, actorId, workspaceId, organizationId) {
   const items = database.prepare(`
-    SELECT progress.*, version.book_id, version.page_count, book.title
-    FROM reading_progress AS progress
-    JOIN book_versions AS version ON version.id = progress.book_version_id
+    WITH daily AS (
+      SELECT book_version_id, SUM(effective_reading_ms) AS effective_reading_ms,
+        MAX(updated_at) AS daily_updated_at
+      FROM reading_daily_book_summaries
+      WHERE organization_id_at_creation = ? AND actor_id_at_creation = ?
+        AND workspace_id_at_creation = ?
+      GROUP BY book_version_id
+    )
+    SELECT version.id AS book_version_id, version.book_id, version.page_count, book.title,
+      progress.last_page_no, progress.updated_at AS progress_updated_at,
+      daily.effective_reading_ms, daily.daily_updated_at
+    FROM book_versions AS version
     JOIN books AS book ON book.id = version.book_id
-    WHERE progress.actor_id = ? AND progress.workspace_id = ?
-      AND version.organization_id_at_creation = ? AND book.organization_id_at_creation = ?
-    ORDER BY progress.updated_at DESC
-  `).all(actorId, workspaceId, organizationId, organizationId).map((row) => ({
+    LEFT JOIN reading_progress AS progress
+      ON progress.book_version_id = version.id
+     AND progress.actor_id = ? AND progress.workspace_id = ?
+    LEFT JOIN daily ON daily.book_version_id = version.id
+    WHERE version.organization_id_at_creation = ? AND book.organization_id_at_creation = ?
+      AND (progress.id IS NOT NULL OR daily.book_version_id IS NOT NULL)
+    ORDER BY COALESCE(daily.daily_updated_at, progress.updated_at) DESC, version.id
+  `).all(
+    organizationId, actorId, workspaceId,
+    actorId, workspaceId,
+    organizationId, organizationId,
+  ).map((row) => ({
     bookId: row.book_id,
     bookVersionId: row.book_version_id,
     title: row.title,
-    currentPage: row.last_page_no,
+    currentPage: row.last_page_no ?? null,
     totalPages: row.page_count,
-    percent: Math.min(100, Math.round((row.last_page_no / row.page_count) * 100)),
-    effectiveMinutes: Math.floor(row.valid_reading_seconds / 60),
-    readRangeVersion: String(row.version),
-    updatedAt: row.updated_at,
+    ...(row.effective_reading_ms === null
+      ? {}
+      : { effectiveMinutes: Math.floor(Number(row.effective_reading_ms) / 60_000) }),
+    updatedAt: row.daily_updated_at ?? row.progress_updated_at,
   }))
+  const measuredItems = items.filter((item) => Object.hasOwn(item, 'effectiveMinutes'))
   return {
     items,
-    totalEffectiveMinutes: items.reduce((total, item) => total + item.effectiveMinutes, 0),
-    startedBookCount: items.length,
+    ...(measuredItems.length
+      ? { totalEffectiveMinutes: measuredItems.reduce((total, item) => total + item.effectiveMinutes, 0) }
+      : {}),
   }
 }
 
@@ -305,9 +339,9 @@ export function projectUsageSummary(database, organizationId, workspaceId) {
   `).get(organizationId, workspaceId).count
   const reading = database.prepare(`
     SELECT COUNT(*) AS reading_count, COUNT(DISTINCT actor_id_at_creation) AS active_readers
-    FROM reading_events
+    FROM reading_daily_book_summaries
     WHERE organization_id_at_creation = ? AND workspace_id_at_creation = ?
-      AND valid_reading_seconds > 0
+      AND effective_reading_ms > 0
   `).get(organizationId, workspaceId)
   const pendingSafetyCount = database.prepare(`
     SELECT COUNT(*) AS count

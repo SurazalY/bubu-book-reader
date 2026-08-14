@@ -10,6 +10,7 @@ import {
   transaction,
   uniqueRows,
 } from './sql.js'
+import { closeReadingSummarySessionsForLease } from './monitoring.js'
 
 const MAX_EVENT_SECONDS = 120
 const DEFAULT_MAX_OFFLINE_AGE_MS = 7 * 24 * 60 * 60 * 1000
@@ -216,13 +217,19 @@ export function createReadingDomain(dependencies) {
       requireScopedBookVersion(context.db, bookVersionId, organizationId())
       const nowDate = context.now()
       const now = nowDate.toISOString()
-      const ttlSeconds = Number.isInteger(input.ttlSeconds) ? input.ttlSeconds : 90
-      if (ttlSeconds < 15 || ttlSeconds > 300) throw new TypeError('ttlSeconds 必须在 15 到 300 秒之间')
-      const expiresAt = new Date(nowDate.getTime() + ttlSeconds * 1000).toISOString()
+      const expiresAt = new Date(nowDate.getTime() + 90 * 1000).toISOString()
       const lease = transaction(context.db, () => {
         const expired = all(context.db, `SELECT * FROM active_reading_leases
           WHERE actor_id = :actorId AND released_at IS NULL AND expires_at <= :now`, { actorId: actorId(), now })
-        for (const expiredLease of expired) closeLeaseHistory(context, expiredLease.id, expiredLease.expires_at, now)
+        for (const expiredLease of expired) {
+          closeLeaseHistory(context, expiredLease.id, expiredLease.expires_at, now, 'lease_ended')
+          closeReadingSummarySessionsForLease(context.db, {
+            leaseId: expiredLease.id,
+            endedAt: expiredLease.expires_at,
+            endReason: 'lease_ended',
+            updatedAt: now,
+          })
+        }
         run(context.db, `UPDATE active_reading_leases SET released_at = :now, updated_at = :now, version = version + 1
           WHERE actor_id = :actorId AND released_at IS NULL AND expires_at <= :now`, { actorId: actorId(), now })
         const active = one(context.db, `SELECT * FROM active_reading_leases
@@ -242,21 +249,28 @@ export function createReadingDomain(dependencies) {
             && currentHistory.device_id === deviceId
             && currentHistory.book_version_id === bookVersionId
           if (sameHistoryScope) {
-            run(context.db, `UPDATE reading_device_lease_history SET valid_until = :expiresAt,
-              updated_at = :now, version = version + 1 WHERE id = :id`, { id: currentHistory.id, expiresAt, now })
-          } else {
-            closeLeaseHistory(context, active.id, now, now)
-            insertLeaseHistory(context, active.id, organizationId(), workspaceId(), actorId(), deviceId, bookVersionId, now, expiresAt)
+            return { leaseId: active.id, expiresAt: active.expires_at, takeover: false }
           }
-          run(context.db, `UPDATE active_reading_leases SET workspace_id = :workspaceId, book_version_id = :bookVersionId,
-            expires_at = :expiresAt, updated_at = :now, version = version + 1 WHERE id = :id`, {
-            id: active.id, workspaceId: workspaceId(), bookVersionId, expiresAt, now,
+          run(context.db, `UPDATE active_reading_leases
+            SET released_at = :now, updated_at = :now, version = version + 1
+            WHERE id = :id`, { id: active.id, now })
+          closeLeaseHistory(context, active.id, now, now, 'lease_taken_over')
+          closeReadingSummarySessionsForLease(context.db, {
+            leaseId: active.id,
+            endedAt: now,
+            endReason: 'lease_taken_over',
+            updatedAt: now,
           })
-          return { leaseId: active.id, expiresAt, takeover: false }
         }
-        if (active) {
+        if (active && active.device_id !== deviceId) {
           run(context.db, `UPDATE active_reading_leases SET released_at = :now, updated_at = :now, version = version + 1 WHERE id = :id`, { id: active.id, now })
-          closeLeaseHistory(context, active.id, now, now)
+          closeLeaseHistory(context, active.id, now, now, 'lease_taken_over')
+          closeReadingSummarySessionsForLease(context.db, {
+            leaseId: active.id,
+            endedAt: now,
+            endReason: 'lease_taken_over',
+            updatedAt: now,
+          })
         }
         const leaseId = context.idFactory()
         run(context.db, `INSERT INTO active_reading_leases (id, actor_id, workspace_id, device_id, book_version_id, acquired_at, expires_at, created_at, updated_at, version)
@@ -282,7 +296,7 @@ export function createReadingDomain(dependencies) {
     },
 
     async takeOverLease(input) {
-      const result = await this.acquireLease({ ...input, ttlSeconds: input.ttlSeconds, takeover: true })
+      const result = await this.acquireLease({ ...input, takeover: true })
       return { ...result, takeover: true }
     },
 
@@ -294,7 +308,6 @@ export function createReadingDomain(dependencies) {
       const result = transaction(context.db, () => {
         const accepted = []
         const replayed = []
-        const affectedVersions = new Set()
         for (const event of events) {
           const eventId = assertString(event.id, 'event.id')
           const normalized = normalizeEvent(event)
@@ -334,13 +347,9 @@ export function createReadingDomain(dependencies) {
             foreground: normalized.foreground, screenOn: normalized.screenOn,
             offlineSequence: normalized.offlineSequence, payloadJson: normalized.payloadJson, ...metrics,
           })
-          affectedVersions.add(normalized.bookVersionId)
           accepted.push(eventId)
         }
         const recalculatedAt = isoNow(context)
-        for (const bookVersionId of affectedVersions) {
-          recomputeReadingProgress(context, actorId(), workspaceId(), bookVersionId, recalculatedAt)
-        }
         if (accepted.length > 0) recomputeEyeCare(context, actorId(), workspaceId(), recalculatedAt)
         return { accepted, replayed }
       })
@@ -686,11 +695,18 @@ function insertLeaseHistory(context, leaseId, organizationId, workspaceId, actor
   })
 }
 
-function closeLeaseHistory(context, leaseId, validUntil, updatedAt) {
+function closeLeaseHistory(context, leaseId, validUntil, updatedAt, endReason = null) {
+  const hasEndReason = context.db.prepare("SELECT 1 FROM pragma_table_info('reading_device_lease_history') WHERE name = 'end_reason'").get()
   run(context.db, `UPDATE reading_device_lease_history
     SET valid_until = CASE WHEN valid_until > :validUntil THEN :validUntil ELSE valid_until END,
+      ${hasEndReason ? 'end_reason = COALESCE(end_reason, :endReason),' : ''}
       updated_at = :updatedAt, version = version + 1
-    WHERE lease_id = :leaseId AND valid_from <= :validUntil`, { leaseId, validUntil, updatedAt })
+    WHERE lease_id = :leaseId AND valid_from <= :validUntil`, {
+    leaseId,
+    validUntil,
+    updatedAt,
+    ...(hasEndReason ? { endReason } : {}),
+  })
 }
 
 function validateEventTimeAndLease(context, event, options) {
@@ -720,7 +736,7 @@ function validateEventTimeAndLease(context, event, options) {
 function deriveMetrics(event) {
   const activeTypes = new Set(['page_stay', 'page_turn', 'selection', 'bookmark', 'annotation', 'ai_question', 'class_sync'])
   const active = event.foreground === 1 && event.screenOn === 1 && activeTypes.has(event.eventType)
-  return { validReadingSeconds: active ? event.durationSeconds : 0, validEyeSeconds: active ? event.durationSeconds : 0 }
+  return { validReadingSeconds: 0, validEyeSeconds: active ? event.durationSeconds : 0 }
 }
 
 function eventFingerprint(event, scope) {
@@ -775,25 +791,6 @@ function requireScopedBookVersion(db, bookVersionId, organizationId, publishedOn
   }
 }
 
-function recomputeReadingProgress(context, actorId, workspaceId, bookVersionId, now) {
-  const rows = all(context.db, `SELECT * FROM reading_events
-    WHERE actor_id_at_creation = :actorId AND workspace_id_at_creation = :workspaceId
-      AND book_version_id = :bookVersionId
-    ORDER BY client_occurred_at, id`, { actorId, workspaceId, bookVersionId })
-  const activeRows = rows.filter(isStoredEventActive)
-  if (activeRows.length === 0) return
-  const latest = activeRows.at(-1)
-  const validReadingSeconds = intervalDurationSeconds(mergeEventIntervals(activeRows, 'valid_reading_seconds'))
-  run(context.db, `INSERT INTO reading_progress (id, actor_id, workspace_id, book_version_id, last_page_no, valid_reading_seconds, updated_from_event_at, created_at, updated_at, version)
-    VALUES (:id, :actorId, :workspaceId, :bookVersionId, :pageNo, :seconds, :eventAt, :now, :now, 1)
-    ON CONFLICT(actor_id, workspace_id, book_version_id) DO UPDATE SET last_page_no = excluded.last_page_no,
-      valid_reading_seconds = excluded.valid_reading_seconds, updated_from_event_at = excluded.updated_from_event_at,
-      updated_at = excluded.updated_at, version = version + 1`, {
-    id: context.idFactory(), actorId, workspaceId, bookVersionId, pageNo: latest.page_no,
-    seconds: validReadingSeconds, eventAt: latest.client_occurred_at, now,
-  })
-}
-
 function recomputeEyeCare(context, actorId, workspaceId, now) {
   const rows = all(context.db, `SELECT * FROM reading_events
     WHERE actor_id_at_creation = :actorId AND workspace_id_at_creation = :workspaceId
@@ -817,11 +814,6 @@ function recomputeEyeCare(context, actorId, workspaceId, now) {
   })
 }
 
-function isStoredEventActive(row) {
-  return row.foreground === 1 && row.screen_on === 1
-    && ['page_stay', 'page_turn', 'selection', 'bookmark', 'annotation', 'ai_question', 'class_sync'].includes(row.event_type)
-}
-
 function mergeEventIntervals(rows, secondsColumn) {
   const intervals = rows
     .filter((row) => row[secondsColumn] > 0)
@@ -837,10 +829,6 @@ function mergeEventIntervals(rows, secondsColumn) {
     else previous.end = Math.max(previous.end, interval.end)
   }
   return merged
-}
-
-function intervalDurationSeconds(intervals) {
-  return Math.floor(intervals.reduce((total, interval) => total + interval.end - interval.start, 0) / 1000)
 }
 
 function allocateWindowSeconds(intervals, kind) {

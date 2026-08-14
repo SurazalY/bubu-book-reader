@@ -6,7 +6,9 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const staticImportPattern = /(?:import|export)\s+(?:[^;'"`]*?\s+from\s+)?['"]([^'"]+)['"]/g
 const dynamicImportPattern = /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g
 const forbiddenSpecifierPattern = /(?:\/(?:data|fixtures?|demos?|mocks?)(?:\/|$)|(?:^|\/)demo[^/]*$)/i
-const storagePattern = /\b(?:localStorage|sessionStorage|indexedDB)\b/
+const forbiddenStoragePattern = /\b(?:localStorage|sessionStorage)\b/
+const indexedDbPattern = /\bindexedDB\b/
+const allowedIndexedDbModule = 'src/student/reading-monitor/pendingStore.js'
 
 export const FINAL_ROUTE_SURFACES = [
   {
@@ -73,6 +75,7 @@ export function scanRuntimeGraph(entryRelativePath) {
   const visited = new Set()
   const forbiddenImports = []
   const storageReferences = []
+  const allowedStorageReferences = []
 
   while (pending.length) {
     const currentPath = pending.pop()
@@ -81,7 +84,11 @@ export function scanRuntimeGraph(entryRelativePath) {
 
     const source = readFileSync(currentPath, 'utf8')
     const currentRelativePath = normalizePath(currentPath)
-    if (storagePattern.test(source)) storageReferences.push(currentRelativePath)
+    if (forbiddenStoragePattern.test(source)) storageReferences.push(currentRelativePath)
+    if (indexedDbPattern.test(source)) {
+      if (currentRelativePath === allowedIndexedDbModule) allowedStorageReferences.push(currentRelativePath)
+      else storageReferences.push(currentRelativePath)
+    }
 
     for (const specifier of collectSpecifiers(source)) {
       if (forbiddenSpecifierPattern.test(specifier)) {
@@ -99,7 +106,8 @@ export function scanRuntimeGraph(entryRelativePath) {
     entry: entryRelativePath,
     modules: [...visited].map(normalizePath).sort(),
     forbiddenImports,
-    storageReferences: storageReferences.sort(),
+    storageReferences: [...new Set(storageReferences)].sort(),
+    allowedStorageReferences: [...new Set(allowedStorageReferences)].sort(),
   }
 }
 

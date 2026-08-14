@@ -4,7 +4,6 @@ import { RingProgress } from '../components/Progress.jsx'
 import PageHead from '../components/PageHead.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 import useEyeCarePrivacy from '../state/useEyeCarePrivacy.js'
-import useReadingStatistics from '../state/useReadingStatistics.js'
 
 const AI_NAME = '读伴 AI'
 const READING_GLOSSARY = [
@@ -30,18 +29,20 @@ function formatTime(value) {
 export default function Usage() {
   const { ai, runtime } = useStudent()
   const workspaceId = runtime.data?.workspaceId
-  const statistics = useReadingStatistics(workspaceId)
   const privacy = useEyeCarePrivacy({ workspaceId })
   const quota = ai?.quota || {}
   const remaining = numberOrNull(quota.remaining)
   const usagePercent = Math.min(100, numberOrNull(quota.usagePercent) ?? 0)
-  const eyeCare = statistics.data?.eyeCare || {}
-  const enforcement = privacy.eyeCare?.enforcement || {}
-  const resting = enforcement.status === 'forced_rest' || eyeCare.status === 'forced_rest'
-  const continuousMinutes = Math.round((numberOrNull(eyeCare.continuousEyeSeconds) || 0) / 60)
-  const todayMinutes = Math.round((numberOrNull(eyeCare.todayValidEyeSeconds) || 0) / 60)
-  const weekMinutes = Math.round((numberOrNull(eyeCare.weekValidEyeSeconds) || 0) / 60)
-  const forcedRestUntil = enforcement.forcedRestUntil || eyeCare.forcedRestUntil
+  const eyeCare = privacy.eyeCare
+  const enforcement = eyeCare?.enforcement || {}
+  const resting = enforcement.status === 'forced_rest'
+  const continuousSeconds = numberOrNull(eyeCare?.continuousEyeSeconds)
+  const dailySeconds = numberOrNull(eyeCare?.dailyValidEyeSeconds)
+  const weeklySeconds = numberOrNull(eyeCare?.weeklyValidEyeSeconds)
+  const continuousMinutes = continuousSeconds === null ? null : Math.round(continuousSeconds / 60)
+  const todayMinutes = dailySeconds === null ? null : Math.round(dailySeconds / 60)
+  const weekMinutes = weeklySeconds === null ? null : Math.round(weeklySeconds / 60)
+  const forcedRestUntil = enforcement.forcedRestUntil
 
   return (
     <div className="flex-1 space-y-4">
@@ -96,19 +97,17 @@ export default function Usage() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Meter
               label="这次已经连续读了"
-              value={`${continuousMinutes} 分钟`}
-              percent={resting ? 100 : 0}
+              value={continuousMinutes === null ? '服务端未返回' : `${continuousMinutes} 分钟`}
               note={resting ? `当前处于强制休息，预计 ${formatTime(forcedRestUntil)} 自动恢复` : '阈值由服务端策略执行，页面不自行推算。'}
             />
             <Meter
               label="今天累计"
-              value={`${todayMinutes} 分钟`}
-              percent={resting ? 100 : 0}
-              note={`本周有效用眼 ${weekMinutes} 分钟，后台停留和无交互不会计入。`}
+              value={todayMinutes === null ? '服务端未返回' : `${todayMinutes} 分钟`}
+              note={weekMinutes === null ? '本周有效用眼时长未返回。' : `本周有效用眼 ${weekMinutes} 分钟，后台停留和无交互不会计入。`}
             />
           </div>
           <p className="mt-3.5 rounded-xl bg-white/58 px-4 py-3 text-micro leading-relaxed text-ink-500">
-            当前状态：{resting ? '正在强制休息' : (eyeCare.status === 'normal' ? '正常' : '正在读取')}{privacy.eyeCare?.offline ? '；网络暂不可用时会沿用最近一次有效护眼状态。' : ''}
+            当前状态：{resting ? '正在强制休息' : (enforcement.status === 'normal' ? '正常' : '正在读取')}{privacy.eyeCare?.offline ? '；网络暂不可用时会沿用最近一次有效护眼状态。' : ''}
           </p>
         </GlassPanel>
       </div>
@@ -145,14 +144,11 @@ function Row({ label, value }) {
   )
 }
 
-function Meter({ label, value, percent, note }) {
+function Meter({ label, value, note }) {
   return (
     <GlassCard className="px-4 py-3.5">
       <span className="text-micro text-ink-500">{label}</span>
       <p className="mt-1 font-serif text-h2 font-bold text-ink-900 tabular-nums">{value}</p>
-      <div className="student-meter-track mt-2.5 h-2 w-full overflow-hidden rounded-full">
-        <div className="student-eye-fill h-full rounded-full" style={{ width: `${percent}%` }} />
-      </div>
       <p className="mt-2 text-micro leading-relaxed text-ink-400">{note}</p>
     </GlassCard>
   )

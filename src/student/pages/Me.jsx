@@ -9,7 +9,8 @@ import useEyeCarePrivacy from '../state/useEyeCarePrivacy.js'
 import { useStudentCommunity } from '../community/CommunityRuntimeContext.jsx'
 
 function formatMinutes(value) {
-  const minutes = Math.max(0, Math.round(Number(value) || 0))
+  if (typeof value !== 'number' || !Number.isFinite(value)) return '暂未返回'
+  const minutes = Math.max(0, Math.round(value))
   if (minutes < 60) return `${minutes} 分钟`
   return `${Math.floor(minutes / 60)} 小时 ${minutes % 60} 分钟`
 }
@@ -28,23 +29,23 @@ export default function Me() {
   const library = useReadingLibrary({ workspaceId })
   const privacy = useEyeCarePrivacy({ workspaceId })
   const student = studentValue || { name: '正在读取', className: '', level: {} }
+  const levelValue = Number(student.level?.value)
   const level = {
-    value: student.level?.value ?? 0,
-    title: student.level?.title || '阅读新芽',
+    value: Number.isFinite(levelValue) ? levelValue : null,
+    title: student.level?.title || '等级正在读取',
     progressPercent: student.level?.progressPercent,
   }
-  const total = Math.round((statistics.data?.totalEffectiveReadingSeconds || 0) / 60)
-  const weekMinutes = Math.round((statistics.data?.weekEffectiveReadingSeconds || 0) / 60)
-  const todayEyeMinutes = Math.round((statistics.data?.eyeCare?.todayValidEyeSeconds || 0) / 60)
+  const todayMinutes = statistics.data ? statistics.data.todayEffectiveReadingSeconds / 60 : null
+  const todayEyeSeconds = privacy.eyeCare?.dailyValidEyeSeconds
+  const todayEyeMinutes = Number.isFinite(todayEyeSeconds) ? Math.round(todayEyeSeconds / 60) : null
   const levelProgress = Number(level.progressPercent)
-  const levelPercent = Number.isFinite(levelProgress) ? Math.max(0, Math.min(100, levelProgress)) : 0
+  const levelPercent = Number.isFinite(levelProgress) ? Math.max(0, Math.min(100, levelProgress)) : null
   const highlightCount = library.excerpts.length
   const bookmarkCount = library.bookmarks.length
   const noteCount = library.annotations.length
   const teacherBadge = (privacy.data?.requests || []).filter((request) => request.status === 'pending').length
   const mineCount = Array.isArray(community.mine) ? community.mine.length : 0
   const savedCount = Array.isArray(community.savedPosts) ? community.savedPosts.length : 0
-  const finishedBooks = (runtime.data?.books || []).filter((book) => (book.progress?.percent || 0) >= 100).length
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
@@ -65,13 +66,15 @@ export default function Me() {
         >
           <div className="flex items-baseline justify-between gap-2">
             <span className="font-serif text-title font-bold text-ink-900">
-              Lv.{level.value} · {level.title}
+              {level.value === null ? '等级暂未返回' : `Lv.${level.value} · ${level.title}`}
             </span>
             <span className="text-micro text-ink-400">看徽章</span>
           </div>
-          <div className="student-meter-track mt-2.5 h-2 w-full overflow-hidden rounded-full">
-            <div className="student-level-fill h-full rounded-full" style={{ width: `${levelPercent}%` }} />
-          </div>
+          {levelPercent !== null && (
+            <div className="student-meter-track mt-2.5 h-2 w-full overflow-hidden rounded-full">
+              <div className="student-level-fill h-full rounded-full" style={{ width: `${levelPercent}%` }} />
+            </div>
+          )}
           <p className="mt-2 text-micro text-ink-500 tabular-nums">
             {Number.isFinite(levelProgress) ? '当前等级与进度由服务端阅读数据计算' : '当前等级已由服务端下发，进度阈值暂未开放'}
           </p>
@@ -97,10 +100,10 @@ export default function Me() {
             </Link>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <Stat label="有效阅读" value={formatMinutes(total)} note="累计" icon="Clock" />
-            <Stat label="读完的书" value={`${finishedBooks} 本`} note="全部读到最后一页" icon="BookCheck" />
-            <Stat label="近期阅读" value={`${statistics.data?.readingDays || 0} 天`} note="有真实阅读记录的天数" icon="CalendarDays" />
-            <Stat label="本周阅读" value={formatMinutes(weekMinutes)} note="只算有效阅读" icon="TrendingUp" />
+            <Stat label="今日有效阅读" value={formatMinutes(todayMinutes)} note={statistics.data?.statDate || '统计日读取中'} icon="Clock" />
+            <Stat label="今日打卡" value={statistics.data ? (statistics.data.checkIn.checked ? '已打卡' : '未打卡') : '暂未返回'} note="固定 5 分钟阈值" icon="CalendarCheck" />
+            <Stat label="连续打卡" value={statistics.data ? `${statistics.data.streakDays} 天` : '暂未返回'} note="只统计自己的记录" icon="CalendarDays" />
+            <Stat label="最近阅读" value={statistics.data?.lastReading?.title || '暂无记录'} note={statistics.data?.lastReading ? `第 ${statistics.data.lastReading.lastPageNo} 页` : '页码不表示完成度'} icon="BookOpen" />
           </div>
           <p className="mt-3 text-micro text-ink-400">仅统计前台、亮屏且有交互的有效阅读时间，重叠设备区间不会重复累计。</p>
         </GlassPanel>
@@ -111,21 +114,21 @@ export default function Me() {
             icon="TrendingUp"
             tone="mint"
             title="阅读足迹"
-            desc={`本周 ${formatMinutes(weekMinutes)}，累计 ${formatMinutes(total)}`}
+            desc={statistics.status === 'ready' ? `今天 ${formatMinutes(todayMinutes)}，连续打卡 ${statistics.data.streakDays} 天` : '今日阅读记录正在读取'}
           />
           <Entry
             to="/student/me/level"
             icon="Award"
             tone="apricot"
             title="阅读等级与徽章"
-            desc={`Lv.${level.value} ${level.title} · 徽章数据尚未下发`}
+            desc={level.value === null ? '等级数据尚未下发' : `Lv.${level.value} ${level.title} · 徽章数据尚未下发`}
           />
           <Entry
             to="/student/me/usage"
             icon="Gauge"
             tone="sky"
             title="用量与护眼"
-            desc={`今日有效用眼 ${todayEyeMinutes} 分钟 · ${statistics.data?.eyeCare?.status || '状态读取中'}`}
+            desc={todayEyeMinutes === null ? '护眼状态正在读取' : `今日有效用眼 ${todayEyeMinutes} 分钟 · ${privacy.eyeCare?.enforcement?.status || '状态读取中'}`}
           />
           {/* 红线：只显示未读数量，不显示通知内容，更不显示任何安全事件 */}
           <Entry
