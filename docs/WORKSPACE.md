@@ -28,8 +28,8 @@
 本机约定：
 
 ```text
-/Users/yak/Project/读伴书籍解析器/   原始书籍、解析代码、中间结果和发布包
-/Users/yak/Project/读伴项目资料归档/ 历史交付包、需求材料与压缩包原件
+/Users/yak/Project/整书阅读/book-parser/              原始书籍、解析代码、中间结果和发布包
+/Users/yak/Project/整书阅读/archive/project-materials/ 历史交付包、需求材料与压缩包原件
 ```
 
 ## 书籍交付边界
