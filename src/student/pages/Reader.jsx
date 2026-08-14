@@ -266,17 +266,22 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     return () => ro.disconnect()
   }, [])
 
+  const pageDesign = useMemo(() => {
+    const imagePage = loadedPages.find((page) => page.pageImage?.url && page.width > 0 && page.height > 0)
+    return imagePage ? { width: imagePage.width, height: imagePage.height } : PAGE_DESIGN
+  }, [loadedPages])
+
   const scale = useMemo(() => {
     if (box.w <= 0 || box.h <= 0) return 0
     const perPage = spread ? (box.w - 26) / 2 : box.w
-    const k = Math.min(box.h / PAGE_DESIGN.height, perPage / PAGE_DESIGN.width)
+    const k = Math.min(box.h / pageDesign.height, perPage / pageDesign.width)
     // 小字号故意留一点余白，视觉上更像手里捧着的书，不顶满屏
     const cap = prefs.fontScale === 'sm' ? 0.92 : 1
     return Math.max(0.4, Math.min(k, 2)) * cap
-  }, [box, spread, prefs.fontScale])
+  }, [box, pageDesign, spread, prefs.fontScale])
 
-  const pageW = Math.round(PAGE_DESIGN.width * scale)
-  const pageH = Math.round(PAGE_DESIGN.height * scale)
+  const pageW = Math.round(pageDesign.width * scale)
+  const pageH = Math.round(pageDesign.height * scale)
 
   // —— 翻页 ——
   // 页数、尺寸、单双页变化都要给 HTMLFlipBook 换 key，否则库内部状态会错乱（旧站踩过）

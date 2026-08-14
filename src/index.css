@@ -1235,6 +1235,48 @@ select.console-input {
   flex-direction: column;
   box-sizing: border-box;
 }
+.student-page-image-inner {
+  position: relative;
+  box-sizing: border-box;
+  transform-origin: top left;
+}
+.student-page-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.student-page-image-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.student-page-image-block {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  color: transparent;
+  font-family: theme('fontFamily.serif');
+  font-size: 42px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  text-indent: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.student-page-image-block::selection {
+  color: transparent;
+  background: rgba(150, 214, 226, 0.55);
+}
 .student-page-head {
   flex-shrink: 0;
   display: flex;

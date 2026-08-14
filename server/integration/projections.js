@@ -134,14 +134,16 @@ export function projectBookPage(database, page) {
     text: page.text_content,
     width: page.width,
     height: page.height,
+    pageImage: publicAsset(illustration),
     blocks: page.blocks.map((block) => ({
       id: block.id,
       blockId: block.id,
       kind: 'paragraph',
       text: block.text_content,
+      charStart: block.char_start,
+      charEnd: block.char_end,
       coordinates: { x: block.x, y: block.y, width: block.width, height: block.height },
     })),
-    illustration: publicAsset(illustration),
   }
 }
 

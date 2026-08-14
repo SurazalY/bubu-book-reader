@@ -17,6 +17,7 @@ function firstValue(...values) {
 
 function numberOrNull(...values) {
   const value = firstValue(...values)
+  if (value === null) return null
   const numeric = typeof value === 'number' ? value : Number(value)
   return Number.isFinite(numeric) ? numeric : null
 }
@@ -185,10 +186,19 @@ function toReaderBlock(raw) {
   const text = firstValue(source.text, source.content, typeof raw === 'string' ? raw : null)
   if (typeof text !== 'string' || !text.trim()) return null
   const blockId = firstValue(source.blockId, source.id)
+  const coordinates = asRecord(source.coordinates || source.bbox)
+  const x = numberOrNull(source.x, coordinates.x)
+  const y = numberOrNull(source.y, coordinates.y)
+  const width = numberOrNull(source.width, coordinates.width)
+  const height = numberOrNull(source.height, coordinates.height)
+  const charStart = numberOrNull(source.charStart, source.char_start)
+  const charEnd = numberOrNull(source.charEnd, source.char_end)
   return {
     ...(blockId ? { id: blockId, blockId } : {}),
     kind: firstValue(source.kind, source.type, 'paragraph'),
     text,
+    ...(x !== null && y !== null && width !== null && height !== null ? { bbox: { x, y, width, height } } : {}),
+    ...(Number.isSafeInteger(charStart) && Number.isSafeInteger(charEnd) ? { charStart, charEnd } : {}),
   }
 }
 
@@ -202,11 +212,18 @@ export function toReaderPageDto(raw) {
   if (!blocks.length && typeof plainText === 'string' && plainText.trim()) {
     blocks.push({ kind: 'paragraph', text: plainText })
   }
-  const illustration = toAsset(source.illustration || source.figure || content.illustration)
+  const rawPageImage = source.pageImage || source.page_image || content.pageImage
+    || (asRecord(source.illustration).kind === 'page_image' ? source.illustration : null)
+  const pageImage = toAsset(rawPageImage)
+  const illustration = toAsset(source.figure || content.illustration
+    || (asRecord(source.illustration).kind !== 'page_image' ? source.illustration : null))
   return {
     no: numberOrNull(source.pageNo, source.no, source.page),
+    width: numberOrNull(source.width, content.width),
+    height: numberOrNull(source.height, content.height),
     chapter: firstValue(source.chapter, source.chapterTitle, content.chapter),
     blocks,
+    pageImage,
     illustration,
     figure: illustration ? { ...illustration, caption: firstValue(asRecord(source.figure).caption, asRecord(source.illustration).caption, content.caption) } : null,
   }

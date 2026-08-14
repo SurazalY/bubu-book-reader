@@ -79,13 +79,13 @@ function buildSegments(text, { student = [], teacher = [], notes = [], live = []
   return segs
 }
 
-function MarkedParagraph({ text, marks, className, blockId }) {
+function MarkedParagraph({ text, marks, className, blockId, style }) {
   const segs = buildSegments(text, marks)
   if (segs.length === 1 && !segs[0].s && !segs[0].t && !segs[0].n && !segs[0].l) {
-    return <p className={className} data-block-id={blockId}>{text}</p>
+    return <p className={className} style={style} data-block-id={blockId}>{text}</p>
   }
   return (
-    <p className={className} data-block-id={blockId}>
+    <p className={className} style={style} data-block-id={blockId}>
       {segs.map((seg, i) => {
         if (!seg.s && !seg.t && !seg.n && !seg.l) return <span key={i}>{seg.t2}</span>
         const title = [
@@ -125,59 +125,93 @@ const BookPage = forwardRef(function BookPage(
   { page, scale = 1, totalPages, bookmarked, onToggleBookmark, marks = {}, tone = 'warm', current = false },
   ref,
 ) {
+  const hasPageImage = Boolean(page.pageImage?.url && Number.isFinite(page.width) && Number.isFinite(page.height))
   const { width, height, padX, padY } = PAGE_DESIGN
+  const designWidth = hasPageImage ? page.width : width
+  const designHeight = hasPageImage ? page.height : height
   const figure = page.figure || page.illustration
+  const imageBlocks = hasPageImage ? page.blocks.filter((block) => block.bbox) : []
   return (
     <div className="student-book-page" ref={ref} data-density="soft">
       <div
         className={cx('student-page-frame', `student-page--${tone}`)}
-        style={{ width: Math.round(width * scale), height: Math.round(height * scale) }}
+        style={{ width: Math.round(designWidth * scale), height: Math.round(designHeight * scale) }}
       >
-        <div
-          className="student-page-inner"
-          style={{
-            width,
-            height,
-            padding: `${padY}px ${padX}px`,
-            transform: `scale(${scale})`,
-            transformOrigin: 'top left',
-          }}
-        >
-          <div className="student-page-head">
-            <span className="truncate">{page.chapter}</span>
+        {hasPageImage ? (
+          <div
+            className="student-page-image-inner"
+            style={{ width: designWidth, height: designHeight, transform: `scale(${scale})` }}
+          >
+            <img
+              className="student-page-image"
+              src={page.pageImage.url}
+              alt={`第 ${page.no} 页原书页面`}
+              draggable="false"
+            />
+            {/* 图片承担全部视觉；此层只提供与同一像素坐标系对齐的透明、可选 DOM 汉字。 */}
+            <div className="student-page-image-layer" data-page={page.no}>
+              {imageBlocks.map((block, index) => {
+                const box = block.bbox
+                return (
+                  <MarkedParagraph
+                    key={block.blockId || block.id || index}
+                    blockId={block.blockId || block.id}
+                    text={block.text}
+                    marks={marks}
+                    className="student-page-image-block"
+                    style={{ left: box.x, top: box.y, width: box.width, minHeight: box.height }}
+                  />
+                )
+              })}
+            </div>
           </div>
+        ) : (
+          <div
+            className="student-page-inner"
+            style={{
+              width,
+              height,
+              padding: `${padY}px ${padX}px`,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left',
+            }}
+          >
+            <div className="student-page-head">
+              <span className="truncate">{page.chapter}</span>
+            </div>
 
-          {/* data-page 是页内坐标映射的最小实现：选区落在哪一页由它判定，
-              Stage 4 的引文卡片与未来接真实 PDF 的坐标映射都复用这个锚点。 */}
-          <div className="student-page-body" data-page={page.no}>
-            {page.blocks.map((b, i) =>
-              b.k === 'h' || b.kind === 'heading' || b.kind === 'h' ? (
-                <h2 key={i} className="student-page-h">
-                  {b.t || b.text}
-                </h2>
-              ) : (
-                <MarkedParagraph
-                  key={b.blockId || b.id || i}
-                  blockId={b.blockId || b.id}
-                  text={b.t || b.text}
-                  marks={marks}
-                  className="student-page-p"
-                />
-              ),
-            )}
-            {figure && (
-              <figure className="student-page-figure">
-                <PageArt kind={figure.kind} src={figure.url} />
-                <figcaption>{figure.caption || '正文插图'}</figcaption>
-              </figure>
-            )}
-          </div>
+            {/* data-page 是页内坐标映射的最小实现：选区落在哪一页由它判定，
+                Stage 4 的引文卡片与未来接真实 PDF 的坐标映射都复用这个锚点。 */}
+            <div className="student-page-body" data-page={page.no}>
+              {page.blocks.map((b, i) =>
+                b.k === 'h' || b.kind === 'heading' || b.kind === 'h' ? (
+                  <h2 key={i} className="student-page-h">
+                    {b.t || b.text}
+                  </h2>
+                ) : (
+                  <MarkedParagraph
+                    key={b.blockId || b.id || i}
+                    blockId={b.blockId || b.id}
+                    text={b.t || b.text}
+                    marks={marks}
+                    className="student-page-p"
+                  />
+                ),
+              )}
+              {figure && (
+                <figure className="student-page-figure">
+                  <PageArt kind={figure.kind} src={figure.url} />
+                  <figcaption>{figure.caption || '正文插图'}</figcaption>
+                </figure>
+              )}
+            </div>
 
-          <div className="student-page-foot">
-            <span className="tabular-nums">第 {page.no} 页</span>
-            {totalPages ? <span className="tabular-nums opacity-70">全书 {totalPages} 页</span> : null}
+            <div className="student-page-foot">
+              <span className="tabular-nums">第 {page.no} 页</span>
+              {totalPages ? <span className="tabular-nums opacity-70">全书 {totalPages} 页</span> : null}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 页角书签：规格 §6.3「书签用于标记整页，放在页角或工具栏，不与摘录混用」。
             所以它只认整页，不接受选区，也不写进摘录列表。 */}

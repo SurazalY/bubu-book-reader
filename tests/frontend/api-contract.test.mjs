@@ -242,6 +242,32 @@ test('学生阅读器只把 API 分页正文映射为可渲染块', () => {
     kind: 'paragraph',
     text: '可以交给模型核验的原文。',
   })
+
+  const imagePage = toReaderPageDto({
+    pageNo: 9,
+    width: 1289,
+    height: 1869,
+    pageImage: { id: 'asset-page-9', kind: 'page_image', url: '/books/p9.png' },
+    blocks: [{
+      id: 'p0009-b001',
+      text: '原书汉字',
+      charStart: 0,
+      charEnd: 4,
+      coordinates: { x: 120, y: 240, width: 640, height: 96 },
+    }],
+  })
+  assert.deepEqual(imagePage.pageImage, { id: 'asset-page-9', kind: 'page_image', url: '/books/p9.png' })
+  assert.equal(imagePage.width, 1289)
+  assert.equal(imagePage.height, 1869)
+  assert.deepEqual(imagePage.blocks[0], {
+    id: 'p0009-b001',
+    blockId: 'p0009-b001',
+    kind: 'paragraph',
+    text: '原书汉字',
+    bbox: { x: 120, y: 240, width: 640, height: 96 },
+    charStart: 0,
+    charEnd: 4,
+  })
 })
 
 test('学生 AI 面板只消费服务端会话、额度并用真实写请求发送', async () => {
