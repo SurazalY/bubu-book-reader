@@ -107,12 +107,15 @@ student(2 行) / teacher(25 行) / grade_manager(52 行) / school_admin(79 行) 
 
 **结论：建第二个班必须用校长账号 `internal-principal`（`school_admin`，school 范围，`bootstrap-internal-demo.js` 183、253–254 行），不能用老师账号。** 别等到验收当天才发现建不了班。校长的密码与演示学生同源，在 `.env` 的 `INTERNAL_DEMO_PASSWORD`。
 
-**更正四：D-19 尚未关闭，且它改过你要动的文件。**
+**更正四：D-19 已复验关闭，但它改过你要动的文件，且成果未提交。**
 
-我刚做完 D-19（原版 PDF 正文发糊），**状态是「已修，待真人复验」**。它改动了 `src/student/pages/Reader.jsx`、`src/index.css`、`src/student/components/PdfBookPage.jsx`、两个前端测试文件，**且全部未提交**。详见台账第十五节。
+> 2026-08-17 深夜更新：本条写就时 D-19 状态是「已修，待真人复验」；同夜用户复验通过，原话「清晰度基本没问题了」。**该缺陷已关闭**，你不需要接手它。台账第十五节末尾记了复验的边界（抽样观感，未逐本点验 49 本，三处改动无法归因到单项）。
+
+D-19（原版 PDF 正文发糊）改动了 `src/student/pages/Reader.jsx`、`src/index.css`、`src/student/components/PdfBookPage.jsx`，新增 `src/student/pdf-page-design.js` 与两个前端测试文件，**全部未提交**。详见台账第十五节。
 
 对你的影响：
-- 如果用户复验 D-19 不通过，可能还要回去改这三个文件。你在 Phase 4 里如果也要动它们（T4.6 动 `Shelf.jsx` 不冲突，但 D-09 落地要动 `src/components/ui.jsx` 和详情页），**注意别把 D-19 的未提交改动搞丢**。
+- 你在 Phase 4 里如果要动这几个文件（T4.6 动 `Shelf.jsx` 不冲突，但 D-09 落地要动 `src/components/ui.jsx` 和学生详情页），**注意别把 D-19 与 D-18 的未提交改动搞丢**。
+- D-19 已关闭意味着 §6.3 那三处新契约是**生效中的既有行为**，不是待验证的实验品——改坏它们就是回归。
 - 工作树里 D-18 与 D-19 的成果都是未提交状态。**禁止 `git checkout` / `reset` / `stash` / `clean` 丢弃任何未提交内容。**
 
 ---
