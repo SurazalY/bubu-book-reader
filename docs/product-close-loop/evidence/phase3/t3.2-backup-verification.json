@@ -1,0 +1,22 @@
+{
+  "task": "T3.2-backup-verification",
+  "startedAt": "2026-08-17T20:15:20.755571+08:00",
+  "finishedAt": "2026-08-17T20:15:20.792907+08:00",
+  "source": "D:/Project/整书8.15/server/data/readmate.sqlite",
+  "backupPath": "D:/Project/整书8.15/server/data/readmate.sqlite.pre-phase3-import-backup",
+  "method": "VACUUM INTO",
+  "busyTimeout": 0,
+  "vacuumSucceeded": true,
+  "opened": true,
+  "journalMode": "delete",
+  "backupBytes": 4198400,
+  "counts": {
+    "books": 1,
+    "book_versions": 1,
+    "reading_summary_sessions": 9,
+    "reading_progress": 1,
+    "reading_daily_book_summaries": 1,
+    "reading_page_coverage": 34
+  },
+  "error": null
+}

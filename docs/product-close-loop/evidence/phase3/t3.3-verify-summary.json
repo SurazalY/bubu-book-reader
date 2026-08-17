@@ -1,0 +1,3767 @@
+{
+  "task": "T3.3-verify-catalog",
+  "generatedAt": "2026-08-17T12:20:21+00:00",
+  "ok": true,
+  "advisoryOk": true,
+  "catalog": "book-parser/catalog-default-49.json",
+  "database": "server/data/readmate.sqlite",
+  "databaseUri": "file:///D:/Project/%E6%95%B4%E4%B9%A68.15/server/data/readmate.sqlite?mode=ro",
+  "queryOnly": true,
+  "journalMode": "wal",
+  "packageRoot": "book-parser/work/package-v2-trusted",
+  "schema": {
+    "tables": {
+      "books": [
+        "id",
+        "organization_id_at_creation",
+        "actor_id_at_creation",
+        "title",
+        "status",
+        "created_at",
+        "updated_at",
+        "version"
+      ],
+      "book_versions": [
+        "id",
+        "book_id",
+        "organization_id_at_creation",
+        "actor_id_at_creation",
+        "label",
+        "source_format",
+        "page_count",
+        "created_at",
+        "updated_at",
+        "version",
+        "package_format",
+        "release_sha256",
+        "normalization_version",
+        "content_provenance_json",
+        "package_quality_status"
+      ],
+      "book_pages": [
+        "id",
+        "book_version_id",
+        "page_no",
+        "text_content",
+        "width",
+        "height",
+        "created_at",
+        "updated_at",
+        "version",
+        "raw_text",
+        "normalized_text",
+        "printed_page_label"
+      ],
+      "book_assets": [
+        "id",
+        "book_version_id",
+        "page_id",
+        "asset_type",
+        "storage_key",
+        "usage_label",
+        "mime_type",
+        "size_bytes",
+        "sha256",
+        "width",
+        "height",
+        "created_at",
+        "updated_at",
+        "version"
+      ],
+      "book_catalog_metadata": [
+        "book_id",
+        "author",
+        "illustrator",
+        "source_page",
+        "usage_label",
+        "rights_json",
+        "grade",
+        "created_at",
+        "updated_at",
+        "version"
+      ]
+    },
+    "missing": []
+  },
+  "databaseFiles": {
+    "before": {
+      "sqlite": {
+        "path": "D:\\Project\\整书8.15\\server\\data\\readmate.sqlite",
+        "exists": true,
+        "sizeBytes": 95834112,
+        "mtimeNs": 1786968980420246700,
+        "mtimeIso": "2026-08-17T12:16:20+00:00"
+      },
+      "wal": {
+        "path": "D:\\Project\\整书8.15\\server\\data\\readmate.sqlite-wal",
+        "exists": true,
+        "sizeBytes": 9723232,
+        "mtimeNs": 1786968980444990600,
+        "mtimeIso": "2026-08-17T12:16:20+00:00"
+      },
+      "shm": {
+        "path": "D:\\Project\\整书8.15\\server\\data\\readmate.sqlite-shm",
+        "exists": true,
+        "sizeBytes": 32768,
+        "mtimeNs": 1786966947708404200,
+        "mtimeIso": "2026-08-17T11:42:27+00:00"
+      }
+    },
+    "after": {
+      "sqlite": {
+        "path": "D:\\Project\\整书8.15\\server\\data\\readmate.sqlite",
+        "exists": true,
+        "sizeBytes": 95834112,
+        "mtimeNs": 1786968980420246700,
+        "mtimeIso": "2026-08-17T12:16:20+00:00"
+      },
+      "wal": {
+        "path": "D:\\Project\\整书8.15\\server\\data\\readmate.sqlite-wal",
+        "exists": true,
+        "sizeBytes": 9723232,
+        "mtimeNs": 1786968980444990600,
+        "mtimeIso": "2026-08-17T12:16:20+00:00"
+      },
+      "shm": {
+        "path": "D:\\Project\\整书8.15\\server\\data\\readmate.sqlite-shm",
+        "exists": true,
+        "sizeBytes": 32768,
+        "mtimeNs": 1786966947708404200,
+        "mtimeIso": "2026-08-17T11:42:27+00:00"
+      }
+    },
+    "unchanged": {
+      "sqlite": true,
+      "wal": true,
+      "shm": true
+    },
+    "allUnchanged": true
+  },
+  "extraBookIds": [],
+  "totals": {
+    "books": 49,
+    "passed": 49,
+    "failed": 0
+  },
+  "assertionTotals": {
+    "published": {
+      "pass": 49,
+      "fail": 0
+    },
+    "pageCount": {
+      "pass": 49,
+      "fail": 0
+    },
+    "blankNormalizedEmpty": {
+      "pass": 49,
+      "fail": 0
+    },
+    "assets": {
+      "pass": 49,
+      "fail": 0
+    },
+    "grade": {
+      "pass": 49,
+      "fail": 0
+    }
+  },
+  "advisoryTotals": {
+    "singleTrustedVersion": {
+      "pass": 49,
+      "fail": 0
+    },
+    "packageQualityStatus": {
+      "pass": 49,
+      "fail": 0
+    }
+  },
+  "failures": {
+    "published": [],
+    "pageCount": [],
+    "blankNormalizedEmpty": [],
+    "assets": [],
+    "grade": []
+  },
+  "advisoryFailures": {
+    "singleTrustedVersion": [],
+    "packageQualityStatus": []
+  },
+  "rows": [
+    {
+      "bookId": "book-001",
+      "title": "和大人一起读·儿童歌谣",
+      "versionId": "book-001-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 98,
+          "versionPageCount": 98,
+          "pageRowCount": 98,
+          "versionId": "book-001-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 10,
+          "emptyPages": [
+            2,
+            3,
+            14,
+            18,
+            52,
+            66,
+            76,
+            92,
+            96,
+            97
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-001-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 1,
+          "actual": 1,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-001-trusted-v1",
+          "versionIds": [
+            "book-001-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-001-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-002",
+      "title": "和大人一起读·国学启蒙",
+      "versionId": "book-002-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 98,
+          "versionPageCount": 98,
+          "pageRowCount": 98,
+          "versionId": "book-002-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 7,
+          "emptyPages": [
+            2,
+            3,
+            51,
+            56,
+            72,
+            96,
+            97
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-002-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 1,
+          "actual": 1,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-002-trusted-v1",
+          "versionIds": [
+            "book-002-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-002-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-003",
+      "title": "和大人一起读·寓言故事",
+      "versionId": "book-003-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 98,
+          "versionPageCount": 98,
+          "pageRowCount": 98,
+          "versionId": "book-003-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 20,
+          "emptyPages": [
+            2,
+            3,
+            9,
+            11,
+            17,
+            24,
+            30,
+            36,
+            44,
+            48,
+            52,
+            60,
+            67,
+            69,
+            80,
+            84,
+            86,
+            88,
+            96,
+            97
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-003-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 1,
+          "actual": 1,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-003-trusted-v1",
+          "versionIds": [
+            "book-003-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-003-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-004",
+      "title": "和大人一起读·童话故事",
+      "versionId": "book-004-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 98,
+          "versionPageCount": 98,
+          "pageRowCount": 98,
+          "versionId": "book-004-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 11,
+          "emptyPages": [
+            2,
+            3,
+            7,
+            11,
+            44,
+            54,
+            71,
+            80,
+            87,
+            96,
+            97
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-004-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 1,
+          "actual": 1,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-004-trusted-v1",
+          "versionIds": [
+            "book-004-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-004-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-005",
+      "title": "读读童谣和儿歌·中国传统文化",
+      "versionId": "book-005-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 96,
+          "versionPageCount": 96,
+          "pageRowCount": 96,
+          "versionId": "book-005-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 16,
+          "emptyPages": [
+            21,
+            24,
+            30,
+            33,
+            36,
+            44,
+            46,
+            50,
+            54,
+            61,
+            66,
+            70,
+            83,
+            88,
+            94,
+            95
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-005-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 1,
+          "actual": 1,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-005-trusted-v1",
+          "versionIds": [
+            "book-005-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-005-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-006",
+      "title": "读读童谣和儿歌·外国童谣",
+      "versionId": "book-006-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 98,
+          "versionPageCount": 98,
+          "pageRowCount": 98,
+          "versionId": "book-006-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 9,
+          "emptyPages": [
+            2,
+            3,
+            12,
+            30,
+            48,
+            56,
+            72,
+            96,
+            97
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-006-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 1,
+          "actual": 1,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-006-trusted-v1",
+          "versionIds": [
+            "book-006-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-006-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-007",
+      "title": "读读童谣和儿歌·多彩的童年",
+      "versionId": "book-007-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 98,
+          "versionPageCount": 98,
+          "pageRowCount": 98,
+          "versionId": "book-007-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 4,
+          "emptyPages": [
+            2,
+            3,
+            96,
+            97
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-007-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 1,
+          "actual": 1,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-007-trusted-v1",
+          "versionIds": [
+            "book-007-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-007-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-008",
+      "title": "读读童谣和儿歌·奇妙的大自然",
+      "versionId": "book-008-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 98,
+          "versionPageCount": 98,
+          "pageRowCount": 98,
+          "versionId": "book-008-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 9,
+          "emptyPages": [
+            2,
+            3,
+            18,
+            22,
+            60,
+            72,
+            90,
+            96,
+            97
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-008-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 1,
+          "actual": 1,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-008-trusted-v1",
+          "versionIds": [
+            "book-008-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-008-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-009",
+      "title": "一只想飞的猫",
+      "versionId": "book-009-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 130,
+          "versionPageCount": 130,
+          "pageRowCount": 130,
+          "versionId": "book-009-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 18,
+          "emptyPages": [
+            2,
+            3,
+            7,
+            18,
+            35,
+            42,
+            53,
+            64,
+            72,
+            76,
+            81,
+            86,
+            107,
+            110,
+            117,
+            122,
+            128,
+            129
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-009-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-009-trusted-v1",
+          "versionIds": [
+            "book-009-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-009-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-010",
+      "title": "一起长大的玩具",
+      "versionId": "book-010-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-010-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 6,
+          "emptyPages": [
+            2,
+            3,
+            98,
+            106,
+            160,
+            161
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-010-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-010-trusted-v1",
+          "versionIds": [
+            "book-010-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-010-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-011",
+      "title": "七色花",
+      "versionId": "book-011-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-011-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 27,
+          "emptyPages": [
+            12,
+            15,
+            20,
+            25,
+            31,
+            38,
+            46,
+            48,
+            54,
+            58,
+            67,
+            72,
+            74,
+            81,
+            84,
+            89,
+            93,
+            100,
+            102,
+            106,
+            110,
+            121,
+            128,
+            135,
+            141,
+            154,
+            159
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-011-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-011-trusted-v1",
+          "versionIds": [
+            "book-011-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-011-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-012",
+      "title": "孤独的小螃蟹",
+      "versionId": "book-012-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 130,
+          "versionPageCount": 130,
+          "pageRowCount": 130,
+          "versionId": "book-012-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 14,
+          "emptyPages": [
+            2,
+            3,
+            7,
+            25,
+            31,
+            51,
+            73,
+            90,
+            95,
+            108,
+            116,
+            120,
+            128,
+            129
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-012-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-012-trusted-v1",
+          "versionIds": [
+            "book-012-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-012-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-013",
+      "title": "小狗的小房子",
+      "versionId": "book-013-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 130,
+          "versionPageCount": 130,
+          "pageRowCount": 130,
+          "versionId": "book-013-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 11,
+          "emptyPages": [
+            2,
+            3,
+            7,
+            55,
+            65,
+            69,
+            76,
+            81,
+            120,
+            128,
+            129
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-013-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-013-trusted-v1",
+          "versionIds": [
+            "book-013-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-013-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-014",
+      "title": "小鲤鱼跳龙门",
+      "versionId": "book-014-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 130,
+          "versionPageCount": 130,
+          "pageRowCount": 130,
+          "versionId": "book-014-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 20,
+          "emptyPages": [
+            2,
+            3,
+            7,
+            11,
+            33,
+            41,
+            47,
+            50,
+            54,
+            59,
+            73,
+            77,
+            88,
+            99,
+            103,
+            108,
+            114,
+            121,
+            128,
+            129
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-014-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-014-trusted-v1",
+          "versionIds": [
+            "book-014-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-014-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-015",
+      "title": "愿望的实现",
+      "versionId": "book-015-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 154,
+          "versionPageCount": 154,
+          "pageRowCount": 154,
+          "versionId": "book-015-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 30,
+          "emptyPages": [
+            5,
+            9,
+            12,
+            16,
+            19,
+            24,
+            28,
+            32,
+            36,
+            42,
+            47,
+            51,
+            56,
+            62,
+            71,
+            76,
+            81,
+            87,
+            91,
+            100,
+            109,
+            112,
+            119,
+            125,
+            129,
+            132,
+            136,
+            140,
+            145,
+            152
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-015-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-015-trusted-v1",
+          "versionIds": [
+            "book-015-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-015-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-016",
+      "title": "歪脑袋木头桩",
+      "versionId": "book-016-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 130,
+          "versionPageCount": 130,
+          "pageRowCount": 130,
+          "versionId": "book-016-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 14,
+          "emptyPages": [
+            2,
+            3,
+            7,
+            20,
+            37,
+            59,
+            69,
+            79,
+            90,
+            103,
+            114,
+            122,
+            128,
+            129
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-016-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-016-trusted-v1",
+          "versionIds": [
+            "book-016-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-016-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-017",
+      "title": "神笔马良",
+      "versionId": "book-017-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 193,
+          "versionPageCount": 193,
+          "pageRowCount": 193,
+          "versionId": "book-017-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 3,
+          "emptyPages": [
+            9,
+            26,
+            136
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-017-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 2,
+          "actual": 2,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-017-trusted-v1",
+          "versionIds": [
+            "book-017-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-017-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-018",
+      "title": "中国古代寓言",
+      "versionId": "book-018-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-018-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 1,
+          "emptyPages": [
+            11
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-018-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 3,
+          "actual": 3,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-018-trusted-v1",
+          "versionIds": [
+            "book-018-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-018-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-019",
+      "title": "伊索寓言",
+      "versionId": "book-019-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-019-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 1,
+          "emptyPages": [
+            13
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-019-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 3,
+          "actual": 3,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-019-trusted-v1",
+          "versionIds": [
+            "book-019-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-019-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-020",
+      "title": "克雷洛夫寓言",
+      "versionId": "book-020-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-020-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 2,
+          "emptyPages": [
+            11,
+            106
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-020-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 3,
+          "actual": 3,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-020-trusted-v1",
+          "versionIds": [
+            "book-020-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-020-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-021",
+      "title": "安徒生童话",
+      "versionId": "book-021-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 194,
+          "versionPageCount": 194,
+          "pageRowCount": 194,
+          "versionId": "book-021-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 8,
+          "emptyPages": [
+            5,
+            13,
+            30,
+            58,
+            69,
+            76,
+            135,
+            154
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-021-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 3,
+          "actual": 3,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-021-trusted-v1",
+          "versionIds": [
+            "book-021-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-021-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-022",
+      "title": "拉封丹寓言",
+      "versionId": "book-022-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-022-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 2,
+          "emptyPages": [
+            11,
+            20
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-022-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 3,
+          "actual": 3,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-022-trusted-v1",
+          "versionIds": [
+            "book-022-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-022-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-023",
+      "title": "格林童话",
+      "versionId": "book-023-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 244,
+          "versionPageCount": 244,
+          "pageRowCount": 244,
+          "versionId": "book-023-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 8,
+          "emptyPages": [
+            7,
+            14,
+            24,
+            64,
+            102,
+            147,
+            162,
+            189
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-023-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 3,
+          "actual": 3,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-023-trusted-v1",
+          "versionIds": [
+            "book-023-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-023-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-024",
+      "title": "稻草人",
+      "versionId": "book-024-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 233,
+          "versionPageCount": 233,
+          "pageRowCount": 233,
+          "versionId": "book-024-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 14,
+          "emptyPages": [
+            5,
+            24,
+            27,
+            51,
+            55,
+            68,
+            100,
+            102,
+            142,
+            148,
+            154,
+            160,
+            216,
+            228
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-024-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 3,
+          "actual": 3,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-024-trusted-v1",
+          "versionIds": [
+            "book-024-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-024-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-025",
+      "title": "世界神话传说",
+      "versionId": "book-025-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-025-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 0,
+          "emptyPages": [],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-025-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-025-trusted-v1",
+          "versionIds": [
+            "book-025-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-025-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-026",
+      "title": "中国古代神话",
+      "versionId": "book-026-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-026-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 4,
+          "emptyPages": [
+            10,
+            18,
+            112,
+            125
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-026-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-026-trusted-v1",
+          "versionIds": [
+            "book-026-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-026-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-027",
+      "title": "十万个为什么",
+      "versionId": "book-027-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-027-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 1,
+          "emptyPages": [
+            7
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-027-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-027-trusted-v1",
+          "versionIds": [
+            "book-027-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-027-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-028",
+      "title": "吉尔伽美什",
+      "versionId": "book-028-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 146,
+          "versionPageCount": 146,
+          "pageRowCount": 146,
+          "versionId": "book-028-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 27,
+          "emptyPages": [
+            9,
+            10,
+            14,
+            17,
+            21,
+            24,
+            29,
+            31,
+            33,
+            41,
+            42,
+            46,
+            48,
+            59,
+            60,
+            66,
+            70,
+            76,
+            85,
+            86,
+            95,
+            111,
+            120,
+            129,
+            130,
+            136,
+            144
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-028-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-028-trusted-v1",
+          "versionIds": [
+            "book-028-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-028-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-029",
+      "title": "地球的故事",
+      "versionId": "book-029-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 225,
+          "versionPageCount": 225,
+          "pageRowCount": 225,
+          "versionId": "book-029-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 0,
+          "emptyPages": [],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-029-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-029-trusted-v1",
+          "versionIds": [
+            "book-029-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-029-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-030",
+      "title": "山海经",
+      "versionId": "book-030-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-030-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 0,
+          "emptyPages": [],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-030-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-030-trusted-v1",
+          "versionIds": [
+            "book-030-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-030-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-031",
+      "title": "希腊神话故事",
+      "versionId": "book-031-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 161,
+          "versionPageCount": 161,
+          "pageRowCount": 161,
+          "versionId": "book-031-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 1,
+          "emptyPages": [
+            5
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-031-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-031-trusted-v1",
+          "versionIds": [
+            "book-031-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-031-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-032",
+      "title": "森林报",
+      "versionId": "book-032-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 322,
+          "versionPageCount": 322,
+          "pageRowCount": 322,
+          "versionId": "book-032-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 0,
+          "emptyPages": [],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-032-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-032-trusted-v1",
+          "versionIds": [
+            "book-032-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-032-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-033",
+      "title": "爷爷的爷爷哪里来",
+      "versionId": "book-033-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 194,
+          "versionPageCount": 194,
+          "pageRowCount": 194,
+          "versionId": "book-033-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 0,
+          "emptyPages": [],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-033-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-033-trusted-v1",
+          "versionIds": [
+            "book-033-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-033-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-034",
+      "title": "穿过地平线",
+      "versionId": "book-034-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 225,
+          "versionPageCount": 225,
+          "pageRowCount": 225,
+          "versionId": "book-034-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 1,
+          "emptyPages": [
+            224
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-034-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-034-trusted-v1",
+          "versionIds": [
+            "book-034-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-034-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-035",
+      "title": "细菌世界历险记",
+      "versionId": "book-035-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 194,
+          "versionPageCount": 194,
+          "pageRowCount": 194,
+          "versionId": "book-035-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 6,
+          "emptyPages": [
+            9,
+            27,
+            111,
+            134,
+            149,
+            174
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-035-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 4,
+          "actual": 4,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-035-trusted-v1",
+          "versionIds": [
+            "book-035-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-035-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-036",
+      "title": "一千零一夜",
+      "versionId": "book-036-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-036-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 13,
+          "emptyPages": [
+            9,
+            40,
+            112,
+            117,
+            120,
+            123,
+            125,
+            129,
+            141,
+            144,
+            146,
+            154,
+            156
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-036-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 5,
+          "actual": 5,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-036-trusted-v1",
+          "versionIds": [
+            "book-036-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-036-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-037",
+      "title": "三国演义",
+      "versionId": "book-037-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 194,
+          "versionPageCount": 194,
+          "pageRowCount": 194,
+          "versionId": "book-037-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 7,
+          "emptyPages": [
+            9,
+            14,
+            49,
+            60,
+            73,
+            148,
+            192
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-037-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 5,
+          "actual": 5,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-037-trusted-v1",
+          "versionIds": [
+            "book-037-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-037-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-038",
+      "title": "列那狐的故事",
+      "versionId": "book-038-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 218,
+          "versionPageCount": 218,
+          "pageRowCount": 218,
+          "versionId": "book-038-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 15,
+          "emptyPages": [
+            9,
+            14,
+            25,
+            38,
+            48,
+            65,
+            86,
+            101,
+            114,
+            128,
+            144,
+            152,
+            181,
+            197,
+            210
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-038-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 5,
+          "actual": 5,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-038-trusted-v1",
+          "versionIds": [
+            "book-038-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-038-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-039",
+      "title": "红楼梦",
+      "versionId": "book-039-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 194,
+          "versionPageCount": 194,
+          "pageRowCount": 194,
+          "versionId": "book-039-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 1,
+          "emptyPages": [
+            9
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-039-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 5,
+          "actual": 5,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-039-trusted-v1",
+          "versionIds": [
+            "book-039-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-039-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-040",
+      "title": "西游记",
+      "versionId": "book-040-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 194,
+          "versionPageCount": 194,
+          "pageRowCount": 194,
+          "versionId": "book-040-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 7,
+          "emptyPages": [
+            9,
+            18,
+            24,
+            30,
+            55,
+            90,
+            105
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-040-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 5,
+          "actual": 5,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-040-trusted-v1",
+          "versionIds": [
+            "book-040-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-040-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-041",
+      "title": "欧洲民间故事",
+      "versionId": "book-041-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 162,
+          "versionPageCount": 162,
+          "pageRowCount": 162,
+          "versionId": "book-041-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 13,
+          "emptyPages": [
+            9,
+            11,
+            22,
+            39,
+            51,
+            65,
+            78,
+            89,
+            98,
+            108,
+            120,
+            131,
+            145
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-041-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 5,
+          "actual": 5,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-041-trusted-v1",
+          "versionIds": [
+            "book-041-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-041-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-042",
+      "title": "水浒传",
+      "versionId": "book-042-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 193,
+          "versionPageCount": 193,
+          "pageRowCount": 193,
+          "versionId": "book-042-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 1,
+          "emptyPages": [
+            9
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-042-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 5,
+          "actual": 5,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-042-trusted-v1",
+          "versionIds": [
+            "book-042-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-042-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-043",
+      "title": "非洲民间故事",
+      "versionId": "book-043-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 161,
+          "versionPageCount": 161,
+          "pageRowCount": 161,
+          "versionId": "book-043-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 21,
+          "emptyPages": [
+            10,
+            16,
+            26,
+            32,
+            41,
+            55,
+            59,
+            68,
+            74,
+            79,
+            82,
+            85,
+            91,
+            95,
+            103,
+            106,
+            109,
+            114,
+            121,
+            126,
+            141
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-043-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 5,
+          "actual": 5,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-043-trusted-v1",
+          "versionIds": [
+            "book-043-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-043-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-044",
+      "title": "小英雄雨来",
+      "versionId": "book-044-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 193,
+          "versionPageCount": 193,
+          "pageRowCount": 193,
+          "versionId": "book-044-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 6,
+          "emptyPages": [
+            12,
+            19,
+            96,
+            131,
+            147,
+            192
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-044-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 6,
+          "actual": 6,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-044-trusted-v1",
+          "versionIds": [
+            "book-044-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-044-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-045",
+      "title": "尼尔斯骑鹅旅行记",
+      "versionId": "book-045-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 354,
+          "versionPageCount": 354,
+          "pageRowCount": 354,
+          "versionId": "book-045-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 16,
+          "emptyPages": [
+            9,
+            17,
+            22,
+            34,
+            40,
+            72,
+            104,
+            115,
+            159,
+            211,
+            255,
+            269,
+            285,
+            290,
+            299,
+            353
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-045-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 6,
+          "actual": 6,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-045-trusted-v1",
+          "versionIds": [
+            "book-045-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-045-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-046",
+      "title": "汤姆·索亚历险记",
+      "versionId": "book-046-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 242,
+          "versionPageCount": 242,
+          "pageRowCount": 242,
+          "versionId": "book-046-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 1,
+          "emptyPages": [
+            7
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-046-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 6,
+          "actual": 6,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-046-trusted-v1",
+          "versionIds": [
+            "book-046-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-046-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-047",
+      "title": "爱丽丝漫游奇境",
+      "versionId": "book-047-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 258,
+          "versionPageCount": 258,
+          "pageRowCount": 258,
+          "versionId": "book-047-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 13,
+          "emptyPages": [
+            7,
+            11,
+            13,
+            27,
+            36,
+            54,
+            63,
+            91,
+            99,
+            101,
+            109,
+            157,
+            215
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-047-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 6,
+          "actual": 6,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-047-trusted-v1",
+          "versionIds": [
+            "book-047-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-047-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-048",
+      "title": "爱的教育",
+      "versionId": "book-048-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 226,
+          "versionPageCount": 226,
+          "pageRowCount": 226,
+          "versionId": "book-048-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 11,
+          "emptyPages": [
+            7,
+            46,
+            57,
+            74,
+            96,
+            158,
+            166,
+            190,
+            204,
+            220,
+            224
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-048-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 6,
+          "actual": 6,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-048-trusted-v1",
+          "versionIds": [
+            "book-048-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-048-trusted-v1",
+          "failures": []
+        }
+      }
+    },
+    {
+      "bookId": "book-049",
+      "title": "鲁滨逊漂流记",
+      "versionId": "book-049-trusted-v1",
+      "ok": true,
+      "assertions": {
+        "published": {
+          "pass": true,
+          "exists": true,
+          "status": "published",
+          "failures": []
+        },
+        "pageCount": {
+          "pass": true,
+          "catalogPageCount": 314,
+          "versionPageCount": 314,
+          "pageRowCount": 314,
+          "versionId": "book-049-trusted-v1",
+          "failures": []
+        },
+        "blankNormalizedEmpty": {
+          "pass": true,
+          "sourceField": "quality.automatic.emptyPages",
+          "emptyPageCount": 15,
+          "emptyPages": [
+            7,
+            14,
+            29,
+            43,
+            54,
+            59,
+            87,
+            103,
+            109,
+            138,
+            158,
+            202,
+            234,
+            274,
+            313
+          ],
+          "missingPageNos": [],
+          "nonEmptyPageNos": [],
+          "failures": []
+        },
+        "assets": {
+          "pass": true,
+          "source_pdf": 1,
+          "cover": 1,
+          "otherAssetTypes": {},
+          "versionId": "book-049-trusted-v1",
+          "failures": []
+        },
+        "grade": {
+          "pass": true,
+          "column": "grade",
+          "expected": 6,
+          "actual": 6,
+          "hasMetadataRow": true,
+          "failures": []
+        }
+      },
+      "advisories": {
+        "singleTrustedVersion": {
+          "pass": true,
+          "expectedVersionId": "book-049-trusted-v1",
+          "versionIds": [
+            "book-049-trusted-v1"
+          ],
+          "failures": []
+        },
+        "packageQualityStatus": {
+          "pass": true,
+          "status": "trusted-baseline",
+          "versionId": "book-049-trusted-v1",
+          "failures": []
+        }
+      }
+    }
+  ]
+}

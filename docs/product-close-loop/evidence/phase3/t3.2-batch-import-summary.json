@@ -1,0 +1,1385 @@
+{
+  "task": "T3.2-batch-import",
+  "generatedAt": "2026-08-17T12:16:20+00:00",
+  "dryRun": false,
+  "resume": false,
+  "catalog": "book-parser/catalog-default-49.json",
+  "database": "server/data/readmate.sqlite",
+  "packageRoot": "book-parser/work/package-v2-trusted",
+  "publicRoot": "D:\\Project\\整书8.15\\public",
+  "actorId": "internal-principal",
+  "workspaceId": "internal-demo-school-workspace",
+  "alwaysSkipBookIds": [
+    "book-001"
+  ],
+  "skipBookIds": [
+    "book-001"
+  ],
+  "totals": {
+    "books": 49,
+    "success": 48,
+    "failed": 0,
+    "skipped": 1,
+    "planned": 0
+  },
+  "rows": [
+    {
+      "bookId": "book-001",
+      "title": "和大人一起读·儿童歌谣",
+      "versionId": "book-001-trusted-v1",
+      "status": "skipped",
+      "reason": "已存在且已核验合规，按裁决跳过",
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.0,
+      "command": null
+    },
+    {
+      "bookId": "book-002",
+      "title": "和大人一起读·国学启蒙",
+      "versionId": "book-002-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.567,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-002",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-003",
+      "title": "和大人一起读·寓言故事",
+      "versionId": "book-003-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.581,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-003",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-004",
+      "title": "和大人一起读·童话故事",
+      "versionId": "book-004-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.498,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-004",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-005",
+      "title": "读读童谣和儿歌·中国传统文化",
+      "versionId": "book-005-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.639,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-005",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-006",
+      "title": "读读童谣和儿歌·外国童谣",
+      "versionId": "book-006-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.66,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-006",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-007",
+      "title": "读读童谣和儿歌·多彩的童年",
+      "versionId": "book-007-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.516,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-007",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-008",
+      "title": "读读童谣和儿歌·奇妙的大自然",
+      "versionId": "book-008-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.569,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-008",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-009",
+      "title": "一只想飞的猫",
+      "versionId": "book-009-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.787,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-009",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-010",
+      "title": "一起长大的玩具",
+      "versionId": "book-010-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.627,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-010",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-011",
+      "title": "七色花",
+      "versionId": "book-011-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.773,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-011",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-012",
+      "title": "孤独的小螃蟹",
+      "versionId": "book-012-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.57,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-012",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-013",
+      "title": "小狗的小房子",
+      "versionId": "book-013-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.591,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-013",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-014",
+      "title": "小鲤鱼跳龙门",
+      "versionId": "book-014-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.767,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-014",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-015",
+      "title": "愿望的实现",
+      "versionId": "book-015-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.799,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-015",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-016",
+      "title": "歪脑袋木头桩",
+      "versionId": "book-016-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.804,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-016",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-017",
+      "title": "神笔马良",
+      "versionId": "book-017-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.584,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-017",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-018",
+      "title": "中国古代寓言",
+      "versionId": "book-018-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.655,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-018",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-019",
+      "title": "伊索寓言",
+      "versionId": "book-019-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.631,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-019",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-020",
+      "title": "克雷洛夫寓言",
+      "versionId": "book-020-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.622,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-020",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-021",
+      "title": "安徒生童话",
+      "versionId": "book-021-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.676,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-021",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-022",
+      "title": "拉封丹寓言",
+      "versionId": "book-022-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.591,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-022",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-023",
+      "title": "格林童话",
+      "versionId": "book-023-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.794,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-023",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-024",
+      "title": "稻草人",
+      "versionId": "book-024-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.749,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-024",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-025",
+      "title": "世界神话传说",
+      "versionId": "book-025-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.56,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-025",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-026",
+      "title": "中国古代神话",
+      "versionId": "book-026-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.623,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-026",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-027",
+      "title": "十万个为什么",
+      "versionId": "book-027-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.56,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-027",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-028",
+      "title": "吉尔伽美什",
+      "versionId": "book-028-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.638,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-028",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-029",
+      "title": "地球的故事",
+      "versionId": "book-029-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.637,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-029",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-030",
+      "title": "山海经",
+      "versionId": "book-030-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.664,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-030",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-031",
+      "title": "希腊神话故事",
+      "versionId": "book-031-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.555,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-031",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-032",
+      "title": "森林报",
+      "versionId": "book-032-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.944,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-032",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-033",
+      "title": "爷爷的爷爷哪里来",
+      "versionId": "book-033-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.644,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-033",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-034",
+      "title": "穿过地平线",
+      "versionId": "book-034-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.627,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-034",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-035",
+      "title": "细菌世界历险记",
+      "versionId": "book-035-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.682,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-035",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-036",
+      "title": "一千零一夜",
+      "versionId": "book-036-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.675,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-036",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-037",
+      "title": "三国演义",
+      "versionId": "book-037-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.644,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-037",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-038",
+      "title": "列那狐的故事",
+      "versionId": "book-038-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.729,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-038",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-039",
+      "title": "红楼梦",
+      "versionId": "book-039-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.878,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-039",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-040",
+      "title": "西游记",
+      "versionId": "book-040-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.622,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-040",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-041",
+      "title": "欧洲民间故事",
+      "versionId": "book-041-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.636,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-041",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-042",
+      "title": "水浒传",
+      "versionId": "book-042-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.766,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-042",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-043",
+      "title": "非洲民间故事",
+      "versionId": "book-043-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.698,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-043",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-044",
+      "title": "小英雄雨来",
+      "versionId": "book-044-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.62,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-044",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-045",
+      "title": "尼尔斯骑鹅旅行记",
+      "versionId": "book-045-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 1.088,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-045",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-046",
+      "title": "汤姆·索亚历险记",
+      "versionId": "book-046-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.821,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-046",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-047",
+      "title": "爱丽丝漫游奇境",
+      "versionId": "book-047-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.801,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-047",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-048",
+      "title": "爱的教育",
+      "versionId": "book-048-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.694,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-048",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    },
+    {
+      "bookId": "book-049",
+      "title": "鲁滨逊漂流记",
+      "versionId": "book-049-trusted-v1",
+      "status": "success",
+      "reason": null,
+      "assets": {
+        "source_pdf": null,
+        "cover": null
+      },
+      "error": null,
+      "elapsedSeconds": 0.857,
+      "command": [
+        "D:\\IDE\\Node.js\\node.EXE",
+        "server/db/import-book-package-v2.js",
+        "--database",
+        "server/data/readmate.sqlite",
+        "--package",
+        "book-parser/work/package-v2-trusted/book-049",
+        "--actor-id",
+        "internal-principal",
+        "--workspace-id",
+        "internal-demo-school-workspace",
+        "--public-root",
+        "D:\\Project\\整书8.15\\public",
+        "--accept-trusted"
+      ]
+    }
+  ]
+}

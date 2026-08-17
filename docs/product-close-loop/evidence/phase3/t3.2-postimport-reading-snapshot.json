@@ -1,0 +1,793 @@
+{
+  "task": "T3.2-postimport-reading-snapshot",
+  "sampledAt": "2026-08-17T20:16:30.821309+08:00",
+  "dbUri": "file:D:/Project/整书8.15/server/data/readmate.sqlite?mode=ro",
+  "journalMode": "wal",
+  "openedReadOnly": true,
+  "queryOnly": true,
+  "wroteToDatabase": false,
+  "books": {
+    "rowCount": 49,
+    "rows": [
+      {
+        "id": "book-001",
+        "status": "published",
+        "title": "和大人一起读·儿童歌谣",
+        "updated_at": "2026-08-17T06:31:49.819Z"
+      },
+      {
+        "id": "book-002",
+        "status": "published",
+        "title": "和大人一起读·国学启蒙",
+        "updated_at": "2026-08-17T12:15:48.308Z"
+      },
+      {
+        "id": "book-003",
+        "status": "published",
+        "title": "和大人一起读·寓言故事",
+        "updated_at": "2026-08-17T12:15:48.894Z"
+      },
+      {
+        "id": "book-004",
+        "status": "published",
+        "title": "和大人一起读·童话故事",
+        "updated_at": "2026-08-17T12:15:49.387Z"
+      },
+      {
+        "id": "book-005",
+        "status": "published",
+        "title": "读读童谣和儿歌·中国传统文化",
+        "updated_at": "2026-08-17T12:15:50.028Z"
+      },
+      {
+        "id": "book-006",
+        "status": "published",
+        "title": "读读童谣和儿歌·外国童谣",
+        "updated_at": "2026-08-17T12:15:50.691Z"
+      },
+      {
+        "id": "book-007",
+        "status": "published",
+        "title": "读读童谣和儿歌·多彩的童年",
+        "updated_at": "2026-08-17T12:15:51.204Z"
+      },
+      {
+        "id": "book-008",
+        "status": "published",
+        "title": "读读童谣和儿歌·奇妙的大自然",
+        "updated_at": "2026-08-17T12:15:51.766Z"
+      },
+      {
+        "id": "book-009",
+        "status": "published",
+        "title": "一只想飞的猫",
+        "updated_at": "2026-08-17T12:15:52.557Z"
+      },
+      {
+        "id": "book-010",
+        "status": "published",
+        "title": "一起长大的玩具",
+        "updated_at": "2026-08-17T12:15:53.181Z"
+      },
+      {
+        "id": "book-011",
+        "status": "published",
+        "title": "七色花",
+        "updated_at": "2026-08-17T12:15:53.959Z"
+      },
+      {
+        "id": "book-012",
+        "status": "published",
+        "title": "孤独的小螃蟹",
+        "updated_at": "2026-08-17T12:15:54.524Z"
+      },
+      {
+        "id": "book-013",
+        "status": "published",
+        "title": "小狗的小房子",
+        "updated_at": "2026-08-17T12:15:55.116Z"
+      },
+      {
+        "id": "book-014",
+        "status": "published",
+        "title": "小鲤鱼跳龙门",
+        "updated_at": "2026-08-17T12:15:55.888Z"
+      },
+      {
+        "id": "book-015",
+        "status": "published",
+        "title": "愿望的实现",
+        "updated_at": "2026-08-17T12:15:56.687Z"
+      },
+      {
+        "id": "book-016",
+        "status": "published",
+        "title": "歪脑袋木头桩",
+        "updated_at": "2026-08-17T12:15:57.483Z"
+      },
+      {
+        "id": "book-017",
+        "status": "published",
+        "title": "神笔马良",
+        "updated_at": "2026-08-17T12:15:58.072Z"
+      },
+      {
+        "id": "book-018",
+        "status": "published",
+        "title": "中国古代寓言",
+        "updated_at": "2026-08-17T12:15:58.728Z"
+      },
+      {
+        "id": "book-019",
+        "status": "published",
+        "title": "伊索寓言",
+        "updated_at": "2026-08-17T12:15:59.361Z"
+      },
+      {
+        "id": "book-020",
+        "status": "published",
+        "title": "克雷洛夫寓言",
+        "updated_at": "2026-08-17T12:15:59.977Z"
+      },
+      {
+        "id": "book-021",
+        "status": "published",
+        "title": "安徒生童话",
+        "updated_at": "2026-08-17T12:16:00.658Z"
+      },
+      {
+        "id": "book-022",
+        "status": "published",
+        "title": "拉封丹寓言",
+        "updated_at": "2026-08-17T12:16:01.237Z"
+      },
+      {
+        "id": "book-023",
+        "status": "published",
+        "title": "格林童话",
+        "updated_at": "2026-08-17T12:16:02.043Z"
+      },
+      {
+        "id": "book-024",
+        "status": "published",
+        "title": "稻草人",
+        "updated_at": "2026-08-17T12:16:02.790Z"
+      },
+      {
+        "id": "book-025",
+        "status": "published",
+        "title": "世界神话传说",
+        "updated_at": "2026-08-17T12:16:03.352Z"
+      },
+      {
+        "id": "book-026",
+        "status": "published",
+        "title": "中国古代神话",
+        "updated_at": "2026-08-17T12:16:03.968Z"
+      },
+      {
+        "id": "book-027",
+        "status": "published",
+        "title": "十万个为什么",
+        "updated_at": "2026-08-17T12:16:04.526Z"
+      },
+      {
+        "id": "book-028",
+        "status": "published",
+        "title": "吉尔伽美什",
+        "updated_at": "2026-08-17T12:16:05.174Z"
+      },
+      {
+        "id": "book-029",
+        "status": "published",
+        "title": "地球的故事",
+        "updated_at": "2026-08-17T12:16:05.804Z"
+      },
+      {
+        "id": "book-030",
+        "status": "published",
+        "title": "山海经",
+        "updated_at": "2026-08-17T12:16:06.457Z"
+      },
+      {
+        "id": "book-031",
+        "status": "published",
+        "title": "希腊神话故事",
+        "updated_at": "2026-08-17T12:16:07.030Z"
+      },
+      {
+        "id": "book-032",
+        "status": "published",
+        "title": "森林报",
+        "updated_at": "2026-08-17T12:16:07.953Z"
+      },
+      {
+        "id": "book-033",
+        "status": "published",
+        "title": "爷爷的爷爷哪里来",
+        "updated_at": "2026-08-17T12:16:08.613Z"
+      },
+      {
+        "id": "book-034",
+        "status": "published",
+        "title": "穿过地平线",
+        "updated_at": "2026-08-17T12:16:09.243Z"
+      },
+      {
+        "id": "book-035",
+        "status": "published",
+        "title": "细菌世界历险记",
+        "updated_at": "2026-08-17T12:16:09.919Z"
+      },
+      {
+        "id": "book-036",
+        "status": "published",
+        "title": "一千零一夜",
+        "updated_at": "2026-08-17T12:16:10.601Z"
+      },
+      {
+        "id": "book-037",
+        "status": "published",
+        "title": "三国演义",
+        "updated_at": "2026-08-17T12:16:11.236Z"
+      },
+      {
+        "id": "book-038",
+        "status": "published",
+        "title": "列那狐的故事",
+        "updated_at": "2026-08-17T12:16:11.952Z"
+      },
+      {
+        "id": "book-039",
+        "status": "published",
+        "title": "红楼梦",
+        "updated_at": "2026-08-17T12:16:12.851Z"
+      },
+      {
+        "id": "book-040",
+        "status": "published",
+        "title": "西游记",
+        "updated_at": "2026-08-17T12:16:13.464Z"
+      },
+      {
+        "id": "book-041",
+        "status": "published",
+        "title": "欧洲民间故事",
+        "updated_at": "2026-08-17T12:16:14.100Z"
+      },
+      {
+        "id": "book-042",
+        "status": "published",
+        "title": "水浒传",
+        "updated_at": "2026-08-17T12:16:14.852Z"
+      },
+      {
+        "id": "book-043",
+        "status": "published",
+        "title": "非洲民间故事",
+        "updated_at": "2026-08-17T12:16:15.563Z"
+      },
+      {
+        "id": "book-044",
+        "status": "published",
+        "title": "小英雄雨来",
+        "updated_at": "2026-08-17T12:16:16.188Z"
+      },
+      {
+        "id": "book-045",
+        "status": "published",
+        "title": "尼尔斯骑鹅旅行记",
+        "updated_at": "2026-08-17T12:16:17.257Z"
+      },
+      {
+        "id": "book-046",
+        "status": "published",
+        "title": "汤姆·索亚历险记",
+        "updated_at": "2026-08-17T12:16:18.094Z"
+      },
+      {
+        "id": "book-047",
+        "status": "published",
+        "title": "爱丽丝漫游奇境",
+        "updated_at": "2026-08-17T12:16:18.890Z"
+      },
+      {
+        "id": "book-048",
+        "status": "published",
+        "title": "爱的教育",
+        "updated_at": "2026-08-17T12:16:19.587Z"
+      },
+      {
+        "id": "book-049",
+        "status": "published",
+        "title": "鲁滨逊漂流记",
+        "updated_at": "2026-08-17T12:16:20.444Z"
+      }
+    ],
+    "book001": {
+      "id": "book-001",
+      "status": "published",
+      "title": "和大人一起读·儿童歌谣",
+      "updated_at": "2026-08-17T06:31:49.819Z"
+    }
+  },
+  "book_versions": {
+    "rowCount": 49,
+    "rows": [
+      {
+        "id": "book-001-trusted-v1",
+        "book_id": "book-001",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "05941212b7f9cf33b6d7d52042c41cfb9bfad523e97c676fe96e502a902842d6",
+        "page_count": 98,
+        "updated_at": "2026-08-17T06:31:49.797Z"
+      },
+      {
+        "id": "book-002-trusted-v1",
+        "book_id": "book-002",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "1e04b4de81a82ebb7dc8569a8f271caf03a6ab6e967151f2f9dad5e8ba070cd0",
+        "page_count": 98,
+        "updated_at": "2026-08-17T12:15:48.246Z"
+      },
+      {
+        "id": "book-003-trusted-v1",
+        "book_id": "book-003",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "d1d9c2b95f9e7cfb7d041bf323c35e0e1203a54d372812bc61b4844a6c4186ba",
+        "page_count": 98,
+        "updated_at": "2026-08-17T12:15:48.875Z"
+      },
+      {
+        "id": "book-004-trusted-v1",
+        "book_id": "book-004",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "da57059928301cd4948db2a6b524b5c34bd723654103e4706f170ba763770b9b",
+        "page_count": 98,
+        "updated_at": "2026-08-17T12:15:49.363Z"
+      },
+      {
+        "id": "book-005-trusted-v1",
+        "book_id": "book-005",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "5cbba0ad706e64dec1a97b62f00b2e2104e3dc9bda8d84c8498d3849d06eaddf",
+        "page_count": 96,
+        "updated_at": "2026-08-17T12:15:50.002Z"
+      },
+      {
+        "id": "book-006-trusted-v1",
+        "book_id": "book-006",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "67d1439d5f9e235b72216808cc4802c54dcd168fe5c22bd0e3522a61e1e982fd",
+        "page_count": 98,
+        "updated_at": "2026-08-17T12:15:50.657Z"
+      },
+      {
+        "id": "book-007-trusted-v1",
+        "book_id": "book-007",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "57d3116f32cd99cdd850b8680e5dc4a67618fe7fe9571f18d299a0d66a1866a2",
+        "page_count": 98,
+        "updated_at": "2026-08-17T12:15:51.181Z"
+      },
+      {
+        "id": "book-008-trusted-v1",
+        "book_id": "book-008",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "72e4889f509a312c8ded549c50e14ca0851f4fe8d428c41d98e2fdb394091ccc",
+        "page_count": 98,
+        "updated_at": "2026-08-17T12:15:51.745Z"
+      },
+      {
+        "id": "book-009-trusted-v1",
+        "book_id": "book-009",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "02f325574a3eb8f673af5132e4a56ee5fb68a8f55cf0641b3573d54abf903139",
+        "page_count": 130,
+        "updated_at": "2026-08-17T12:15:52.515Z"
+      },
+      {
+        "id": "book-010-trusted-v1",
+        "book_id": "book-010",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "8b9c90d07d9a8112ba600d6e6e79adf80759bbffa9802807ae5cc8726f80fd44",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:15:53.091Z"
+      },
+      {
+        "id": "book-011-trusted-v1",
+        "book_id": "book-011",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "008c99b3ed4c2f44d99d777bcb7e37d56b8079ca298b0ef41c74f416627cb023",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:15:53.914Z"
+      },
+      {
+        "id": "book-012-trusted-v1",
+        "book_id": "book-012",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "fc186bee28b77a796606e169373ae0cfad1c02b153475580e4b6f6b905dfcad5",
+        "page_count": 130,
+        "updated_at": "2026-08-17T12:15:54.484Z"
+      },
+      {
+        "id": "book-013-trusted-v1",
+        "book_id": "book-013",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "d5f65e7bcfa9d55d56900cdca30bdf74c936f13f638ca17a1ddccbe70d9647cf",
+        "page_count": 130,
+        "updated_at": "2026-08-17T12:15:55.075Z"
+      },
+      {
+        "id": "book-014-trusted-v1",
+        "book_id": "book-014",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "dd834cc8a1b3a4f69a5569fe439d02343941d55807a6cb8e2d8f13872b3b494b",
+        "page_count": 130,
+        "updated_at": "2026-08-17T12:15:55.854Z"
+      },
+      {
+        "id": "book-015-trusted-v1",
+        "book_id": "book-015",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "1e7266a1499afa8ba397b982156f9fe1ddc918937ec77f645551f0276c74855e",
+        "page_count": 154,
+        "updated_at": "2026-08-17T12:15:56.627Z"
+      },
+      {
+        "id": "book-016-trusted-v1",
+        "book_id": "book-016",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "64e8694116167cfecac8476e54273ea826c28e740814b2d2775e771657955a7a",
+        "page_count": 130,
+        "updated_at": "2026-08-17T12:15:57.428Z"
+      },
+      {
+        "id": "book-017-trusted-v1",
+        "book_id": "book-017",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "07b3bfe0b918d4009236e3003a237b97a8253c03def199c89731b4ceaafc0975",
+        "page_count": 193,
+        "updated_at": "2026-08-17T12:15:58.017Z"
+      },
+      {
+        "id": "book-018-trusted-v1",
+        "book_id": "book-018",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "c78d23fa94e736d4cd49c5d2fbb29c235ec73ceff8103c486ccbe3cf1c518dc0",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:15:58.664Z"
+      },
+      {
+        "id": "book-019-trusted-v1",
+        "book_id": "book-019",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "78cb8db5898671900a70acc6638d94e9a6613192f85c39c36516452217805c39",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:15:59.313Z"
+      },
+      {
+        "id": "book-020-trusted-v1",
+        "book_id": "book-020",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "f200fca63a2e98c23c18c4dd2b2a7176eddce230054f6aec8a291a4499d2bcc6",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:15:59.923Z"
+      },
+      {
+        "id": "book-021-trusted-v1",
+        "book_id": "book-021",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "eb8696977fc0f47b1bad67db35db9ec0a8823d5512c4e57960f9fa58c46300c7",
+        "page_count": 194,
+        "updated_at": "2026-08-17T12:16:00.584Z"
+      },
+      {
+        "id": "book-022-trusted-v1",
+        "book_id": "book-022",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "5a59680c45230876c6577e6ec6c0f398d0a5486b20834e348263f299443aad2d",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:16:01.179Z"
+      },
+      {
+        "id": "book-023-trusted-v1",
+        "book_id": "book-023",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "d4071a4a22d587ba12e6a9e36fcf1d2edaebc71b3c3f2f5d1bd0b3fced413532",
+        "page_count": 244,
+        "updated_at": "2026-08-17T12:16:01.993Z"
+      },
+      {
+        "id": "book-024-trusted-v1",
+        "book_id": "book-024",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "390264d4761060c8f599dab3fe482cbd2de2434c82e748661683ad231028f114",
+        "page_count": 233,
+        "updated_at": "2026-08-17T12:16:02.703Z"
+      },
+      {
+        "id": "book-025-trusted-v1",
+        "book_id": "book-025",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "d6da072a02e28a91483adc0ffadebd2afe9c1029fcfed12c3612431d59a2cf74",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:16:03.294Z"
+      },
+      {
+        "id": "book-026-trusted-v1",
+        "book_id": "book-026",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "14ea07f177c9d87468208cfa87fdb4cd1c4941db720c9918cdab9528df57f499",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:16:03.904Z"
+      },
+      {
+        "id": "book-027-trusted-v1",
+        "book_id": "book-027",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "cc69aaaacc3e808361904292370e7997b96d4b36b0c1d90459ef93895bc3707c",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:16:04.457Z"
+      },
+      {
+        "id": "book-028-trusted-v1",
+        "book_id": "book-028",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "e0010463288f24fb31d2e595c14151b831404e1df9de6f4ca9f5e697b67b6570",
+        "page_count": 146,
+        "updated_at": "2026-08-17T12:16:05.130Z"
+      },
+      {
+        "id": "book-029-trusted-v1",
+        "book_id": "book-029",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "65046004a5ff23b90d18256bb0b2cfcb3cacadfefddb9ab41a919680dd531f2e",
+        "page_count": 225,
+        "updated_at": "2026-08-17T12:16:05.713Z"
+      },
+      {
+        "id": "book-030-trusted-v1",
+        "book_id": "book-030",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "c1f268109e006265b08fb930f56330b4f3db7f95e90607af3014dc5514204594",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:16:06.275Z"
+      },
+      {
+        "id": "book-031-trusted-v1",
+        "book_id": "book-031",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "92b99d3c8c8a94206c00543e218c06a0f72be7b36b63df8d497012afb460a5a5",
+        "page_count": 161,
+        "updated_at": "2026-08-17T12:16:06.966Z"
+      },
+      {
+        "id": "book-032-trusted-v1",
+        "book_id": "book-032",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "43074f63518b3b47d73f1cc35386d2785669f88e2b384724d5b09116d2dc90a5",
+        "page_count": 322,
+        "updated_at": "2026-08-17T12:16:07.806Z"
+      },
+      {
+        "id": "book-033-trusted-v1",
+        "book_id": "book-033",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "de799009bd7a7a0bf32f931d4a4f0565f4b31a9c5036d3a0995dd55dfa107af9",
+        "page_count": 194,
+        "updated_at": "2026-08-17T12:16:08.529Z"
+      },
+      {
+        "id": "book-034-trusted-v1",
+        "book_id": "book-034",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "e2811187515dfa32ebd1461d18222635b7dde9c01b652d69d53a15fa70649b73",
+        "page_count": 225,
+        "updated_at": "2026-08-17T12:16:09.172Z"
+      },
+      {
+        "id": "book-035-trusted-v1",
+        "book_id": "book-035",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "82da464350e730ad55335e5d1330082cebb08c81647e010f88dc665a09592ab7",
+        "page_count": 194,
+        "updated_at": "2026-08-17T12:16:09.829Z"
+      },
+      {
+        "id": "book-036-trusted-v1",
+        "book_id": "book-036",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "a42c2d12f1156077b3a4a8d226129bcdc4d276376777d530f2a98f4ffe3e3dbd",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:16:10.545Z"
+      },
+      {
+        "id": "book-037-trusted-v1",
+        "book_id": "book-037",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "f2bbdf5c0e4b2493ae5d2494e15a24f2f4dc311dcb14174bf0ec4faf9737f868",
+        "page_count": 194,
+        "updated_at": "2026-08-17T12:16:11.148Z"
+      },
+      {
+        "id": "book-038-trusted-v1",
+        "book_id": "book-038",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "6df9c242cb708af6fe0331d9919584693c1a3880262dfb16c83920ab4cc5913e",
+        "page_count": 218,
+        "updated_at": "2026-08-17T12:16:11.845Z"
+      },
+      {
+        "id": "book-039-trusted-v1",
+        "book_id": "book-039",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "b7974abaa1a8e8584704e04bf121946018aaab9d616e1bb4e8777b495687bf9d",
+        "page_count": 194,
+        "updated_at": "2026-08-17T12:16:12.754Z"
+      },
+      {
+        "id": "book-040-trusted-v1",
+        "book_id": "book-040",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "73c7a3e792ff6127f5c3a54babfd3e47c3e04cb7fc6c0f4f75aa298d8cf567a8",
+        "page_count": 194,
+        "updated_at": "2026-08-17T12:16:13.383Z"
+      },
+      {
+        "id": "book-041-trusted-v1",
+        "book_id": "book-041",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "d62afe1dabc6c1d2f2393df2bc5c02de98ec94288667479a6ab9bdf7dcb54020",
+        "page_count": 162,
+        "updated_at": "2026-08-17T12:16:14.005Z"
+      },
+      {
+        "id": "book-042-trusted-v1",
+        "book_id": "book-042",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "fff756ba98c4592bbf4f6242c161aeb87a884539bbedc95848e85c0be9b6c4f1",
+        "page_count": 193,
+        "updated_at": "2026-08-17T12:16:14.621Z"
+      },
+      {
+        "id": "book-043-trusted-v1",
+        "book_id": "book-043",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "1ffaf3a2a7928aab2372ee6b6e5b66d72955003cd2d56d6531a8b68b478a5adc",
+        "page_count": 161,
+        "updated_at": "2026-08-17T12:16:15.462Z"
+      },
+      {
+        "id": "book-044-trusted-v1",
+        "book_id": "book-044",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "c4185d0e4e167e816c77f978e3c40cdfa4b396127470c3c3b491e32f1c016551",
+        "page_count": 193,
+        "updated_at": "2026-08-17T12:16:16.092Z"
+      },
+      {
+        "id": "book-045-trusted-v1",
+        "book_id": "book-045",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "5878072c183d131debe48464f8f997cc27d269d900b81ac493ad2d51d0af8c3e",
+        "page_count": 354,
+        "updated_at": "2026-08-17T12:16:17.030Z"
+      },
+      {
+        "id": "book-046-trusted-v1",
+        "book_id": "book-046",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "616f9d79b62f2288fc90da78969d987c0d44c1ebe65ad48094bdebc66f58212c",
+        "page_count": 242,
+        "updated_at": "2026-08-17T12:16:17.942Z"
+      },
+      {
+        "id": "book-047-trusted-v1",
+        "book_id": "book-047",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "c61068df660d2f16272938d4186433ec5e547b14575e5244275c3ea384c770d0",
+        "page_count": 258,
+        "updated_at": "2026-08-17T12:16:18.700Z"
+      },
+      {
+        "id": "book-048-trusted-v1",
+        "book_id": "book-048",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "2f9779be7eb3d95dc8390602d6af4f8f74767844bf9ff5bb511608ecc51d151c",
+        "page_count": 226,
+        "updated_at": "2026-08-17T12:16:19.467Z"
+      },
+      {
+        "id": "book-049-trusted-v1",
+        "book_id": "book-049",
+        "package_quality_status": "trusted-baseline",
+        "release_sha256": "fd90212e1ebecef7e09ccc60f457310f235f723730783ec6add194a70b42cbaf",
+        "page_count": 314,
+        "updated_at": "2026-08-17T12:16:20.255Z"
+      }
+    ],
+    "book001TrustedV1": {
+      "id": "book-001-trusted-v1",
+      "book_id": "book-001",
+      "package_quality_status": "trusted-baseline",
+      "release_sha256": "05941212b7f9cf33b6d7d52042c41cfb9bfad523e97c676fe96e502a902842d6",
+      "page_count": 98,
+      "updated_at": "2026-08-17T06:31:49.797Z"
+    }
+  },
+  "reading_summary_sessions": {
+    "rowCount": 9,
+    "rows": [
+      {
+        "id": "reading-session-5ef8e32c-d9df-4c22-bf4e-2d6f0a290310",
+        "cumulative_effective_ms": 194544
+      },
+      {
+        "id": "reading-session-7619f0f2-fb47-4876-a8d0-e11c387649aa",
+        "cumulative_effective_ms": 20651
+      },
+      {
+        "id": "reading-session-7ae5ac37-1ef7-4d41-912f-1af2cb1cb123",
+        "cumulative_effective_ms": 24888
+      },
+      {
+        "id": "reading-session-836a515d-209c-4d80-b1e5-33e3434a472d",
+        "cumulative_effective_ms": 9381
+      },
+      {
+        "id": "reading-session-9bc60936-f73c-4a13-b616-8f58eca628fc",
+        "cumulative_effective_ms": 97821
+      },
+      {
+        "id": "reading-session-a9f014b0-32da-49a3-9ab3-f304ff91a4d3",
+        "cumulative_effective_ms": 3978
+      },
+      {
+        "id": "reading-session-c0627dc0-ac63-4ae2-8c7b-16161daeb8a9",
+        "cumulative_effective_ms": 1480
+      },
+      {
+        "id": "reading-session-e6b32785-f4f9-4fa2-b06b-cf3bdced2195",
+        "cumulative_effective_ms": 90499
+      },
+      {
+        "id": "reading-session-f7246f26-3353-4f92-8773-649643703c4b",
+        "cumulative_effective_ms": 19184
+      }
+    ]
+  },
+  "reading_progress": {
+    "rowCount": 1,
+    "rows": [
+      {
+        "id": "f22d6b69-125b-4431-9945-24352e027c68",
+        "book_version_id": "book-001-trusted-v1",
+        "last_page_no": 15
+      }
+    ]
+  },
+  "reading_daily_book_summaries": {
+    "rowCount": 1,
+    "durationColumn": "effective_reading_ms",
+    "byStatDate": [
+      {
+        "stat_date": "2026-08-17",
+        "rowCount": 1,
+        "effective_reading_ms": 462426
+      }
+    ],
+    "rows": [
+      {
+        "id": "a559fd6e-845f-478f-915e-4ec7cee6d825",
+        "book_version_id": "book-001-trusted-v1",
+        "stat_date": "2026-08-17",
+        "effective_reading_ms": 462426,
+        "last_page_no": 15
+      }
+    ]
+  },
+  "reading_page_coverage": {
+    "rowCount": 34
+  }
+}
