@@ -96,7 +96,7 @@ function fakeIndexedDatabase() {
 
 function summary(sessionId, revision, extra = {}) {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sessionId,
     revision,
     fingerprint: `${revision}`.padStart(64, '0'),

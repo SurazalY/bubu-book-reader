@@ -5,6 +5,7 @@ import { cx } from '../../shared/cx.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 import { GlassPanel } from '../components/Glass.jsx'
 import BookPage from '../components/BookPage.jsx'
+import PdfBookPage, { useProtectedPdfDocument } from '../components/PdfBookPage.jsx'
 import {
   NoteComposer,
   ReaderToast,
@@ -124,6 +125,8 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     ai,
   } = useStudent()
   const library = useReadingLibrary({ workspaceId })
+  const sourcePdf = useMemo(() => book.assets?.find((asset) => asset.kind === 'source_pdf') || null, [book.assets])
+  const [readerMode, setReaderMode] = useState(sourcePdf ? 'original' : 'text')
 
   // 字号偏好在固定排版里不能靠重排实现，所以走「放大就只看一页」：
   // 小／中字号 = 双页对开（像真的翻书），大字号 = 单页铺满（每个字都更大）。
@@ -133,6 +136,12 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   const loadedPages = pageResource.data?.pages || []
   const totalPages = book.progress?.totalPages || loadedPages.reduce((max, page) => Math.max(max, page.no || 0), 0) || pageNo
   const pageCount = Math.max(totalPages, pageNo, 1)
+  const pdf = useProtectedPdfDocument({
+    asset: sourcePdf,
+    workspaceId,
+    expectedPages: pageCount,
+    enabled: readerMode === 'original',
+  })
   const loadedByNumber = useMemo(() => new Map(loadedPages.map((page) => [page.no, page])), [loadedPages])
   const pageState = pageResource.status === 'loading'
     ? { heading: '正在加载正文', text: `正在向服务端读取第 ${pageNo} 页。` }
@@ -155,7 +164,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     .map((page) => ({ title: page.chapter, from: page.no, to: page.no }))
   const first = 1
   const last = totalPages
-  const label = '服务端正文'
+  const label = readerMode === 'original' ? '原版 PDF' : 'OCR 文字'
   const set = useMemo(() => ({ pages, chapters, first, last, label }), [chapters, first, label, last, pages])
 
   // 起始页优先使用服务端阅读进度，没有进度时从第一页开始
@@ -195,12 +204,16 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
 
   const visible = spread ? [leaf, leaf + 1].filter((i) => i < pages.length) : [leaf]
   const currentPage = pages[leaf]?.no || first
+  const readRangeVersion = loadedByNumber.get(currentPage)?.readRangeVersion || null
   const visiblePageNos = visible.map((index) => pages[index]?.no).filter(Number.isSafeInteger)
   const stableView = useMemo(() => createStableView({
     layout: spread ? 'double' : 'single',
     pageNos: visiblePageNos,
   }), [spread, visiblePageNos.join(',')])
   const readPage = stableView.mainPageNo
+  const readerReady = readerMode === 'original'
+    ? pdf.status === 'ready'
+    : pageResource.status === 'ready' && loadedPages.length > 0
   const monitor = useMemo(() => {
     if (!student?.id || !workspaceId) return null
     return {
@@ -216,7 +229,8 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     stableView,
     movementEvent,
     workspaceId,
-    readerReady: pageResource.status === 'ready' && loadedPages.length > 0,
+    readerMode,
+    readerReady,
     monitor,
   })
   const session = classroom.data?.mode ? classroom.data : null
@@ -246,11 +260,12 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   // 任何一种状态下阅读、历史对话、批注与书签都照常，面板不会把人锁死。
   const safeMode = ai.safeMode
   const blocker = useMemo(() => {
+    if (!readRangeVersion) return { key: 'page_scope_loading', tone: 'neutral', icon: 'Loader', title: '正在校验当前页', desc: '服务端正在返回当前页的已读范围版本。', stillCan: '等待期间仍可继续阅读、翻页和查看目录。' }
     if (ai.status === 'loading') return { key: 'loading', tone: 'neutral', icon: 'Loader', title: '正在加载 AI 会话', desc: '正在向服务端读取历史对话与额度。', stillCan: '等待期间仍可继续阅读、翻页、选文和查看目录。' }
     if (ai.status === 'error' || ai.error) return { key: 'offline', tone: 'warning', icon: 'WifiOff', title: 'AI 服务暂不可用', desc: ai.error?.message || '服务端没有返回对话数据。', stillCan: '仍可继续阅读、翻页、选文和查看目录。' }
     if (ai.quota.remaining === 0) return { key: 'quota', tone: 'warning', icon: 'Clock', title: '今天的提问次数已用完', desc: '恢复时间以服务端返回为准。', stillCan: '仍可继续阅读、翻页、选文和查看历史对话。' }
     return null
-  }, [ai.error, ai.quota.remaining, ai.status])
+  }, [ai.error, ai.quota.remaining, ai.status, readRangeVersion])
 
   // —— 舞台测量与整页缩放 ——
   useLayoutEffect(() => {
@@ -266,10 +281,9 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     return () => ro.disconnect()
   }, [])
 
-  const pageDesign = useMemo(() => {
-    const imagePage = loadedPages.find((page) => page.pageImage?.url && page.width > 0 && page.height > 0)
-    return imagePage ? { width: imagePage.width, height: imagePage.height } : PAGE_DESIGN
-  }, [loadedPages])
+  const pageDesign = useMemo(() => readerMode === 'original' && pdf.width > 0 && pdf.height > 0
+    ? { width: pdf.width, height: pdf.height }
+    : PAGE_DESIGN, [pdf.height, pdf.width, readerMode])
 
   const scale = useMemo(() => {
     if (box.w <= 0 || box.h <= 0) return 0
@@ -285,7 +299,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
 
   // —— 翻页 ——
   // 页数、尺寸、单双页变化都要给 HTMLFlipBook 换 key，否则库内部状态会错乱（旧站踩过）
-  const flipKey = `srd-${bookId}-${pageW}x${pageH}-${spread ? 'd' : 's'}-${prefs.flipStyle}`
+  const flipKey = `srd-${bookId}-${readerMode}-${pageW}x${pageH}-${spread ? 'd' : 's'}-${prefs.flipStyle}`
   const curl = prefs.flipStyle === 'curl' && !prefs.reduceMotion
   const flipBootstrap = useRef({ key: null, expectedLeaf: initialLeaf, pending: true })
   const bindFlipBook = useCallback((instance) => {
@@ -449,13 +463,13 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
       key: `t-${traySeq.current}`,
       text: sel.text,
       pages: sel.pages.length ? sel.pages : [],
+      selections: sel.selections || [],
       selectedBlockIds: sel.selectedBlockIds || [],
       selectionRange: sel.selectionRange || null,
     }
     setTray((list) => (list.some((it) => it.text === item.text) ? list : [...list, item]))
     setSelection({ ...sel, key: item.key })
-    telemetry.confirmInteraction('selection')
-  }, [telemetry])
+  }, [])
 
   const { mode } = useReaderGesture(stageRef, {
     onFlipPrev: prev,
@@ -472,7 +486,8 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     onSelectEnd,
     // 批注弹层与竹娃面板打开时，手势整条让位：那两处都有输入框，
     // 长按状态机再插一脚会把输入体验搞坏（浮层控件本身另有 data-reader-ui 放行）
-    enabled: pageResource.status === 'ready' && loadedPages.length > 0 && !noteDraft && !aiOpen,
+    enabled: readerReady && !noteDraft && !aiOpen,
+    selectionEnabled: readerMode === 'text',
   })
 
   // 选文浮层（工具栏与首尾控制点）的位置：量正文里真实画出来的那一段（data-sel-now）。
@@ -582,6 +597,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
       title: book.title,
       page: pageOfSel(selection),
       text: selection.text,
+      selections: selection.selections || [],
       selectedBlockIds: selection.selectedBlockIds || [],
       selectionRange: selection.selectionRange || null,
     }])
@@ -596,7 +612,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         text: selection.text,
         selectionRange: selection.selectionRange,
       }, excerptItems.length))
-      telemetry.confirmInteraction('excerpt')
+      telemetry.confirmInteraction('excerpt', [pageOfSel(selection)])
       flash(`已收藏摘录 · 第 ${pageOfSel(selection)} 页`, 'BookmarkCheck')
       clearSel(true)
     } catch (error) {
@@ -621,6 +637,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
       title: book.title,
       page: it.pages[0] || currentPage,
       text: it.text,
+      selections: it.selections || [],
       selectedBlockIds: it.selectedBlockIds || [],
       selectionRange: it.selectionRange || null,
     })))
@@ -639,7 +656,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
           selectionRange: item.selectionRange,
         }, excerptItems.length + index))
       }
-      telemetry.confirmInteraction('excerpt')
+      telemetry.confirmInteraction('excerpt', [...new Set(tray.flatMap((item) => item.pages))])
       flash(`已收藏 ${tray.length} 条摘录`, 'BookmarkCheck')
       setTray([])
       clearSel(false)
@@ -663,7 +680,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         const input = writingInput(item, annotationItems.length + index)
         await library.createAnnotation({ ...input, body: text, color: 'violet' })
       }
-      telemetry.confirmInteraction('annotation')
+      telemetry.confirmInteraction('annotation', [...new Set(noteDraft.items.map((item) => item.page))])
       flash(`已保存 ${noteDraft.items.length} 条批注`, 'PenLine')
       setNoteDraft(null)
       setSelection(null)
@@ -673,9 +690,49 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     }
   }
 
+  const toggleBookmark = async (no) => {
+    const existing = bookmarkItems.find((item) => item.pageNo === no)
+    try {
+      if (existing) {
+        await library.deleteBookmark(existing.id, existing.version)
+        flash(`已移除第 ${no} 页书签`, 'BookmarkMinus')
+      } else {
+        await library.createBookmark({
+          bookVersionId: book.versionId,
+          pageNo: no,
+          label: `第 ${no} 页`,
+          position: bookmarkItems.length,
+        })
+        flash(`已添加第 ${no} 页书签`, 'BookmarkCheck')
+      }
+      telemetry.confirmInteraction('bookmark', [no])
+    } catch (error) {
+      flash(error?.message || '书签没有保存成功，请稍后重试。', 'CloudOff')
+    }
+  }
+
   const renderPage = (idx, live) => {
     const p = pages[idx]
     if (!p) return null
+    if (readerMode === 'original') {
+      return (
+        <PdfBookPage
+          key={`${book.versionId}-pdf-${p.no}`}
+          document={pdf.document}
+          documentError={pdf.error}
+          pageNo={p.no}
+          scale={scale}
+          designWidth={pageDesign.width}
+          designHeight={pageDesign.height}
+          totalPages={totalPages}
+          active={Math.abs(p.no - currentPage) <= 2}
+          tone={prefs.paperTone}
+          current={live}
+          bookmarked={bookmarks.includes(p.no)}
+          onToggleBookmark={toggleBookmark}
+        />
+      )
+    }
     return (
       <BookPage
         key={`${book.versionId}-${p.no}`}
@@ -685,26 +742,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         tone={prefs.paperTone}
         current={live}
         bookmarked={bookmarks.includes(p.no)}
-        onToggleBookmark={async (no) => {
-          const existing = bookmarkItems.find((item) => item.pageNo === no)
-          try {
-            if (existing) {
-              await library.deleteBookmark(existing.id, existing.version)
-              flash(`已移除第 ${no} 页书签`, 'BookmarkMinus')
-            } else {
-              await library.createBookmark({
-                bookVersionId: book.versionId,
-                pageNo: no,
-                label: `第 ${no} 页`,
-                position: bookmarkItems.length,
-              })
-              flash(`已添加第 ${no} 页书签`, 'BookmarkCheck')
-            }
-            telemetry.confirmInteraction('bookmark')
-          } catch (error) {
-            flash(error?.message || '书签没有保存成功，请稍后重试。', 'CloudOff')
-          }
-        }}
+        onToggleBookmark={toggleBookmark}
         marks={marksAll}
       />
     )
@@ -718,6 +756,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         // 面板不盖正文：让阅读器右侧留出面板宽度，舞台变窄后书页自己重新等比缩放，
         // 学生问问题的时候仍然看得见自己在读哪一页
         aiOpen && 'student-reader--ai',
+        `student-reader--${readerMode}`,
       )}
     >
       {/* 课堂共读边缘光：蓝＝锁定书籍，紫＝同步页面，只在屏幕最外沿，不压正文（§8.1／§8.2） */}
@@ -748,6 +787,37 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
             {label} · 覆盖第 {first}–{last} 页
           </p>
         </div>
+
+        {sourcePdf && (
+          <div className="student-reader-mode-switch" role="group" aria-label="阅读模式">
+            {[
+              { key: 'original', label: '原版 PDF' },
+              { key: 'text', label: 'OCR 文字' },
+            ].map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                className={cx('student-reader-mode-button', readerMode === option.key && 'student-reader-mode-button--active')}
+                aria-pressed={readerMode === option.key}
+                onClick={() => {
+                  if (readerMode === option.key) return
+                  setSelection(null)
+                  window.getSelection?.()?.removeAllRanges()
+                  setReaderMode(option.key)
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {readerMode === 'original' && pdf.status === 'error' && (
+          <button type="button" onClick={pdf.reload} className="student-reader-btn" title="重新读取受保护的源 PDF">
+            <Icon name="RotateCcw" className="h-4 w-4" />
+            重试 PDF
+          </button>
+        )}
 
         {pageResource.status === 'error' && (
           <button type="button" onClick={pageResource.reload} className="student-reader-btn" title="重新读取当前正文页">
@@ -889,15 +959,17 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
           ))}
 
         {/* 选文浮层：首尾控制点 + 四项工具栏（§6.2 第 4 条、§6.3） */}
-        <SelectionHandles rect={selRect} />
-        <SelectionToolbar
-          rect={selRect}
-          saved={!!selection && marksAll.student.some((h) => h.text === selection.text)}
-          onAsk={askOne}
-          onSave={saveOne}
-          onNote={noteOne}
-          onCancel={() => clearSel(true)}
-        />
+        {readerMode === 'text' && <SelectionHandles rect={selRect} />}
+        {readerMode === 'text' && (
+          <SelectionToolbar
+            rect={selRect}
+            saved={!!selection && marksAll.student.some((h) => h.text === selection.text)}
+            onAsk={askOne}
+            onSave={saveOne}
+            onNote={noteOne}
+            onCancel={() => clearSel(true)}
+          />
+        )}
 
         {/* 竹娃收叠在书页边缘（§7.2）：点一下探出、再点打开面板、几秒不理自己退回。
             只在阅读器里出现，其它页面一律没有全局 AI 宠物（红线 6）。 */}
@@ -915,7 +987,11 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         {chrome && !selection && tray.length === 0 && !toast && (
           <div className={cx('student-reader-hint', mode === 'select' && 'student-reader-hint--on')}>
             <Icon name="Hand" className="h-3.5 w-3.5 shrink-0" strokeWidth={1.9} />
-            {mode === 'select' ? '移动手指扩展选区，抬手后选择要做什么' : '横向拖动翻页 · 长按文字选段（电脑按住 Ctrl 拖动）'}
+            {mode === 'select'
+              ? '移动手指扩展选区，抬手后选择要做什么'
+              : readerMode === 'text'
+                ? '横向拖动翻页 · 长按文字选段（电脑按住 Ctrl 拖动）'
+                : '横向拖动翻页 · 原版模式保留 PDF 排版'}
           </div>
         )}
       </div>
@@ -1017,10 +1093,14 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         book={book}
         bookId={bookId}
         currentPageNo={currentPage}
+        readRangeVersion={readRangeVersion}
         blocker={blocker}
         safeMode={safeMode}
         classroom={session}
-        onConfirmedInteraction={() => telemetry.confirmInteraction('ai_submit')}
+        onConfirmedInteraction={(quotes) => telemetry.confirmInteraction('ai_submit', [...new Set([
+          currentPage,
+          ...quotes.flatMap((quote) => (quote.selections || []).map((item) => item.pageNo)),
+        ])])}
         onJumpPage={(no) => {
           if (!pages.some((page) => page.no === Number(no))) {
             flash(`服务端页码范围为第 ${first}–${last} 页`, 'Info')

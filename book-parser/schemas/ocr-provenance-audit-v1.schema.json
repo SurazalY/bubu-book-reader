@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ocr-provenance-audit-v1.schema.json",
+  "title": "OCR Provenance Audit Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "eventId",
+    "eventType",
+    "bookId",
+    "pageNo",
+    "attemptId",
+    "attemptSha256",
+    "taskSourceThreadId",
+    "actualOcrTaskThreadId",
+    "artifactFieldModified",
+    "reason",
+    "recordedAt"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "ocr-provenance-audit/v1"},
+    "eventId": {"type": "string", "minLength": 1},
+    "eventType": {"const": "provenance-correction"},
+    "bookId": {"const": "book-025"},
+    "pageNo": {"const": 1},
+    "attemptId": {"const": "book-025-p0001-a01-attempt-0001"},
+    "attemptSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "taskSourceThreadId": {"type": "string", "minLength": 1},
+    "actualOcrTaskThreadId": {"const": "01a00612-3bc9-7ad2-8db5-0a8ad32b9a33"},
+    "artifactFieldModified": {"const": false},
+    "reason": {"type": "string", "minLength": 1},
+    "recordedAt": {"type": "string", "minLength": 1}
+  }
+}

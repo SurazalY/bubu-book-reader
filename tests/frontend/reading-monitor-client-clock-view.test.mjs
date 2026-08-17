@@ -73,7 +73,8 @@ test('错误版本、跨书版本、不可访问与非整数/越界页码都明�
 
 test('正文响应不得静默换版本、跨书或换页', () => {
   const expected = { bookId: 'book-a', bookVersionId: 'version-a', pageNo: 8 }
-  assert.equal(validateReaderPageResponse({ data: { ...expected, text: '正文' } }, expected).text, '正文')
+  const readRangeVersion = `read-range-v2:${'a'.repeat(64)}`
+  assert.equal(validateReaderPageResponse({ data: { ...expected, readRangeVersion, text: '正文' } }, expected).text, '正文')
   assert.throws(() => validateReaderPageResponse({ data: { ...expected, bookVersionId: 'version-b' } }, expected), (error) => error.code === 'VERSION_RESPONSE_MISMATCH')
   assert.throws(() => validateReaderPageResponse({ data: { ...expected, bookId: 'book-b' } }, expected), (error) => error.code === 'BOOK_RESPONSE_MISMATCH')
   assert.throws(() => validateReaderPageResponse({ data: { ...expected, pageNo: 9 } }, expected), (error) => error.code === 'PAGE_RESPONSE_MISMATCH')

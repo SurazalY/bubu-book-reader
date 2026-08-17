@@ -44,6 +44,7 @@ export function createReadingMonitorCoordinator({
   scope: suppliedScope,
   bookVersionId,
   initialView,
+  initialReaderMode,
   idFactory,
   cryptoImpl,
   readerReady = false,
@@ -57,10 +58,12 @@ export function createReadingMonitorCoordinator({
   const acquisitionScope = assertScope(suppliedScope)
   let scope = null
   requiredString(bookVersionId, 'bookVersionId')
+  if (!['original', 'text'].includes(initialReaderMode)) throw new TypeError('initialReaderMode必须是original或text')
 
   let tracker = null
   let session = null
   let currentView = initialView
+  let currentReaderMode = initialReaderMode
   let summaryTimer = null
   let statDateTimer = null
   let stopped = false
@@ -193,6 +196,7 @@ export function createReadingMonitorCoordinator({
     tracker = createActivityTracker({
       clock,
       initialView: currentView,
+      initialReaderMode: currentReaderMode,
       ready: readerReady,
       visible: currentVisible,
       foreground: currentForeground,
@@ -247,6 +251,7 @@ export function createReadingMonitorCoordinator({
       hadSkip: measured.hadSkip,
       hadReread: measured.hadReread,
       lastPageNo: measured.lastPageNo,
+      pageCoverage: measured.pageCoverage,
       endedAt: normalizedEndedAt,
       endReason,
     }, { cryptoImpl })
@@ -425,10 +430,20 @@ export function createReadingMonitorCoordinator({
         return tracker?.move(view, source) ?? null
       })
     },
-    confirmedInteraction() {
+    confirmedInteraction(pageNos) {
       return run(async () => {
         await ensureCurrentStatDateDirect()
-        return tracker?.confirmedInteraction() ?? null
+        const measured = tracker?.confirmedInteraction(pageNos) ?? null
+        if (measured && session && !closed && !pendingCapacityBlocked) await persistSnapshot()
+        return measured
+      })
+    },
+    setReaderMode(value) {
+      return run(async () => {
+        await ensureCurrentStatDateDirect()
+        if (!['original', 'text'].includes(value)) throw new TypeError('阅读模式必须是original或text')
+        currentReaderMode = value
+        return tracker?.setReaderMode(value) ?? null
       })
     },
     setReaderReady(value) {

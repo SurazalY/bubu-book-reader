@@ -118,6 +118,7 @@ function coordinatorFixture({
     scope: scopeInput,
     bookVersionId: 'version-1',
     initialView: view(10),
+    initialReaderMode: 'text',
     readerReady: true,
     idFactory(prefix) {
       ids += 1

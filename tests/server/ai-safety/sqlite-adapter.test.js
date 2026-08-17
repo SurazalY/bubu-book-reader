@@ -69,7 +69,7 @@ function modelResponse(overrides = {}) {
 
 function request(idempotencyKey, question = 'prompt') {
   return {
-    authContext: { organizationId: 'organization-1', userId: 'student-1' },
+    authContext: { organizationId: 'organization-1', userId: 'student-1', workspaceId: 'workspace-1' },
     request: {
       idempotencyKey,
       conversationId: 'conversation-1',
@@ -77,7 +77,7 @@ function request(idempotencyKey, question = 'prompt') {
       currentPageId: 'page-2',
       readRangeVersion: 'read-range-1',
       question,
-      selectedBlockIds: ['block-2'],
+      selections: [{ pageNo: 2, blockId: 'block-2', startOffset: 0, endOffset: 4 }],
     },
   }
 }
@@ -847,7 +847,7 @@ test('真实 SQLite 幂等键按组织、主体和会话隔离，失败重试与
   const scopeASecondConversation = request('shared-key', 'scope-a-conversation-2')
   scopeASecondConversation.request.conversationId = 'conversation-2'
   const scopeB = request('shared-key', 'scope-b')
-  scopeB.authContext = { organizationId: 'organization-b', userId: 'student-b' }
+  scopeB.authContext = { organizationId: 'organization-b', userId: 'student-b', workspaceId: 'workspace-b' }
   scopeB.request.conversationId = 'conversation-b'
 
   await assert.rejects(aiService.answer(scopeA), /no approved model produced a valid response/)
@@ -922,14 +922,14 @@ test('真实 SQLite 拒绝跨租户或跨主体复用 conversationId，且模型
   await assert.rejects(
     aiService.answer({
       ...request('cross-org-1', 'prompt-cross-org'),
-      authContext: { organizationId: 'organization-b', userId: 'student-b' },
+      authContext: { organizationId: 'organization-b', userId: 'student-b', workspaceId: 'workspace-b' },
     }),
     (error) => error?.code === 'RESOURCE_NOT_FOUND',
   )
   await assert.rejects(
     aiService.answer({
       ...request('cross-owner-1', 'prompt-cross-owner'),
-      authContext: { organizationId: 'organization-1', userId: 'student-b' },
+      authContext: { organizationId: 'organization-1', userId: 'student-b', workspaceId: 'workspace-1' },
     }),
     (error) => error?.code === 'RESOURCE_NOT_FOUND',
   )

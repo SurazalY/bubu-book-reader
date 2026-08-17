@@ -109,7 +109,7 @@ function baseRequest(overrides = {}) {
     currentPageId: 'page-2',
     readRangeVersion: 'read-range-1',
     question: '这一页里发生了什么？',
-    selectedBlockIds: ['block-2'],
+    selections: [{ pageNo: 2, blockId: 'block-2', startOffset: 0, endOffset: 4 }],
     ...overrides,
   }
 }
@@ -120,6 +120,7 @@ function baseEnvelope(overrides = {}) {
     authContext: {
       organizationId: 'organization-1',
       userId: 'student-1',
+      workspaceId: 'workspace-1',
       ...authContext,
     },
     request: {
@@ -671,11 +672,20 @@ test('认证身份与普通请求分离，指纹不保存原问，超长或非�
   )
   await assert.rejects(aiService.answer(baseEnvelope({ idempotencyKey: 'request-too-long', question: '字'.repeat(33) })), (error) => error?.code === 'QUESTION_TOO_LONG')
   await assert.rejects(
-    aiService.answer(baseEnvelope({ idempotencyKey: 'request-block-limit', selectedBlockIds: ['block-1', 'block-2'] })),
+    aiService.answer(baseEnvelope({
+      idempotencyKey: 'request-block-limit',
+      selections: [
+        { pageNo: 1, blockId: 'block-1', startOffset: 0, endOffset: 1 },
+        { pageNo: 2, blockId: 'block-2', startOffset: 0, endOffset: 1 },
+      ],
+    })),
     (error) => error?.code === 'TOO_MANY_SELECTED_BLOCKS',
   )
   await assert.rejects(
-    aiService.answer(baseEnvelope({ idempotencyKey: 'request-range-limit', selectionRange: { blockId: 'block-2', startOffset: 0, endOffset: 50 } })),
+    aiService.answer(baseEnvelope({
+      idempotencyKey: 'request-range-limit',
+      selections: [{ pageNo: 2, blockId: 'block-2', startOffset: 0, endOffset: 129 }],
+    })),
     (error) => error?.code === 'INVALID_SELECTION_RANGE',
   )
   const result = await aiService.answer(baseEnvelope({ idempotencyKey: 'request-digest' }))
@@ -688,6 +698,37 @@ test('认证身份与普通请求分离，指纹不保存原问，超长或非�
   assert.equal(generationCalls, 1)
   assert.equal(storedFingerprint.includes(baseRequest().question), false)
   assert.equal(database.state.idempotencyRecords[0].fingerprint.includes('organizationId'), false)
+})
+
+test('跨页 selections 保留每页锚点并由服务端按 block 重建引用文本', async () => {
+  const database = readableDatabase()
+  const providerRequests = []
+  const testOnlyProvider = {
+    listCandidates: async () => [{ id: 'primary' }],
+    generate: async ({ request }) => {
+      providerRequests.push(request)
+      return baseModelResponse()
+    },
+  }
+  const { aiService } = createHarness({
+    database,
+    modelProvider: testOnlyProvider,
+    policy: { maxSelectedBlockIds: 2, maxSelectionCharacters: 128 },
+  })
+  const selections = [
+    { pageNo: 1, blockId: 'block-1', startOffset: 0, endOffset: 3 },
+    { pageNo: 2, blockId: 'block-2', startOffset: 4, endOffset: 9 },
+  ]
+
+  await aiService.answer(baseEnvelope({
+    idempotencyKey: 'request-cross-page-selections',
+    selections,
+  }))
+
+  assert.equal(providerRequests.length, 1)
+  assert.deepEqual(providerRequests[0].selections, selections)
+  assert.equal(providerRequests[0].selectionText, '前一页\n主人公犹豫')
+  assert.equal(Object.hasOwn(providerRequests[0], 'quotes'), false)
 })
 
 test('记忆卡只要求全部来源已读，非 lexical top 的来源仍随卡片带入并可引用', () => {

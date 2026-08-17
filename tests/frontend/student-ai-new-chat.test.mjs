@@ -11,18 +11,19 @@ test('全新 AI 会话首次发送不携带旧会话并保留新选择的书页�
 
   const payload = runtime.createStudentAiMessagePayload({
     text: '重新问一个问题',
-    quotes: [{ text: '新选文', selectedBlockIds: ['block-new'], selectionRange: { blockId: 'block-new', startOffset: 0, endOffset: 3 } }],
+    quotes: [{ text: '不得上传的客户端文本', selections: [{ pageNo: 12, blockId: 'block-new', startOffset: 0, endOffset: 3 }] }],
     bookId: 'book-1',
     conversationId: 'conversation-old',
     currentPageNo: 12,
+    readRangeVersion: 'read-range-v2:test',
     safeMode: true,
     startFresh: true,
   })
 
   assert.equal(Object.hasOwn(payload, 'conversationId'), false)
-  assert.equal(payload.quotes[0].text, '新选文')
-  assert.deepEqual(payload.selectedBlockIds, ['block-new'])
-  assert.deepEqual(payload.selectionRange, { blockId: 'block-new', startOffset: 0, endOffset: 3 })
+  assert.equal(Object.hasOwn(payload, 'quotes'), false)
+  assert.deepEqual(payload.selections, [{ pageNo: 12, blockId: 'block-new', startOffset: 0, endOffset: 3 }])
+  assert.equal(payload.readRangeVersion, 'read-range-v2:test')
   assert.equal(payload.bookId, 'book-1')
   assert.equal(payload.currentPageNo, 12)
 
@@ -69,6 +70,9 @@ test('新对话状态阻止旧会话回选并在服务端创建后刷新完整�
   assert.match(hook, /setStartingFresh\(true\)/)
   assert.doesNotMatch(hook, /newChat: \(\) => setActiveId\(null\)/)
   assert.match(panel, /clearAiQuotes\(\)[\s\S]{0,80}ai\.newChat\(bookId\)/)
+  assert.match(panel, /const result = await ai\.send\(/)
+  assert.match(panel, /if \(!result\?\.accepted\) return/)
+  assert.match(panel, /onConfirmedInteraction\?\.\(aiQuotes\)/)
 })
 
 test('真实学生 AI 运行时把课堂广播映射为同一教师提问与同一回复', async () => {

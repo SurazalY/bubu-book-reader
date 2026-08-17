@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "book-package/v1",
+  "type": "object",
+  "required": ["schemaVersion", "bookId", "pageCount", "source", "render", "pages", "quality"],
+  "properties": {
+    "schemaVersion": {"const": "book-package/v1"},
+    "bookId": {"type": "string", "minLength": 1},
+    "pageCount": {"type": "integer", "minimum": 1},
+    "source": {"type": "object", "required": ["path", "sha256"]},
+    "render": {"type": "object", "required": ["dpi", "coordinateSystem"]},
+    "pages": {"type": "array", "items": {"type": "object", "required": ["pageNo", "image", "status"]}},
+    "quality": {"type": "object", "required": ["pageCount", "successfulPages", "failedPages"]}
+  }
+}

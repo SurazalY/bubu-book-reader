@@ -25,7 +25,7 @@ function temporaryRuntime() {
   }
 }
 
-test('imported book assets are served from their configured directory and never fall back to index.html', async (context) => {
+test('书籍资产不再由公开静态路径暴露，受保护端点要求会话', async (context) => {
   const runtime = temporaryRuntime()
   const application = createReadmateApplication({
     databasePath: runtime.databasePath,
@@ -48,9 +48,11 @@ test('imported book assets are served from their configured directory and never 
   const address = server.address()
   const baseUrl = `http://127.0.0.1:${address.port}`
   const cover = await fetch(`${baseUrl}/books/public-domain-book/cover_original.jpg`)
-  assert.equal(cover.status, 200)
-  assert.equal(cover.headers.get('content-type'), 'image/jpeg')
-  assert.deepEqual(Buffer.from(await cover.arrayBuffer()), runtime.coverBytes)
+  assert.equal(cover.status, 404)
+  assert.notEqual(cover.headers.get('content-type'), 'text/html; charset=utf-8')
+
+  const protectedAsset = await fetch(`${baseUrl}/api/v1/books/assets/asset-id`)
+  assert.equal(protectedAsset.status, 401)
 
   const missing = await fetch(`${baseUrl}/books/public-domain-book/missing.jpg`)
   assert.equal(missing.status, 404)

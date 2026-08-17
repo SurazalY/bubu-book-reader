@@ -1,4 +1,7 @@
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto'
+import { createReadStream, statSync } from 'node:fs'
+import { isAbsolute, relative, resolve } from 'node:path'
+import { pipeline } from 'node:stream/promises'
 
 import express from 'express'
 
@@ -63,6 +66,7 @@ const errorStatus = {
   SAFETY_MINIMUM_CONTEXT_AVAILABLE: 409,
   READING_LEASE_REQUIRED: 409,
   READING_LEASE_HELD: 409,
+  STALE_READ_RANGE: 409,
   LEASE_REQUIRED: 409,
   LEASE_CONFLICT: 409,
   REVISION_GAP: 409,
@@ -78,6 +82,7 @@ const errorStatus = {
   VALIDATION_FAILED: 422,
   INVALID_REQUEST: 422,
   HUMAN_REVIEW_REQUIRED: 422,
+  ASSET_INTEGRITY_MISMATCH: 409,
   RATE_LIMITED: 429,
   MODEL_CANDIDATES_UNAVAILABLE: 503,
   MODEL_PROVIDER_FAILED: 503,
@@ -86,6 +91,43 @@ const errorStatus = {
 
 function route(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next)
+}
+
+function resolveStoredAsset(publicAssetDirectory, storageKey) {
+  if (typeof publicAssetDirectory !== 'string' || !publicAssetDirectory) {
+    throw new HttpError(503, 'DEPENDENCY_UNAVAILABLE', '书籍资产目录未配置')
+  }
+  if (typeof storageKey !== 'string' || !storageKey || isAbsolute(storageKey)) {
+    throw new HttpError(409, 'ASSET_INTEGRITY_MISMATCH', '书籍资产存储键无效')
+  }
+  const root = resolve(publicAssetDirectory)
+  const filename = resolve(root, storageKey)
+  const boundary = relative(root, filename)
+  if (!boundary || boundary.startsWith('..') || isAbsolute(boundary)) {
+    throw new HttpError(409, 'ASSET_INTEGRITY_MISMATCH', '书籍资产存储键越界')
+  }
+  return filename
+}
+
+function byteRange(header, size) {
+  if (!header) return null
+  const match = /^bytes=(\d*)-(\d*)$/.exec(header)
+  if (!match || (!match[1] && !match[2])) throw new HttpError(416, 'VALIDATION_FAILED', 'Range 仅支持单个 bytes 区间')
+  let start
+  let end
+  if (!match[1]) {
+    const suffix = Number(match[2])
+    if (!Number.isSafeInteger(suffix) || suffix <= 0) throw new HttpError(416, 'VALIDATION_FAILED', 'Range 后缀长度无效')
+    start = Math.max(0, size - suffix)
+    end = size - 1
+  } else {
+    start = Number(match[1])
+    end = match[2] ? Number(match[2]) : size - 1
+  }
+  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || start >= size || end < start) {
+    throw new HttpError(416, 'VALIDATION_FAILED', 'Range 超出资产边界')
+  }
+  return { start, end: Math.min(end, size - 1) }
 }
 
 function writeKey(req) {
@@ -318,7 +360,7 @@ function addAiAudit(database, req, result) {
   })
 }
 
-export function createIntegrationRouter({ database, identityService, sessionSecret, modelProvider, reviewProvider, quotaPolicy, deliveryAdapter, summaryLinkSigningKey, miniProgramReceiptVerifier, cookieSecure, internalDemoMode = false } = {}) {
+export function createIntegrationRouter({ database, identityService, sessionSecret, modelProvider, reviewProvider, quotaPolicy, deliveryAdapter, summaryLinkSigningKey, miniProgramReceiptVerifier, cookieSecure, publicAssetDirectory, internalDemoMode = false } = {}) {
   const router = express.Router()
   const requireSession = createRequireSessionMiddleware(identityService)
   const requireWorkspace = createRequireWorkspaceMiddleware(identityService)
@@ -380,6 +422,7 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
           const scope = deriveAiRequestScope(database, {
             organizationId: req.workspace.organizationId,
             ownerUserId: req.identitySession.user.id,
+            workspaceId: req.workspace.id,
             bookId: req.body?.bookId,
             currentPageNo: req.body?.currentPageNo,
           })
@@ -493,10 +536,59 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
     return sendData(res, { items: projectBooks(database, req.identitySession.user.id, req.workspace.id, rows) }, { requestId: req.requestId })
   }))
 
+  router.get('/books/assets/:assetId', route(async (req, res) => {
+    const { reading } = domainForRequest(req, database, identityService)
+    const asset = await reading.getBookAsset(req.params.assetId)
+    const filename = resolveStoredAsset(publicAssetDirectory, asset.storage_key)
+    let stat
+    try {
+      stat = statSync(filename)
+    } catch {
+      throw new HttpError(404, 'RESOURCE_NOT_FOUND', '书籍资产文件不存在')
+    }
+    if (!stat.isFile() || stat.size !== Number(asset.size_bytes)) {
+      throw new HttpError(409, 'ASSET_INTEGRITY_MISMATCH', '书籍资产文件大小与登记值不一致')
+    }
+    let range
+    try {
+      range = byteRange(req.get('Range'), stat.size)
+    } catch (error) {
+      if (error instanceof HttpError && error.status === 416) {
+        res.set('Content-Range', `bytes */${stat.size}`)
+      }
+      throw error
+    }
+    res.set({
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'private, max-age=3600',
+      'Content-Type': asset.mime_type,
+      'Content-Disposition': 'inline',
+      'X-Content-Type-Options': 'nosniff',
+    })
+    if (range) {
+      res.status(206)
+      res.set('Content-Range', `bytes ${range.start}-${range.end}/${stat.size}`)
+      res.set('Content-Length', String(range.end - range.start + 1))
+      await pipeline(createReadStream(filename, range), res)
+      return
+    }
+    res.set('Content-Length', String(stat.size))
+    await pipeline(createReadStream(filename), res)
+  }))
+
   router.get('/books/:bookId/pages/:pageNo', route(async (req, res) => {
     const { reading } = domainForRequest(req, database, identityService)
     const page = await reading.getPage(req.params.bookId, Number(req.params.pageNo), req.query.versionId || null)
-    return sendData(res, projectBookPage(database, page), { requestId: req.requestId })
+    const scope = deriveAiRequestScope(database, {
+      organizationId: req.workspace.organizationId,
+      ownerUserId: req.identitySession.user.id,
+      workspaceId: req.workspace.id,
+      bookId: req.params.bookId,
+      bookVersionId: page.book_version_id,
+      currentPageNo: page.page_no,
+    })
+    if (!scope) throw new HttpError(404, 'RESOURCE_NOT_FOUND', '当前书页不存在或不在可读范围')
+    return sendData(res, projectBookPage(database, page, { readRangeVersion: scope.readRangeVersion }), { requestId: req.requestId })
   }))
 
   router.get('/reading/progress', route((req, res) => sendData(res,
@@ -860,10 +952,14 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
     const scope = deriveAiRequestScope(database, {
       organizationId: req.workspace.organizationId,
       ownerUserId: req.identitySession.user.id,
+      workspaceId: req.workspace.id,
       bookId: req.body?.bookId,
       currentPageNo: req.body?.currentPageNo,
     })
     if (!scope) throw new HttpError(404, 'RESOURCE_NOT_FOUND', '当前书页不存在或不在可读范围')
+    if (req.body?.readRangeVersion !== scope.readRangeVersion) {
+      throw new HttpError(409, 'STALE_READ_RANGE', '已读范围已变化，请刷新当前书页后重试')
+    }
     let conversationId = req.body?.conversationId
     const ownedConversation = conversationId && database.prepare(`
       SELECT id FROM ai_conversations WHERE id = ? AND organization_id = ? AND owner_user_id = ?
@@ -881,7 +977,11 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
       })
     }
     const result = await aiRuntime.aiService.answer({
-      authContext: { organizationId: req.workspace.organizationId, userId: req.identitySession.user.id },
+      authContext: {
+        organizationId: req.workspace.organizationId,
+        userId: req.identitySession.user.id,
+        workspaceId: req.workspace.id,
+      },
       request: {
         idempotencyKey: key,
         conversationId,
@@ -889,8 +989,7 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
         currentPageId: scope.currentPageId,
         readRangeVersion: scope.readRangeVersion,
         question: req.body?.text,
-        selectedBlockIds: req.body?.selectedBlockIds,
-        selectionRange: req.body?.selectionRange,
+        selections: req.body?.selections,
         serviceMode: req.body?.safeMode ? 'safe' : 'balanced',
       },
     })

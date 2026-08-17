@@ -57,6 +57,9 @@ function toAsset(raw) {
     id: firstValue(source.id, source.assetId),
     kind: firstValue(source.kind, source.type),
     url,
+    ...(firstValue(source.mimeType, source.mime_type) ? { mimeType: firstValue(source.mimeType, source.mime_type) } : {}),
+    ...(numberOrNull(source.sizeBytes, source.size_bytes) !== null ? { sizeBytes: numberOrNull(source.sizeBytes, source.size_bytes) } : {}),
+    ...(firstValue(source.sha256, source.digest) ? { sha256: firstValue(source.sha256, source.digest) } : {}),
   }
 }
 
@@ -219,6 +222,10 @@ export function toReaderPageDto(raw) {
     || (asRecord(source.illustration).kind !== 'page_image' ? source.illustration : null))
   return {
     no: numberOrNull(source.pageNo, source.no, source.page),
+    printedPageLabel: firstValue(source.printedPageLabel, source.printed_page_label),
+    ...(firstValue(source.readRangeVersion, source.read_range_version)
+      ? { readRangeVersion: firstValue(source.readRangeVersion, source.read_range_version) }
+      : {}),
     width: numberOrNull(source.width, content.width),
     height: numberOrNull(source.height, content.height),
     chapter: firstValue(source.chapter, source.chapterTitle, content.chapter),

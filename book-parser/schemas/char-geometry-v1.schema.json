@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "char-geometry/v1",
+  "title": "Foreground-aligned per-character geometry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "source", "render", "method", "pages", "quality"],
+  "properties": {
+    "schemaVersion": {"const": "char-geometry/v1"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["renderManifest", "renderManifestSha256", "lunaResponse", "lunaResponseSha256", "textPolicy"],
+      "properties": {
+        "renderManifest": {"type": "string", "minLength": 1},
+        "renderManifestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "lunaResponse": {"type": "string", "minLength": 1},
+        "lunaResponseSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "textPolicy": {"const": "preserved-from-luna-no-re-ocr-no-normalization"},
+        "geometryTextPolicy": {"const": "raw-text-preserved-effective-text-only-for-proven-adjacent-boundary-shifts"}
+      }
+    },
+    "render": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dpi", "coordinateSystem"],
+      "properties": {
+        "dpi": {"type": "integer", "minimum": 1},
+        "coordinateSystem": {"const": "pixel, origin=top-left"}
+      }
+    },
+    "method": {"const": "foreground-projection-sequence-alignment-v1"},
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/page"}
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pageCount", "blockCount", "successfulBlocks", "failedBlocks", "successfulBlockRate", "positionedCharacters", "failureReasons", "failedBlockRecords", "pages"],
+      "properties": {
+        "pageCount": {"type": "integer", "minimum": 1},
+        "blockCount": {"type": "integer", "minimum": 0},
+        "successfulBlocks": {"type": "integer", "minimum": 0},
+        "failedBlocks": {"type": "integer", "minimum": 0},
+        "directSuccessfulBlocks": {"type": "integer", "minimum": 0},
+        "correctedSuccessfulBlocks": {"type": "integer", "minimum": 0},
+        "boundaryCorrectionCount": {"type": "integer", "minimum": 0},
+        "successfulBlockRate": {"type": "number", "minimum": 0, "maximum": 1},
+        "positionedCharacters": {"type": "integer", "minimum": 0},
+        "failureReasons": {"$ref": "#/$defs/failureReasons"},
+        "failedBlockRecords": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/failedBlockRecord"}
+        },
+        "pages": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/pageQuality"}
+        },
+        "pdfValidation": {"$ref": "#/$defs/pdfValidation"}
+      }
+    }
+  },
+  "$defs": {
+    "pixelBox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": {"type": "integer", "minimum": 0},
+        "y": {"type": "integer", "minimum": 0},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      }
+    },
+    "sourceBox": {
+      "oneOf": [
+        {"$ref": "#/$defs/pixelBox"},
+        {
+          "type": "array",
+          "prefixItems": [
+            {"type": "number"},
+            {"type": "number"},
+            {"type": "number"},
+            {"type": "number"}
+          ],
+          "items": false,
+          "minItems": 4,
+          "maxItems": 4
+        }
+      ]
+    },
+    "character": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "charIndex", "bbox", "confidence", "method", "status", "foregroundPixels"],
+      "properties": {
+        "text": {"type": "string", "minLength": 1, "maxLength": 1},
+        "charIndex": {"type": "integer", "minimum": 0},
+        "bbox": {"$ref": "#/$defs/pixelBox"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "method": {"const": "foreground-aligned"},
+        "status": {"const": "ok"},
+        "foregroundPixels": {"type": "integer", "minimum": 2}
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["text", "bbox", "chars", "geometryStatus", "geometryConfidence", "geometryMethod", "geometryFailureReason", "geometryMetrics"],
+      "properties": {
+        "text": {"type": "string"},
+        "bbox": {"$ref": "#/$defs/sourceBox"},
+        "geometryEffectiveText": {"type": "string", "minLength": 1},
+        "geometryCorrection": {"$ref": "#/$defs/geometryCorrection"},
+        "chars": {"type": "array", "items": {"$ref": "#/$defs/character"}},
+        "geometryStatus": {"enum": ["ok", "failed"]},
+        "geometryConfidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "geometryMethod": {"const": "foreground-projection-sequence-alignment-v1"},
+        "geometryFailureReason": {"type": ["string", "null"]},
+        "geometryMetrics": {"type": "object"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"geometryStatus": {"const": "ok"}}},
+          "then": {
+            "properties": {
+              "chars": {"minItems": 1},
+              "geometryFailureReason": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"geometryStatus": {"const": "failed"}}},
+          "then": {
+            "properties": {
+              "chars": {"maxItems": 0},
+              "geometryConfidence": {"const": 0},
+              "geometryFailureReason": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      ]
+    },
+    "page": {
+      "type": "object",
+      "required": ["pageNo", "width", "height", "image", "blocks", "geometryQuality"],
+      "properties": {
+        "pageNo": {"type": "integer", "minimum": 1},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1},
+        "image": {"type": "string", "minLength": 1},
+        "blocks": {"type": "array", "items": {"$ref": "#/$defs/block"}},
+        "geometryQuality": {
+          "$ref": "#/$defs/geometryQuality"
+        }
+      }
+    },
+    "geometryCorrection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "role", "peerBlockId", "transferredText", "evidence"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "kind": {"const": "adjacent-line-boundary-shift"},
+        "role": {"enum": ["source", "target"]},
+        "peerBlockId": {"type": "string", "minLength": 1},
+        "transferredText": {"type": "string", "minLength": 1, "maxLength": 1},
+        "evidence": {"type": "object"}
+      }
+    },
+    "failureReasons": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 1}
+    },
+    "geometryQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blockCount", "successfulBlocks", "failedBlocks", "positionedCharacters", "failureReasons"],
+      "properties": {
+        "blockCount": {"type": "integer", "minimum": 0},
+        "successfulBlocks": {"type": "integer", "minimum": 0},
+        "failedBlocks": {"type": "integer", "minimum": 0},
+        "directSuccessfulBlocks": {"type": "integer", "minimum": 0},
+        "correctedSuccessfulBlocks": {"type": "integer", "minimum": 0},
+        "boundaryCorrectionCount": {"type": "integer", "minimum": 0},
+        "positionedCharacters": {"type": "integer", "minimum": 0},
+        "failureReasons": {"$ref": "#/$defs/failureReasons"}
+      }
+    },
+    "pageQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pageNo", "blockCount", "successfulBlocks", "failedBlocks", "positionedCharacters", "failureReasons"],
+      "properties": {
+        "pageNo": {"type": "integer", "minimum": 1},
+        "blockCount": {"type": "integer", "minimum": 0},
+        "successfulBlocks": {"type": "integer", "minimum": 0},
+        "failedBlocks": {"type": "integer", "minimum": 0},
+        "directSuccessfulBlocks": {"type": "integer", "minimum": 0},
+        "correctedSuccessfulBlocks": {"type": "integer", "minimum": 0},
+        "boundaryCorrectionCount": {"type": "integer", "minimum": 0},
+        "positionedCharacters": {"type": "integer", "minimum": 0},
+        "failureReasons": {"$ref": "#/$defs/failureReasons"}
+      }
+    },
+    "failedBlockRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pageNo", "blockId", "text", "bbox", "reason", "expectedCharacterCount", "observedGroupCount"],
+      "properties": {
+        "pageNo": {"type": "integer", "minimum": 1},
+        "blockId": {"type": ["string", "null"]},
+        "text": {"type": "string"},
+        "bbox": {"$ref": "#/$defs/sourceBox"},
+        "reason": {"type": "string", "minLength": 1},
+        "expectedCharacterCount": {"type": "integer", "minimum": 0},
+        "observedGroupCount": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "pdfValidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "pageCount", "font", "pages"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "pageCount": {"type": "integer", "minimum": 1},
+        "font": {"type": "string", "minLength": 1},
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["pageNo", "expectedCharacterCount", "extractedCharacterCount", "textMatchesInsertionOrder", "minimumCharacterBboxIoU", "blocks"],
+            "properties": {
+              "pageNo": {"type": "integer", "minimum": 1},
+              "expectedCharacterCount": {"type": "integer", "minimum": 0},
+              "extractedCharacterCount": {"type": "integer", "minimum": 0},
+              "textMatchesInsertionOrder": {"type": "boolean"},
+              "minimumCharacterBboxIoU": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+              "blocks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["blockId", "characterCount", "targetHorizontalSpanPixels", "pdfHorizontalSpanPixels", "coarseLineWidthPixels", "pdfSpanToCoarseLineRatio"],
+                  "properties": {
+                    "blockId": {"type": ["string", "null"]},
+                    "characterCount": {"type": "integer", "minimum": 1},
+                    "targetHorizontalSpanPixels": {"type": "number", "exclusiveMinimum": 0},
+                    "pdfHorizontalSpanPixels": {"type": "number", "exclusiveMinimum": 0},
+                    "coarseLineWidthPixels": {"type": "number", "exclusiveMinimum": 0},
+                    "pdfSpanToCoarseLineRatio": {"type": "number", "exclusiveMinimum": 0}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

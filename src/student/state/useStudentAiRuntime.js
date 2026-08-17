@@ -5,17 +5,15 @@ import { createStudentApi } from '../../api/student.js'
 import { useApiResource } from '../../api/useApiResource.js'
 import { buildConversationWriteOptions, createConversationApi } from './useConversationManager.js'
 
-export function createStudentAiMessagePayload({ text, quotes, bookId, conversationId, currentPageNo, safeMode, startFresh }) {
+export function createStudentAiMessagePayload({ text, quotes, bookId, conversationId, currentPageNo, readRangeVersion, safeMode, startFresh }) {
   const normalizedQuotes = quotes || []
-  const selectedBlockIds = [...new Set(normalizedQuotes.flatMap((quote) => quote.selectedBlockIds || []))]
-  const selectionRange = normalizedQuotes.length === 1 ? normalizedQuotes[0].selectionRange || null : null
+  const selections = normalizedQuotes.flatMap((quote) => Array.isArray(quote.selections) ? quote.selections : [])
   const payload = {
     text,
-    quotes: normalizedQuotes,
     bookId,
     currentPageNo,
-    selectedBlockIds,
-    selectionRange,
+    readRangeVersion,
+    selections,
     safeMode: Boolean(safeMode),
   }
   if (!startFresh && conversationId) payload.conversationId = conversationId
@@ -128,8 +126,10 @@ export default function useStudentAiRuntime(workspaceId, books = []) {
     }
   }, [resource.reload])
 
-  const send = useCallback(async ({ text, quotes, bookId, currentPageNo, safe }) => {
-    if (!text?.trim() && !quotes?.length) return
+  const send = useCallback(async ({ text, quotes, bookId, currentPageNo, readRangeVersion, safe }) => {
+    if (!text?.trim() && !quotes?.length) {
+      return { accepted: false, error: { code: 'QUESTION_REQUIRED', message: '请输入问题或选择原文' } }
+    }
     setPending(true)
     setActionError(null)
     try {
@@ -141,6 +141,7 @@ export default function useStudentAiRuntime(workspaceId, books = []) {
           bookId,
           conversationId: activeId,
           currentPageNo,
+          readRangeVersion,
           safeMode: safe,
           startFresh: startingFresh,
         }),
@@ -148,8 +149,10 @@ export default function useStudentAiRuntime(workspaceId, books = []) {
       )
       if (startingFresh) freshConversationIdRef.current = response.data?.conversationId || null
       await resource.reload()
+      return { accepted: true, data: response.data }
     } catch (error) {
       setActionError(error)
+      return { accepted: false, error }
     } finally {
       setPending(false)
     }

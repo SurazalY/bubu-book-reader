@@ -44,6 +44,7 @@ export default function useReadingTelemetry({
   bookVersionId,
   pageNo,
   stableView,
+  readerMode,
   movementEvent,
   workspaceId,
   readerReady = true,
@@ -190,6 +191,7 @@ export default function useReadingTelemetry({
         scope,
         bookVersionId,
         initialView: stableView,
+        initialReaderMode: readerMode,
         readerReady,
         initiallyVisible: documentVisible(),
         idFactory: monitor.idFactory || newEventId,
@@ -252,6 +254,12 @@ export default function useReadingTelemetry({
 
   useEffect(() => {
     const entry = coordinatorRef.current
+    if (!entry || !['original', 'text'].includes(readerMode)) return
+    entry.ready.then(() => entry.coordinator?.setReaderMode(readerMode)).catch(() => undefined)
+  }, [readerMode])
+
+  useEffect(() => {
+    const entry = coordinatorRef.current
     entry?.ready.then(() => entry.coordinator?.setReaderReady(readerReady)).catch(() => undefined)
   }, [readerReady])
 
@@ -265,9 +273,10 @@ export default function useReadingTelemetry({
 
   return {
     error: monitorError || legacyError,
-    confirmInteraction() {
+    confirmInteraction(_kind, pageNos = stableView?.pageNos) {
       const entry = coordinatorRef.current
-      entry?.ready.then(() => entry.coordinator?.confirmedInteraction()).catch(() => undefined)
+      if (!entry) return Promise.resolve(null)
+      return entry.ready.then(() => entry.coordinator?.confirmedInteraction(pageNos) ?? null)
     },
     closeAndWait(reason = 'reader_close') {
       const entry = coordinatorRef.current

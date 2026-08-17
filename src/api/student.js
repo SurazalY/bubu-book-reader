@@ -13,6 +13,7 @@ const READING_SUMMARY_FIELDS = Object.freeze([
   'hadSkip',
   'hadReread',
   'lastPageNo',
+  'pageCoverage',
   'endedAt',
   'endReason',
   'fingerprint',

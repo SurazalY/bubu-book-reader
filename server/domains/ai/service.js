@@ -4,7 +4,7 @@ import { selectReadableSources, toModelSources, validateCitations } from './retr
 
 const RESPONSE_TYPES = new Set(['answer', 'guidance', 'insufficient_evidence', 'off_topic'])
 const SAFE_SPOILER_DEGRADATION = '我只会依据你已经读到的内容陪你分析。现在缺少可以安全引用的原文，我们先看看这一页或你选中的句子吧。'
-const IDENTITY_FIELDS = new Set(['organizationId', 'userId'])
+const IDENTITY_FIELDS = new Set(['organizationId', 'userId', 'workspaceId'])
 
 export class AiDomainError extends Error {
   constructor(code, message, options = {}) {
@@ -135,39 +135,52 @@ function normalizeEnvelope(input) {
     throw new AiDomainError('INVALID_REQUEST', 'request is required')
   }
   if ([...IDENTITY_FIELDS].some((field) => hasOwn(request, field))) {
-    throw new AiDomainError('INVALID_REQUEST', 'organizationId and userId must not be accepted from the request body')
+    throw new AiDomainError('INVALID_REQUEST', 'organizationId, userId, and workspaceId must not be accepted from the request body')
   }
   return {
     authContext: {
       organizationId: requiredString(authContext.organizationId, 'authContext.organizationId'),
       userId: requiredString(authContext.userId, 'authContext.userId'),
+      workspaceId: requiredString(authContext.workspaceId, 'authContext.workspaceId'),
     },
     rawRequest: request,
   }
 }
 
-function normalizeSelectionRange(value, selectedBlockIds, activePolicy) {
-  if (value === undefined || value === null) return null
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new AiDomainError('INVALID_SELECTION_RANGE', 'selectionRange must be an object')
+function normalizeSelections(value, activePolicy) {
+  if (value === undefined || value === null) return []
+  if (!Array.isArray(value)) throw new AiDomainError('INVALID_SELECTION_RANGE', 'selections must be an array')
+  if (value.length > activePolicy.maxSelectedBlockIds) {
+    throw new AiDomainError('TOO_MANY_SELECTED_BLOCKS', 'selections exceeds the configured block limit')
   }
-  const allowedFields = new Set(['blockId', 'startOffset', 'endOffset'])
-  if (Object.keys(value).some((field) => !allowedFields.has(field))) {
-    throw new AiDomainError('INVALID_SELECTION_RANGE', 'selectionRange contains an unsupported field')
-  }
-  const blockId = requiredString(value.blockId, 'selectionRange.blockId')
-  const startOffset = value.startOffset
-  const endOffset = value.endOffset
-  if (!selectedBlockIds.includes(blockId)) {
-    throw new AiDomainError('INVALID_SELECTION_RANGE', 'selectionRange.blockId must be present in selectedBlockIds')
-  }
-  if (!Number.isInteger(startOffset) || !Number.isInteger(endOffset) || startOffset < 0 || endOffset <= startOffset) {
-    throw new AiDomainError('INVALID_SELECTION_RANGE', 'selectionRange offsets must be increasing non-negative integers')
-  }
-  if (endOffset - startOffset > activePolicy.maxSelectionCharacters) {
-    throw new AiDomainError('INVALID_SELECTION_RANGE', 'selectionRange exceeds the configured character limit')
-  }
-  return { blockId, startOffset, endOffset }
+  const seenBlocks = new Set()
+  let selectedCharacters = 0
+  return value.map((selection, index) => {
+    if (!selection || typeof selection !== 'object' || Array.isArray(selection)) {
+      throw new AiDomainError('INVALID_SELECTION_RANGE', `selections[${index}] must be an object`)
+    }
+    const allowedFields = new Set(['pageNo', 'blockId', 'startOffset', 'endOffset'])
+    if (Object.keys(selection).length !== allowedFields.size
+      || Object.keys(selection).some((field) => !allowedFields.has(field))) {
+      throw new AiDomainError('INVALID_SELECTION_RANGE', `selections[${index}] fields are invalid`)
+    }
+    const pageNo = selection.pageNo
+    const blockId = requiredString(selection.blockId, `selections[${index}].blockId`)
+    const startOffset = selection.startOffset
+    const endOffset = selection.endOffset
+    if (!Number.isInteger(pageNo) || pageNo < 1
+      || !Number.isInteger(startOffset) || !Number.isInteger(endOffset)
+      || startOffset < 0 || endOffset <= startOffset) {
+      throw new AiDomainError('INVALID_SELECTION_RANGE', `selections[${index}] anchor is invalid`)
+    }
+    if (seenBlocks.has(blockId)) throw new AiDomainError('INVALID_SELECTION_RANGE', 'selections contains a duplicate blockId')
+    seenBlocks.add(blockId)
+    selectedCharacters += endOffset - startOffset
+    if (selectedCharacters > activePolicy.maxSelectionCharacters) {
+      throw new AiDomainError('INVALID_SELECTION_RANGE', 'selections exceeds the configured character limit')
+    }
+    return { pageNo, blockId, startOffset, endOffset }
+  })
 }
 
 function normalizeRequest(input, activePolicy) {
@@ -175,14 +188,11 @@ function normalizeRequest(input, activePolicy) {
   if (typeof rawQuestion !== 'string' || rawQuestion.length > activePolicy.maxQuestionCharacters) {
     throw new AiDomainError('QUESTION_TOO_LONG', 'question exceeds the configured character limit')
   }
-  const rawSelectedBlockIds = input?.selectedBlockIds
-  if (rawSelectedBlockIds !== undefined && !Array.isArray(rawSelectedBlockIds)) {
-    throw new AiDomainError('INVALID_REQUEST', 'selectedBlockIds must be an array')
+  if (hasOwn(input, 'selectedBlockIds') || hasOwn(input, 'selectionRange')) {
+    throw new AiDomainError('INVALID_REQUEST', 'use structured selections[] instead of legacy selection fields')
   }
-  if (Array.isArray(rawSelectedBlockIds) && rawSelectedBlockIds.length > activePolicy.maxSelectedBlockIds) {
-    throw new AiDomainError('TOO_MANY_SELECTED_BLOCKS', 'selectedBlockIds exceeds the configured limit')
-  }
-  const selectedBlockIds = uniqueStrings(rawSelectedBlockIds)
+  const selections = normalizeSelections(input?.selections, activePolicy)
+  const selectedBlockIds = selections.map((selection) => selection.blockId)
   return {
     idempotencyKey: requiredString(input?.idempotencyKey, 'idempotencyKey'),
     conversationId: requiredString(input?.conversationId, 'conversationId'),
@@ -190,7 +200,7 @@ function normalizeRequest(input, activePolicy) {
     currentPageId: requiredString(input?.currentPageId, 'currentPageId'),
     readRangeVersion: requiredString(input?.readRangeVersion, 'readRangeVersion'),
     question: requiredString(rawQuestion, 'question'),
-    selectionRange: normalizeSelectionRange(input?.selectionRange, selectedBlockIds, activePolicy),
+    selections,
     selectedBlockIds,
     serviceMode: stringValue(input?.serviceMode) || 'balanced',
   }
@@ -200,12 +210,13 @@ function fingerprintMaterial(authContext, request) {
   return {
     organizationId: authContext.organizationId,
     userId: authContext.userId,
+    workspaceId: authContext.workspaceId,
     conversationId: request.conversationId,
     bookVersionId: request.bookVersionId,
     currentPageId: request.currentPageId,
     readRangeVersion: request.readRangeVersion,
     question: request.question,
-    selectionRange: request.selectionRange,
+    selections: request.selections,
     selectedBlockIds: request.selectedBlockIds,
     serviceMode: request.serviceMode,
   }
@@ -219,27 +230,30 @@ async function buildFingerprint(fingerprintHasher, authContext, request) {
   return fingerprint
 }
 
-function resolveSelectionText({ selectionRange, evidenceBlocks, bookVersionId, readablePageIds }) {
-  if (!selectionRange) return ''
-  const block = (Array.isArray(evidenceBlocks) ? evidenceBlocks : []).find(
-    (candidate) =>
-      stringValue(candidate?.id) === selectionRange.blockId &&
-      candidate?.bookVersionId === bookVersionId &&
-      readablePageIds.has(stringValue(candidate?.pageId)),
-  )
-  const content = typeof block?.content === 'string' ? block.content : null
-  if (!content || selectionRange.endOffset > content.length) {
-    throw new AiDomainError('INVALID_SELECTION_RANGE', 'selectionRange is outside the readable evidence block')
-  }
-  return content.slice(selectionRange.startOffset, selectionRange.endOffset)
+function resolveSelectionText({ selections, evidenceBlocks, bookVersionId, readablePageIds }) {
+  const blocks = Array.isArray(evidenceBlocks) ? evidenceBlocks : []
+  return selections.map((selection) => {
+    const block = blocks.find(
+      (candidate) => stringValue(candidate?.id) === selection.blockId
+        && candidate?.bookVersionId === bookVersionId
+        && candidate?.pageNumber === selection.pageNo
+        && readablePageIds.has(stringValue(candidate?.pageId)),
+    )
+    const content = typeof block?.content === 'string' ? block.content : null
+    if (!content || selection.endOffset > content.length) {
+      throw new AiDomainError('INVALID_SELECTION_RANGE', 'selection is outside a readable evidence block')
+    }
+    return content.slice(selection.startOffset, selection.endOffset)
+  }).join('\n')
 }
 
-function providerRequest({ request, sources, recentMessages, candidateUserIds, candidateCatalog, strictSpoilerMode }) {
+function providerRequest({ request, sources, selectionText, recentMessages, candidateUserIds, candidateCatalog, strictSpoilerMode }) {
   return {
     bookVersionId: request.bookVersionId,
     conversationId: request.conversationId,
     question: request.question,
-    selectionRange: request.selectionRange,
+    selections: request.selections,
+    selectionText,
     strictSpoilerMode,
     recentMessages,
     sources: toModelSources(sources),
@@ -518,6 +532,7 @@ export function createAiService({
       const readScope = await db.reading.getValidReadScope({
         organizationId: authContext.organizationId,
         userId: authContext.userId,
+        workspaceId: authContext.workspaceId,
         bookVersionId: request.bookVersionId,
         currentPageId: request.currentPageId,
         readRangeVersion: request.readRangeVersion,
@@ -564,7 +579,7 @@ export function createAiService({
       ])
       const candidateUserIds = uniqueStrings(candidateCatalog.map((candidate) => candidate.candidateUserId ?? candidate.stableAccountId))
       const selectionText = resolveSelectionText({
-        selectionRange: request.selectionRange,
+        selections: request.selections,
         evidenceBlocks,
         bookVersionId: request.bookVersionId,
         readablePageIds,
@@ -592,6 +607,7 @@ export function createAiService({
           providerRequest({
             request,
             sources,
+            selectionText,
             recentMessages: Array.isArray(recentMessages) ? recentMessages : [],
             candidateUserIds,
             candidateCatalog,

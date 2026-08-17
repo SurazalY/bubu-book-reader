@@ -13,6 +13,11 @@ function nonNegativeInteger(value, label) {
   return value
 }
 
+function positiveInteger(value, label) {
+  if (!Number.isSafeInteger(value) || value < 1) throw new TypeError(`${label}必须是正安全整数`)
+  return value
+}
+
 function normalizePoint(clock, point) {
   const next = point || clock.now()
   const wallMs = Number(next.wallMs)
@@ -24,6 +29,7 @@ function normalizePoint(clock, point) {
 export function createActivityTracker({
   clock,
   initialView = null,
+  initialReaderMode,
   ready = false,
   visible = true,
   foreground = true,
@@ -34,6 +40,7 @@ export function createActivityTracker({
 } = {}) {
   if (!clock?.now) throw new TypeError('有效停留追踪器需要可注入时钟')
   nonNegativeInteger(maxContinuousMs, '单段上限')
+  if (!['original', 'text'].includes(initialReaderMode)) throw new TypeError('阅读模式必须是original或text')
 
   const state = {
     ready: Boolean(ready),
@@ -42,6 +49,8 @@ export function createActivityTracker({
     leaseValid: Boolean(leaseValid),
     storageAvailable: Boolean(storageAvailable),
     view: initialView,
+    readerMode: initialReaderMode,
+    pageCoverage: new Map(),
     visitEffectiveMs: 0,
     segment: null,
     cumulativeEffectiveMs: 0,
@@ -73,6 +82,19 @@ export function createActivityTracker({
     state.segment.creditedMs = credited
     state.cumulativeEffectiveMs += delta
     state.visitEffectiveMs += delta
+    if (delta > 0) {
+      for (const pageNo of state.view?.pageNos || []) {
+        const coverage = state.pageCoverage.get(pageNo) || {
+          pageNo,
+          effectiveOriginalMs: 0,
+          effectiveTextMs: 0,
+          confirmedInteractions: 0,
+        }
+        if (state.readerMode === 'original') coverage.effectiveOriginalMs += delta
+        else coverage.effectiveTextMs += delta
+        state.pageCoverage.set(pageNo, coverage)
+      }
+    }
     if (close) state.segment = null
     return delta
   }
@@ -133,9 +155,24 @@ export function createActivityTracker({
     return snapshot(at, false)
   }
 
-  function confirmedInteraction(point) {
+  function confirmedInteraction(pageNos = state.view?.pageNos || [], point) {
+    if (!Array.isArray(pageNos) || pageNos.length === 0) throw new TypeError('确认交互必须携带物理页')
+    const normalizedPages = [...new Set(pageNos.map((pageNo) => positiveInteger(pageNo, '确认交互物理页')))]
     const at = normalizePoint(clock, point)
+    const acceptInteraction = eligible()
     cut(at)
+    if (acceptInteraction) {
+      for (const pageNo of normalizedPages) {
+        const coverage = state.pageCoverage.get(pageNo) || {
+          pageNo,
+          effectiveOriginalMs: 0,
+          effectiveTextMs: 0,
+          confirmedInteractions: 0,
+        }
+        coverage.confirmedInteractions += 1
+        state.pageCoverage.set(pageNo, coverage)
+      }
+    }
     startSegment(at)
     return snapshot(at, false)
   }
@@ -148,6 +185,10 @@ export function createActivityTracker({
       hadSkip: state.hadSkip,
       hadReread: state.hadReread,
       lastPageNo: state.view?.mainPageNo ?? null,
+      readerMode: state.readerMode,
+      pageCoverage: Object.freeze([...state.pageCoverage.values()]
+        .sort((left, right) => left.pageNo - right.pageNo)
+        .map((entry) => Object.freeze({ ...entry }))),
       measuredThroughWallMs: state.measuredThroughWallMs ?? at.wallMs,
       segmentActive: Boolean(state.segment),
       viewEffectiveMs: state.visitEffectiveMs,
@@ -186,6 +227,14 @@ export function createActivityTracker({
     },
     setStorageAvailable(value, point) {
       synchronizeEligibility({ storageAvailable: Boolean(value) }, point)
+    },
+    setReaderMode(value, point) {
+      if (!['original', 'text'].includes(value)) throw new TypeError('阅读模式必须是original或text')
+      const at = normalizePoint(clock, point)
+      cut(at)
+      state.readerMode = value
+      startSegment(at)
+      return snapshot(at, false)
     },
     getState() {
       return snapshot(undefined, false)

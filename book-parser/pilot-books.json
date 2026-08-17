@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "reader-dual-mode-pilot-books/v1",
+  "books": [
+    {
+      "bookId": "book-001",
+      "versionId": "book-001-ocr-v2",
+      "title": "和大人一起读·儿童歌谣",
+      "pageCount": 98,
+      "coordinateSystem": "pixel, origin=top-left, 200 dpi",
+      "ocrPipelineVersion": "text-ocr-v1",
+      "promptArtifact": "prompts/luna-ocr-v1.md",
+      "promptVersion": "luna-ocr-v1",
+      "packageBuilderVersion": "book-package-v2-builder-v1",
+      "sourcePdf": "input/快乐读书吧1-6年级阅读全本/快乐读书吧1年级/快乐读书吧部编版一年级和大人一起读 儿童歌谣 .pdf",
+      "sourceSha256": "abeacc303306bb4faba7648de179914a87fc6260d8a043fccb13d6bfb98204f5",
+      "ocrJob": "work/text-ocr-v1/jobs/book-001"
+    },
+    {
+      "bookId": "book-025",
+      "versionId": "book-025-ocr-v2",
+      "title": "世界神话传说",
+      "pageCount": 162,
+      "coordinateSystem": "pixel, origin=top-left, 200 dpi",
+      "ocrPipelineVersion": "text-ocr-v1",
+      "promptArtifact": "prompts/luna-ocr-v1.md",
+      "promptVersion": "luna-ocr-v1",
+      "packageBuilderVersion": "book-package-v2-builder-v1",
+      "sourcePdf": "input/快乐读书吧1-6年级阅读全本/快乐读书吧4年级/快乐读书吧部编版配套阅读 世界神话传说 .pdf",
+      "sourceSha256": "5c419590e69f1d00d276acd16e157bdb0c8f3e2fc0d25183484cdf65faced6cd",
+      "ocrJob": "work/text-ocr-v1/jobs/book-025"
+    },
+    {
+      "bookId": "book-045",
+      "versionId": "book-045-ocr-v2",
+      "title": "尼尔斯骑鹅旅行记",
+      "pageCount": 354,
+      "coordinateSystem": "pixel, origin=top-left, 200 dpi",
+      "ocrPipelineVersion": "text-ocr-v1",
+      "promptArtifact": "prompts/luna-ocr-v1.md",
+      "promptVersion": "luna-ocr-v1",
+      "packageBuilderVersion": "book-package-v2-builder-v1",
+      "sourcePdf": "input/快乐读书吧1-6年级阅读全本/快乐读书吧6年级/快乐读书吧六年级全本 尼尔斯骑鹅旅行记 .pdf",
+      "sourceSha256": "78ae35fcfd50ebfaaf6392dafa4392eda29a4dcedb40940ea51323d3fbe891ae",
+      "ocrJob": "work/text-ocr-v1/jobs/book-045"
+    }
+  ]
+}

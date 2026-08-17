@@ -109,7 +109,7 @@ export function createOpenAiCompatibleProvider({ env = process.env, fetchImpl = 
   }
 }
 
-function readScopeProvider(database, input) {
+function readScopeSnapshot(database, input) {
   const page = database.prepare(`
     SELECT page.id, page.page_no, page.book_version_id
     FROM book_pages AS page
@@ -120,9 +120,48 @@ function readScopeProvider(database, input) {
       AND book.status = 'published'
   `).get(input.currentPageId, input.bookVersionId, input.organizationId, input.organizationId)
   if (!page) return null
-  const expectedVersion = `current-page:${page.id}`
-  if (input.readRangeVersion !== expectedVersion) return null
-  return { currentPageId: page.id, pageIds: [page.id], readRangeVersion: expectedVersion }
+  const covered = database.prepare(`
+    SELECT page.id AS page_id, page.page_no, coverage.version AS coverage_version
+    FROM reading_page_coverage AS coverage
+    JOIN book_pages AS page
+      ON page.book_version_id = coverage.book_version_id
+     AND page.page_no = coverage.page_no
+    WHERE coverage.organization_id_at_creation = ?
+      AND coverage.actor_id_at_creation = ?
+      AND coverage.workspace_id_at_creation = ?
+      AND coverage.book_version_id = ?
+      AND (
+        coverage.effective_original_ms > 0
+        OR coverage.effective_text_ms > 0
+        OR coverage.confirmed_interactions > 0
+      )
+    ORDER BY page.page_no, page.id
+  `).all(input.organizationId, input.userId, input.workspaceId, input.bookVersionId)
+  const pageIds = [...new Set([...covered.map((entry) => entry.page_id), page.id])]
+  const material = {
+    schemaVersion: 2,
+    organizationId: input.organizationId,
+    userId: input.userId,
+    workspaceId: input.workspaceId,
+    bookVersionId: input.bookVersionId,
+    currentPageId: page.id,
+    pageIds,
+    coverageVersions: covered.map((entry) => ({
+      pageId: entry.page_id,
+      version: entry.coverage_version,
+    })),
+  }
+  return {
+    currentPageId: page.id,
+    pageIds,
+    readRangeVersion: `read-range-v2:${createHash('sha256').update(JSON.stringify(material)).digest('hex')}`,
+  }
+}
+
+function readScopeProvider(database, input) {
+  const snapshot = readScopeSnapshot(database, input)
+  if (!snapshot || input.readRangeVersion !== snapshot.readRangeVersion) return null
+  return snapshot
 }
 
 function evidenceBlockProvider(database, input) {
@@ -326,7 +365,14 @@ export function createConversation(database, { id, organizationId, ownerUserId, 
   return id
 }
 
-export function deriveAiRequestScope(database, { organizationId, ownerUserId, bookId, currentPageNo }) {
+export function deriveAiRequestScope(database, {
+  organizationId,
+  ownerUserId,
+  workspaceId,
+  bookId,
+  bookVersionId = null,
+  currentPageNo,
+}) {
   const normalizedPageNo = Number(currentPageNo)
   if (!Number.isSafeInteger(normalizedPageNo) || normalizedPageNo <= 0) return null
   const page = database.prepare(`
@@ -335,14 +381,22 @@ export function deriveAiRequestScope(database, { organizationId, ownerUserId, bo
     JOIN book_versions AS version ON version.book_id = book.id AND version.organization_id_at_creation = book.organization_id_at_creation
     JOIN book_pages AS page ON page.book_version_id = version.id AND page.page_no = ?
     WHERE book.id = ? AND book.organization_id_at_creation = ? AND book.status = 'published'
+      AND (? IS NULL OR version.id = ?)
     ORDER BY version.created_at DESC, version.id DESC
     LIMIT 1
-  `).get(normalizedPageNo, bookId, organizationId)
+  `).get(normalizedPageNo, bookId, organizationId, bookVersionId, bookVersionId)
   if (!page) return null
-  return {
+  const snapshot = readScopeSnapshot(database, {
+    organizationId,
+    userId: ownerUserId,
+    workspaceId,
     bookVersionId: page.book_version_id,
     currentPageId: page.page_id,
+  })
+  if (!snapshot) return null
+  return {
+    bookVersionId: page.book_version_id,
+    ...snapshot,
     currentPageNo: page.page_no,
-    readRangeVersion: `current-page:${page.page_id}`,
   }
 }

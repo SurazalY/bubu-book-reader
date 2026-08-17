@@ -14,6 +14,8 @@ function createFixture() {
   const migrationDirectory = new URL('../../../server/db/migrations/', import.meta.url)
   const migrations = readdirSync(migrationDirectory).filter((file) => /^01[0-3].*\.sql$/.test(file)).sort()
   for (const file of migrations) db.exec(readFileSync(new URL(file, migrationDirectory), 'utf8'))
+  const dualModeMigration = readFileSync(new URL('044_reader_dual_mode_pilot.sql', migrationDirectory), 'utf8')
+  db.exec(dualModeMigration.slice(0, dualModeMigration.indexOf('CREATE TABLE reading_summary_page_coverage')))
   let idIndex = 0
   let now = new Date('2026-08-05T10:00:00.000Z')
   const dependencies = {

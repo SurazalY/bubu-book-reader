@@ -1130,6 +1130,28 @@ select.console-input {
   background: rgba(214, 242, 232, 0.9);
   color: #1F7A66;
 }
+.student-reader-mode-switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.48);
+  padding: 3px;
+}
+.student-reader-mode-button {
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 650;
+  color: theme('colors.ink.500');
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+.student-reader-mode-button--active {
+  background: #fff;
+  color: theme('colors.ink.900');
+  box-shadow: 0 1px 4px rgba(38, 32, 22, 0.12);
+}
 .student-icon-btn {
   display: grid;
   height: 30px;
@@ -1235,47 +1257,44 @@ select.console-input {
   flex-direction: column;
   box-sizing: border-box;
 }
-.student-page-image-inner {
-  position: relative;
-  box-sizing: border-box;
-  transform-origin: top left;
+.student-pdf-page-frame {
+  background: #fff;
 }
-.student-page-image {
+.student-pdf-canvas-wrap {
   position: absolute;
   inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
   user-select: none;
-  -webkit-user-drag: none;
 }
-.student-page-image-layer {
+.student-pdf-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  user-select: none;
+}
+.student-pdf-status,
+.student-pdf-page-placeholder {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
+  inset: auto 20px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 7px 12px;
+  font-size: 12px;
+  color: theme('colors.ink.500');
+  box-shadow: 0 2px 10px rgba(38, 32, 22, 0.1);
 }
-.student-page-image-block {
-  position: absolute;
-  box-sizing: border-box;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  color: transparent;
-  font-family: theme('fontFamily.serif');
-  font-size: 42px;
-  font-weight: 400;
-  line-height: 1.45;
-  text-align: left;
-  text-indent: 0;
-  white-space: pre-wrap;
-  word-break: break-all;
-  user-select: text;
-  -webkit-user-select: text;
-}
-.student-page-image-block::selection {
-  color: transparent;
-  background: rgba(150, 214, 226, 0.55);
+.student-pdf-status--error {
+  inset: 24px;
+  align-self: center;
+  border-radius: 12px;
+  color: #9F342C;
+  white-space: normal;
 }
 .student-page-head {
   flex-shrink: 0;

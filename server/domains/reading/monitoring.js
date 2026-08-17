@@ -24,6 +24,7 @@ const SUMMARY_FIELDS = new Set([
   'hadSkip',
   'hadReread',
   'lastPageNo',
+  'pageCoverage',
   'endedAt',
   'endReason',
   'fingerprint',
@@ -37,6 +38,12 @@ const CLIENT_END_REASONS = new Set([
   'stat_date_change',
 ])
 const LEASE_END_REASONS = new Set(['lease_ended', 'lease_taken_over'])
+const PAGE_COVERAGE_FIELDS = new Set([
+  'pageNo',
+  'effectiveOriginalMs',
+  'effectiveTextMs',
+  'confirmedInteractions',
+])
 
 function domainError(code, message, details) {
   const error = new Error(message)
@@ -163,9 +170,33 @@ export function canonicalReadingSummaryFingerprint(summary) {
     summary.hadSkip,
     summary.hadReread,
     summary.lastPageNo,
+    summary.pageCoverage,
     summary.endedAt,
     summary.endReason,
   ]), 'utf8').digest('hex')
+}
+
+function normalizePageCoverage(value, cumulativeEffectiveMs) {
+  if (!Array.isArray(value)) throw validationError('summary.pageCoverage 必须是数组')
+  const seen = new Set()
+  const normalized = value.map((entry, index) => {
+    const input = exactObject(entry, PAGE_COVERAGE_FIELDS, `summary.pageCoverage[${index}]`)
+    for (const field of PAGE_COVERAGE_FIELDS) {
+      if (!Object.hasOwn(input, field)) throw validationError(`summary.pageCoverage[${index}].${field} 缺失`)
+    }
+    const pageNo = safeInteger(input.pageNo, `summary.pageCoverage[${index}].pageNo`, 1)
+    if (seen.has(pageNo)) throw validationError('summary.pageCoverage 物理页不能重复')
+    seen.add(pageNo)
+    const effectiveOriginalMs = safeInteger(input.effectiveOriginalMs, `summary.pageCoverage[${index}].effectiveOriginalMs`)
+    const effectiveTextMs = safeInteger(input.effectiveTextMs, `summary.pageCoverage[${index}].effectiveTextMs`)
+    const confirmedInteractions = safeInteger(input.confirmedInteractions, `summary.pageCoverage[${index}].confirmedInteractions`)
+    if (effectiveOriginalMs + effectiveTextMs > cumulativeEffectiveMs) {
+      throw validationError('单页双模式有效覆盖不能超过会话累计有效时长')
+    }
+    return { pageNo, effectiveOriginalMs, effectiveTextMs, confirmedInteractions }
+  })
+  normalized.sort((left, right) => left.pageNo - right.pageNo)
+  return normalized
 }
 
 function normalizeSummary(body, now) {
@@ -173,7 +204,7 @@ function normalizeSummary(body, now) {
   for (const field of SUMMARY_FIELDS) {
     if (!Object.hasOwn(input, field)) throw validationError(`summary.${field} 缺失`)
   }
-  if (input.schemaVersion !== 1) throw validationError('summary.schemaVersion 仅支持 1')
+  if (input.schemaVersion !== 2) throw validationError('summary.schemaVersion 仅支持 2')
   const sessionId = requiredText(input.sessionId, 'summary.sessionId')
   const revision = safeInteger(input.revision, 'summary.revision', 1)
   const leaseId = requiredText(input.leaseId, 'summary.leaseId')
@@ -189,6 +220,7 @@ function normalizeSummary(body, now) {
     throw validationError('summary.hadSkip 与 summary.hadReread 必须是布尔值')
   }
   const lastPageNo = safeInteger(input.lastPageNo, 'summary.lastPageNo', 1)
+  const pageCoverage = normalizePageCoverage(input.pageCoverage, cumulativeEffectiveMs)
   if ((input.endedAt === null) !== (input.endReason === null)) {
     throw validationError('summary.endedAt 与 summary.endReason 必须同时为空或同时提供')
   }
@@ -226,7 +258,7 @@ function normalizeSummary(body, now) {
   const fingerprint = requiredText(input.fingerprint, 'summary.fingerprint')
   if (!FINGERPRINT.test(fingerprint)) throw validationError('summary.fingerprint 必须是 64 位小写十六进制')
   const normalized = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sessionId,
     revision,
     leaseId,
@@ -238,6 +270,7 @@ function normalizeSummary(body, now) {
     hadSkip: input.hadSkip,
     hadReread: input.hadReread,
     lastPageNo,
+    pageCoverage,
     endedAt: endedAt?.toISOString() ?? null,
     endReason,
     fingerprint,
@@ -479,6 +512,85 @@ function writeReadingPosition(database, context, summary, nowIso) {
   })
 }
 
+function writePageCoverage(database, context, summary, nowIso) {
+  const existingRows = database.prepare(`SELECT page_no, effective_original_ms, effective_text_ms,
+      confirmed_interactions
+    FROM reading_summary_page_coverage
+    WHERE session_id = ?
+    ORDER BY page_no`).all(summary.sessionId)
+  const incoming = new Map(summary.pageCoverage.map((entry) => [entry.pageNo, entry]))
+  for (const existing of existingRows) {
+    if (!incoming.has(Number(existing.page_no))) {
+      throw domainError('SUMMARY_REGRESSION', '摘要逐页覆盖不能删除已经确认的物理页')
+    }
+  }
+  const existingByPage = new Map(existingRows.map((row) => [Number(row.page_no), row]))
+  for (const entry of summary.pageCoverage) {
+    const previous = existingByPage.get(entry.pageNo)
+    const previousOriginal = Number(previous?.effective_original_ms || 0)
+    const previousText = Number(previous?.effective_text_ms || 0)
+    const previousInteractions = Number(previous?.confirmed_interactions || 0)
+    if (entry.effectiveOriginalMs < previousOriginal
+      || entry.effectiveTextMs < previousText
+      || entry.confirmedInteractions < previousInteractions) {
+      throw domainError('SUMMARY_REGRESSION', `摘要物理页 ${entry.pageNo} 覆盖字段不能倒退`)
+    }
+    const originalDelta = entry.effectiveOriginalMs - previousOriginal
+    const textDelta = entry.effectiveTextMs - previousText
+    const interactionDelta = entry.confirmedInteractions - previousInteractions
+    database.prepare(`INSERT INTO reading_summary_page_coverage (
+        session_id, page_no, effective_original_ms, effective_text_ms,
+        confirmed_interactions, created_at, updated_at, version
+      ) VALUES (
+        :sessionId, :pageNo, :effectiveOriginalMs, :effectiveTextMs,
+        :confirmedInteractions, :now, :now, 1
+      ) ON CONFLICT(session_id, page_no) DO UPDATE SET
+        effective_original_ms = excluded.effective_original_ms,
+        effective_text_ms = excluded.effective_text_ms,
+        confirmed_interactions = excluded.confirmed_interactions,
+        updated_at = excluded.updated_at,
+        version = reading_summary_page_coverage.version + 1`).run({
+      sessionId: summary.sessionId,
+      pageNo: entry.pageNo,
+      effectiveOriginalMs: entry.effectiveOriginalMs,
+      effectiveTextMs: entry.effectiveTextMs,
+      confirmedInteractions: entry.confirmedInteractions,
+      now: nowIso,
+    })
+    if (originalDelta === 0 && textDelta === 0 && interactionDelta === 0) continue
+    database.prepare(`INSERT INTO reading_page_coverage (
+        id, organization_id_at_creation, actor_id_at_creation, workspace_id_at_creation,
+        book_version_id, page_no, effective_original_ms, effective_text_ms,
+        confirmed_interactions, last_covered_at, created_at, updated_at, version
+      ) VALUES (
+        :id, :organizationId, :actorId, :workspaceId,
+        :bookVersionId, :pageNo, :originalDelta, :textDelta,
+        :interactionDelta, :measuredThroughAt, :now, :now, 1
+      ) ON CONFLICT (
+        organization_id_at_creation, actor_id_at_creation, workspace_id_at_creation,
+        book_version_id, page_no
+      ) DO UPDATE SET
+        effective_original_ms = reading_page_coverage.effective_original_ms + excluded.effective_original_ms,
+        effective_text_ms = reading_page_coverage.effective_text_ms + excluded.effective_text_ms,
+        confirmed_interactions = reading_page_coverage.confirmed_interactions + excluded.confirmed_interactions,
+        last_covered_at = MAX(reading_page_coverage.last_covered_at, excluded.last_covered_at),
+        updated_at = excluded.updated_at,
+        version = reading_page_coverage.version + 1`).run({
+      id: context.idFactory(),
+      organizationId: context.organizationId,
+      actorId: context.actorId,
+      workspaceId: context.workspaceId,
+      bookVersionId: summary.bookVersionId,
+      pageNo: entry.pageNo,
+      originalDelta,
+      textDelta,
+      interactionDelta,
+      measuredThroughAt: summary.measuredThroughAt,
+      now: nowIso,
+    })
+  }
+}
+
 function insertSession(database, context, classId, summary, history, nowIso) {
   const serverClosed = LEASE_END_REASONS.has(history.end_reason)
   const status = serverClosed || summary.endedAt ? 'closed' : 'open'
@@ -609,6 +721,7 @@ function processSummary(database, context, summary, now) {
     }
     const delta = summary.cumulativeEffectiveMs - Number(session.cumulative_effective_ms)
     updateSession(database, session, summary, nowIso)
+    writePageCoverage(database, context, summary, nowIso)
     writeDailySummary(database, context, context.classId, summary, delta, nowIso)
     writeReadingPosition(database, context, summary, nowIso)
     session = database.prepare('SELECT * FROM reading_summary_sessions WHERE id = ?').get(summary.sessionId)
@@ -624,6 +737,7 @@ function processSummary(database, context, summary, now) {
     throw domainError('LEASE_CONFLICT', '当前学生已有其他 open 摘要会话')
   }
   insertSession(database, context, context.classId, summary, history, nowIso)
+  writePageCoverage(database, context, summary, nowIso)
   writeDailySummary(database, context, context.classId, summary, summary.cumulativeEffectiveMs, nowIso)
   writeReadingPosition(database, context, summary, nowIso)
   session = database.prepare('SELECT * FROM reading_summary_sessions WHERE id = ?').get(summary.sessionId)
@@ -714,7 +828,10 @@ export function createReadingMonitoringDomain(dependencies = {}) {
         actorId: actorId(),
         workspaceId: workspaceId(),
       })
-      requireBookVersion(context.db, organizationId(), summary.bookVersionId, summary.lastPageNo)
+      const version = requireBookVersion(context.db, organizationId(), summary.bookVersionId, summary.lastPageNo)
+      if (summary.pageCoverage.some((entry) => entry.pageNo > Number(version.page_count))) {
+        throw validationError('summary.pageCoverage 包含超出书籍版本的物理页')
+      }
       const trusted = {
         idFactory: context.idFactory,
         organizationId: organizationId(),
@@ -755,6 +872,9 @@ export function deleteReadingMonitorDataForAccount(database, { organizationId, a
       normalizedOrganizationId,
     )
     if (!actor) throw domainError('RESOURCE_NOT_FOUND', '待删除学生不属于指定组织')
+    const pageCoverage = database.prepare(`DELETE FROM reading_page_coverage
+      WHERE organization_id_at_creation = ? AND actor_id_at_creation = ?`)
+      .run(normalizedOrganizationId, normalizedActorId).changes
     const sessions = database.prepare(`DELETE FROM reading_summary_sessions
       WHERE organization_id_at_creation = ? AND actor_id_at_creation = ?`)
       .run(normalizedOrganizationId, normalizedActorId).changes
@@ -763,7 +883,7 @@ export function deleteReadingMonitorDataForAccount(database, { organizationId, a
       .run(normalizedOrganizationId, normalizedActorId).changes
     const progress = database.prepare('DELETE FROM reading_progress WHERE actor_id = ?')
       .run(normalizedActorId).changes
-    return { sessions, dailySummaries, progress }
+    return { sessions, dailySummaries, progress, pageCoverage }
   })
 }
 

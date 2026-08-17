@@ -65,6 +65,13 @@ function insertBook(db, { organizationId = 'org-a', actorId = 'student-a', bookI
        source_format, page_count, created_at, updated_at, version)
     VALUES (?, ?, ?, ?, 'v1', 'text', ?, ?, ?, 1)`)
     .run(versionId, bookId, organizationId, actorId, pages, BASE_NOW, BASE_NOW)
+  const insertPage = db.prepare(`INSERT INTO book_pages
+      (id, book_version_id, page_no, text_content, width, height, raw_text, normalized_text,
+       created_at, updated_at, version)
+    VALUES (?, ?, ?, '', 1, 1, '', '', ?, ?, 1)`)
+  for (let pageNo = 1; pageNo <= pages; pageNo += 1) {
+    insertPage.run(`${versionId}:page:${pageNo}`, versionId, pageNo, BASE_NOW, BASE_NOW)
+  }
 }
 
 function createFixture() {
@@ -133,7 +140,7 @@ function createFixture() {
 
 function summaryBody(overrides = {}) {
   const body = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sessionId: 'session-a',
     revision: 1,
     leaseId: 'lease-placeholder',
@@ -145,6 +152,7 @@ function summaryBody(overrides = {}) {
     hadSkip: false,
     hadReread: false,
     lastPageNo: 2,
+    pageCoverage: [],
     endedAt: null,
     endReason: null,
     fingerprint: '',
@@ -273,6 +281,60 @@ test('摘要 accepted/replayed/superseded、历史指纹、连续 revision 与�
     1: first.fingerprint,
     2: second.fingerprint,
   })
+})
+
+test('逐页覆盖按 original/text 与确认交互持久化，重放不重复且不能由 lastPageNo 推导', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:00:30.000Z')
+  const first = summaryBody({
+    leaseId: lease.leaseId,
+    lastPageNo: 7,
+    pageCoverage: [
+      { pageNo: 2, effectiveOriginalMs: 10_000, effectiveTextMs: 20_000, confirmedInteractions: 1 },
+    ],
+  })
+  assert.equal((await fixture.monitoring.acceptSessionSummary({ deviceId: 'device-a', body: first })).result, 'accepted')
+  assert.equal((await fixture.monitoring.acceptSessionSummary({ deviceId: 'device-a', body: first })).result, 'replayed')
+  assert.deepEqual(fixture.db.prepare(`SELECT page_no, effective_original_ms, effective_text_ms,
+      confirmed_interactions, version FROM reading_page_coverage ORDER BY page_no`).all().map((row) => ({ ...row })), [
+    { page_no: 2, effective_original_ms: 10_000, effective_text_ms: 20_000, confirmed_interactions: 1, version: 1 },
+  ])
+  assert.equal(fixture.db.prepare(`SELECT COUNT(*) AS count FROM reading_page_coverage
+    WHERE page_no BETWEEN 1 AND 7`).get().count, 1)
+
+  fixture.setNow('2026-08-10T00:00:45.000Z')
+  const second = summaryBody({
+    leaseId: lease.leaseId,
+    revision: 2,
+    measuredThroughAt: '2026-08-10T00:00:45.000Z',
+    cumulativeEffectiveMs: 45_000,
+    lastPageNo: 8,
+    pageCoverage: [
+      { pageNo: 2, effectiveOriginalMs: 10_000, effectiveTextMs: 30_000, confirmedInteractions: 1 },
+      { pageNo: 8, effectiveOriginalMs: 5_000, effectiveTextMs: 0, confirmedInteractions: 1 },
+    ],
+  })
+  assert.equal((await fixture.monitoring.acceptSessionSummary({ deviceId: 'device-a', body: second })).result, 'accepted')
+  assert.deepEqual(fixture.db.prepare(`SELECT page_no, effective_original_ms, effective_text_ms,
+      confirmed_interactions FROM reading_page_coverage ORDER BY page_no`).all().map((row) => ({ ...row })), [
+    { page_no: 2, effective_original_ms: 10_000, effective_text_ms: 30_000, confirmed_interactions: 1 },
+    { page_no: 8, effective_original_ms: 5_000, effective_text_ms: 0, confirmed_interactions: 1 },
+  ])
+
+  fixture.setNow('2026-08-10T00:00:46.000Z')
+  const droppedPage = summaryBody({
+    leaseId: lease.leaseId,
+    revision: 3,
+    measuredThroughAt: '2026-08-10T00:00:46.000Z',
+    cumulativeEffectiveMs: 46_000,
+    lastPageNo: 8,
+    pageCoverage: [{ pageNo: 8, effectiveOriginalMs: 6_000, effectiveTextMs: 0, confirmedInteractions: 1 }],
+  })
+  await assert.rejects(() => fixture.monitoring.acceptSessionSummary({ deviceId: 'device-a', body: droppedPage }), { code: 'SUMMARY_REGRESSION' })
+  assert.equal(fixture.db.prepare(`SELECT latest_revision FROM reading_summary_sessions
+    WHERE id = ?`).get(first.sessionId).latest_revision, 2)
 })
 
 test('G5-01 旧事件只贡献护眼，不写阅读时长且不能覆盖摘要每日事实和位置', async (t) => {
@@ -677,7 +739,7 @@ test('reading-domain 删除按组织隔离；六个月 cleanup 先关历史已�
       '2026-08-10', 1, 0, 0, ?, 1, ?, ?, 1)`).run(BASE_NOW, BASE_NOW, BASE_NOW)
   assert.deepEqual(deleteReadingMonitorDataForAccount(fixture.db, {
     organizationId: 'org-a', actorId: 'student-a2',
-  }), { sessions: 1, dailySummaries: 1, progress: 1 })
+  }), { sessions: 1, dailySummaries: 1, progress: 1, pageCoverage: 0 })
   assert.throws(() => deleteReadingMonitorDataForAccount(fixture.db, {
     organizationId: 'org-b', actorId: 'student-a2',
   }), { code: 'RESOURCE_NOT_FOUND' })

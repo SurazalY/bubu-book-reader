@@ -32,7 +32,7 @@ test('阅读监测租约 API 只把协议字段放入 body，范围只进入工�
   }
 
   await api.acquireReadingLease({
-    schemaVersion: 1,
+    schemaVersion: 2,
     bookVersionId: 'version/a',
     takeover: false,
     scope,
@@ -72,7 +72,7 @@ test('阅读摘要 API 可直接适配 C 端口输入且不泄漏 scope/device/�
   const recorder = recordingClient()
   const api = createStudentApi(recorder.client)
   const summary = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sessionId: 'session-1',
     revision: 1,
     leaseId: 'lease-1',
@@ -84,6 +84,7 @@ test('阅读摘要 API 可直接适配 C 端口输入且不泄漏 scope/device/�
     hadSkip: false,
     hadReread: true,
     lastPageNo: 2,
+    pageCoverage: [{ pageNo: 2, effectiveOriginalMs: 0, effectiveTextMs: 30_000, confirmedInteractions: 1 }],
     endedAt: null,
     endReason: null,
     fingerprint: 'a'.repeat(64),
@@ -105,7 +106,7 @@ test('阅读摘要 API 可直接适配 C 端口输入且不泄漏 scope/device/�
     workspaceId: 'workspace-a',
     idempotencyKey: 'summary-1',
     body: {
-      schemaVersion: 1,
+      schemaVersion: 2,
       sessionId: 'session-1',
       revision: 1,
       leaseId: 'lease-1',
@@ -117,6 +118,7 @@ test('阅读摘要 API 可直接适配 C 端口输入且不泄漏 scope/device/�
       hadSkip: false,
       hadReread: true,
       lastPageNo: 2,
+      pageCoverage: [{ pageNo: 2, effectiveOriginalMs: 0, effectiveTextMs: 30_000, confirmedInteractions: 1 }],
       endedAt: null,
       endReason: null,
       fingerprint: 'a'.repeat(64),

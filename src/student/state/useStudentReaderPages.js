@@ -21,6 +21,11 @@ export function validateReaderPageResponse(response, { bookId, bookVersionId, pa
     error.code = 'PAGE_RESPONSE_MISMATCH'
     throw error
   }
+  if (typeof data.readRangeVersion !== 'string' || !data.readRangeVersion.startsWith('read-range-v2:')) {
+    const error = new Error('服务端未返回可验证的已读范围版本')
+    error.code = 'READ_RANGE_RESPONSE_MISMATCH'
+    throw error
+  }
   return data
 }
 

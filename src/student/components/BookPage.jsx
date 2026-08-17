@@ -125,57 +125,24 @@ const BookPage = forwardRef(function BookPage(
   { page, scale = 1, totalPages, bookmarked, onToggleBookmark, marks = {}, tone = 'warm', current = false },
   ref,
 ) {
-  const hasPageImage = Boolean(page.pageImage?.url && Number.isFinite(page.width) && Number.isFinite(page.height))
   const { width, height, padX, padY } = PAGE_DESIGN
-  const designWidth = hasPageImage ? page.width : width
-  const designHeight = hasPageImage ? page.height : height
   const figure = page.figure || page.illustration
-  const imageBlocks = hasPageImage ? page.blocks.filter((block) => block.bbox) : []
   return (
     <div className="student-book-page" ref={ref} data-density="soft">
       <div
         className={cx('student-page-frame', `student-page--${tone}`)}
-        style={{ width: Math.round(designWidth * scale), height: Math.round(designHeight * scale) }}
+        style={{ width: Math.round(width * scale), height: Math.round(height * scale) }}
       >
-        {hasPageImage ? (
-          <div
-            className="student-page-image-inner"
-            style={{ width: designWidth, height: designHeight, transform: `scale(${scale})` }}
-          >
-            <img
-              className="student-page-image"
-              src={page.pageImage.url}
-              alt={`第 ${page.no} 页原书页面`}
-              draggable="false"
-            />
-            {/* 图片承担全部视觉；此层只提供与同一像素坐标系对齐的透明、可选 DOM 汉字。 */}
-            <div className="student-page-image-layer" data-page={page.no}>
-              {imageBlocks.map((block, index) => {
-                const box = block.bbox
-                return (
-                  <MarkedParagraph
-                    key={block.blockId || block.id || index}
-                    blockId={block.blockId || block.id}
-                    text={block.text}
-                    marks={marks}
-                    className="student-page-image-block"
-                    style={{ left: box.x, top: box.y, width: box.width, minHeight: box.height }}
-                  />
-                )
-              })}
-            </div>
-          </div>
-        ) : (
-          <div
-            className="student-page-inner"
-            style={{
-              width,
-              height,
-              padding: `${padY}px ${padX}px`,
-              transform: `scale(${scale})`,
-              transformOrigin: 'top left',
-            }}
-          >
+        <div
+          className="student-page-inner"
+          style={{
+            width,
+            height,
+            padding: `${padY}px ${padX}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+          }}
+        >
             <div className="student-page-head">
               <span className="truncate">{page.chapter}</span>
             </div>
@@ -210,8 +177,7 @@ const BookPage = forwardRef(function BookPage(
               <span className="tabular-nums">第 {page.no} 页</span>
               {totalPages ? <span className="tabular-nums opacity-70">全书 {totalPages} 页</span> : null}
             </div>
-          </div>
-        )}
+        </div>
 
         {/* 页角书签：规格 §6.3「书签用于标记整页，放在页角或工具栏，不与摘录混用」。
             所以它只认整页，不接受选区，也不写进摘录列表。 */}

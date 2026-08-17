@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
-import { randomBytes, randomUUID } from 'node:crypto'
-import { existsSync, mkdtempSync, rmSync } from 'node:fs'
+import { createHash, randomBytes, randomUUID } from 'node:crypto'
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
@@ -14,6 +14,7 @@ import {
   canonicalReadingSummaryFingerprint,
   readingStatDateFor,
 } from '../../../server/domains/reading/monitoring.js'
+import { deriveAiRequestScope } from '../../../server/integration/ai-runtime.js'
 
 function identityFixture() {
   const suffix = randomUUID()
@@ -160,13 +161,19 @@ async function login(baseUrl, fixture, user) {
   return jar
 }
 
-async function createPublishedBook(application, fixture) {
+async function createPublishedBook(application, fixture, assetFixture = null) {
   const reading = createReadingDomain({
     db: application.database,
     actor: { id: fixture.adminId },
     workspace: { id: fixture.workspaceId, organizationId: fixture.organizationId },
     authorize: async () => true,
     audit: async () => undefined,
+    assetMetadataVerifier: assetFixture
+      ? async ({ storageKey }) => {
+        if (storageKey !== assetFixture.storageKey) throw new Error('未登记的测试资产键')
+        return assetFixture
+      }
+      : undefined,
     idFactory: randomUUID,
     now: () => new Date(),
   })
@@ -174,6 +181,7 @@ async function createPublishedBook(application, fixture) {
     title: '爱丽丝漫游奇境（公共领域内部联调节选）',
     label: 'internal-test-v1',
     sourceFormat: 'text',
+    assets: assetFixture ? [{ ...assetFixture, assetType: 'source_text' }] : [],
     pages: [
       {
         pageNo: 1,
@@ -218,12 +226,25 @@ async function createPublishedBook(application, fixture) {
 async function startHarness(t, options = {}) {
   const directory = mkdtempSync(join(tmpdir(), 'readmate-integration-http-'))
   const databasePath = join(directory, 'integration.sqlite')
+  const publicAssetDirectory = join(directory, 'public')
+  const assetFixture = {
+    storageKey: 'books/integration/source.txt',
+    usageLabel: 'local integration/internal test',
+    mimeType: 'text/plain',
+    bytes: Buffer.from('受保护的书籍源资产', 'utf8'),
+  }
+  assetFixture.sizeBytes = assetFixture.bytes.length
+  assetFixture.sha256 = createHash('sha256').update(assetFixture.bytes).digest('hex')
+  const assetPath = join(publicAssetDirectory, assetFixture.storageKey)
+  mkdirSync(join(publicAssetDirectory, 'books', 'integration'), { recursive: true })
+  writeFileSync(assetPath, assetFixture.bytes)
   const fixture = identityFixture()
   const application = createReadmateApplication({
     databasePath,
     sessionSecret: randomBytes(48).toString('base64url'),
     cookieSecure: false,
     serveStatic: false,
+    publicAssetDirectory,
     modelProvider: options.modelProvider,
     reviewProvider: options.reviewProvider,
     deliveryAdapter: options.deliveryAdapter,
@@ -231,7 +252,7 @@ async function startHarness(t, options = {}) {
     miniProgramReceiptVerifier: options.miniProgramReceiptVerifier,
   })
   application.identity.service.importSeed(fixture.seed)
-  const book = await createPublishedBook(application, fixture)
+  const book = await createPublishedBook(application, fixture, assetFixture)
   const now = new Date().toISOString()
   application.database.prepare(`
     INSERT INTO safety_handlers (
@@ -251,6 +272,7 @@ async function startHarness(t, options = {}) {
     application,
     fixture,
     book,
+    assetFixture,
     baseUrl: `http://127.0.0.1:${server.address().port}/api/v1`,
   }
 }
@@ -346,6 +368,25 @@ test('真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许�
   assert.equal(Object.hasOwn(books.payload.data.items[0].progress, 'percent'), false)
   assert.equal(Object.hasOwn(books.payload.data.items[0].progress, 'effectiveMinutes'), false)
   assert.equal(Object.hasOwn(books.payload.data.items[0], 'finished'), false)
+  const sourceAsset = books.payload.data.items[0].assets.find((asset) => asset.kind === 'source_text')
+  assert.equal(sourceAsset.mimeType, 'text/plain')
+  assert.equal(sourceAsset.sizeBytes, harness.assetFixture.sizeBytes)
+  assert.equal(sourceAsset.sha256, harness.assetFixture.sha256)
+  const assetHeaders = {
+    Cookie: [...studentJar].map(([name, value]) => `${name}=${value}`).join('; '),
+    'X-Workspace-Id': fixture.workspaceId,
+    Range: 'bytes=0-5',
+  }
+  const rangedAsset = await fetch(`${new URL(baseUrl).origin}${sourceAsset.url}`, { headers: assetHeaders })
+  assert.equal(rangedAsset.status, 206)
+  assert.equal(rangedAsset.headers.get('content-range'), `bytes 0-5/${harness.assetFixture.sizeBytes}`)
+  assert.match(rangedAsset.headers.get('content-type'), /^text\/plain(?:;|$)/)
+  assert.deepEqual(Buffer.from(await rangedAsset.arrayBuffer()), harness.assetFixture.bytes.subarray(0, 6))
+  const invalidRange = await fetch(`${new URL(baseUrl).origin}${sourceAsset.url}`, {
+    headers: { ...assetHeaders, Range: `bytes=${harness.assetFixture.sizeBytes}-` },
+  })
+  assert.equal(invalidRange.status, 416)
+  assert.equal(invalidRange.headers.get('content-range'), `bytes */${harness.assetFixture.sizeBytes}`)
   const page = await requestJson(baseUrl, studentJar, `/books/${book.bookId}/pages/1`, { workspaceId: fixture.workspaceId })
   assert.equal(page.payload.data.blocks[0].text.includes('爱丽丝'), true)
 
@@ -393,7 +434,7 @@ test('真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许�
     FROM reading_device_lease_history WHERE lease_id = ? ORDER BY valid_from DESC LIMIT 1`)
     .get(lease.payload.data.leaseId)
   const summary = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sessionId: 'integration-reading-summary-1',
     revision: 1,
     leaseId: lease.payload.data.leaseId,
@@ -405,6 +446,7 @@ test('真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许�
     hadSkip: false,
     hadReread: false,
     lastPageNo: 2,
+    pageCoverage: [],
     endedAt: null,
     endReason: null,
     fingerprint: '',
@@ -1140,12 +1182,41 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
     LIMIT 1
   `).get(book.versionId)
   const unreadPage = application.database.prepare(`
-    SELECT page_no FROM book_pages
+    SELECT id, page_no FROM book_pages
     WHERE book_version_id = ? AND page_no > 1
     ORDER BY page_no
     LIMIT 1
   `).get(book.versionId)
   assert.ok(unreadPage)
+  const scopeBeforeProgress = deriveAiRequestScope(application.database, {
+    organizationId: fixture.organizationId,
+    ownerUserId: fixture.studentId,
+    workspaceId: fixture.workspaceId,
+    bookId: book.bookId,
+    bookVersionId: book.versionId,
+    currentPageNo: unreadPage.page_no,
+  })
+  assert.deepEqual(scopeBeforeProgress.pageIds, [unreadPage.id])
+  const unreadPageDto = await requestJson(baseUrl, studentJar, `/books/${book.bookId}/pages/${unreadPage.page_no}`, {
+    workspaceId: fixture.workspaceId,
+  })
+  assert.equal(unreadPageDto.status, 200, JSON.stringify(unreadPageDto.payload))
+  assert.equal(unreadPageDto.payload.data.readRangeVersion, scopeBeforeProgress.readRangeVersion)
+  const staleReadRange = await requestJson(baseUrl, studentJar, '/ai/messages', {
+    method: 'POST',
+    workspaceId: fixture.workspaceId,
+    idempotencyKey: 'ai-message-stale-read-range',
+    body: {
+      bookId: book.bookId,
+      currentPageNo: unreadPage.page_no,
+      readRangeVersion: 'read-range-v2:forged',
+      text: '这个已读范围版本是伪造的。',
+      safeMode: true,
+    },
+  })
+  assert.equal(staleReadRange.status, 409, JSON.stringify(staleReadRange.payload))
+  assert.equal(staleReadRange.payload.error.code, 'STALE_READ_RANGE')
+  assert.equal(providerRequests.length, 0)
   const explicitCurrentPage = await requestJson(baseUrl, studentJar, '/ai/messages', {
     method: 'POST',
     workspaceId: fixture.workspaceId,
@@ -1153,6 +1224,7 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
     body: {
       bookId: book.bookId,
       currentPageNo: unreadPage.page_no,
+      readRangeVersion: unreadPageDto.payload.data.readRangeVersion,
       text: '请说明还没有读到的页面内容。',
       safeMode: true,
     },
@@ -1167,8 +1239,58 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
     ) VALUES (?, ?, ?, ?, 2, 86400, ?, ?, ?, 1)`)
     .run(randomUUID(), fixture.studentId, fixture.workspaceId, book.versionId,
       positionAtLastPageAt, positionAtLastPageAt, positionAtLastPageAt)
+  const scopeAfterProgress = deriveAiRequestScope(application.database, {
+    organizationId: fixture.organizationId,
+    ownerUserId: fixture.studentId,
+    workspaceId: fixture.workspaceId,
+    bookId: book.bookId,
+    bookVersionId: book.versionId,
+    currentPageNo: unreadPage.page_no,
+  })
+  assert.deepEqual(scopeAfterProgress, scopeBeforeProgress)
+  const coveredAt = '2026-08-15T01:02:03.000Z'
+  application.database.prepare(`INSERT INTO reading_page_coverage (
+      id, organization_id_at_creation, actor_id_at_creation, workspace_id_at_creation,
+      book_version_id, page_no, effective_original_ms, effective_text_ms,
+      confirmed_interactions, last_covered_at, created_at, updated_at, version
+    ) VALUES (?, ?, ?, ?, ?, 1, 5000, 0, 0, ?, ?, ?, 1)`)
+    .run(randomUUID(), fixture.organizationId, fixture.studentId, fixture.workspaceId,
+      book.versionId, coveredAt, coveredAt, coveredAt)
+  const scopeAfterExactCoverage = deriveAiRequestScope(application.database, {
+    organizationId: fixture.organizationId,
+    ownerUserId: fixture.studentId,
+    workspaceId: fixture.workspaceId,
+    bookId: book.bookId,
+    bookVersionId: book.versionId,
+    currentPageNo: unreadPage.page_no,
+  })
+  const firstPageId = application.database.prepare(`
+    SELECT id FROM book_pages WHERE book_version_id = ? AND page_no = 1
+  `).get(book.versionId).id
+  assert.deepEqual(scopeAfterExactCoverage.pageIds, [firstPageId, unreadPage.id])
+  assert.notEqual(scopeAfterExactCoverage.readRangeVersion, scopeBeforeProgress.readRangeVersion)
+  application.database.prepare(`UPDATE reading_page_coverage SET
+      effective_original_ms = effective_original_ms + 1000,
+      updated_at = ?, version = version + 1
+    WHERE organization_id_at_creation = ? AND actor_id_at_creation = ?
+      AND workspace_id_at_creation = ? AND book_version_id = ? AND page_no = 1`)
+    .run('2026-08-15T01:03:03.000Z', fixture.organizationId, fixture.studentId, fixture.workspaceId, book.versionId)
+  const scopeAfterCoverageVersionAdvance = deriveAiRequestScope(application.database, {
+    organizationId: fixture.organizationId,
+    ownerUserId: fixture.studentId,
+    workspaceId: fixture.workspaceId,
+    bookId: book.bookId,
+    bookVersionId: book.versionId,
+    currentPageNo: unreadPage.page_no,
+  })
+  assert.deepEqual(scopeAfterCoverageVersionAdvance.pageIds, scopeAfterExactCoverage.pageIds)
+  assert.notEqual(scopeAfterCoverageVersionAdvance.readRangeVersion, scopeAfterExactCoverage.readRangeVersion)
   let conversationId = null
   let lastAnswer
+  const currentPageDto = await requestJson(baseUrl, studentJar, `/books/${book.bookId}/pages/1`, {
+    workspaceId: fixture.workspaceId,
+  })
+  assert.equal(currentPageDto.status, 200, JSON.stringify(currentPageDto.payload))
   for (let index = 1; index <= 3; index += 1) {
     lastAnswer = await requestJson(baseUrl, studentJar, '/ai/messages', {
       method: 'POST',
@@ -1178,11 +1300,11 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
         conversationId,
         bookId: book.bookId,
         currentPageNo: 1,
+        readRangeVersion: currentPageDto.payload.data.readRangeVersion,
         text: `第 ${index} 次真实联调问题`,
         safeMode: true,
         ...(index === 1 ? {
-          selectedBlockIds: [selectedBlock.id],
-          selectionRange: { blockId: selectedBlock.id, startOffset: 0, endOffset: 6 },
+          selections: [{ pageNo: 1, blockId: selectedBlock.id, startOffset: 0, endOffset: 6 }],
         } : {}),
       },
     })
@@ -1190,7 +1312,8 @@ test('真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状�
     conversationId = lastAnswer.payload.data.conversationId
   }
   assert.equal(lastAnswer.payload.data.citations.length, 1)
-  assert.deepEqual(providerRequests[1].selectionRange, { blockId: selectedBlock.id, startOffset: 0, endOffset: 6 })
+  assert.deepEqual(providerRequests[1].selections, [{ pageNo: 1, blockId: selectedBlock.id, startOffset: 0, endOffset: 6 }])
+  assert.equal(providerRequests[1].selectionText, selectedBlock.text_content.slice(0, 6))
   assert.equal(providerRequests[1].sources[0].evidenceId, selectedBlock.id)
   assert.equal(providerRequests[1].sources.every((source) => source.pageNumber === 1), true)
   assert.equal(lastAnswer.payload.data.safety.threshold, 0.8)

@@ -13,6 +13,7 @@ const FINGERPRINT_FIELDS = Object.freeze([
   'hadSkip',
   'hadReread',
   'lastPageNo',
+  'pageCoverage',
   'endedAt',
   'endReason',
 ])
@@ -50,6 +51,7 @@ export async function createSummaryRevision({
   hadSkip,
   hadReread,
   lastPageNo,
+  pageCoverage,
   endedAt = null,
   endReason = null,
 }, { cryptoImpl } = {}) {
@@ -62,6 +64,22 @@ export async function createSummaryRevision({
   requiredString(measuredThroughAt, 'measuredThroughAt')
   safeInteger(cumulativeEffectiveMs, 'cumulativeEffectiveMs')
   safeInteger(lastPageNo, 'lastPageNo', 1)
+  if (!Array.isArray(pageCoverage)) throw new TypeError('pageCoverage必须是数组')
+  const seenPages = new Set()
+  const normalizedPageCoverage = pageCoverage.map((entry, index) => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) throw new TypeError(`pageCoverage[${index}]必须是对象`)
+    const fields = ['pageNo', 'effectiveOriginalMs', 'effectiveTextMs', 'confirmedInteractions']
+    const unknown = Object.keys(entry).filter((field) => !fields.includes(field))
+    if (unknown.length || fields.some((field) => !Object.hasOwn(entry, field))) throw new TypeError(`pageCoverage[${index}]字段不完整`)
+    const pageNo = safeInteger(entry.pageNo, `pageCoverage[${index}].pageNo`, 1)
+    if (seenPages.has(pageNo)) throw new TypeError('pageCoverage页码不能重复')
+    seenPages.add(pageNo)
+    const effectiveOriginalMs = safeInteger(entry.effectiveOriginalMs, `pageCoverage[${index}].effectiveOriginalMs`)
+    const effectiveTextMs = safeInteger(entry.effectiveTextMs, `pageCoverage[${index}].effectiveTextMs`)
+    const confirmedInteractions = safeInteger(entry.confirmedInteractions, `pageCoverage[${index}].confirmedInteractions`)
+    if (effectiveOriginalMs + effectiveTextMs > cumulativeEffectiveMs) throw new TypeError('单页双模式覆盖不能超过累计有效时长')
+    return { pageNo, effectiveOriginalMs, effectiveTextMs, confirmedInteractions }
+  }).sort((left, right) => left.pageNo - right.pageNo)
   if (typeof hadSkip !== 'boolean' || typeof hadReread !== 'boolean') throw new TypeError('行为累计字段必须是布尔值')
   if ((endedAt == null) !== (endReason == null)) throw new TypeError('endedAt与endReason必须同时为空或同时提供')
   if (endReason != null) {
@@ -69,7 +87,7 @@ export async function createSummaryRevision({
     assertEnum(endReason, SESSION_END_REASONS, '会话结束原因')
   }
   const summary = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sessionId,
     revision,
     leaseId,
@@ -81,6 +99,7 @@ export async function createSummaryRevision({
     hadSkip,
     hadReread,
     lastPageNo,
+    pageCoverage: normalizedPageCoverage,
     endedAt,
     endReason,
   }

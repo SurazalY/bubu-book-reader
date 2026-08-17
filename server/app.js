@@ -18,6 +18,11 @@ export function createReadmateApplication(options = {}) {
     cookieSecure: options.cookieSecure,
     permissionPolicy: options.permissionPolicy,
   })
+  const distDirectory = path.resolve(serverDirectory, options.distDirectory ?? process.env.DIST_DIR ?? '../dist')
+  const publicAssetDirectory = path.resolve(
+    serverDirectory,
+    options.publicAssetDirectory ?? process.env.PUBLIC_ASSET_DIR ?? distDirectory,
+  )
   const integration = createIntegrationRouter({
     database: identity.database,
     identityService: identity.service,
@@ -29,6 +34,7 @@ export function createReadmateApplication(options = {}) {
     summaryLinkSigningKey: options.summaryLinkSigningKey,
     miniProgramReceiptVerifier: options.miniProgramReceiptVerifier,
     cookieSecure: options.cookieSecure,
+    publicAssetDirectory,
     internalDemoMode: options.internalDemoMode ?? process.env.INTERNAL_DEMO_MODE === '1',
   })
   const app = express()
@@ -37,12 +43,6 @@ export function createReadmateApplication(options = {}) {
   app.use('/api/v1', integration.router)
 
   if (options.serveStatic !== false) {
-    const distDirectory = path.resolve(serverDirectory, options.distDirectory ?? process.env.DIST_DIR ?? '../dist')
-    const publicAssetDirectory = path.resolve(
-      serverDirectory,
-      options.publicAssetDirectory ?? process.env.PUBLIC_ASSET_DIR ?? distDirectory,
-    )
-    app.use('/books', express.static(path.join(publicAssetDirectory, 'books'), { index: false }))
     app.use('/books', (_req, res) => res.status(404).end())
     app.use(express.static(distDirectory))
     app.get('*', (req, res) => res.sendFile(path.join(distDirectory, 'index.html')))

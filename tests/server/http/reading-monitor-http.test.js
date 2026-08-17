@@ -225,7 +225,7 @@ async function acquireLease(harness, jar, key = randomUUID()) {
 function summaryBody({ leaseId, bookVersionId, baseMs = Date.now(), ...overrides }) {
   const startedAt = new Date(baseMs).toISOString()
   const body = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sessionId: `session-${randomUUID()}`,
     revision: 1,
     leaseId,
@@ -237,6 +237,7 @@ function summaryBody({ leaseId, bookVersionId, baseMs = Date.now(), ...overrides
     hadSkip: false,
     hadReread: false,
     lastPageNo: 1,
+    pageCoverage: [],
     endedAt: null,
     endReason: null,
     fingerprint: '',

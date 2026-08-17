@@ -157,11 +157,12 @@ test('客户端规范指纹与冻结JSON字段顺序完全一致', async () => {
     hadSkip: true,
     hadReread: false,
     lastPageNo: 18,
+    pageCoverage: [{ pageNo: 18, effectiveOriginalMs: 120_000, effectiveTextMs: 300_000, confirmedInteractions: 2 }],
     endedAt: null,
     endReason: null,
   }
   const summary = await createSummaryRevision(input, { cryptoImpl: webcrypto })
-  const expected = createHash('sha256').update(JSON.stringify(canonicalSummaryValues({ schemaVersion: 1, ...input }))).digest('hex')
+  const expected = createHash('sha256').update(JSON.stringify(canonicalSummaryValues({ schemaVersion: 2, ...input }))).digest('hex')
   assert.equal(summary.fingerprint, expected)
   assert.match(summary.fingerprint, /^[0-9a-f]{64}$/)
   assert.equal(Object.hasOwn(summary, 'screenOn'), false)
@@ -181,7 +182,7 @@ test('revision从1严格连续，8个结束原因均受控', async () => {
   const base = {
     sessionId: 'session-1', revision: 1, leaseId: 'lease-1', bookVersionId: 'version-1', statDate: '2026-08-10',
     startedAt: '2026-08-10T08:00:00.000Z', measuredThroughAt: '2026-08-10T08:01:00.000Z',
-    cumulativeEffectiveMs: 60_000, hadSkip: false, hadReread: false, lastPageNo: 1,
+    cumulativeEffectiveMs: 60_000, hadSkip: false, hadReread: false, lastPageNo: 1, pageCoverage: [],
   }
   await assert.rejects(
     () => createSummaryRevision({ ...base, endedAt: '2026-08-10T08:01:00.000Z', endReason: 'unknown' }, { cryptoImpl: webcrypto }),

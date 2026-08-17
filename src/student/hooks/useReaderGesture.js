@@ -109,7 +109,7 @@ function rawTextOffset(block, container, offset) {
 }
 
 function selectionEvidence(sel, stage, maxLen) {
-  if (!sel?.rangeCount) return { selectedBlockIds: [], selectionRange: null }
+  if (!sel?.rangeCount) return { selections: [], selectedBlockIds: [], selectionRange: null }
   const range = sel.getRangeAt(0)
   const blocks = [...stage.querySelectorAll('[data-block-id]')].filter((block) => {
     try {
@@ -119,42 +119,58 @@ function selectionEvidence(sel, stage, maxLen) {
     }
   })
   const selectedBlockIds = [...new Set(blocks.map((block) => block.dataset.blockId).filter(Boolean))]
-  if (blocks.length !== 1 || selectedBlockIds.length !== 1) {
-    return { selectedBlockIds, selectionRange: null }
+  let remaining = maxLen
+  const selections = []
+  const selectedTexts = []
+  for (const block of blocks) {
+    if (!remaining) break
+    const blockId = block.dataset.blockId
+    const pageNo = Number(block.closest('[data-page]')?.getAttribute('data-page'))
+    if (!blockId || !Number.isSafeInteger(pageNo) || pageNo < 1) continue
+    const startElement = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer
+    const endElement = range.endContainer.nodeType === 3 ? range.endContainer.parentElement : range.endContainer
+    const rawStartOffset = block.contains(startElement)
+      ? rawTextOffset(block, range.startContainer, range.startOffset)
+      : 0
+    const rawEndOffset = block.contains(endElement)
+      ? rawTextOffset(block, range.endContainer, range.endOffset)
+      : (block.textContent || '').length
+    const blockText = block.textContent || ''
+    const selectedSource = blockText.slice(rawStartOffset, rawEndOffset)
+    const leadingWhitespace = selectedSource.length - selectedSource.trimStart().length
+    const text = selectedSource.trim().slice(0, remaining)
+    if (!text) continue
+    const startOffset = rawStartOffset + leadingWhitespace
+    const endOffset = startOffset + text.length
+    selections.push({ pageNo, blockId, startOffset, endOffset })
+    selectedTexts.push(text)
+    remaining -= text.length
   }
-  const block = blocks[0]
-  const startElement = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer
-  const endElement = range.endContainer.nodeType === 3 ? range.endContainer.parentElement : range.endContainer
-  if (!block.contains(startElement) || !block.contains(endElement)) {
-    return { selectedBlockIds, selectionRange: null }
-  }
-  const rawStartOffset = rawTextOffset(block, range.startContainer, range.startOffset)
-  const rawEndOffset = rawTextOffset(block, range.endContainer, range.endOffset)
-  const blockText = block.textContent || ''
-  const selectedSource = blockText.slice(rawStartOffset, rawEndOffset)
-  const leadingWhitespace = selectedSource.length - selectedSource.trimStart().length
-  const text = selectedSource.trim().slice(0, maxLen)
-  const startOffset = rawStartOffset + leadingWhitespace
-  const endOffset = startOffset + text.length
+  const selectionRange = selections.length === 1
+    ? {
+      blockId: selections[0].blockId,
+      startOffset: selections[0].startOffset,
+      endOffset: selections[0].endOffset,
+    }
+    : null
   return {
-    selectedBlockIds,
-    text,
-    selectionRange: endOffset > startOffset
-      ? { blockId: selectedBlockIds[0], startOffset, endOffset }
-      : null,
+    selections,
+    selectedBlockIds: selections.map((selection) => selection.blockId),
+    text: selectedTexts.join('\n'),
+    selectionRange,
   }
 }
 
 export function useReaderGesture(
   stageRef,
-  { onFlipPrev, onFlipNext, onTap, onSelectStart, onSelectEnd, enabled = true, maxLen = 600 } = {},
+  { onFlipPrev, onFlipNext, onTap, onSelectStart, onSelectEnd, enabled = true, selectionEnabled = true, maxLen = 600 } = {},
 ) {
   // 'idle' | 'pending' | 'flip' | 'select'
   const [mode, setMode] = useState('idle')
   const st = useRef({ mode: 'idle', x: 0, y: 0, t: 0, dx: 0, anchor: null, id: null })
   // 回调放 ref，避免父组件每次渲染都重新绑定原生监听器（重绑会丢掉进行中的手势）
   const cb = useRef({})
-  cb.current = { onFlipPrev, onFlipNext, onTap, onSelectStart, onSelectEnd, enabled, maxLen }
+  cb.current = { onFlipPrev, onFlipNext, onTap, onSelectStart, onSelectEnd, enabled, selectionEnabled, maxLen }
 
   useEffect(() => {
     const stage = stageRef.current
@@ -171,6 +187,7 @@ export function useReaderGesture(
     }
 
     const enterSelect = (x, y) => {
+      if (!cb.current.selectionEnabled) return
       const range = caretAt(x, y)
       // 锚点只存屏幕坐标，不存 DOM 节点：
       // 进入选文会通知页面（React 重渲染），书页里的文本节点会被整批替掉，
@@ -234,16 +251,18 @@ export function useReaderGesture(
       st.current = { mode: 'pending', x: e.clientX, y: e.clientY, t: Date.now(), dx: 0, anchor: null, id: e.pointerId }
       setMode2('pending')
       window.getSelection?.()?.removeAllRanges()
-      if (e.ctrlKey) {
+      if (e.ctrlKey && cb.current.selectionEnabled) {
         // 桌面调试通道：Ctrl + 拖动直接选文，不等长按
         clearTimer()
         enterSelect(e.clientX, e.clientY)
         return
       }
       clearTimer()
-      timer = window.setTimeout(() => {
-        if (st.current.mode === 'pending') enterSelect(st.current.x, st.current.y)
-      }, LONG_PRESS_MS)
+      if (cb.current.selectionEnabled) {
+        timer = window.setTimeout(() => {
+          if (st.current.mode === 'pending') enterSelect(st.current.x, st.current.y)
+        }, LONG_PRESS_MS)
+      }
     }
 
     const onMove = (e) => {
@@ -264,9 +283,11 @@ export function useReaderGesture(
           s.y = e.clientY
           s.t = Date.now()
           clearTimer()
-          timer = window.setTimeout(() => {
-            if (st.current.mode === 'pending') enterSelect(st.current.x, st.current.y)
-          }, LONG_PRESS_MS)
+          if (cb.current.selectionEnabled) {
+            timer = window.setTimeout(() => {
+              if (st.current.mode === 'pending') enterSelect(st.current.x, st.current.y)
+            }, LONG_PRESS_MS)
+          }
         }
       }
       if (s.mode === 'flip') {
