@@ -69,6 +69,13 @@ ABSOLUTE_PATH_PATTERNS = (
     re.compile(r"\\\\[A-Za-z0-9]"),
     re.compile(r"/(?:Users|home|mnt|Volumes)/"),
 )
+ALLOWED_OUTPUT_ROOTS = ("book-parser/work", "book-parser/releases")
+FORBIDDEN_OUTPUT_PREFIXES = (
+    "device-migration-20260815",
+    "book-parser/work/ocr-antigravity-v1",
+    "book-parser/input",
+)
+
 PROMPT_PLACEHOLDER = f"""# OCR prompt artifact — not applicable on the trusted baseline
 
 This package was produced by the trusted path (`{OCR_PIPELINE_VERSION}`), whose job
@@ -128,6 +135,37 @@ def page_dimensions(document: pymupdf.Document) -> list[tuple[int, int]]:
         rect = document.load_page(index).rect
         sizes.append((max(1, round(rect.width)), max(1, round(rect.height))))
     return sizes
+
+
+def _is_under(path: Path, ancestor: Path) -> bool:
+    """Return True when `path` equals or lives under `ancestor` (both must be resolved)."""
+    try:
+        path.relative_to(ancestor)
+        return True
+    except ValueError:
+        return False
+
+
+def assert_safe_output_path(output: Path, root: Path) -> Path:
+    """Reject output paths outside allowed package roots or inside protected archives.
+
+    Resolves symlinks and `..` segments before checking so a malicious relative path
+    cannot escape into read-only archive or OCR input directories.
+    """
+    resolved = output.resolve()
+    repo = root.resolve()
+    for relative_prefix in FORBIDDEN_OUTPUT_PREFIXES:
+        forbidden = (repo / relative_prefix).resolve()
+        if _is_under(resolved, forbidden):
+            raise ValueError(
+                f"refusing unsafe --output {output}: must not write into protected path {relative_prefix}"
+            )
+    if not any(_is_under(resolved, (repo / relative_root).resolve()) for relative_root in ALLOWED_OUTPUT_ROOTS):
+        allowed = ", ".join(ALLOWED_OUTPUT_ROOTS)
+        raise ValueError(
+            f"refusing unsafe --output {output}: resolved path must be under one of: {allowed}"
+        )
+    return resolved
 
 
 def promote_staging(staging: Path, output: Path) -> None:
@@ -252,7 +290,7 @@ def build(
         ],
     }
 
-    output = output.resolve()
+    output = assert_safe_output_path(output, root)
     if output.exists() and not force:
         raise FileExistsError(f"output already exists: {output}")
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -443,6 +481,7 @@ def main() -> None:
     args = parser.parse_args()
     root = args.repo_root.resolve()
     output = args.output or root / "book-parser" / "work" / "package-v2-trusted" / args.book_id
+    assert_safe_output_path(output, root)
     result = build(args.catalog, args.book_id, output, root, force=args.force)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
 

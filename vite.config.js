@@ -1,9 +1,31 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+function isPublicBooksPath(url) {
+  const path = (url || '').split('?')[0]
+  return path === '/books' || path.startsWith('/books/')
+}
+
+function blockPublicBooksInDev() {
+  return {
+    name: 'block-public-books-in-dev',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (!isPublicBooksPath(req.url)) {
+          next()
+          return
+        }
+        res.statusCode = 404
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.end('Not Found')
+      })
+    },
+  }
+}
+
 // BrowserRouter 的深链接由 Express 回退到 index.html，静态资源必须始终从站点根加载。
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), blockPublicBooksInDev()],
   base: '/',
   server: {
     port: 5190,

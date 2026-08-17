@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline"))
 import pymupdf  # noqa: E402
 
 from book_package_v2 import sha256_file, write_canonical_json  # noqa: E402
-from build_trusted_package_v2 import build  # noqa: E402
+from build_trusted_package_v2 import assert_safe_output_path, build  # noqa: E402
 from trusted_package_v2 import read_page_text, scan_ocr_pages, split_blocks, utf16_length  # noqa: E402
 from validate_book_package_v2 import validate  # noqa: E402
 
@@ -71,7 +71,7 @@ class TrustedFixture:
         })
 
     def build(self, name: str = "package") -> tuple[dict, Path]:
-        output = self.root / "out" / name
+        output = self.root / "book-parser" / "work" / "package-v2-trusted-test" / name
         return build(self.catalog_path, BOOK_ID, output, self.root), output
 
 
@@ -249,6 +249,39 @@ class TrustedPackageV2Test(unittest.TestCase):
         self.assertEqual([page.kind for page in page_files], ["text", "blank"])
         self.assertEqual(read_page_text(page_files[1]), "")
         self.assertEqual(read_page_text(page_files[0]), "正文\n")
+
+    def test_output_path_guard_accepts_allowed_roots(self):
+        temporary = tempfile.TemporaryDirectory(prefix="trusted-output-guard-")
+        self.addCleanup(temporary.cleanup)
+        repo = Path(temporary.name)
+        for relative in (
+            "book-parser/work/package-v2-trusted/book-001",
+            "book-parser/releases/book-001-v1",
+        ):
+            with self.subTest(relative=relative):
+                output = repo / relative
+                resolved = assert_safe_output_path(output, repo)
+                self.assertEqual(resolved, output.resolve())
+
+    def test_output_path_guard_rejects_unsafe_paths_without_deleting(self):
+        temporary = tempfile.TemporaryDirectory(prefix="trusted-output-guard-")
+        self.addCleanup(temporary.cleanup)
+        repo = Path(temporary.name)
+        marker_name = "keep-me.txt"
+        unsafe_targets: list[tuple[str, Path]] = [
+            ("repo root", repo),
+            ("device-migration archive", repo / "device-migration-20260815" / "verification-extract"),
+            ("ocr input job", repo / "book-parser" / "work" / "ocr-antigravity-v1" / "jobs" / BOOK_ID),
+        ]
+        for label, target in unsafe_targets:
+            with self.subTest(label=label):
+                target.mkdir(parents=True, exist_ok=True)
+                marker = target / marker_name
+                marker.write_text("must survive", encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    assert_safe_output_path(target, repo)
+                self.assertTrue(marker.is_file(), f"{label}: marker file was deleted")
+                self.assertEqual(marker.read_text(encoding="utf-8"), "must survive")
 
 
 if __name__ == "__main__":

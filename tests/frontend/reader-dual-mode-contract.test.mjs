@@ -26,7 +26,21 @@ test('原版模式从受保护资产用 PDF.js 加载，页数不一致显式失
   assert.match(pdfPage, /withCredentials: true/)
   assert.match(pdfPage, /PDF_PAGE_COUNT_MISMATCH/)
   assert.match(pdfPage, /GlobalWorkerOptions\.workerSrc/)
+  assert.match(pdfPage, /from 'pdfjs-dist\/legacy\/build\/pdf\.mjs'/)
+  assert.match(pdfPage, /pdfjs-dist\/legacy\/build\/pdf\.worker\.min\.mjs/)
+  assert.doesNotMatch(pdfPage, /pdfjs-dist\/build\/pdf(?:\.worker)?(?:\.min)?\.mjs/)
   assert.doesNotMatch(pdfPage, /textLayer|TextLayer/)
+})
+
+test('浏览器侧 pdfjs 只允许 legacy 构建，防止现代构建在无 getOrInsertComputed 的浏览器里炸掉', async () => {
+  const pdfPage = await readFile(pdfPageUrl, 'utf8')
+  const importMatches = [...pdfPage.matchAll(/['"]pdfjs-dist\/[^'"]+['"]/g)].map((match) => match[0])
+
+  assert.ok(importMatches.length >= 2, 'PdfBookPage 必须同时声明模块与 worker')
+  for (const specifier of importMatches) {
+    assert.match(specifier, /pdfjs-dist\/legacy\/build\//)
+    assert.doesNotMatch(specifier, /pdfjs-dist\/build\//)
+  }
 })
 
 test('OCR 文字模式只输出可选择 DOM，不再在页图上叠 OCR 层', async () => {

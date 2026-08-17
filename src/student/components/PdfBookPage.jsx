@@ -1,10 +1,10 @@
 import { forwardRef, useEffect, useState } from 'react'
-import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist/build/pdf.mjs'
+import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 import { cx } from '../../shared/cx.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 
-GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/legacy/build/pdf.worker.min.mjs', import.meta.url).toString()
 
 export function useProtectedPdfDocument({ asset, workspaceId, expectedPages, enabled }) {
   const [attempt, setAttempt] = useState(0)
