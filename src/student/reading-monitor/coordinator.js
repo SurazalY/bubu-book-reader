@@ -504,6 +504,9 @@ export function createReadingMonitorCoordinator({
       leaseController.stop()
       await operation.catch(() => undefined)
     },
+    waitIdle() {
+      return operation.catch(() => undefined)
+    },
     getState,
   })
 }

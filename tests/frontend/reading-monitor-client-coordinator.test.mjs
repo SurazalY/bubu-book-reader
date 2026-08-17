@@ -13,6 +13,15 @@ import {
 } from '../../src/student/reading-monitor/pendingStore.js'
 import { createStableView } from '../../src/student/reading-monitor/view.js'
 
+async function waitUntil(predicate, { timeoutMs = 2000 } = {}) {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    if (await predicate()) return
+    await new Promise((resolve) => setImmediate(resolve))
+  }
+  throw new Error(`waitUntil timed out after ${timeoutMs}ms`)
+}
+
 function schedulerHarness(startWall) {
   let wallMs = startWall
   let monotonicMs = 0
@@ -314,11 +323,14 @@ test('tickDirect抛错后定时链仍会进行下一次尝试', async () => {
   })
   await fixture.coordinator.start()
   await fixture.time.advance(300_000)
+  await fixture.coordinator.waitIdle()
   assert.equal(fixture.submissions.length, 0)
   assert.equal(digestCalls, 1)
   assert.equal(tickErrors.at(-1)?.context?.phase, 'summary_tick')
   assert.equal(fixture.coordinator.getState().error?.code, 'DIGEST_FAILED')
   await fixture.time.advance(15_000)
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => fixture.submissions.length >= 1)
   assert.ok(fixture.submissions.length >= 1)
   assert.equal(fixture.submissions.at(-1).summary.revision, 1)
   await fixture.coordinator.stop()
@@ -384,17 +396,20 @@ test('真实生命周期事件在后台、freeze和网络恢复时额外提交',
   await fixture.time.advance(2_000)
   documentTarget.visibilityState = 'hidden'
   documentTarget.dispatch('visibilitychange')
-  await fixture.time.settle()
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => fixture.submissions.length >= 1)
   const afterBackground = fixture.submissions.length
   assert.ok(afterBackground >= 1)
   documentTarget.dispatch('freeze')
-  await fixture.time.settle()
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => fixture.submissions.length > afterBackground)
   assert.ok(fixture.submissions.length > afterBackground)
   documentTarget.visibilityState = 'visible'
   documentTarget.dispatch('visibilitychange')
   await fixture.time.advance(1_000)
   windowTarget.dispatch('online')
-  await fixture.time.settle()
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => fixture.submissions.at(-1)?.summary?.revision >= 3)
   assert.ok(fixture.submissions.at(-1).summary.revision >= 3)
   await fixture.coordinator.close('reader_close')
   await fixture.coordinator.stop()
@@ -415,7 +430,7 @@ test('首页刷新协调在accepted终态前不解锁', async () => {
     settled = true
     return result
   })
-  await fixture.time.settle()
+  await waitUntil(() => fixture.store.records.length === 1 && settled === false)
   assert.equal(settled, false)
   assert.equal(fixture.store.records.length, 1)
   online = true
