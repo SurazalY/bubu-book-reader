@@ -22,6 +22,8 @@
 | D-07 | 阅读偏好「纸张颜色」无反馈 | **不记**（已定性） | — | 属实现预期。`paperTone` 确实传给了两种模式（`Reader.jsx` 717–747），文字模式经 `student-page--${tone}` 真实套用底色（`BookPage.jsx` 132–134 + `src/index.css` 1234–1245）；原版模式同一节点被后写的 `.student-pdf-page-frame { background: #fff }` 锁白，且 canvas 铺满整页，故视觉上不吃。**附带建议**：偏好面板未标注「仅文字模式」，宜补文案 |
 | D-08 | 验收清单文案与实际 UI 不符 | 文档修订 | 待修 | **原判断需更正**：`04` 与 `03` 正文**都没有**「开始阅读」这一表述，该四字来自 `BookDetail.jsx` 第 50 行注释，不在验收清单。真实不符项是 `04` 多处写「文字模式」，而实际切换按钮文案为「**OCR 文字**」（`Reader.jsx` 795），涉及 `04` 第 40、43、45、46、64 行 |
 | D-09 | 书籍详情页封面在冷请求下取不到 | 应修 | 未修 | 详情页用的是 `src/components/ui.jsx` 的裸 `<img>`（`BookDetail.jsx` 第 3 行导入，第 411 行渲染），`src = book.coverUrl \|\| book.cover?.url \|\| ${BASE_URL}covers/${book.id}.jpg`。对已导入书 `coverUrl` 即受保护 URL，而裸 `<img>` 无法携带 `X-Workspace-Id`，冷请求必然 400 → `onError` → 渐变文字封。**真人复验判「通过」系被 HTTP 缓存误导**（详见 D-10），非真实通过。契约测试 `tests/frontend/book-cover-protected-asset.test.mjs` 只锁了首页与书架，故意未锁详情页 |
+| D-12 | 跨设备真冲突时整段会话的阅读时长静默丢失 | **应修**（主控上调，复核原判「建议」） | 未修（Phase 6 前处置） | `f5f99a8` 让 `pendingQueue` 丢弃 `LEASE_CONFLICT` 队头，但 `persistSnapshot` 仍执行了 `revisions.commit`（`coordinator.js` 277–278、`pendingQueue.js` 52–54）。于是本地 revision 已推进而服务端从未收下前一个 revision，下一次提交即 `REVISION_GAP`，**该会话此后写不进去**。修 D-11 后本机重挂已不再触发此路，剩下的触发条件是"另一台设备持有活租约"这类真冲突（学校平板 / 家里设备）。**上调理由**：后果是学生这一整段阅读时长静默消失、无任何界面提示，而"阅读被记录"正是本产品的核心承诺；虽触发条件不常见，但一旦发生不可察觉、不可追回。不挡 Phase 3（批量导入不涉此路），**须在 Phase 6 计时联动验收前处置** |
+| D-13 | 同一学生多条残留 open 会话只能关掉一条 | 建议 | 未修 | `monitoring.js` 740–758 的 `otherOpen` 用 `.get()` 取单行且未过滤 `workspace_id`，若同一学生存在多条残留 open，一次只处理一条，理论上可留下多余 open 行。属防御深度不足，非越权（关闭目标仍限于该学生自己的行） |
 | D-10 | 受保护资产响应可缓存且未按工作空间区分 | 应修（**Phase 4 前处置**） | 未修 | 资产响应带 `Cache-Control: private, max-age=3600`，**且无 `Vary: X-Workspace-Id`**。两重后果：① 一次带头 fetch 会为同一 URL 预热缓存，使随后不带头的裸 `<img>`/CSS `url()` 也能显示，**掩盖鉴权失败**（D-09 即因此被误判为通过）；② 授权结果被缓存长达 1 小时，教师取消发布或调整班级可见范围后，学生浏览器仍可从缓存读到封面乃至源 PDF。第 ② 点直接冲击 Phase 4「教师发布管理与班级可见范围」的有效性，须在进 Phase 4 前定方案 |
 
 ## 二、明确不记为缺陷
@@ -32,6 +34,7 @@
 | 文字模式错字 / 缺字 / 排版怪异 | OCR 为可信输入，按 B-2 不做任何形式的 OCR 质量评价 |
 | 第 2、3 页文字模式空白 | 基线事实：98 物理页中仅 88 页有 OCR 文本，10 页无文本。空白属预期 |
 | 作者显示「服务端未返回作者」 | 符合决策 D6（作者字段留空） |
+| 阅读器顶栏「本次已读 X 分钟」刷新后归零 | **属预期，且是复验时最容易误判为失败的一项。** 该数字是 `Reader.jsx` 本地 `setInterval` 每 60 秒加一，语义是"本次"，刷新必然从零开始。它与书籍详情页的「有效阅读时间」是两个不同的东西：后者走 `reading_daily_book_summaries` 的 `SUM(effective_reading_ms)`，跨会话跨日汇总，刷新不受影响 |
 
 ## 三、待定性观察
 
@@ -60,7 +63,22 @@
 
 第三条最值得警惕：**为核心修复所加的守卫如果自身不可靠，它既可能在修复被破坏时仍然通过，也可能在一切正常时报红**，等于这条守卫暂时不能作为 D-11 不回归的凭据。
 
-修 D-11 的 agent 分析为假时钟 `settle()`（8 次 `setImmediate`）与异步 `persistSnapshot` 的**测试侧**竞态，非产品缺陷，并按要求未改测试掩盖。该定性**尚待独立复核确认**。
+### 定性结论：测试侧竞态（独立复核已确认前两条）
+
+复核 agent 的实测把"随机抖动"变成了确定规律：
+
+| 跑法 | 「真实生命周期…额外提交」 | 「首页刷新…不解锁」 |
+|---|---|---|
+| **只跑这两条 × 20** | **20/20 失败** | 20/20 通过 |
+| 整文件 × 10 | 9 过 / 1 败 | 10/10 通过 |
+
+**冷启动必败、混在整文件里跑才偶败**——前面的用例预热了 `crypto.subtle` 之后概率才下降。根因是测试第 32–34 行 `settle()` 的固定 8 次 `setImmediate` 等不到 `persistSnapshot`（内含 `crypto.subtle.digest` 与入队）完成，断言开火时异步提交还在飞。
+
+产品侧 `visibilitychange` / `freeze` / `online` 均走串行 `run()` → `persistSnapshot()`，**没有"超时就丢"的分支**。故为测试窗口过窄，**不是生产丢摘要**。
+
+第三条（D-11 新守卫）复核未覆盖——因派发简报写于发现它之前，只点名了前两条。其定性仍开放，且必须查清是同源的测试侧竞态还是**产品侧续期逻辑本身有竞态**；若为后者，意味着 D-11 只修了一半。
+
+**修法约束**：不得把 8 拍改成更多拍（只是把窗口挪远），应改为轮询等待条件成立（`waitUntil(predicate, timeout)`）或等 coordinator 空闲；不得放宽或删除断言换取通过。
 
 **为何必须在 Phase 3 前定性**：这些用例覆盖的正是「学生切后台 / 页面被冻结 / 网络恢复时补交阅读时长」路径。若抖动源自 coordinator 侧真实竞态而非测试写法，意味着真实场景下学生阅读记录仍会偶发丢失——那 D-11 只修了一半。而即便确为测试侧，按当前复发率，Phase 3–7 每次质量门都可能撞上假红，届时最危险的不是浪费时间，而是**把真回归当成"已知抖动"放过去**（本次已发生一次：三条失败中有一条其实是新守卫，若不细看极易归入既有噪音）。
 
@@ -213,3 +231,44 @@ useReadingTelemetry.js:113-149 → page_stay / page_turn → enqueueLegacy → s
 2. **服务端放宽**：为 `GET /books/assets/:assetId` 增加"缺头时以会话 `activeWorkspaceId` 推断工作空间"的回退，并同步收紧缓存（见 D-10）。
 
 方案 2 改一处即可覆盖全部消费方，方案 1 需逐个改造且每新增一个展示位就要重复一次。但方案 2 触及鉴权中间件，需谨慎评估越权风险与既有测试（`identity-core.test.js` 578–582 断言"有 Cookie 无头 → 400"，放宽后该断言需重新界定适用范围）。**该决策留给 Phase 4 前处置，不在 Phase 2 内擅自变更鉴权。**
+
+## 九、`f5f99a8` 契约边界独立复核（只读，审查范围 `937ce0b..f5f99a8`）
+
+D-11 的修复动到了 `server/domains/reading/monitoring.js` 与 `catalog.js`，改的是**新会话何时可以接管未关闭旧会话**的租约语义。该语义虽不属 B-2 明文冻结项，但紧邻冻结区且改变了数据何时可写，故未照单接收，另派只读复核。
+
+**结论：有条件通过。** 条件为①三条抖动测试确定化②真人 6 分钟复验。
+
+### 契约边界：通过
+
+- `summary.js` **不在该提交的 11 个文件内**，`createSummaryRevision()` 与 `FINGERPRINT_FIELDS` 原样未动；服务端 `SUMMARY_FIELDS`（14–31）与 `normalizeSummary()`（202–269）未改
+- 未新建第二套系统：复用既有 `closeReadingSummarySessionsForLease` → `closeOpenSummaryRows`；新增的 `expireStaleLeasesForActor`（340–345）只是既有 `expireActiveLease` 的按 actor 清扫；租约 TTL 仍为 90 秒
+- 写入语义未变：同会话 `delta = 新累计 − 旧累计`，新会话首份累计作第一笔 delta
+
+### 越权风险：无
+
+接管条件确为「同一学生 +（同一租约 或 租约已死）」（`monitoring.js` 740–758）：
+
+| 场景 | 结论 |
+|---|---|
+| 另一名学生 | `findLeaseHistory`（374–389）要求 org / actor / workspace / device / bookVersion 全等，对不上即拒 |
+| 另一台设备、租约仍活 | `sameLease` 假且 `otherLeaseDead` 假 → 仍抛 `LEASE_CONFLICT`，只能走既有显式接管 |
+| 另一台设备、租约已过期 | 关闭的是同一学生的残留；`acquireLease` 本就会清过期租约 |
+| 另一工作空间 | `findLeaseHistory` 要求 `workspace_id` 一致 |
+
+`closeOpenSummaryRows`（325–331）另带 `lease_id_at_start = :leaseId AND status = 'open' AND measured_through_at <= :endedAt`，不会全表扫。
+
+### 跨会话汇总：无清零回归
+
+详情页「有效阅读时间」是跨会话跨日汇总，刷新不会抹掉已入账时长。链路：`reading_daily_book_summaries.effective_reading_ms` → `projectBooks()`（`projections.js` 22–38、81–87）按 actor + workspace + bookVersion 做 `SUM`，`effectiveMinutes = Math.floor(ms / 60000)` → `adapters/student.js` 136 `minutes` → `BookDetail.jsx` 189–191。194544 ms → `floor(3.24)` = 3，与现状吻合。
+
+多会话不重复计墙钟：旧会话累计已入日汇总，新会话从 0 起只把自己的累计当 delta。
+
+### 不重复计时：独立验证成立；并查出一条丢失路径
+
+`REVISION_CONFLICT`（704–707）真实存在且拒绝写入：同 revision 指纹不同即抛错 return，不 `updateSession`、不写日汇总；指纹相同则 `replayed`/`superseded`，也不加 delta。
+
+重复方向全部安全。**但丢失方向查出一条**，已记为 **D-12**（见缺陷清单）。
+
+### 关闭残留不丢数据：确认
+
+`closeOpenSummaryRows` 只更新 `status / ended_at / end_reason / updated_at / version+1`，不碰 `cumulative_effective_ms`、`latest_revision`、`latest_fingerprint`、`revision_fingerprints_json`。单调触发器（`043_reading_session_summaries.sql` 168–194）禁止累计回退、禁止已关闭行改 `ended_at`，允许 open → closed。服务端新测例（`reading-monitoring.test.js` 568–575）断言关闭后仍为 194544、revision 仍为 1。**「3 分钟」基线不会被清零或重算。**
