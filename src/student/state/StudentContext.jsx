@@ -8,7 +8,7 @@ const StudentContext = createContext(null)
 const visualPreferenceDefaults = Object.freeze({
   paperTone: 'warm',
   fontScale: 'md',
-  flipStyle: 'curl',
+  flipStyle: 'slide',
   reduceMotion: false,
   mascotIntro: false,
 })

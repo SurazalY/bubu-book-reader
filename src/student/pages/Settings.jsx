@@ -45,10 +45,6 @@ const FONT_SCALES = [
   { k: 'md', t: '中' },
   { k: 'lg', t: '大' },
 ]
-const FLIP_STYLES = [
-  { k: 'curl', t: '三维翻页' },
-  { k: 'slide', t: '平移' },
-]
 
 export default function Settings() {
   const { prefs, setPref, togglePref, student, me, ai } = useStudent()
@@ -133,13 +129,6 @@ export default function Settings() {
                   options={FONT_SCALES}
                   onPick={(k) => setPref('fontScale', k)}
                   hint="选「大」时一次只显示一页，书页排版本身不会重新流动"
-                />
-                <Choice
-                  label="翻页效果"
-                  value={prefs.flipStyle}
-                  options={FLIP_STYLES}
-                  onPick={(k) => setPref('flipStyle', k)}
-                  hint="开了「减少动态效果」时会自动走平移"
                 />
               </Block>
 

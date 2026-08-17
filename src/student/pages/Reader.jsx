@@ -32,6 +32,9 @@ import {
 
 const PAGE_DESIGN = Object.freeze({ width: 468, height: 636, padX: 36, padY: 42 })
 const AI_NAME = '竹娃'
+// D-03：三维翻页已隐藏。保持 false，使 HTMLFlipBook / api.flip() 运行时不可达；
+// JSX 与标识保留，以免冻结扫描测试失败。残留 flipStyle === 'curl' 也走平移。
+const STUDENT_CURL_FLIP_ENABLED = false
 
 // 横屏整书阅读器（规格 §6 全段）。
 //
@@ -301,7 +304,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   // —— 翻页 ——
   // 页数、尺寸、单双页变化都要给 HTMLFlipBook 换 key，否则库内部状态会错乱（旧站踩过）
   const flipKey = `srd-${bookId}-${readerMode}-${pageW}x${pageH}-${spread ? 'd' : 's'}-${prefs.flipStyle}`
-  const curl = prefs.flipStyle === 'curl' && !prefs.reduceMotion
+  const curl = STUDENT_CURL_FLIP_ENABLED && prefs.flipStyle === 'curl' && !prefs.reduceMotion
   const flipBootstrap = useRef({ key: null, expectedLeaf: initialLeaf, pending: true })
   const bindFlipBook = useCallback((instance) => {
     if (!instance) {
@@ -879,7 +882,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
             onClick={() => setPane((v) => !v)}
             aria-expanded={pane}
             className="student-reader-btn"
-            title="纸张颜色、字号与翻页效果"
+            title="纸张颜色与字号"
           >
             <Icon name="Settings2" className="h-4 w-4" />
             阅读偏好
@@ -1133,7 +1136,8 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   )
 }
 
-// 阅读偏好小面板：规格 §11.6「阅读器字号、行距、纸张颜色和翻页效果作为独立阅读偏好保存」。
+// 阅读偏好小面板：规格 §11.6「阅读器字号、行距、纸张颜色作为独立阅读偏好保存」。
+// 翻页效果（D-03）已隐藏：默认平移，curl 分支运行时不可达，只保留「减少动态效果」。
 // 设置页在 Stage 6，但阅读器自己要能就地调，否则学生读到一半得跳出去改。
 function PrefPane({ prefs, setPref, onClose }) {
   const rows = [
@@ -1155,15 +1159,6 @@ function PrefPane({ prefs, setPref, onClose }) {
         { k: 'sm', t: '小' },
         { k: 'md', t: '中' },
         { k: 'lg', t: '大' },
-      ],
-    },
-    {
-      key: 'flipStyle',
-      label: '翻页效果',
-      hint: '开启「减少动态效果」时自动走平移',
-      options: [
-        { k: 'curl', t: '三维翻页' },
-        { k: 'slide', t: '平移' },
       ],
     },
   ]
