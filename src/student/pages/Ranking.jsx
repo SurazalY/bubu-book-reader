@@ -5,11 +5,13 @@ import { BookCover, Icon } from '../../components/ui.jsx'
 import { formatReadingMinutes } from '../../shared/format.js'
 import { GlassPanel } from '../components/Glass.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
+import useRefreshStudentRuntimeOnMount from '../state/useRefreshStudentRuntimeOnMount.js'
 
 const titleCollator = new Intl.Collator('zh-CN', { sensitivity: 'base', numeric: true })
 
 // 旧路由保留兼容，但页面不再按阅读时长、页码或完成情况做竞争式排序。
 export default function Ranking() {
+  useRefreshStudentRuntimeOnMount()
   const { runtime } = useStudent()
   const rows = useMemo(() => (runtime.data?.books || [])
     .slice()

@@ -5,6 +5,7 @@ import { buildStudentReaderUrl } from '../../api/student.js'
 import { GlassCard, GlassPanel } from '../components/Glass.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 import useReadingLibrary from '../state/useReadingLibrary.js'
+import useRefreshStudentRuntimeOnMount from '../state/useRefreshStudentRuntimeOnMount.js'
 import { useStudentCommunity } from '../community/CommunityRuntimeContext.jsx'
 
 function formatMinutes(value, { zero = '0 分钟' } = {}) {
@@ -52,6 +53,7 @@ function toDetailBook(raw, { grade, library }) {
 export default function BookDetail() {
   const { bookId } = useParams()
   const navigate = useNavigate()
+  useRefreshStudentRuntimeOnMount()
   const { runtime, student, prefs } = useStudent()
   const { community } = useStudentCommunity()
   const library = useReadingLibrary({ workspaceId: runtime.data?.workspaceId })

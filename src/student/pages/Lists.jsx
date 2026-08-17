@@ -5,12 +5,14 @@ import { GlassCard, GlassPanel } from '../components/Glass.jsx'
 import PageHead from '../components/PageHead.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 import usePersonalReadingAdapter from '../state/usePersonalReadingAdapter.js'
+import useRefreshStudentRuntimeOnMount from '../state/useRefreshStudentRuntimeOnMount.js'
 
 // 全部书单（规格 §5.2）：
 // - 三个系统书单「我喜欢的书／最近阅读／本地下载」由系统自动维护，不能删也不能手动加书；
 // - 自定义书单可以建、改名、调顺序、删除，删掉的进「最近删除」还能恢复；
 // - 删书单不会删掉书，也不会影响阅读进度、书签和摘录。
 export default function Lists() {
+  useRefreshStudentRuntimeOnMount()
   const { runtime } = useStudent()
   const { bookMap, library, me, systemLists, systemListBooks } = usePersonalReadingAdapter({
     workspaceId: runtime.data?.workspaceId,

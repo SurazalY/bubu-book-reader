@@ -3,6 +3,7 @@ import { cx, Icon } from '../../components/ui.jsx'
 import { GlassPanel } from '../components/Glass.jsx'
 import BookCard from '../components/BookCard.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
+import useRefreshStudentRuntimeOnMount from '../state/useRefreshStudentRuntimeOnMount.js'
 
 const SHELF_FILTERS = [
   { key: 'all', label: '全部书籍', icon: 'Library', options: [{ key: 'all', label: '全部', match: () => true }] },
@@ -23,6 +24,7 @@ function findFilterOption(group, option) {
 // 学生能在书架看到的书都可以阅读，未开放的书根本不出现在数据里（不做「无权限」灰卡）。
 // 切换筛选时右侧用交错出现 + 位置过渡，不整页生硬刷新。
 export default function Shelf() {
+  useRefreshStudentRuntimeOnMount()
   const { shelfView, patchShelfView, runtime } = useStudent()
   const books = runtime.data?.books || []
   const { group, option, query, railOpen } = shelfView

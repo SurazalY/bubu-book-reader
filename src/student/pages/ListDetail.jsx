@@ -6,6 +6,7 @@ import BookCard from '../components/BookCard.jsx'
 import PageHead from '../components/PageHead.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 import usePersonalReadingAdapter from '../state/usePersonalReadingAdapter.js'
+import useRefreshStudentRuntimeOnMount from '../state/useRefreshStudentRuntimeOnMount.js'
 
 // 书单详情（规格 §5.2）：
 // - 系统书单只读，页面上直接说明它是怎么自动来的；
@@ -15,6 +16,7 @@ const SUBJECTS = ['全部', '语文', '科学', '道德与法治']
 
 export default function ListDetail() {
   const { listId } = useParams()
+  useRefreshStudentRuntimeOnMount()
   const { runtime } = useStudent()
   const { books: shelfBooks, bookMap, library, me, systemLists, systemListBooks } = usePersonalReadingAdapter({
     workspaceId: runtime.data?.workspaceId,
