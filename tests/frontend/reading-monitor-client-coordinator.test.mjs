@@ -167,6 +167,8 @@ test('统计日边界先以stat_date_change结束旧会话，再建新会话', a
   await fixture.coordinator.start()
   const oldSessionId = fixture.coordinator.getState().sessionId
   await fixture.time.advance(10_000)
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => fixture.submissions[0]?.summary?.endReason === 'stat_date_change')
   const state = fixture.coordinator.getState()
   assert.notEqual(state.sessionId, oldSessionId)
   assert.equal(state.statDate, '2026-08-10')
@@ -187,6 +189,8 @@ test('租约结束原因由服务端权威关闭，客户端只提交截止前�
   await fixture.coordinator.start()
   await fixture.time.advance(60_000)
   assert.equal(fixture.coordinator.getState().closed, true)
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => fixture.submissions.length >= 1)
   assert.equal(fixture.submissions.at(-1).summary.measuredThroughAt, new Date(fixture.time.wallNow()).toISOString())
   assert.equal(fixture.submissions.at(-1).summary.cumulativeEffectiveMs, 60_000)
   assert.equal(fixture.submissions.at(-1).summary.endedAt, null)
@@ -207,6 +211,12 @@ test('租约过期回调迟到30秒也不会计入expiresAt之后的时长', asy
   await fixture.time.advance(10_000)
   await fixture.time.advanceWithoutCallbacks(35_000)
   await fixture.time.runDueCallbacksLate()
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => {
+    const summary = fixture.submissions.at(-1)?.summary
+    return summary?.cumulativeEffectiveMs === 90_000
+      && summary?.measuredThroughAt === new Date(startedAt + 90_000).toISOString()
+  })
   const finalSummary = fixture.submissions.at(-1).summary
   assert.equal(finalSummary.measuredThroughAt, new Date(startedAt + 90_000).toISOString())
   assert.equal(finalSummary.cumulativeEffectiveMs, 90_000)
@@ -347,9 +357,13 @@ test('摘要提交LEASE_CONFLICT后定时链不永久停摆', async () => {
   })
   await fixture.coordinator.start()
   await fixture.time.advance(300_000)
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => calls >= 1 && fixture.submissions.length >= 1)
   assert.equal(calls, 1)
   assert.equal(fixture.submissions.length, 1)
   await fixture.time.advance(300_000)
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => calls >= 2 && fixture.submissions.length >= 2)
   assert.ok(calls >= 2)
   assert.ok(fixture.submissions.length >= 2)
   await fixture.coordinator.stop()
@@ -359,6 +373,8 @@ test('约5分钟、后台、网络恢复和关闭均触发累计摘要', async (
   const fixture = coordinatorFixture()
   await fixture.coordinator.start()
   await fixture.time.advance(300_000)
+  await fixture.coordinator.waitIdle()
+  await waitUntil(() => fixture.submissions.length >= 1)
   assert.ok(fixture.submissions.length >= 1)
   const beforeClose = fixture.submissions.length
   fixture.coordinator.move(view(11), 'student_adjacent')
