@@ -6,6 +6,8 @@ import { createDomainContext, transaction } from './sql.js'
 const SHANGHAI_OFFSET_MS = 8 * 60 * 60 * 1000
 const STAT_DAY_OFFSET_MS = 4 * 60 * 60 * 1000
 const LEASE_TTL_MS = 90 * 1000
+// 7 min = 5 min summary tick + 90 s lease TTL + ~30 s scheduling slack; below 360 s is tight on tick boundaries.
+const STALE_SESSION_RENEW_THRESHOLD_MS = 420 * 1000
 const FUTURE_SKEW_MS = 120 * 1000
 const MAX_SAFE_DURATION = Number.MAX_SAFE_INTEGER
 const ISO_MILLISECONDS = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
@@ -818,6 +820,27 @@ export function createReadingMonitoringDomain(dependencies = {}) {
           || active.device_id !== normalizedDeviceId
           || active.book_version_id !== bookVersionId) {
           throw domainError('LEASE_CONFLICT', '活动租约与当前可信范围不一致')
+        }
+        // Use the latest session on this lease regardless of status: same-device re-acquire
+        // closes open rows with lease_taken_over while the zombie tab keeps renewing.
+        const leaseSession = tableExists(context.db, 'reading_summary_sessions')
+          ? context.db.prepare(`SELECT measured_through_at FROM reading_summary_sessions
+            WHERE lease_id_at_start = :leaseId
+              AND organization_id_at_creation = :organizationId AND actor_id_at_creation = :actorId
+            ORDER BY created_at DESC LIMIT 1`).get({
+            leaseId: normalizedLeaseId,
+            organizationId: organizationId(),
+            actorId: actorId(),
+          })
+          : null
+        if (leaseSession) {
+          const baselineMs = Math.max(
+            Date.parse(leaseSession.measured_through_at),
+            Date.parse(active.acquired_at),
+          )
+          if (Date.parse(renewedAt) - baselineMs > STALE_SESSION_RENEW_THRESHOLD_MS) {
+            throw domainError('LEASE_REQUIRED', '阅读租约关联会话已停滞，不能续期')
+          }
         }
         context.db.prepare(`UPDATE active_reading_leases
           SET expires_at = :expiresAt, updated_at = :renewedAt, version = version + 1

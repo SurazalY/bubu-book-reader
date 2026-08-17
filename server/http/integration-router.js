@@ -38,6 +38,8 @@ import {
 } from '../integration/projections.js'
 
 const DEVICE_COOKIE = 'readmate_device'
+// Persistent device identity across browser restarts; independent of login session TTL.
+const DEVICE_COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60
 const MANUAL_DEMO_EVIDENCE = Object.freeze([
   {
     text: '李老师最近经常当着同学说我没用，我一到他的课就特别害怕。',
@@ -306,6 +308,22 @@ function readDeviceId(req, secret) {
   const supplied = Buffer.from(token.slice(separator + 1), 'base64url')
   const expected = createHmac('sha256', secret).update(deviceId).digest()
   return supplied.length === expected.length && timingSafeEqual(supplied, expected) ? deviceId : null
+}
+
+function deviceCookieOptions(cookieSecure) {
+  return {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: Boolean(cookieSecure),
+    path: '/',
+    maxAge: DEVICE_COOKIE_MAX_AGE_SECONDS,
+  }
+}
+
+function ensureDeviceCookie(req, res, sessionSecret, cookieSecure) {
+  const deviceId = readDeviceId(req, sessionSecret) || randomUUID()
+  res.cookie(DEVICE_COOKIE, signDeviceId(deviceId, sessionSecret), deviceCookieOptions(cookieSecure))
+  return deviceId
 }
 
 function domainForRequest(req, database, identityService) {
@@ -635,8 +653,8 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
 
   router.post('/reading/lease', route(async (req, res) => {
     const key = writeKey(req)
+    const deviceId = ensureDeviceCookie(req, res, sessionSecret, cookieSecure)
     const { reading } = domainForRequest(req, database, identityService)
-    const deviceId = readDeviceId(req, sessionSecret) || randomUUID()
     const outcome = await executeIdempotentAsync(database, {
       key,
       scope: `reading.lease:${req.workspace.organizationId}:${req.identitySession.user.id}:${req.workspace.id}`,
@@ -652,8 +670,6 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
         }
       },
     })
-    const confirmedDeviceId = outcome.payload?.data?.deviceId || deviceId
-    res.cookie(DEVICE_COOKIE, signDeviceId(confirmedDeviceId, sessionSecret), { httpOnly: true, sameSite: 'lax', secure: Boolean(cookieSecure), path: '/' })
     return sendOutcome(res, req, outcome)
   }))
 
@@ -1182,7 +1198,7 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
 
   router.post('/classroom/sessions/:sessionId/control', requirePermission(identityService, 'classroom.control'), route(async (req, res) => {
     const key = writeKey(req)
-    const deviceId = readDeviceId(req, sessionSecret) || randomUUID()
+    const deviceId = ensureDeviceCookie(req, res, sessionSecret, cookieSecure)
     const { teaching } = domainForRequest(req, database, identityService)
     const outcome = await executeIdempotentAsync(database, {
       key,
@@ -1199,8 +1215,6 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
         }
       },
     })
-    const confirmedDeviceId = outcome.payload?.data?.deviceId || deviceId
-    res.cookie(DEVICE_COOKIE, signDeviceId(confirmedDeviceId, sessionSecret), { httpOnly: true, sameSite: 'lax', secure: Boolean(cookieSecure), path: '/' })
     return sendOutcome(res, req, outcome)
   }))
 

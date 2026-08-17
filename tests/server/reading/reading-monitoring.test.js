@@ -578,6 +578,156 @@ test('同租约残留open会话不挡新会话，且不覆盖旧累计毫秒', a
   assert.equal(nextRow.last_page_no, 3)
 })
 
+test('过期租约残留 open 会话时新设备 acquire 成功并关闭残留会话', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:01:00.000Z')
+  const leftover = summaryBody({
+    sessionId: 'session-expired-leftover',
+    leaseId: lease.leaseId,
+    cumulativeEffectiveMs: 60_000,
+    measuredThroughAt: '2026-08-10T00:01:00.000Z',
+    lastPageNo: 1,
+  })
+  assert.equal((await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: leftover,
+  })).result, 'accepted')
+
+  fixture.setNow('2026-08-10T00:02:00.000Z')
+  const newLease = await fixture.reading.acquireLease({ deviceId: 'device-b', bookVersionId: 'version-a' })
+  assert.notEqual(newLease.leaseId, lease.leaseId)
+
+  const leftoverRow = fixture.db.prepare(`SELECT status, end_reason, cumulative_effective_ms, latest_revision
+    FROM reading_summary_sessions WHERE id = 'session-expired-leftover'`).get()
+  assert.equal(leftoverRow.status, 'closed')
+  assert.equal(leftoverRow.end_reason, 'lease_ended')
+  assert.equal(Number(leftoverRow.cumulative_effective_ms), 60_000)
+  assert.equal(Number(leftoverRow.latest_revision), 1)
+})
+
+test('关联 open 会话未超停滞阈值时续期正常成功', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:01:00.000Z')
+  await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: summaryBody({
+      leaseId: lease.leaseId,
+      measuredThroughAt: '2026-08-10T00:01:00.000Z',
+    }),
+  })
+  fixture.setNow('2026-08-10T00:07:00.000Z')
+  const futureExpiry = new Date(Date.parse('2026-08-10T00:07:00.000Z') + 90_000).toISOString()
+  fixture.db.prepare(`UPDATE active_reading_leases SET expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(futureExpiry, '2026-08-10T00:07:00.000Z', lease.leaseId)
+  const renewed = await fixture.monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'device-a',
+    body: { schemaVersion: 1, bookVersionId: 'version-a' },
+  })
+  assert.equal(renewed.leaseId, lease.leaseId)
+  assert.equal(renewed.expiresAt, '2026-08-10T00:08:30.000Z')
+})
+
+test('关联 open 会话停滞超阈值时续期被拒', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:01:00.000Z')
+  await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: summaryBody({
+      leaseId: lease.leaseId,
+      measuredThroughAt: '2026-08-10T00:01:00.000Z',
+    }),
+  })
+  fixture.setNow('2026-08-10T00:08:01.000Z')
+  const futureExpiry = new Date(Date.parse('2026-08-10T00:08:01.000Z') + 90_000).toISOString()
+  fixture.db.prepare(`UPDATE active_reading_leases SET expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(futureExpiry, '2026-08-10T00:08:01.000Z', lease.leaseId)
+  await assert.rejects(() => fixture.monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'device-a',
+    body: { schemaVersion: 1, bookVersionId: 'version-a' },
+  }), { code: 'LEASE_REQUIRED' })
+})
+
+test('关联 closed 会话 measured_through_at 停滞超阈值时续期被拒', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:01:00.000Z')
+  await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: summaryBody({
+      leaseId: lease.leaseId,
+      measuredThroughAt: '2026-08-10T00:01:00.000Z',
+    }),
+  })
+  fixture.db.prepare(`UPDATE reading_summary_sessions
+    SET status = 'closed', ended_at = ?, end_reason = 'lease_taken_over', updated_at = ?
+    WHERE lease_id_at_start = ?`).run('2026-08-10T00:01:00.000Z', '2026-08-10T00:01:00.000Z', lease.leaseId)
+  fixture.setNow('2026-08-10T00:08:01.000Z')
+  const futureExpiry = new Date(Date.parse('2026-08-10T00:08:01.000Z') + 90_000).toISOString()
+  fixture.db.prepare(`UPDATE active_reading_leases SET expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(futureExpiry, '2026-08-10T00:08:01.000Z', lease.leaseId)
+  await assert.rejects(() => fixture.monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'device-a',
+    body: { schemaVersion: 1, bookVersionId: 'version-a' },
+  }), { code: 'LEASE_REQUIRED' })
+})
+
+test('同设备 re-acquire 关闭 open 会话后 measured_through_at 停滞时续期被拒', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:01:00.000Z')
+  await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: summaryBody({
+      leaseId: lease.leaseId,
+      measuredThroughAt: '2026-08-10T00:01:00.000Z',
+    }),
+  })
+  fixture.setNow('2026-08-10T00:08:01.000Z')
+  const futureExpiry = new Date(Date.parse('2026-08-10T00:08:01.000Z') + 90_000).toISOString()
+  fixture.db.prepare(`UPDATE active_reading_leases SET expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(futureExpiry, '2026-08-10T00:08:01.000Z', lease.leaseId)
+  const reacquired = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  assert.equal(reacquired.leaseId, lease.leaseId)
+  const closedRow = fixture.db.prepare(`SELECT status, end_reason, measured_through_at, cumulative_effective_ms
+    FROM reading_summary_sessions WHERE lease_id_at_start = ?`).get(lease.leaseId)
+  assert.equal(closedRow.status, 'closed')
+  assert.equal(closedRow.end_reason, 'lease_taken_over')
+  assert.equal(closedRow.measured_through_at, '2026-08-10T00:01:00.000Z')
+  await assert.rejects(() => fixture.monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'device-a',
+    body: { schemaVersion: 1, bookVersionId: 'version-a' },
+  }), { code: 'LEASE_REQUIRED' })
+})
+
+test('刚获取租约尚无 open 会话时续期正常成功', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:06:00.000Z')
+  const futureExpiry = new Date(Date.parse('2026-08-10T00:06:00.000Z') + 90_000).toISOString()
+  fixture.db.prepare(`UPDATE active_reading_leases SET expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(futureExpiry, '2026-08-10T00:06:00.000Z', lease.leaseId)
+  const renewed = await fixture.monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'device-a',
+    body: { schemaVersion: 1, bookVersionId: 'version-a' },
+  })
+  assert.equal(renewed.leaseId, lease.leaseId)
+  assert.equal(renewed.expiresAt, '2026-08-10T00:07:30.000Z')
+})
+
 test('跨 session 晚到正常累加 delta/OR，但较旧位置不回退', async (t) => {
   const fixture = createFixture()
   t.after(() => fixture.close())

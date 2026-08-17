@@ -136,7 +136,10 @@ async function requestJson(baseUrl, jar, path, options = {}) {
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   })
   rememberCookies(jar, response)
-  return { status: response.status, payload: await response.json() }
+  const setCookies = typeof response.headers.getSetCookie === 'function'
+    ? response.headers.getSetCookie()
+    : [response.headers.get('set-cookie')].filter(Boolean)
+  return { status: response.status, payload: await response.json(), setCookies }
 }
 
 function assertRequestId(response) {
@@ -511,4 +514,163 @@ test('G2-18 HTTP self/scope 严格返回新 DTO，并区分空态、权限、跨
   assert.deepEqual(emptyClass.payload.data.students, [])
   assert.equal(emptyClass.payload.data.trend.length, 7)
   assertRequestId(emptyClass)
+})
+
+test('READING_LEASE_HELD 409 仍下发持久 readmate_device Cookie', async (t) => {
+  const harness = await startHarness(t)
+  const deviceAJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  await acquireLease(harness, deviceAJar, 'lease-held-device-a')
+
+  const deviceBJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const conflict = await requestJson(harness.baseUrl, deviceBJar, '/reading/lease', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'lease-held-device-b',
+    body: { bookVersionId: harness.book.versionId },
+  })
+  assert.equal(conflict.status, 409, JSON.stringify(conflict.payload))
+  assert.equal(conflict.payload.error.code, 'READING_LEASE_HELD')
+  assertRequestId(conflict)
+  assert.ok(conflict.setCookies.some((value) => value.startsWith('readmate_device=')), conflict.setCookies.join('; '))
+  assert.ok(conflict.setCookies.some((value) => /Max-Age=\d+/i.test(value)), conflict.setCookies.join('; '))
+})
+
+test('HTTP 过期租约残留 open 会话时新设备 acquire 成功', async (t) => {
+  const harness = await startHarness(t)
+  const deviceAJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const lease = await acquireLease(harness, deviceAJar, 'expired-leftover-device-a')
+  const activeLease = harness.application.database.prepare('SELECT acquired_at FROM active_reading_leases WHERE id = ?').get(lease.leaseId)
+  const acquiredMs = Date.parse(activeLease.acquired_at)
+  const startedAt = new Date(acquiredMs + 100).toISOString()
+  const measuredThroughAt = new Date(acquiredMs + 200).toISOString()
+  const leftover = summaryBody({
+    leaseId: lease.leaseId,
+    bookVersionId: harness.book.versionId,
+    sessionId: 'session-http-expired-leftover',
+    startedAt,
+    measuredThroughAt,
+    statDate: readingStatDateFor(startedAt),
+    cumulativeEffectiveMs: 100,
+  })
+  leftover.fingerprint = canonicalReadingSummaryFingerprint(leftover)
+  const accepted = await requestJson(harness.baseUrl, deviceAJar, '/reading/session-summaries', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'expired-leftover-summary',
+    body: leftover,
+  })
+  assert.equal(accepted.status, 200, JSON.stringify(accepted.payload))
+
+  const sessionRow = harness.application.database.prepare(`SELECT measured_through_at
+    FROM reading_summary_sessions WHERE id = 'session-http-expired-leftover'`).get()
+  const measuredThroughMs = Date.parse(sessionRow.measured_through_at)
+  while (Date.now() <= measuredThroughMs) {
+    await new Promise((resolve) => setTimeout(resolve, 5))
+  }
+  const expiredAt = sessionRow.measured_through_at
+  harness.application.database.prepare(`UPDATE active_reading_leases
+    SET expires_at = ?, updated_at = ? WHERE id = ?`).run(expiredAt, expiredAt, lease.leaseId)
+
+  const deviceBJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const acquired = await requestJson(harness.baseUrl, deviceBJar, '/reading/lease', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'expired-leftover-device-b',
+    body: { bookVersionId: harness.book.versionId },
+  })
+  assert.equal(acquired.status, 200, JSON.stringify(acquired.payload))
+  assert.notEqual(acquired.payload.data.leaseId, lease.leaseId)
+
+  const leftoverRow = harness.application.database.prepare(`SELECT status, end_reason, cumulative_effective_ms, latest_revision
+    FROM reading_summary_sessions WHERE id = 'session-http-expired-leftover'`).get()
+  assert.equal(leftoverRow.status, 'closed')
+  assert.equal(leftoverRow.end_reason, 'lease_ended')
+  assert.equal(Number(leftoverRow.cumulative_effective_ms), 100)
+  assert.equal(Number(leftoverRow.latest_revision), 1)
+})
+
+test('HTTP 关联 open 会话停滞超阈值时续期返回 LEASE_REQUIRED', async (t) => {
+  const harness = await startHarness(t)
+  const studentJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const lease = await acquireLease(harness, studentJar, 'http-stale-open-acquire')
+  const baseMs = Date.now() - 500_000
+  const acquiredAt = new Date(baseMs).toISOString()
+  const futureExpiry = new Date(Date.now() + 90_000).toISOString()
+  harness.application.database.prepare(`UPDATE active_reading_leases
+    SET acquired_at = ?, created_at = ?, expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(acquiredAt, acquiredAt, futureExpiry, new Date().toISOString(), lease.leaseId)
+  harness.application.database.prepare(`UPDATE reading_device_lease_history
+    SET valid_from = ?, valid_until = ?, updated_at = ? WHERE lease_id = ?`)
+    .run(acquiredAt, futureExpiry, new Date().toISOString(), lease.leaseId)
+  const summary = summaryBody({
+    leaseId: lease.leaseId,
+    bookVersionId: harness.book.versionId,
+    baseMs,
+    measuredThroughAt: new Date(baseMs + 1_000).toISOString(),
+    cumulativeEffectiveMs: 1_000,
+  })
+  const accepted = await requestJson(harness.baseUrl, studentJar, '/reading/session-summaries', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-stale-open-summary',
+    body: summary,
+  })
+  assert.equal(accepted.status, 200, JSON.stringify(accepted.payload))
+
+  const rejected = await requestJson(harness.baseUrl, studentJar, `/reading/lease/${encodeURIComponent(lease.leaseId)}/renew`, {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-stale-open-renew',
+    body: { schemaVersion: 1, bookVersionId: harness.book.versionId },
+  })
+  assert.equal(rejected.status, 409, JSON.stringify(rejected.payload))
+  assert.equal(rejected.payload.error.code, 'LEASE_REQUIRED')
+  assertRequestId(rejected)
+})
+
+test('HTTP re-acquire 关闭 open 会话后 measured_through_at 停滞时续期返回 LEASE_REQUIRED', async (t) => {
+  const harness = await startHarness(t)
+  const studentJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const lease = await acquireLease(harness, studentJar, 'http-stale-closed-acquire')
+  const baseMs = Date.now() - 500_000
+  const acquiredAt = new Date(baseMs).toISOString()
+  const futureExpiry = new Date(Date.now() + 90_000).toISOString()
+  harness.application.database.prepare(`UPDATE active_reading_leases
+    SET acquired_at = ?, created_at = ?, expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(acquiredAt, acquiredAt, futureExpiry, new Date().toISOString(), lease.leaseId)
+  harness.application.database.prepare(`UPDATE reading_device_lease_history
+    SET valid_from = ?, valid_until = ?, updated_at = ? WHERE lease_id = ?`)
+    .run(acquiredAt, futureExpiry, new Date().toISOString(), lease.leaseId)
+  const summary = summaryBody({
+    leaseId: lease.leaseId,
+    bookVersionId: harness.book.versionId,
+    baseMs,
+    measuredThroughAt: new Date(baseMs + 1_000).toISOString(),
+    cumulativeEffectiveMs: 1_000,
+  })
+  const accepted = await requestJson(harness.baseUrl, studentJar, '/reading/session-summaries', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-stale-closed-summary',
+    body: summary,
+  })
+  assert.equal(accepted.status, 200, JSON.stringify(accepted.payload))
+
+  const reacquired = await acquireLease(harness, studentJar, 'http-stale-closed-reacquire')
+  assert.equal(reacquired.leaseId, lease.leaseId)
+  const closedRow = harness.application.database.prepare(`SELECT status, end_reason, measured_through_at
+    FROM reading_summary_sessions WHERE lease_id_at_start = ?`).get(lease.leaseId)
+  assert.equal(closedRow.status, 'closed')
+  assert.equal(closedRow.end_reason, 'lease_taken_over')
+  assert.equal(closedRow.measured_through_at, summary.measuredThroughAt)
+
+  const rejected = await requestJson(harness.baseUrl, studentJar, `/reading/lease/${encodeURIComponent(lease.leaseId)}/renew`, {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-stale-closed-renew',
+    body: { schemaVersion: 1, bookVersionId: harness.book.versionId },
+  })
+  assert.equal(rejected.status, 409, JSON.stringify(rejected.payload))
+  assert.equal(rejected.payload.error.code, 'LEASE_REQUIRED')
+  assertRequestId(rejected)
 })
