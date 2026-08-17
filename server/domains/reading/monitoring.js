@@ -7,6 +7,9 @@ const SHANGHAI_OFFSET_MS = 8 * 60 * 60 * 1000
 const STAT_DAY_OFFSET_MS = 4 * 60 * 60 * 1000
 const LEASE_TTL_MS = 90 * 1000
 // 7 min = 5 min summary tick + 90 s lease TTL + ~30 s scheduling slack; below 360 s is tight on tick boundaries.
+// Renew and takeover share this threshold. No-session leases use acquired_at as the
+// baseline so "never created a session" is the same stale path, not a skipped if.
+// Healthy clients create a server session in 30–51 ms; 420 s is intentionally loose.
 const STALE_SESSION_RENEW_THRESHOLD_MS = 420 * 1000
 const FUTURE_SKEW_MS = 120 * 1000
 const MAX_SAFE_DURATION = Number.MAX_SAFE_INTEGER
@@ -337,6 +340,35 @@ export function closeReadingSummarySessionsForLease(database, input) {
   requireDatabase(database)
   if (!LEASE_END_REASONS.has(input.endReason)) throw validationError('租约结束原因无效')
   return closeOpenSummaryRows(database, input)
+}
+
+export function findLatestLeaseSession(database, { leaseId, organizationId, actorId }) {
+  requireDatabase(database)
+  if (!tableExists(database, 'reading_summary_sessions')) return null
+  return database.prepare(`SELECT measured_through_at, created_at FROM reading_summary_sessions
+    WHERE lease_id_at_start = :leaseId
+      AND organization_id_at_creation = :organizationId AND actor_id_at_creation = :actorId
+    ORDER BY created_at DESC LIMIT 1`).get({ leaseId, organizationId, actorId }) || null
+}
+
+export function readingLeaseWorkBaselineMs(lease, sessionRow) {
+  if (sessionRow?.measured_through_at) {
+    const measured = Date.parse(sessionRow.measured_through_at)
+    if (Number.isFinite(measured)) return measured
+  }
+  const acquired = Date.parse(lease?.acquired_at)
+  if (!Number.isFinite(acquired)) throw new TypeError('lease.acquired_at 必须是有效时间')
+  return acquired
+}
+
+export function isReadingLeaseWorkStale(
+  lease,
+  sessionRow,
+  nowMs,
+  thresholdMs = STALE_SESSION_RENEW_THRESHOLD_MS,
+) {
+  if (!Number.isFinite(nowMs)) throw new TypeError('nowMs 必须是有效时间')
+  return nowMs - readingLeaseWorkBaselineMs(lease, sessionRow) > thresholdMs
 }
 
 function expireStaleLeasesForActor(database, actorId, nowIso) {
@@ -821,26 +853,15 @@ export function createReadingMonitoringDomain(dependencies = {}) {
           || active.book_version_id !== bookVersionId) {
           throw domainError('LEASE_CONFLICT', '活动租约与当前可信范围不一致')
         }
-        // Use the latest session on this lease regardless of status: same-device re-acquire
-        // closes open rows with lease_taken_over while the zombie tab keeps renewing.
-        const leaseSession = tableExists(context.db, 'reading_summary_sessions')
-          ? context.db.prepare(`SELECT measured_through_at FROM reading_summary_sessions
-            WHERE lease_id_at_start = :leaseId
-              AND organization_id_at_creation = :organizationId AND actor_id_at_creation = :actorId
-            ORDER BY created_at DESC LIMIT 1`).get({
-            leaseId: normalizedLeaseId,
-            organizationId: organizationId(),
-            actorId: actorId(),
-          })
-          : null
-        if (leaseSession) {
-          const baselineMs = Math.max(
-            Date.parse(leaseSession.measured_through_at),
-            Date.parse(active.acquired_at),
-          )
-          if (Date.parse(renewedAt) - baselineMs > STALE_SESSION_RENEW_THRESHOLD_MS) {
-            throw domainError('LEASE_REQUIRED', '阅读租约关联会话已停滞，不能续期')
-          }
+        // Latest session on this lease regardless of status; if none exists, acquired_at
+        // is the baseline so a lease that never created a session cannot renew forever.
+        const leaseSession = findLatestLeaseSession(context.db, {
+          leaseId: normalizedLeaseId,
+          organizationId: organizationId(),
+          actorId: actorId(),
+        })
+        if (isReadingLeaseWorkStale(active, leaseSession, Date.parse(renewedAt))) {
+          throw domainError('LEASE_REQUIRED', '阅读租约关联会话已停滞，不能续期')
         }
         context.db.prepare(`UPDATE active_reading_leases
           SET expires_at = :expiresAt, updated_at = :renewedAt, version = version + 1
@@ -981,5 +1002,6 @@ export function cleanupReadingSummarySessions({ db, now }) {
 }
 
 export const READING_LEASE_TTL_MS = LEASE_TTL_MS
+export const READING_STALE_SESSION_THRESHOLD_MS = STALE_SESSION_RENEW_THRESHOLD_MS
 export const READING_FUTURE_SKEW_MS = FUTURE_SKEW_MS
 export const READING_MAX_CUMULATIVE_MS = MAX_SAFE_DURATION

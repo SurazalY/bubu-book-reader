@@ -4,6 +4,9 @@ export const MAX_CONTINUOUS_EFFECTIVE_MS = 300_000
 export const SKIP_VIEW_MAX_MS = 5_000
 export const REREAD_VIEW_MIN_MS = 30_000
 export const SUMMARY_INTERVAL_MS = 300_000
+// Bound navigation/close waits so a blocked submit queue cannot freeze "返回详情".
+// Healthy confirmation is one HTTP RTT; 4s is enough on a live link and still finite.
+export const CLOSE_WAIT_TIMEOUT_MS = 4_000
 
 export const MOVEMENT_SOURCES = Object.freeze([
   'student_adjacent',

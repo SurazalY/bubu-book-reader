@@ -786,8 +786,11 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
         <button
           type="button"
           onClick={async () => {
-            await telemetry.closeAndWait('reader_close')
-            navigate(`/student/books/${bookId}`)
+            try {
+              await telemetry.closeAndWait('reader_close')
+            } finally {
+              navigate(`/student/books/${bookId}`)
+            }
           }}
           className="student-reader-btn"
           title="回到书籍详情"

@@ -486,6 +486,7 @@ export function createReadingMonitorCoordinator({
     },
     close(reason = 'reader_close', options = {}) {
       const waitForTerminal = options.waitForTerminal === true
+      const waitTimeoutMs = options.waitTimeoutMs
       const closing = run(async () => {
         await ensureCurrentStatDateDirect()
         return closeDirect(reason, options)
@@ -493,8 +494,26 @@ export function createReadingMonitorCoordinator({
       if (!waitForTerminal) return closing
       return closing.then(async (result) => {
         if (result.confirmed || !result.pendingKey) return result
-        const confirmation = await queue.waitForTerminal(result.pendingKey)
-        return { ...result, confirmed: true, confirmation }
+        if (!Number.isFinite(waitTimeoutMs) || waitTimeoutMs < 0) {
+          const confirmation = await queue.waitForTerminal(result.pendingKey)
+          return { ...result, confirmed: true, confirmation }
+        }
+        let timeoutTimer = null
+        const timeout = new Promise((resolve) => {
+          timeoutTimer = scheduler.setTimeout(() => resolve({ result: 'timeout' }), waitTimeoutMs)
+        })
+        try {
+          const confirmation = await Promise.race([
+            queue.waitForTerminal(result.pendingKey),
+            timeout,
+          ])
+          if (confirmation?.result === 'timeout') {
+            return { ...result, confirmed: false, timedOut: true, confirmation }
+          }
+          return { ...result, confirmed: true, confirmation }
+        } finally {
+          if (timeoutTimer != null) scheduler.clearTimeout(timeoutTimer)
+        }
       })
     },
     async stop() {

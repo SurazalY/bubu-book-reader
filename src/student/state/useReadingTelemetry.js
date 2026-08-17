@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { createStudentApi } from '../../api/student.js'
 import {
+  CLOSE_WAIT_TIMEOUT_MS,
   createClock,
   createPendingStore,
   createReadingMonitorApiPorts,
@@ -281,7 +282,10 @@ export default function useReadingTelemetry({
     closeAndWait(reason = 'reader_close') {
       const entry = coordinatorRef.current
       if (!entry) return Promise.resolve({ confirmed: true })
-      return entry.ready.then(() => entry.coordinator?.close(reason, { waitForTerminal: true }) ?? { confirmed: true })
+      return entry.ready.then(() => entry.coordinator?.close(reason, {
+        waitForTerminal: true,
+        waitTimeoutMs: CLOSE_WAIT_TIMEOUT_MS,
+      }) ?? { confirmed: true })
     },
     drainPending() {
       const entry = coordinatorRef.current

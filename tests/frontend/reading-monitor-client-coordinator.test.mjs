@@ -431,6 +431,41 @@ test('真实生命周期事件在后台、freeze和网络恢复时额外提交',
   await fixture.coordinator.stop()
 })
 
+test('提交队列堵塞时关闭等待在有界超时后仍能完成', async () => {
+  const fixture = coordinatorFixture({
+    submitSummary: async () => {
+      throw Object.assign(new Error('断网'), { code: 'NETWORK_ERROR' })
+    },
+  })
+  await fixture.coordinator.start()
+  await fixture.time.advance(5_000)
+  let settled = false
+  const closing = fixture.coordinator.close('reader_close', {
+    waitForTerminal: true,
+    waitTimeoutMs: 1_000,
+  }).then((result) => {
+    settled = true
+    return result
+  })
+  await waitUntil(() => fixture.store.records.length === 1 && settled === false)
+  assert.equal(settled, false)
+  await fixture.coordinator.waitIdle()
+  await fixture.time.advance(1_000)
+  const result = await closing
+  assert.equal(settled, true)
+  assert.equal(result.timedOut, true)
+  assert.equal(result.confirmed, false)
+  assert.equal(fixture.store.records.length, 1)
+  assert.equal(result.summary.endReason, 'reader_close')
+  await fixture.coordinator.stop()
+})
+
+test('closeAndWait 生产路径把有界超时传给关闭等待', async () => {
+  const source = await readFile(new URL('../../src/student/state/useReadingTelemetry.js', import.meta.url), 'utf8')
+  assert.match(source, /waitForTerminal:\s*true/)
+  assert.match(source, /waitTimeoutMs:\s*CLOSE_WAIT_TIMEOUT_MS/)
+})
+
 test('首页刷新协调在accepted终态前不解锁', async () => {
   let online = false
   const fixture = coordinatorFixture({

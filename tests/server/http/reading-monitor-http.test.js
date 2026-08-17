@@ -674,3 +674,102 @@ test('HTTP re-acquire 关闭 open 会话后 measured_through_at 停滞时续期�
   assert.equal(rejected.payload.error.code, 'LEASE_REQUIRED')
   assertRequestId(rejected)
 })
+
+test('HTTP 拿到租约但从未创建会话，超过停滞阈值后续期返回 LEASE_REQUIRED', async (t) => {
+  const harness = await startHarness(t)
+  const studentJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const lease = await acquireLease(harness, studentJar, 'http-no-session-stale-acquire')
+  const sessionCount = harness.application.database.prepare(
+    'SELECT COUNT(*) AS n FROM reading_summary_sessions WHERE lease_id_at_start = ?',
+  ).get(lease.leaseId)
+  assert.equal(Number(sessionCount.n), 0)
+  const acquiredAt = new Date(Date.now() - 500_000).toISOString()
+  const futureExpiry = new Date(Date.now() + 90_000).toISOString()
+  harness.application.database.prepare(`UPDATE active_reading_leases
+    SET acquired_at = ?, created_at = ?, expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(acquiredAt, acquiredAt, futureExpiry, new Date().toISOString(), lease.leaseId)
+  harness.application.database.prepare(`UPDATE reading_device_lease_history
+    SET valid_from = ?, valid_until = ?, updated_at = ? WHERE lease_id = ?`)
+    .run(acquiredAt, futureExpiry, new Date().toISOString(), lease.leaseId)
+  const rejected = await requestJson(harness.baseUrl, studentJar, `/reading/lease/${encodeURIComponent(lease.leaseId)}/renew`, {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-no-session-stale-renew',
+    body: { schemaVersion: 1, bookVersionId: harness.book.versionId },
+  })
+  assert.equal(rejected.status, 409, JSON.stringify(rejected.payload))
+  assert.equal(rejected.payload.error.code, 'LEASE_REQUIRED')
+  assertRequestId(rejected)
+})
+
+test('HTTP 在位者活跃提交时另一设备 takeover 返回 READING_LEASE_HELD', async (t) => {
+  const harness = await startHarness(t)
+  const deviceAJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const lease = await acquireLease(harness, deviceAJar, 'http-active-hold-a')
+  const summary = summaryBody({
+    leaseId: lease.leaseId,
+    bookVersionId: harness.book.versionId,
+  })
+  const accepted = await requestJson(harness.baseUrl, deviceAJar, '/reading/session-summaries', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-active-hold-summary',
+    body: summary,
+  })
+  assert.equal(accepted.status, 200, JSON.stringify(accepted.payload))
+
+  const deviceBJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const conflict = await requestJson(harness.baseUrl, deviceBJar, '/reading/lease', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-active-hold-b',
+    body: { bookVersionId: harness.book.versionId, takeover: true },
+  })
+  assert.equal(conflict.status, 409, JSON.stringify(conflict.payload))
+  assert.equal(conflict.payload.error.code, 'READING_LEASE_HELD')
+  assertRequestId(conflict)
+  const held = harness.application.database.prepare(
+    'SELECT device_id, released_at FROM active_reading_leases WHERE id = ?',
+  ).get(lease.leaseId)
+  assert.equal(held.released_at, null)
+})
+
+test('HTTP 在位者会话停滞时另一设备仍可接管', async (t) => {
+  const harness = await startHarness(t)
+  const deviceAJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const lease = await acquireLease(harness, deviceAJar, 'http-stale-takeover-a')
+  const baseMs = Date.now() - 500_000
+  const acquiredAt = new Date(baseMs).toISOString()
+  const futureExpiry = new Date(Date.now() + 90_000).toISOString()
+  harness.application.database.prepare(`UPDATE active_reading_leases
+    SET acquired_at = ?, created_at = ?, expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(acquiredAt, acquiredAt, futureExpiry, new Date().toISOString(), lease.leaseId)
+  harness.application.database.prepare(`UPDATE reading_device_lease_history
+    SET valid_from = ?, valid_until = ?, updated_at = ? WHERE lease_id = ?`)
+    .run(acquiredAt, futureExpiry, new Date().toISOString(), lease.leaseId)
+  const summary = summaryBody({
+    leaseId: lease.leaseId,
+    bookVersionId: harness.book.versionId,
+    baseMs,
+    measuredThroughAt: new Date(baseMs + 1_000).toISOString(),
+    cumulativeEffectiveMs: 1_000,
+  })
+  const accepted = await requestJson(harness.baseUrl, deviceAJar, '/reading/session-summaries', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-stale-takeover-summary',
+    body: summary,
+  })
+  assert.equal(accepted.status, 200, JSON.stringify(accepted.payload))
+
+  const deviceBJar = await login(harness.baseUrl, harness.fixture, harness.fixture.studentId)
+  const taken = await requestJson(harness.baseUrl, deviceBJar, '/reading/lease', {
+    method: 'POST',
+    workspaceId: harness.fixture.workspaceId,
+    idempotencyKey: 'http-stale-takeover-b',
+    body: { bookVersionId: harness.book.versionId, takeover: true },
+  })
+  assert.equal(taken.status, 200, JSON.stringify(taken.payload))
+  assert.notEqual(taken.payload.data.leaseId, lease.leaseId)
+  assertRequestId(taken)
+})

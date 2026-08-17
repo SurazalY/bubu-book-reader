@@ -10,7 +10,11 @@ import {
   transaction,
   uniqueRows,
 } from './sql.js'
-import { closeReadingSummarySessionsForLease } from './monitoring.js'
+import {
+  closeReadingSummarySessionsForLease,
+  findLatestLeaseSession,
+  isReadingLeaseWorkStale,
+} from './monitoring.js'
 
 const MAX_EVENT_SECONDS = 120
 const DEFAULT_MAX_OFFLINE_AGE_MS = 7 * 24 * 60 * 60 * 1000
@@ -293,10 +297,23 @@ export function createReadingDomain(dependencies) {
           WHERE actor_id = :actorId AND released_at IS NULL AND expires_at <= :now`, { actorId: actorId(), now })
         const active = one(context.db, `SELECT * FROM active_reading_leases
           WHERE actor_id = :actorId AND released_at IS NULL AND expires_at > :now`, { actorId: actorId(), now })
-        if (active && active.device_id !== deviceId && !input.takeover) {
-          const error = new Error('另一台阅读设备仍持有租约，请显式接管')
-          error.code = 'READING_LEASE_HELD'
-          throw error
+        if (active && active.device_id !== deviceId) {
+          const leaseSession = findLatestLeaseSession(context.db, {
+            leaseId: active.id,
+            organizationId: organizationId(),
+            actorId: actorId(),
+          })
+          const stale = isReadingLeaseWorkStale(active, leaseSession, nowDate.getTime())
+          if (!stale && leaseSession) {
+            const error = new Error('另一台阅读设备仍在活跃提交，不能抢占')
+            error.code = 'READING_LEASE_HELD'
+            throw error
+          }
+          if (!stale && !leaseSession && !input.takeover) {
+            const error = new Error('另一台阅读设备仍持有租约，请显式接管')
+            error.code = 'READING_LEASE_HELD'
+            throw error
+          }
         }
         if (active && active.device_id === deviceId) {
           const currentHistory = one(context.db, `SELECT * FROM reading_device_lease_history

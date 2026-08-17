@@ -728,6 +728,89 @@ test('刚获取租约尚无 open 会话时续期正常成功', async (t) => {
   assert.equal(renewed.expiresAt, '2026-08-10T00:07:30.000Z')
 })
 
+test('拿到租约但从未创建任何会话，超过停滞阈值后续期被拒', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  const sessionCount = fixture.db.prepare(
+    'SELECT COUNT(*) AS n FROM reading_summary_sessions WHERE lease_id_at_start = ?',
+  ).get(lease.leaseId)
+  assert.equal(Number(sessionCount.n), 0)
+  fixture.setNow('2026-08-10T00:07:01.000Z')
+  const futureExpiry = new Date(Date.parse('2026-08-10T00:07:01.000Z') + 90_000).toISOString()
+  fixture.db.prepare(`UPDATE active_reading_leases SET expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(futureExpiry, '2026-08-10T00:07:01.000Z', lease.leaseId)
+  await assert.rejects(() => fixture.monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'device-a',
+    body: { schemaVersion: 1, bookVersionId: 'version-a' },
+  }), { code: 'LEASE_REQUIRED' })
+})
+
+test('在位者活跃提交时另一设备接管被拒', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:01:00.000Z')
+  await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: summaryBody({
+      leaseId: lease.leaseId,
+      measuredThroughAt: '2026-08-10T00:01:00.000Z',
+    }),
+  })
+  await assert.rejects(
+    () => fixture.reading.takeOverLease({ deviceId: 'device-b', bookVersionId: 'version-a' }),
+    { code: 'READING_LEASE_HELD' },
+  )
+  const held = fixture.db.prepare(
+    'SELECT id, device_id, released_at FROM active_reading_leases WHERE id = ?',
+  ).get(lease.leaseId)
+  assert.equal(held.device_id, 'device-a')
+  assert.equal(held.released_at, null)
+})
+
+test('在位者会话停滞时另一设备仍可正常接管', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:01:00.000Z')
+  await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: summaryBody({
+      leaseId: lease.leaseId,
+      measuredThroughAt: '2026-08-10T00:01:00.000Z',
+    }),
+  })
+  fixture.setNow('2026-08-10T00:08:01.000Z')
+  const futureExpiry = new Date(Date.parse('2026-08-10T00:08:01.000Z') + 90_000).toISOString()
+  fixture.db.prepare(`UPDATE active_reading_leases SET expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(futureExpiry, '2026-08-10T00:08:01.000Z', lease.leaseId)
+  const taken = await fixture.reading.takeOverLease({ deviceId: 'device-b', bookVersionId: 'version-a' })
+  assert.notEqual(taken.leaseId, lease.leaseId)
+  assert.equal(taken.takeover, true)
+  const previous = fixture.db.prepare(
+    'SELECT released_at FROM active_reading_leases WHERE id = ?',
+  ).get(lease.leaseId)
+  assert.equal(previous.released_at, '2026-08-10T00:08:01.000Z')
+})
+
+test('在位者无会话且已停滞时另一设备无需 takeover 即可获取', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:07:01.000Z')
+  const futureExpiry = new Date(Date.parse('2026-08-10T00:07:01.000Z') + 90_000).toISOString()
+  fixture.db.prepare(`UPDATE active_reading_leases SET expires_at = ?, updated_at = ? WHERE id = ?`)
+    .run(futureExpiry, '2026-08-10T00:07:01.000Z', lease.leaseId)
+  const acquired = await fixture.reading.acquireLease({ deviceId: 'device-b', bookVersionId: 'version-a' })
+  assert.notEqual(acquired.leaseId, lease.leaseId)
+  const previous = fixture.db.prepare(
+    'SELECT released_at FROM active_reading_leases WHERE id = ?',
+  ).get(lease.leaseId)
+  assert.equal(previous.released_at, '2026-08-10T00:07:01.000Z')
+})
+
 test('跨 session 晚到正常累加 delta/OR，但较旧位置不回退', async (t) => {
   const fixture = createFixture()
   t.after(() => fixture.close())
