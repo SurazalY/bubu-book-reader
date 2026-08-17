@@ -1,0 +1,148 @@
+{
+  "task": "T3.2-preimport-baseline",
+  "sampledAt": "2026-08-17T19:17:49.347319+08:00",
+  "dbUri": "file:D:/Project/整书8.15/server/data/readmate.sqlite?mode=ro",
+  "journalMode": "wal",
+  "openedReadOnly": true,
+  "wroteToDatabase": false,
+  "rebuild": {
+    "book-001": {
+      "exitCode": 0,
+      "buildSeconds": 8.052,
+      "wallSeconds": 9.186,
+      "manifestSha256": "05941212b7f9cf33b6d7d52042c41cfb9bfad523e97c676fe96e502a902842d6",
+      "t31ExpectedSha256": "05941212b7f9cf33b6d7d52042c41cfb9bfad523e97c676fe96e502a902842d6",
+      "matchesT31": true,
+      "pageCount": 98,
+      "blankPageCount": 10,
+      "qualityStatus": "trusted-baseline",
+      "versionId": "book-001-trusted-v1"
+    },
+    "book-028": {
+      "exitCode": 0,
+      "buildSeconds": 7.958,
+      "wallSeconds": 8.933,
+      "manifestSha256": "e0010463288f24fb31d2e595c14151b831404e1df9de6f4ca9f5e697b67b6570",
+      "t31ExpectedSha256": "e0010463288f24fb31d2e595c14151b831404e1df9de6f4ca9f5e697b67b6570",
+      "matchesT31": true,
+      "pageCount": 146,
+      "blankPageCount": 27,
+      "qualityStatus": "trusted-baseline",
+      "versionId": "book-028-trusted-v1"
+    },
+    "commands": [
+      "book-parser\\.venv-win\\Scripts\\python.exe book-parser\\pipeline\\build_trusted_package_v2.py --book-id book-001 --force",
+      "book-parser\\.venv-win\\Scripts\\python.exe book-parser\\pipeline\\build_trusted_package_v2.py --book-id book-028 --force"
+    ]
+  },
+  "book031PageContinuity": {
+    "pagesDir": "book-parser/work/ocr-antigravity-v1/jobs/book-031/pages",
+    "fileTotal": 161,
+    "txtCount": 160,
+    "blankCount": 1,
+    "missing": [],
+    "duplicates": [],
+    "otherFiles": [],
+    "passed": true,
+    "sampleFirst5": [
+      "page-0001.txt",
+      "page-0002.txt",
+      "page-0003.txt",
+      "page-0004.txt",
+      "page-0005.blank"
+    ],
+    "sampleLast5": [
+      "page-0157.txt",
+      "page-0158.txt",
+      "page-0159.txt",
+      "page-0160.txt",
+      "page-0161.txt"
+    ]
+  },
+  "note": "books 表主键列名为 id（不是 book_id）。下列 books 行按任务要求记录该书标识与 status。",
+  "books": [
+    {
+      "book_id": "book-001",
+      "id": "book-001",
+      "status": "published"
+    }
+  ],
+  "book_versions": [
+    {
+      "id": "book-001-trusted-v1",
+      "book_id": "book-001",
+      "package_quality_status": "trusted-baseline"
+    }
+  ],
+  "reading_summary_sessions": {
+    "rowCount": 7,
+    "rows": [
+      {
+        "id": "reading-session-5ef8e32c-d9df-4c22-bf4e-2d6f0a290310",
+        "cumulative_effective_ms": 194544
+      },
+      {
+        "id": "reading-session-7619f0f2-fb47-4876-a8d0-e11c387649aa",
+        "cumulative_effective_ms": 20651
+      },
+      {
+        "id": "reading-session-7ae5ac37-1ef7-4d41-912f-1af2cb1cb123",
+        "cumulative_effective_ms": 24888
+      },
+      {
+        "id": "reading-session-9bc60936-f73c-4a13-b616-8f58eca628fc",
+        "cumulative_effective_ms": 97821
+      },
+      {
+        "id": "reading-session-a9f014b0-32da-49a3-9ab3-f304ff91a4d3",
+        "cumulative_effective_ms": 3978
+      },
+      {
+        "id": "reading-session-c0627dc0-ac63-4ae2-8c7b-16161daeb8a9",
+        "cumulative_effective_ms": 1480
+      },
+      {
+        "id": "reading-session-f7246f26-3353-4f92-8773-649643703c4b",
+        "cumulative_effective_ms": 19184
+      }
+    ]
+  },
+  "reading_progress": {
+    "rowCount": 1,
+    "rows": [
+      {
+        "book_version_id": "book-001-trusted-v1",
+        "last_page_no": 21
+      }
+    ]
+  },
+  "reading_daily_book_summaries": {
+    "rowCount": 1,
+    "durationColumn": "effective_reading_ms",
+    "byStatDate": [
+      {
+        "stat_date": "2026-08-17",
+        "rowCount": 1,
+        "effective_reading_ms": 362546
+      }
+    ],
+    "rows": [
+      {
+        "id": "a559fd6e-845f-478f-915e-4ec7cee6d825",
+        "book_version_id": "book-001-trusted-v1",
+        "stat_date": "2026-08-17",
+        "effective_reading_ms": 362546,
+        "last_page_no": 21
+      }
+    ]
+  },
+  "reading_page_coverage": {
+    "rowCount": 22
+  },
+  "inventoryConclusion": {
+    "bookIds": ["book-001"],
+    "versionIds": ["book-001-trusted-v1"],
+    "onlyBook001Imported": true,
+    "book028Present": false
+  }
+}
