@@ -14,6 +14,7 @@
     "server": "node server/index.js",
     "seed:identity": "node server/db/import-seed.js",
     "import:catalog": "node server/db/import-public-domain-catalog.js",
+    "import:book-package-v2": "node server/db/import-book-package-v2.js",
     "bootstrap:internal": "node server/db/bootstrap-internal-demo.js",
     "maintenance:reading-monitor-cleanup": "node server/scripts/reading-monitor-cleanup.js",
     "test:frontend": "node --test tests/frontend/*.mjs",
@@ -21,6 +22,7 @@
   },
   "dependencies": {
     "lucide-react": "^0.460.0",
+    "pdfjs-dist": "6.2.108",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-pageflip": "^2.0.3",
