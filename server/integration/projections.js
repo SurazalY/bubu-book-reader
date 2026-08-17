@@ -12,7 +12,10 @@ function publicAsset(row) {
   return {
     id: row.id ?? null,
     kind: row.asset_type,
-    url: `/${String(row.storage_key).replace(/^\/+/, '')}`,
+    url: `/api/v1/books/assets/${encodeURIComponent(row.id)}`,
+    mimeType: row.mime_type,
+    sizeBytes: row.size_bytes,
+    sha256: row.sha256,
   }
 }
 
@@ -87,12 +90,13 @@ export function projectBooks(database, actorId, workspaceId, rows) {
       id: row.id,
       versionId: row.book_version_id,
       title: row.title,
+      grade: row.grade ?? null,
       author: row.author ?? null,
       illustrator: row.illustrator ?? null,
       sourcePage: row.source_page ?? null,
       usageLabel: row.catalog_usage_label ?? row.cover?.usage_label ?? null,
       cover: publicAsset(row.cover),
-      assets: row.cover ? [publicAsset(row.cover)] : [],
+      assets: (row.assets || []).map(publicAsset),
       progress: projectedProgress,
       access: { readable: true },
       lists: [],
@@ -119,9 +123,9 @@ export function projectBooks(database, actorId, workspaceId, rows) {
   })
 }
 
-export function projectBookPage(database, page) {
+export function projectBookPage(database, page, { readRangeVersion } = {}) {
   const illustration = database.prepare(`
-    SELECT id, asset_type, storage_key
+    SELECT id, asset_type, storage_key, mime_type, size_bytes, sha256
     FROM book_assets
     WHERE page_id = ? AND asset_type = 'page_image'
     ORDER BY created_at, id
@@ -130,16 +134,20 @@ export function projectBookPage(database, page) {
   return {
     id: page.id,
     pageNo: page.page_no,
+    printedPageLabel: page.printed_page_label,
     bookVersionId: page.book_version_id,
-    text: page.text_content,
+    text: page.normalized_text,
+    rawText: page.raw_text,
     width: page.width,
     height: page.height,
+    readRangeVersion,
     pageImage: publicAsset(illustration),
     blocks: page.blocks.map((block) => ({
       id: block.id,
       blockId: block.id,
       kind: 'paragraph',
-      text: block.text_content,
+      text: block.normalized_text,
+      rawText: block.raw_text,
       charStart: block.char_start,
       charEnd: block.char_end,
       coordinates: { x: block.x, y: block.y, width: block.width, height: block.height },

@@ -100,22 +100,27 @@ function insertSession(db, overrides = {}) {
     )`).run(sessionValues(overrides))
 }
 
-test('043 在全新数据库顺序执行并由迁移账本重复启动校验和保护', (t) => {
+test('044 在全新数据库顺序执行并由迁移账本重复启动校验和保护', (t) => {
   const fixture = temporaryDatabase('reading-monitor-fresh-')
   t.after(() => fixture.close())
   const first = runMigrations(fixture.db, migrationDirectory, NOW)
   const second = runMigrations(fixture.db, migrationDirectory, NOW)
-  assert.equal(first.applied.at(-1), '043_reading_session_summaries.sql')
+  assert.equal(first.applied.at(-1), '045_book_catalog_grade_and_trusted_baseline.sql')
   assert.equal(first.applied.length, listMigrationFiles(migrationDirectory).length)
   assert.equal(second.applied.length, 0)
   assert.equal(second.alreadyApplied.length, first.applied.length)
   assert.equal(fixture.db.prepare(`SELECT COUNT(*) AS count FROM sqlite_master
-    WHERE type = 'table' AND name IN ('reading_summary_sessions', 'reading_daily_book_summaries')`).get().count, 2)
+    WHERE type = 'table' AND name IN (
+      'reading_summary_sessions', 'reading_daily_book_summaries',
+      'reading_summary_page_coverage', 'reading_page_coverage'
+    )`).get().count, 4)
   assert.equal(fixture.db.prepare(`SELECT COUNT(*) AS count FROM schema_migrations
     WHERE id = '043_reading_session_summaries.sql' AND length(checksum) = 64`).get().count, 1)
+  assert.equal(fixture.db.prepare(`SELECT COUNT(*) AS count FROM schema_migrations
+    WHERE id = '044_reader_dual_mode_pilot.sql' AND length(checksum) = 64`).get().count, 1)
 })
 
-test('043 可从已执行 042 的干净数据库前向升级并保留 reading_progress', (t) => {
+test('043 与 044 可从已执行 042 的干净数据库前向升级并保留 reading_progress', (t) => {
   const fixture = temporaryDatabase('reading-monitor-forward-')
   t.after(() => fixture.close())
   const stagedMigrations = path.join(fixture.directory, 'migrations')
@@ -133,8 +138,12 @@ test('043 可从已执行 042 的干净数据库前向升级并保留 reading_pr
     path.join(migrationDirectory, '043_reading_session_summaries.sql'),
     path.join(stagedMigrations, '043_reading_session_summaries.sql'),
   )
+  copyFileSync(
+    path.join(migrationDirectory, '044_reader_dual_mode_pilot.sql'),
+    path.join(stagedMigrations, '044_reader_dual_mode_pilot.sql'),
+  )
   const result = runMigrations(fixture.db, stagedMigrations, NOW)
-  assert.deepEqual(result.applied, ['043_reading_session_summaries.sql'])
+  assert.deepEqual(result.applied, ['043_reading_session_summaries.sql', '044_reader_dual_mode_pilot.sql'])
   const progress = fixture.db.prepare(`SELECT last_page_no, valid_reading_seconds
     FROM reading_progress WHERE id = 'legacy-progress'`).get()
   assert.equal(progress.last_page_no, 4)

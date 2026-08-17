@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reader.local/schemas/book-package-v2.schema.json",
+  "title": "Reader book-package/v2 manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "bookId",
+    "versionId",
+    "title",
+    "pageCount",
+    "source",
+    "ocr",
+    "normalization",
+    "content",
+    "corrections",
+    "quality",
+    "rights"
+  ],
+  "allOf": [
+    {
+      "$comment": "Additive trusted-baseline contract: packages built by the trusted (antigravity text) path must carry grade, cover and provenance. Legacy human-reviewed packages are unaffected.",
+      "if": {
+        "properties": { "quality": { "properties": { "status": { "const": "trusted-baseline" } }, "required": ["status"] } },
+        "required": ["quality"]
+      },
+      "then": { "required": ["grade", "cover", "provenance"] }
+    }
+  ],
+  "properties": {
+    "schemaVersion": { "const": "book-package/v2" },
+    "bookId": { "type": "string", "pattern": "^book-[0-9]{3}$" },
+    "versionId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "grade": { "type": "integer", "minimum": 1, "maximum": 6 },
+    "pageCount": { "type": "integer", "minimum": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset", "mimeType", "sha256", "sizeBytes", "pdfPageCount"],
+      "properties": {
+        "asset": { "const": "assets/source.pdf" },
+        "mimeType": { "const": "application/pdf" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "sizeBytes": { "type": "integer", "minimum": 1 },
+        "pdfPageCount": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "cover": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset", "mimeType", "sha256", "sizeBytes", "width", "height", "sourcePageNo"],
+      "properties": {
+        "asset": { "const": "assets/cover.jpg" },
+        "mimeType": { "const": "image/jpeg" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "sizeBytes": { "type": "integer", "minimum": 1 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "sourcePageNo": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pagesIndex", "trustedBaseline"],
+      "properties": {
+        "pagesIndex": { "$ref": "#/$defs/fileRecord" },
+        "trustedBaseline": { "$ref": "#/$defs/fileRecord" }
+      }
+    },
+    "ocr": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobId", "modelRoute", "coordinateSystem", "geometryUsage", "pipelineVersion", "promptVersion", "promptAsset", "promptSha256", "parserVersion", "sourceRecordSha256", "reportSha256"],
+      "properties": {
+        "jobId": { "type": "string", "minLength": 1 },
+        "modelRoute": { "type": "string", "minLength": 1 },
+        "coordinateSystem": { "type": "string", "minLength": 1 },
+        "geometryUsage": { "const": "audit-only-estimated" },
+        "pipelineVersion": { "type": "string", "minLength": 1 },
+        "promptVersion": { "type": "string", "minLength": 1 },
+        "promptAsset": { "const": "provenance/ocr-prompt.md" },
+        "promptSha256": { "$ref": "#/$defs/sha256" },
+        "parserVersion": { "type": "string", "minLength": 1 },
+        "sourceRecordSha256": { "$ref": "#/$defs/sha256" },
+        "reportSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "normalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "policy"],
+      "properties": {
+        "version": { "type": "string", "minLength": 1 },
+        "policy": { "const": "raw-exact-unless-ledger-reviewed" }
+      }
+    },
+    "content": { "$ref": "#/$defs/fileRecord" },
+    "corrections": { "$ref": "#/$defs/fileRecord" },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["report", "sha256", "status"],
+      "properties": {
+        "report": { "const": "quality-report.json" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "status": { "enum": ["human-review-pending", "human-review-failed", "passed", "trusted-baseline"] },
+        "statusNote": { "type": "string", "minLength": 1 },
+        "automatic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["emptyPages"],
+          "properties": {
+            "emptyPages": { "type": "array", "items": { "type": "integer", "minimum": 1 } }
+          }
+        }
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["usage"],
+      "properties": { "usage": { "enum": ["internal-pilot-only", "internal-default-catalog"] } }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "fileRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

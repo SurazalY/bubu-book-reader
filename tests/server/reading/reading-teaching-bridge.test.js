@@ -21,6 +21,9 @@ function createFixture() {
   for (const file of ['010_reading_catalog.sql', '011_reading_activity.sql', '012_teaching_bridge.sql', '013_reading_security_scopes.sql', '014_book_catalog_metadata.sql', '015_classroom_participation.sql']) {
     db.exec(readFileSync(new URL(`../../../server/db/migrations/${file}`, import.meta.url), 'utf8'))
   }
+  const dualModeMigration = readFileSync(new URL('../../../server/db/migrations/044_reader_dual_mode_pilot.sql', import.meta.url), 'utf8')
+  db.exec(dualModeMigration.slice(0, dualModeMigration.indexOf('CREATE TABLE reading_summary_page_coverage')))
+  db.exec(readFileSync(new URL('../../../server/db/migrations/045_book_catalog_grade_and_trusted_baseline.sql', import.meta.url), 'utf8'))
   let index = 0
   let now = new Date('2026-08-04T20:01:00.000Z')
   const auditEvents = []

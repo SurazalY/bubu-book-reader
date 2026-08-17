@@ -20,6 +20,9 @@ const MAX_CONFIGURABLE_FUTURE_CLOCK_SKEW_MS = 10 * 60 * 1000
 const DEFAULT_OFFLINE_LEASE_GRACE_MS = 5 * 60 * 1000
 const MAX_CONFIGURABLE_OFFLINE_LEASE_GRACE_MS = 30 * 60 * 1000
 const SUPPORTED_ASSET_TYPES = new Set(['source_pdf', 'source_epub', 'source_text', 'cover', 'page_image'])
+const PACKAGE_QUALITY_STATUSES = new Set(['human-review-pending', 'human-review-failed', 'passed', 'trusted-baseline'])
+// D1：可发布的 book-package/v2 质量状态 —— 人工闸门通过，或 OCR 按可信基线验收。
+const PUBLISHABLE_PACKAGE_QUALITY_STATUSES = new Set(['passed', 'trusted-baseline'])
 const EVENT_TOP_LEVEL_FIELDS = new Set([
   'id', 'schemaVersion', 'deviceId', 'bookVersionId', 'pageNo', 'eventType', 'clientOccurredAt',
   'durationMs', 'foreground', 'screenOn', 'offlineSequence', 'classSessionId', 'payload',
@@ -74,6 +77,8 @@ export function createReadingDomain(dependencies) {
       const label = assertString(input.label, 'label')
       const sourceFormat = assertString(input.sourceFormat, 'sourceFormat')
       if (!['pdf', 'epub', 'text'].includes(sourceFormat)) throw new TypeError('sourceFormat 必须为 pdf、epub 或 text')
+      const packageMetadata = normalizePackageMetadata(input.packageMetadata, sourceFormat)
+      const catalogGrade = normalizeCatalogGrade(input.catalogGrade)
       const preparedAssets = await prepareAssets(input, pages, dependencies.assetMetadataVerifier)
       const metadata = input.metadata ? {
         author: assertString(input.metadata.author, 'metadata.author'),
@@ -88,9 +93,17 @@ export function createReadingDomain(dependencies) {
           VALUES (:id, :organizationId, :actorId, :title, 'draft', :now, :now, 1)`, {
           id: bookId, organizationId: organizationId(), actorId: actorId(), title, now,
         })
-        run(context.db, `INSERT INTO book_versions (id, book_id, organization_id_at_creation, actor_id_at_creation, label, source_format, page_count, created_at, updated_at, version)
-          VALUES (:id, :bookId, :organizationId, :actorId, :label, :sourceFormat, :pageCount, :now, :now, 1)`, {
-          id: versionId, bookId, organizationId: organizationId(), actorId: actorId(), label, sourceFormat, pageCount: pages.length, now,
+        run(context.db, `INSERT INTO book_versions (
+            id, book_id, organization_id_at_creation, actor_id_at_creation, label, source_format,
+            page_count, package_format, release_sha256, normalization_version,
+            package_quality_status, content_provenance_json, created_at, updated_at, version
+          ) VALUES (
+            :id, :bookId, :organizationId, :actorId, :label, :sourceFormat,
+            :pageCount, :packageFormat, :releaseSha256, :normalizationVersion,
+            :packageQualityStatus, :contentProvenanceJson, :now, :now, 1
+          )`, {
+          id: versionId, bookId, organizationId: organizationId(), actorId: actorId(), label, sourceFormat,
+          pageCount: pages.length, ...packageMetadata, now,
         })
         if (metadata) {
           run(context.db, `INSERT INTO book_catalog_metadata (
@@ -100,6 +113,14 @@ export function createReadingDomain(dependencies) {
             :bookId, :author, :illustrator, :sourcePage, :usageLabel, :rightsJson,
             :now, :now, 1
           )`, { bookId, ...metadata, now })
+        }
+        if (catalogGrade !== null) {
+          run(context.db, `INSERT INTO book_catalog_metadata (book_id, grade, created_at, updated_at, version)
+            VALUES (:bookId, :grade, :now, :now, 1)
+            ON CONFLICT(book_id) DO UPDATE SET grade = excluded.grade,
+              updated_at = excluded.updated_at, version = book_catalog_metadata.version + 1`, {
+            bookId, grade: catalogGrade, now,
+          })
         }
         const pageIds = new Map()
         for (const page of pages) pageIds.set(page.pageNo, insertPage(context, versionId, page, now))
@@ -117,7 +138,8 @@ export function createReadingDomain(dependencies) {
       if (!['draft', 'published', 'archived'].includes(status)) throw new TypeError('status 无效')
       const books = all(context.db, `SELECT b.*, v.id AS book_version_id, v.label AS version_label,
           v.source_format, v.page_count, metadata.author, metadata.illustrator,
-          metadata.source_page, metadata.usage_label AS catalog_usage_label, metadata.rights_json
+          metadata.source_page, metadata.usage_label AS catalog_usage_label, metadata.rights_json,
+          metadata.grade
         FROM books b
         JOIN book_versions v ON v.id = (
           SELECT latest.id FROM book_versions latest
@@ -127,12 +149,15 @@ export function createReadingDomain(dependencies) {
         LEFT JOIN book_catalog_metadata AS metadata ON metadata.book_id = b.id
         WHERE b.organization_id_at_creation = :organizationId AND b.status = :status
         ORDER BY b.created_at DESC, b.id`, { organizationId: organizationId(), status })
-      return books.map((book) => ({
-        ...book,
-        cover: one(context.db, `SELECT asset_type, storage_key, usage_label, mime_type, size_bytes, sha256, width, height
-          FROM book_assets WHERE book_version_id = :bookVersionId AND asset_type = 'cover'
-          ORDER BY created_at, id LIMIT 1`, { bookVersionId: book.book_version_id }) || null,
-      }))
+      return books.map((book) => {
+        const assets = all(context.db, `SELECT id, asset_type, storage_key, usage_label, mime_type,
+            size_bytes, sha256, width, height
+          FROM book_assets WHERE book_version_id = :bookVersionId
+            AND page_id IS NULL AND asset_type IN ('source_pdf', 'source_epub', 'source_text', 'cover')
+          ORDER BY CASE asset_type WHEN 'source_pdf' THEN 0 WHEN 'source_epub' THEN 0
+            WHEN 'source_text' THEN 0 ELSE 1 END, created_at, id`, { bookVersionId: book.book_version_id })
+        return { ...book, assets, cover: assets.find((asset) => asset.asset_type === 'cover') || null }
+      })
     },
 
     async getBookVersionAssets(bookVersionId) {
@@ -151,6 +176,21 @@ export function createReadingDomain(dependencies) {
           WHEN 'source_text' THEN 0 WHEN 'cover' THEN 1 ELSE 2 END, p.page_no, a.id`, {
         bookVersionId: normalizedVersionId, organizationId: organizationId(),
       })
+    },
+
+    async getBookAsset(assetId) {
+      const normalizedAssetId = assertString(assetId, 'assetId')
+      await authorize('book.read', { assetId: normalizedAssetId })
+      const asset = one(context.db, `SELECT asset.*, version.book_id
+        FROM book_assets AS asset
+        JOIN book_versions AS version ON version.id = asset.book_version_id
+        JOIN books AS book ON book.id = version.book_id
+        WHERE asset.id = :assetId
+          AND version.organization_id_at_creation = :organizationId
+          AND book.organization_id_at_creation = :organizationId
+          AND book.status = 'published'`, { assetId: normalizedAssetId, organizationId: organizationId() })
+      if (!asset) throw scopedResourceNotFound('书籍资产不存在或当前不可读取')
+      return asset
     },
 
     async getPage(bookId, pageNo, bookVersionId = null) {
@@ -175,6 +215,25 @@ export function createReadingDomain(dependencies) {
     async publishBook(bookId) {
       await authorize('book.publish', { bookId })
       const now = isoNow(context)
+      const latest = one(context.db, `SELECT version.* FROM book_versions AS version
+        JOIN books AS book ON book.id = version.book_id
+        WHERE version.book_id = :bookId
+          AND version.organization_id_at_creation = :organizationId
+          AND book.organization_id_at_creation = :organizationId
+        ORDER BY version.created_at DESC, version.id DESC LIMIT 1`, {
+        bookId, organizationId: organizationId(),
+      })
+      if (latest?.package_format === 'book-package/v2') {
+        if (!PUBLISHABLE_PACKAGE_QUALITY_STATUSES.has(latest.package_quality_status)) {
+          const error = new Error('book-package/v2 尚未通过人工质量闸门，也不是可信基线包')
+          error.code = 'HUMAN_REVIEW_REQUIRED'
+          throw error
+        }
+        const sourcePdf = one(context.db, `SELECT id FROM book_assets
+          WHERE book_version_id = :versionId AND page_id IS NULL AND asset_type = 'source_pdf'
+          LIMIT 1`, { versionId: latest.id })
+        if (!sourcePdf) throw validationFailed('book-package/v2 发布前必须登记源 PDF 资产')
+      }
       const result = run(context.db, `UPDATE books SET status = 'published', updated_at = :now, version = version + 1
         WHERE id = :bookId AND organization_id_at_creation = :organizationId AND status = 'draft'`, {
         bookId, organizationId: organizationId(), now,
@@ -381,23 +440,96 @@ function insertPage(context, versionId, page, now) {
   const height = Number(page.height)
   if (!(width > 0 && height > 0)) throw new TypeError('page.width 和 page.height 必须大于 0')
   const pageId = page.id || context.idFactory()
-  run(context.db, `INSERT INTO book_pages (id, book_version_id, page_no, text_content, width, height, created_at, updated_at, version)
-    VALUES (:id, :versionId, :pageNo, :textContent, :width, :height, :now, :now, 1)`, {
-    id: pageId, versionId, pageNo, textContent: typeof page.textContent === 'string' ? page.textContent : '', width, height, now,
+  const normalizedText = typeof page.normalizedText === 'string'
+    ? page.normalizedText
+    : typeof page.textContent === 'string' ? page.textContent : ''
+  const rawText = typeof page.rawText === 'string' ? page.rawText : normalizedText
+  run(context.db, `INSERT INTO book_pages (
+      id, book_version_id, page_no, text_content, width, height, raw_text, normalized_text, printed_page_label,
+      created_at, updated_at, version
+    ) VALUES (
+      :id, :versionId, :pageNo, :normalizedText, :width, :height, :rawText, :normalizedText, :printedPageLabel,
+      :now, :now, 1
+    )`, {
+    id: pageId,
+    versionId,
+    pageNo,
+    rawText,
+    normalizedText,
+    printedPageLabel: page.printedPageLabel == null ? null : assertString(page.printedPageLabel, 'page.printedPageLabel'),
+    width,
+    height,
+    now,
   })
   const blocks = Array.isArray(page.blocks) ? page.blocks : []
   uniqueRows(blocks, 'blockKey')
   for (const block of blocks) {
     const coordinates = ['x', 'y', 'width', 'height'].reduce((result, key) => ({ ...result, [key]: Number(block[key]) }), {})
     if (coordinates.x < 0 || coordinates.y < 0 || coordinates.width < 0 || coordinates.height < 0) throw new TypeError('文字坐标不能为负数')
-    run(context.db, `INSERT INTO book_blocks (id, page_id, block_key, paragraph_id, text_content, char_start, char_end, x, y, width, height, created_at, updated_at, version)
-      VALUES (:id, :pageId, :blockKey, :paragraphId, :textContent, :charStart, :charEnd, :x, :y, :width, :height, :now, :now, 1)`, {
+    const normalizedBlockText = typeof block.normalizedText === 'string'
+      ? block.normalizedText
+      : typeof block.textContent === 'string' ? block.textContent : ''
+    const rawBlockText = typeof block.rawText === 'string' ? block.rawText : normalizedBlockText
+    const sourceGeometryJson = block.sourceGeometry == null ? null : JSON.stringify(block.sourceGeometry)
+    const geometryUsage = block.geometryUsage ?? null
+    const blockParameters = {
       id: block.id || context.idFactory(), pageId, blockKey: assertString(block.blockKey, 'block.blockKey'), paragraphId: block.paragraphId || null,
-      textContent: typeof block.textContent === 'string' ? block.textContent : '', charStart: Number.isInteger(block.charStart) ? block.charStart : 0,
-      charEnd: Number.isInteger(block.charEnd) ? block.charEnd : 0, ...coordinates, now,
-    })
+      rawBlockText, normalizedBlockText, charStart: Number.isInteger(block.charStart) ? block.charStart : 0,
+      charEnd: Number.isInteger(block.charEnd) ? block.charEnd : 0,
+      sourceConfidence: block.sourceConfidence == null ? null : Number(block.sourceConfidence),
+      sourceGeometryJson, geometryUsage, ...coordinates, now,
+    }
+    run(context.db, `INSERT INTO book_blocks (
+        id, page_id, block_key, paragraph_id, text_content, char_start, char_end,
+        x, y, width, height, raw_text, normalized_text, source_confidence,
+        source_geometry_json, geometry_usage, created_at, updated_at, version
+      ) VALUES (
+        :id, :pageId, :blockKey, :paragraphId, :normalizedBlockText, :charStart, :charEnd,
+        :x, :y, :width, :height, :rawBlockText, :normalizedBlockText, :sourceConfidence,
+        :sourceGeometryJson, :geometryUsage, :now, :now, 1
+      )`, blockParameters)
   }
   return pageId
+}
+
+function normalizeCatalogGrade(value) {
+  if (value === undefined || value === null) return null
+  if (!Number.isInteger(value) || value < 1 || value > 6) throw new TypeError('catalogGrade 必须是 1 到 6 的整数')
+  return value
+}
+
+function normalizePackageMetadata(value, sourceFormat) {
+  if (value == null) {
+    return {
+      packageFormat: null,
+      releaseSha256: null,
+      normalizationVersion: null,
+      packageQualityStatus: null,
+      contentProvenanceJson: null,
+    }
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('packageMetadata 必须是对象')
+  const allowed = new Set(['format', 'releaseSha256', 'normalizationVersion', 'qualityStatus', 'provenance'])
+  const unknown = Object.keys(value).filter((field) => !allowed.has(field))
+  if (unknown.length) throw new TypeError(`packageMetadata 包含未知字段: ${unknown.join(', ')}`)
+  if (value.format !== 'book-package/v2' || sourceFormat !== 'pdf') throw new TypeError('book-package/v2 只接受 PDF 源格式')
+  const releaseSha256 = assertString(value.releaseSha256, 'packageMetadata.releaseSha256').toLowerCase()
+  if (!/^[0-9a-f]{64}$/.test(releaseSha256)) throw new TypeError('packageMetadata.releaseSha256 必须是 64 位小写十六进制')
+  const normalizationVersion = assertString(value.normalizationVersion, 'packageMetadata.normalizationVersion')
+  const packageQualityStatus = assertString(value.qualityStatus, 'packageMetadata.qualityStatus')
+  if (!PACKAGE_QUALITY_STATUSES.has(packageQualityStatus)) {
+    throw new TypeError('packageMetadata.qualityStatus 无效')
+  }
+  if (!value.provenance || typeof value.provenance !== 'object' || Array.isArray(value.provenance)) {
+    throw new TypeError('packageMetadata.provenance 必须是对象')
+  }
+  return {
+    packageFormat: value.format,
+    releaseSha256,
+    normalizationVersion,
+    packageQualityStatus,
+    contentProvenanceJson: JSON.stringify(value.provenance),
+  }
 }
 
 function insertAsset(context, versionId, pageId, asset, now) {

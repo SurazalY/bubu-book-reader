@@ -1,0 +1,12 @@
+.DS_Store
+.env
+.venv/
+.venv-win/
+__pycache__/
+node_modules/
+*.log
+
+# 本地源文件、运行中间产物和发布包不进入代码版本库。
+/input/
+/work/
+/releases/
