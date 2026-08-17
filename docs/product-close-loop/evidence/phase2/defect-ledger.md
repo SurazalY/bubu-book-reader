@@ -1,0 +1,206 @@
+# Phase 2 缺陷台账（book-001 单书纵向验证）
+
+本台账是 Phase 2 缺陷的权威底账，最终验收报告按此逐条标注 L 级。
+
+验证方式说明：
+- **机器实测**：由 agent 通过 HTTP 请求、数据库查询、代码检索取证
+- **真人实测**：由用户本人在浏览器操作观察（2026-08-17 15:50）
+
+真人复验环境：前端 `127.0.0.1:5190`、后端 `127.0.0.1:5191`，学生账号 `internal-student`，book-001。
+
+## 一、缺陷清单
+
+| 编号 | 缺陷 | 严重度 | 状态 | 复现条件 / 证据 |
+|---|---|---|---|---|
+| D-01 | 原版 PDF 无法加载 | 阻塞 | **已修** `eae6612` | pdfjs-dist 6.2.108 现代构建调用 `Map.prototype.getOrInsertComputed`，该 TC39 提案方法在 Chrome 144 仍未实现；改用自带 polyfill 的 legacy 构建。真人复验确认原版模式可渲染书页，未再出现该报错 |
+| D-02 | 首页/书架卡片封面显示「封面资源不可用」 | 应修 | **已修** `eae6612` | 受保护资产接口要求 `X-Workspace-Id` 头，裸 `<img src>` 无法携带，请求被 400；改为带凭证与工作空间头 fetch 后转 blob URL。真人复验确认书架卡片显示真实插画封面 |
+| D-03 | 三维翻页下第二次翻页与跳页回弹 | 应修（**待裁决**） | 未修 | 勾选「减少动态效果」或翻页效果选「平移」时，下一页与跳页均正常、画面与底栏页码同步；关闭减少动态效果并选「三维翻页」时，只能成功承载一次翻页，第二次翻页或跳页会播出动效后卡回原页。代码路径：`goTo` 在 curl 模式调用 `api.flip()` 后 `return`，真正改页依赖 `onFlip` → `commitLeaf` 回调（`src/student/pages/Reader.jsx` 约 340–360 行），回弹表明该回调未兜住 |
+| D-04 | 阅读器左上角「返回详情」无法回到详情页 | 应修 | 未修 | 真人实测点击无效 |
+| D-05 | 阅读进度不记录最后页码 | 阻塞 | 未修 | **已确认为 D-11 的同一根因症状**，见 D-11 |
+| D-11 | **阅读时长与页码均停止汇总（项目核心目标受损）** | **阻塞** | 未修（定位中） | 详见下节专项 |
+| D-06 | 文字模式长页文本被截断，**被截内容完全不可达** | **应修**（已定性） | 未修 | 文字页为固定 468×636 设计画布，窗口变化只做 `transform: scale`、**禁止重排**（`src/student/components/BookPage.jsx` 第 6–14 行）。裁切发生在多层且均无 `overflow-y: auto`：`.student-page-frame` 的 `overflow: hidden`（`src/index.css` 1228–1230）、`.student-page-body` 的 `min-height:0; overflow: hidden`（同文件 1308–1314）。页内不能滚、不能展开、翻页是换到另一张物理页。**结论：文字模式下用户读不到被裁掉的文字，属功能性内容丢失**，非初见截断。切回原版 PDF 可见全文，但那是换模式，不构成文字模式的阅读能力 |
+| D-07 | 阅读偏好「纸张颜色」无反馈 | **不记**（已定性） | — | 属实现预期。`paperTone` 确实传给了两种模式（`Reader.jsx` 717–747），文字模式经 `student-page--${tone}` 真实套用底色（`BookPage.jsx` 132–134 + `src/index.css` 1234–1245）；原版模式同一节点被后写的 `.student-pdf-page-frame { background: #fff }` 锁白，且 canvas 铺满整页，故视觉上不吃。**附带建议**：偏好面板未标注「仅文字模式」，宜补文案 |
+| D-08 | 验收清单文案与实际 UI 不符 | 文档修订 | 待修 | **原判断需更正**：`04` 与 `03` 正文**都没有**「开始阅读」这一表述，该四字来自 `BookDetail.jsx` 第 50 行注释，不在验收清单。真实不符项是 `04` 多处写「文字模式」，而实际切换按钮文案为「**OCR 文字**」（`Reader.jsx` 795），涉及 `04` 第 40、43、45、46、64 行 |
+| D-09 | 书籍详情页封面在冷请求下取不到 | 应修 | 未修 | 详情页用的是 `src/components/ui.jsx` 的裸 `<img>`（`BookDetail.jsx` 第 3 行导入，第 411 行渲染），`src = book.coverUrl \|\| book.cover?.url \|\| ${BASE_URL}covers/${book.id}.jpg`。对已导入书 `coverUrl` 即受保护 URL，而裸 `<img>` 无法携带 `X-Workspace-Id`，冷请求必然 400 → `onError` → 渐变文字封。**真人复验判「通过」系被 HTTP 缓存误导**（详见 D-10），非真实通过。契约测试 `tests/frontend/book-cover-protected-asset.test.mjs` 只锁了首页与书架，故意未锁详情页 |
+| D-10 | 受保护资产响应可缓存且未按工作空间区分 | 应修（**Phase 4 前处置**） | 未修 | 资产响应带 `Cache-Control: private, max-age=3600`，**且无 `Vary: X-Workspace-Id`**。两重后果：① 一次带头 fetch 会为同一 URL 预热缓存，使随后不带头的裸 `<img>`/CSS `url()` 也能显示，**掩盖鉴权失败**（D-09 即因此被误判为通过）；② 授权结果被缓存长达 1 小时，教师取消发布或调整班级可见范围后，学生浏览器仍可从缓存读到封面乃至源 PDF。第 ② 点直接冲击 Phase 4「教师发布管理与班级可见范围」的有效性，须在进 Phase 4 前定方案 |
+
+## 二、明确不记为缺陷
+
+| 项 | 说明 |
+|---|---|
+| ~~详情页封面为假封面~~ | **该条已撤销，改记为缺陷 D-09。** 真人实测虽看到真实插画封面，但已查明系书架/首页的带头 `fetch` 预热了 HTTP 缓存所致；详情页自身的裸 `<img>` 在冷请求下取不到封面。此为**验收方法被缓存污染**的典型案例：验收路径经过书架再进详情页，就无法暴露详情页的鉴权失败 |
+| 文字模式错字 / 缺字 / 排版怪异 | OCR 为可信输入，按 B-2 不做任何形式的 OCR 质量评价 |
+| 第 2、3 页文字模式空白 | 基线事实：98 物理页中仅 88 页有 OCR 文本，10 页无文本。空白属预期 |
+| 作者显示「服务端未返回作者」 | 符合决策 D6（作者字段留空） |
+
+## 三、待定性观察
+
+| 观察 | 说明 |
+|---|---|
+| 原版模式右页整页橙色 | 真人观察，疑为第 2 页印刷底色（该页无 OCR 文本）或渲染未完成，尚未定性。后续复验时确认 |
+
+## 四、已通过项（真人实测）
+
+- 首页/书架封面显示真实插画封面，书名「和大人一起读·儿童歌谣」正确
+- 详情页封面为真实插画封面
+- 原版 PDF 模式可渲染书页；顶栏「原版 PDF · 覆盖第 1-98 页」，底栏「第 1 页 / 共 98 页」
+- 「减少动态效果」或「平移」翻页效果下，翻页与跳页正常，画面与页码同步
+- 双模式页码对应未见错位
+- 学生端未出现「已读 X%」或「完成度」推算指标
+
+## 五、既有抖动（非本期引入）
+
+`tests/frontend/reading-monitor-client-coordinator.test.mjs` 的「真实生命周期事件在后台、freeze和网络恢复时额外提交」实测 **10 次跑 1 次失败**（断言"应有额外提交"却未提交）。
+
+该测试仅 import `src/student/reading-monitor/` 下的 `clock.js`、`coordinator.js`、`pendingStore.js`、`view.js`，与本期改动文件无依赖关系，确认非本期引入。
+
+**风险不可低估**：该测试覆盖的正是「学生切后台 / 页面被冻结 / 网络恢复时补交阅读时长」这一路径。若抖动源自 coordinator 侧竞态而非测试写法，意味着真实场景下学生阅读记录可能丢失，属产品核心价值受损。按 10% 复发率，Phase 3–7 的质量门几乎必然撞上一次假红。留待 Phase 6 定性：**测试侧竞态还是 coordinator 侧竞态**。
+
+## 六、处置建议
+
+| 缺陷 | 建议时点 | 理由 |
+|---|---|---|
+| **D-11（含 D-05）** | **必须在进 Phase 3 前修，且优先于其他一切** | 阻塞级。项目核心目标"接通既有阅读计时系统"当前未达成。Phase 3 是把 49 本铺开，若阅读行为不被汇总，铺得越多只是把坏掉的闭环复制 49 份，Phase 6、7 验收全部无从谈起 |
+| D-04 返回详情失效 | 进 Phase 3 前修 | 阅读器主链路上的导航死路，修复成本低。可与 D-03 处置合并为一个低风险任务，与 D-11 分开以隔离风险 |
+| D-03 三维翻页回弹 | 可不挡 Phase 3 | 有可用的规避路径（平移 / 减少动态效果），且需先裁决"删掉三维翻页还是修回弹" |
+| D-09 详情页封面、D-10 资产缓存 | **进 Phase 4 前修** | 两者同源，都指向"受保护资产如何被 `<img>`/CSS 消费"这一决策。Phase 4 教师端书库与详情页用 CSS `background-image: url(...)` 取图，处境与 D-09 完全相同；D-10 的缓存问题更会直接削弱 Phase 4 的可见范围管控 |
+| D-06 文字模式内容丢失 | Phase 5 Reader 补缺 | 已定性为应修，但修法涉及设计取舍（页内滚动 / 自动缩小字号以适配 / 增加展开），需先定方案。规模上会影响全部 49 本中所有文本较多的页面 |
+| D-07 | 不记，附带补一句面板文案 | 属实现预期 |
+| D-08 | 随最终报告一并修订 | 纯文档 |
+
+## 七、D-11 专项：事件持续流入，汇总环节冻结
+
+**严重度：阻塞。** 本项目核心目标之一是"接通既有阅读计时系统"，若阅读行为不被汇总，该目标未达成，Phase 6 的计时联动验收整个失去基础。
+
+### 症状（真人报告）
+
+首页显示的"3 分钟"来源不明；用户随后继续阅读，**时长完全不增加**，阅读位置也始终停在第 1 页。用户怀疑"数据库链路整个坏了"。
+
+### 实测数据（主控只读查询，2026-08-17 16:05）
+
+**事件链路正常且仍在持续：** `reading_events` 65 行，全为 `page_stay`，**每分钟一条，从 `06:57:16Z` 连续写到 `08:02:55Z` 无中断**，`offline_sequence` 单调递增到 65，最后 3 条的 `page_no` 均为 3，`foreground=1`、`screen_on=1`。
+
+**汇总链路冻结在首次：**
+
+| 表 | 行数 | 关键值 |
+|---|---|---|
+| `reading_summary_sessions` | 1 | `latest_revision: 1`、`cumulative_effective_ms: 194544`、`last_page_no: 1`、`measured_through_at: 07:01:16.924Z`、`status: open`、`ended_at: null` |
+| `reading_progress` | 1 | `last_page_no: 1`、`valid_reading_seconds: 0`、`updated_from_event_at: 07:01:16.924Z` |
+| `reading_page_coverage` | 2 | 仅 `page_no` 1 与 2；两行 `effective_text_ms` **都是 194544**；`effective_original_ms` 均为 0 |
+
+### 计时的两条独立路径（走读确认，理解本缺陷的前提）
+
+```
+【主路径，权威时长与页码的唯一写入者】
+commitLeaf (Reader.jsx:316-321) → visiblePageNos → createStableView (view.js:8-21)
+  → coordinator.move() (coordinator.js:426-431) → activity.tracker.move() → cut() (activity.js:75-99)
+  → 【触发点】5 分钟 tick / 关阅读器 / 切后台
+  → persistSnapshot() (coordinator.js:233-258, 318-325)
+  → createSummaryRevision() (summary.js:42-106，指纹字段冻结)
+  → POST /reading/session-summaries → writePageCoverage() (monitoring.js:515-578)
+
+【旧事件路径，只喂护眼统计，对汇总零贡献】
+useReadingTelemetry.js:113-149 → page_stay / page_turn → submitReadingEvents
+```
+
+**关键认识**：`reading_events` 属旧事件路径，它持续流入**不代表**计时健康。权威时长与页码只由摘要写入。
+
+### 根因（已定位，文件+行号）
+
+**两个缺陷互相放大，形成自锁：**
+
+1. **定时链一次失败即永久停摆**（主因）。`coordinator.js` 第 168–174 行：5 分钟定时里 `tickDirect()` 一旦抛错，后续的 `scheduleSummary()` 就不再执行，**定时链从此永久停止**，之后既不会重试也不会自愈。
+2. **换页会拆掉监测会话，并制造必然的提交冲突**（触发器）。`Reader.jsx` 第 79 行的组件 `key` 会因 URL `?pageNo=` 变化而重建组件，从而拆掉 coordinator 并换新 `sessionId`；但旧会话在服务端仍是 `open`，新摘要提交会被 `monitoring.js` 第 731–738 行以 **`LEASE_CONFLICT`** 拒绝——该错误又正好触发第 1 条的停表。
+
+**缺陷间的因果链（重要）**：D-01 原版 PDF 加载失败 → 翻页按钮表现为无效（D-03）→ 验证者只能改 URL `?pageNo=` 跳页 → 触发会话重建与 `LEASE_CONFLICT` → 定时链停摆 → D-11 时长与页码双双不再落库 → 表现为 D-05。**这是一条由前序缺陷诱发的连锁失效，不是独立故障。**
+
+### 已排除
+
+- **排除可能 B（指纹重放冻结 revision）**：指纹重放只会返回 200 `replayed`，不会把 revision 冻在 1。
+- **排除鉴权缺头**、**排除数据库不可写**、**排除页码追踪失败**（旧事件 `page_no` 已达 3，与主路径同源于 `commitLeaf`，说明 `leaf` 确实推进到第 3 页）。
+- 因此 **D-05 与 D-11 同根因**，且不是 D-03 的下游（虽然 D-03 是其触发条件之一）。
+
+时间线印证用户观察：
+- 06:56–07:05Z（北京 14:56–15:05）浏览器 agent 会话 → 唯一一次成功提交，产生 revision 1 与 194544 ms，即 UI 上那"3 分钟"（确认为服务端投影，非本地种子）
+- 07:20–07:50Z（北京 15:20–15:50）真人会话 → 事件全收到，汇总零推进
+
+### 数据卫生
+
+调查过程**未向库中写入 revision 2**，以免污染这 3 分钟基线。
+
+### 三个疑点的定论（其中两个是我方误判，已撤销）
+
+| 此前疑点 | 定论 |
+|---|---|
+| 事件 `valid_reading_seconds` 恒为 0 | **设计如此，不是缺陷**（`catalog.js` 868–871）。护眼用 `valid_eye_seconds`，有效阅读时长不从事件累加。若误当根因去改有效时长计算，将触犯 B-2 冻结的计时算法 |
+| 第 1、2 页各记满额 194544 ms | **设计如此，不是缺陷**（`activity.js` 85–96）。双页展开时两页同时可见，同一段有效毫秒记给视图内所有页，该字段非"该页独占时长"，故逐页之和本就不应等于会话总时长 |
+| `effective_original_ms` 全为 0 | **属当时情形，非路径缺失。** 原版模式的时长归因路径存在，但要求 PDF 处于 `ready`（`Reader.jsx` 214–216）。当时 PDF 加载失败（D-01），故全程记在文字模式。D-01 已修，该路径应可工作，但**尚未经真实运行验证**，仍是 Phase 6 的待验项 |
+
+### 修复方向（agent 建议）
+
+优先让**定时失败后仍能续期**（不因一次异常永久停摆），并**避免换页拆掉监测会话**。**不得触碰摘要 schema 与指纹算法。**
+
+真人验证只需一项：连续阅读满 6 分钟以上，在浏览器 Network 面板确认出现**第二条** `session-summaries` 请求。
+
+### 历史记录：曾待区分的两种可能（已由上文定论取代）
+
+| | 可能 A：客户端摘要提交停止 | 可能 B：服务端拒绝 revision ≥ 2 |
+|---|---|---|
+| 机制 | 事件与摘要是两条提交路径，事件通、摘要只成功过一次 | 摘要到达但被幂等/指纹去重判为重放而丢弃，或汇总任务不再被触发 |
+| 支持线索 | `latest_revision` 恒为 1；`reading-monitor-client-coordinator.test.mjs` 的「后台/freeze/网络恢复额外提交」实测 **10 跑 1 败**，失败形态正是"应有额外提交、实际没提交" | 表中存在 `latest_fingerprint` 与 `revision_fingerprints_json` 幂等结构；若指纹输入在多次提交间不变，后续提交会被判重复 |
+
+### 计时的两条独立路径（走读确认，决定性）
+
+```
+【主路径，逐页覆盖真值】
+commitLeaf (Reader.jsx:316-321) → visiblePageNos → createStableView (view.js:8-21)
+  → coordinator.move() (coordinator.js:426-431) → activity.tracker.move() → cut() (activity.js:75-99)
+  → 【触发点】5 分钟 tick / 关阅读器 / 切后台
+  → persistSnapshot() (coordinator.js:233-258, 318-325)
+  → createSummaryRevision() (summary.js:42-106，指纹字段冻结)
+  → ports.submitSummary() (apiPorts.js:34-38) → POST /reading/session-summaries
+  → writePageCoverage() (monitoring.js:515-578) → 写 reading_page_coverage（只加 delta）
+
+【旧事件路径，只喂护眼统计，有效秒恒 0】
+useReadingTelemetry.js:113-149 → page_stay / page_turn → enqueueLegacy → submitReadingEvents
+```
+
+**这条走读修正了此前的两处误判：**
+
+| 此前被列为疑点 | 实际结论 |
+|---|---|
+| 事件 `valid_reading_seconds` 恒为 0 | **设计如此，不是缺陷。** 旧事件路径只服务护眼统计（`valid_eye_seconds`），对摘要汇总无贡献。若误当根因去改有效时长计算，将触犯 B-2 冻结的计时算法 |
+| 第 1、2 页各记满额 194544 ms | **设计如此，不是缺陷。** `stableView.pageNos` 是视图内**可见页集合**，双页展开时两页同时可见，`cut()` 把同一段有效毫秒记给视图内所有页，故逐页之和本就不应等于会话总时长 |
+| "事件持续流入即客户端提交正常" | **推断过宽。** 该结论只对旧事件路径成立；主路径的摘要提交是独立 HTTP 请求（`POST /reading/session-summaries`），完全可能已停止。因此"可能 A"并未被排除，反而最可疑 |
+
+**已可排除**：页码追踪失败。旧事件的 `page_no` 已达 3，而旧事件与主路径同源于 `commitLeaf` → `stableView`，说明 `leaf` 确实推进到第 3 页。**页码是好的，坏的是提交。** 故 D-05 与 D-11 同根因，且**不是** D-03 三维翻页回弹的下游。
+
+### 收窄后的调查方向
+
+摘要提交触发点明确为三个：**5 分钟 tick、关闭阅读器、切后台**。真人连续阅读约 30 分钟理应触发约 6 次 tick，但 revision 恒为 1。核心问题变为：**`persistSnapshot()` 在首次之后为何再未成功推进？** 取证点：定时器是否还在跳 → `persistSnapshot()` 是否提前 return → revision 2 是否生成 → HTTP 是否发出 → 服务端是否判为重放。`pendingStore.js`（存的正是摘要重试队列）的实际内容是区分"没生成/没发出"与"发了但被拒"的最快判据。
+
+### 仍开放的疑点
+
+**`effective_original_ms` 全为 0**，时长全归文字模式。当时原版 PDF 处于加载失败状态，可能确实全程在文字模式；但需从代码确认原版模式的时长归因路径真的可用，否则 Phase 6 的"双模式×计时联动"验收会直接失败。
+
+### 与既有抖动的关联
+
+第五节记录的 `reading-monitor-client-coordinator.test.mjs` 抖动（10 跑 1 败，「应有额外提交、实际没提交」）与本缺陷症状同形。若 coordinator 的提交调度存在竞态，则测试里 10% 复现、真实环境可能常态失败。**此前把该抖动判为"既有噪音"是过于乐观的判断**，现应作为 D-11 的重要线索对待。
+
+## 八、受保护资产鉴权矩阵（Phase 4 决策依据）
+
+`GET /api/v1/books/assets/:assetId` 挂在 integration router 的 `requireSession` + `requireWorkspace` 之后（`server/http/integration-router.js` 387–388），资产路由无例外；`requireWorkspace` 强制读取 `X-Workspace-Id` 头，不会用会话的 `activeWorkspaceId` 兜底（`server/middleware/request-context.js` 53–61）。
+
+| 请求形态 | 会话 Cookie | `X-Workspace-Id` | 结果 |
+|---|---|---|---|
+| `fetch` 带凭证与工作空间头（学生首页/书架已改成这样） | 有 | 有 | **200**，再转 blob URL |
+| 裸 `<img src>` / CSS `background-image: url()` 冷请求 | 有（浏览器自动带） | **无**（浏览器不允许加自定义头） | **400** |
+| 完全未登录 | 无 | 无 | **401** |
+| 同一 URL 曾在 1 小时内被带头请求过且缓存有效 | — | — | 裸 `<img>` **可能**显示（命中缓存）。**不可当作接口契约**，D-09 即因此被误判 |
+
+**结论：浏览器不可能给 `<img>` 或 CSS `url()` 添加自定义请求头，因此这条路走不通。** 修法只有两条：
+
+1. **前端逐个改造**：所有消费方都改成带头 `fetch` + `URL.createObjectURL`（当前仅学生首页与书架完成）。待改造清单：学生详情页（`src/components/ui.jsx` 的 `BookCover`）、教师端书库与详情页（`src/console/pages/teaching/BookLibrary.jsx`、`BookDetail.jsx` 51–52 行、`ArrangeList.jsx`，均用 CSS `url()`）、社区帖图（`PostCard.jsx`、`PostDetail.jsx`，读公开 `covers/${book.id}.jpg`，导入书天然无此文件）。
+2. **服务端放宽**：为 `GET /books/assets/:assetId` 增加"缺头时以会话 `activeWorkspaceId` 推断工作空间"的回退，并同步收紧缓存（见 D-10）。
+
+方案 2 改一处即可覆盖全部消费方，方案 1 需逐个改造且每新增一个展示位就要重复一次。但方案 2 触及鉴权中间件，需谨慎评估越权风险与既有测试（`identity-core.test.js` 578–582 断言"有 Cookie 无头 → 400"，放宽后该断言需重新界定适用范围）。**该决策留给 Phase 4 前处置，不在 Phase 2 内擅自变更鉴权。**

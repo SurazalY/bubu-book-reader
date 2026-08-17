@@ -522,6 +522,62 @@ test('旧租约首次晚到直接 closed，且允许截止前连续晚到 revisi
   }), { code: 'LEASE_CONFLICT' })
 })
 
+test('同租约残留open会话不挡新会话，且不覆盖旧累计毫秒', async (t) => {
+  const fixture = createFixture()
+  t.after(() => fixture.close())
+  const lease = await fixture.reading.acquireLease({ deviceId: 'device-a', bookVersionId: 'version-a' })
+  fixture.setNow('2026-08-10T00:01:00.000Z')
+  await fixture.monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'device-a',
+    body: { schemaVersion: 1, bookVersionId: 'version-a' },
+  })
+  fixture.setNow('2026-08-10T00:02:00.000Z')
+  await fixture.monitoring.renewLease({
+    leaseId: lease.leaseId,
+    deviceId: 'device-a',
+    body: { schemaVersion: 1, bookVersionId: 'version-a' },
+  })
+  fixture.setNow('2026-08-10T00:03:14.544Z')
+  const leftover = summaryBody({
+    sessionId: 'session-leftover',
+    leaseId: lease.leaseId,
+    cumulativeEffectiveMs: 194_544,
+    measuredThroughAt: '2026-08-10T00:03:14.544Z',
+    lastPageNo: 1,
+  })
+  assert.equal((await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: leftover,
+  })).result, 'accepted')
+
+  fixture.setNow('2026-08-10T00:03:20.000Z')
+  const next = summaryBody({
+    sessionId: 'session-next',
+    leaseId: lease.leaseId,
+    startedAt: '2026-08-10T00:03:15.000Z',
+    measuredThroughAt: '2026-08-10T00:03:20.000Z',
+    cumulativeEffectiveMs: 5_000,
+    lastPageNo: 3,
+  })
+  assert.equal((await fixture.monitoring.acceptSessionSummary({
+    deviceId: 'device-a',
+    body: next,
+  })).result, 'accepted')
+
+  const leftoverRow = fixture.db.prepare(`SELECT status, end_reason, cumulative_effective_ms, latest_revision
+    FROM reading_summary_sessions WHERE id = 'session-leftover'`).get()
+  const nextRow = fixture.db.prepare(`SELECT status, cumulative_effective_ms, last_page_no
+    FROM reading_summary_sessions WHERE id = 'session-next'`).get()
+  assert.equal(leftoverRow.status, 'closed')
+  assert.equal(leftoverRow.end_reason, 'lease_taken_over')
+  assert.equal(Number(leftoverRow.cumulative_effective_ms), 194_544)
+  assert.equal(Number(leftoverRow.latest_revision), 1)
+  assert.equal(nextRow.status, 'open')
+  assert.equal(Number(nextRow.cumulative_effective_ms), 5_000)
+  assert.equal(nextRow.last_page_no, 3)
+})
+
 test('跨 session 晚到正常累加 delta/OR，但较旧位置不回退', async (t) => {
   const fixture = createFixture()
   t.after(() => fixture.close())

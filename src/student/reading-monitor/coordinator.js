@@ -76,6 +76,7 @@ export function createReadingMonitorCoordinator({
   let currentForeground = Boolean(initiallyVisible)
   let pendingCapacityBlocked = false
   let pendingCapacityUsage = null
+  let summaryFailureCount = 0
 
   let queue = null
 
@@ -162,16 +163,31 @@ export function createReadingMonitorCoordinator({
     statDateTimer = null
   }
 
-  function scheduleSummary() {
+  function nextSummaryDelayMs() {
+    if (summaryFailureCount <= 0) return SUMMARY_INTERVAL_MS
+    const backoffMs = 15_000 * (2 ** Math.min(summaryFailureCount - 1, 3))
+    return Math.min(SUMMARY_INTERVAL_MS, backoffMs)
+  }
+
+  function scheduleSummary(delayMs = nextSummaryDelayMs()) {
     if (stopped || closed) return
     if (summaryTimer != null) scheduler.clearTimeout(summaryTimer)
     summaryTimer = scheduler.setTimeout(() => {
       summaryTimer = null
       operation = operation.catch(() => undefined).then(async () => {
-        await tickDirect()
-        scheduleSummary()
+        try {
+          await tickDirect()
+          summaryFailureCount = 0
+        } catch (error) {
+          summaryFailureCount += 1
+          lastError = error
+          onError?.(error, { phase: 'summary_tick', attempt: summaryFailureCount })
+          emit({ type: 'summary_tick_failed', attempt: summaryFailureCount })
+        } finally {
+          scheduleSummary()
+        }
       })
-    }, SUMMARY_INTERVAL_MS)
+    }, delayMs)
   }
 
   function scheduleStatDateBoundary() {
@@ -205,6 +221,7 @@ export function createReadingMonitorCoordinator({
       initialPoint: point,
     })
     closed = false
+    summaryFailureCount = 0
     emit({ type: 'session_started' })
   }
 

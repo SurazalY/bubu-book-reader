@@ -47,7 +47,8 @@ const AI_NAME = '竹娃'
 
 // 外层壳：先确定书籍存在，再挂载阅读器主体。
 // 这样「书打不开」这条分支不会插在一堆 Hook 中间（条件式 Hook 会直接崩），
-// 换书时用 key 重挂，页码、托盘与选区都干净重置。
+// 换书或换版本时用 key 重挂，页码、托盘与选区都干净重置。
+// 同一本书内换页（含 URL ?pageNo=）绝不能进 key，否则会拆掉阅读监测会话。
 export default function Reader() {
   const { bookId } = useParams()
   const location = useLocation()
@@ -76,7 +77,7 @@ export default function Reader() {
   }
   return (
     <ReaderView
-      key={`${bookId}:${resolution.bookVersionId}:${resolution.pageNo}:${location.search}`}
+      key={`${bookId}:${resolution.bookVersionId}`}
       book={book}
       bookId={bookId}
       pageNo={pageNo}
@@ -326,6 +327,20 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     const mainPageNo = pages[leaf]?.no || leaf + 1
     if (pageNo !== mainPageNo) commitLeaf(leaf, initialMovementSource || 'system_restore')
   }, [commitLeaf, initialMovementSource, leaf, pageNo, pages])
+
+  // 换页不再重挂 ReaderView，URL ?pageNo= 只能通过 props 推进 leaf。
+  const skipPagePropSync = useRef(true)
+  useEffect(() => {
+    if (skipPagePropSync.current) {
+      skipPagePropSync.current = false
+      return
+    }
+    const idx = pages.findIndex((page) => page.no === pageNo)
+    if (idx < 0) return
+    const aligned = spread ? idx - (idx % 2) : idx
+    if (aligned === leaf) return
+    commitLeaf(aligned, initialMovementSource || 'student_jump')
+  }, [commitLeaf, initialMovementSource, leaf, pageNo, pages, spread])
 
   useEffect(() => {
     if (previousSpread.current === spread) return

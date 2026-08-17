@@ -203,8 +203,8 @@ test('摘要必须先原子持久化再串行请求，三种终态均删除', as
   assert.equal(store.records.length, 0)
 })
 
-test('网络和revision/权限/租约冲突保留记录并停止后续串行修订', async () => {
-  for (const code of ['NETWORK_ERROR', 'REVISION_CONFLICT', 'PERMISSION_DENIED', 'LEASE_CONFLICT']) {
+test('网络和revision/权限冲突保留记录并停止后续串行修订', async () => {
+  for (const code of ['NETWORK_ERROR', 'REVISION_CONFLICT', 'PERMISSION_DENIED']) {
     const store = memoryStore()
     const queue = createPendingQueue({
       store,
@@ -216,6 +216,19 @@ test('网络和revision/权限/租约冲突保留记录并停止后续串行修�
     assert.equal(store.records.length, 1, code)
     assert.equal(queue.getLastError().code, code)
   }
+})
+
+test('LEASE_CONFLICT移出队头以免毒死后续摘要', async () => {
+  const store = memoryStore()
+  const queue = createPendingQueue({
+    store,
+    scope: scopeA,
+    port: { submitSummary: async () => { throw Object.assign(new Error('LEASE_CONFLICT'), { code: 'LEASE_CONFLICT' }) } },
+  })
+  const outcome = await queue.enqueue(summary('session-a', 1), { idempotencyKey: 'key-1' })
+  assert.equal(outcome.confirmed, false)
+  assert.equal(store.records.length, 0)
+  assert.equal(queue.getLastError().code, 'LEASE_CONFLICT')
 })
 
 test('512条或2MiB是硬上限，80%压力阈值可观测', () => {

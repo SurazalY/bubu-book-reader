@@ -49,6 +49,10 @@ export function createPendingQueue({ store, port, scope, onError, onPressure, on
       } catch (error) {
         lastError = error
         onError?.(error, record)
+        if (error?.code === 'LEASE_CONFLICT') {
+          await store.remove(record.key)
+          return { confirmed, retained: records.length - confirmed - 1, error }
+        }
         return { confirmed, retained: records.length - confirmed, error }
       }
     }
@@ -79,10 +83,11 @@ export function createPendingQueue({ store, port, scope, onError, onPressure, on
     usage = persisted.usage
     if (usage.pressure) onPressure?.(usage)
     const drain = await drainDirect()
-    const [confirmed, usageAfterDrain] = await Promise.all([
-      store.has(persisted.record.key).then((present) => !present),
+    const [present, usageAfterDrain] = await Promise.all([
+      store.has(persisted.record.key),
       store.usage(scope),
     ])
+    const confirmed = !drain.error && !present
     return { ...persisted, drain, confirmed, usageAfterDrain }
   }
 

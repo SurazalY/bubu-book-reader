@@ -53,3 +53,10 @@ test('Reader末页双页初始化不制造幽灵页，且仍不显示完成度�
   assert.doesNotMatch(source, /BookProgress|\bpercent\s*=|\bfinished\b/)
   assert.match(source, /第 \{readPage\} 页 \/ 共 \{totalPages\} 页/)
 })
+
+test('同一本书换页不把pageNo或查询串写进ReaderView的key', async () => {
+  const source = await readFile(new URL('../../src/student/pages/Reader.jsx', import.meta.url), 'utf8')
+  assert.match(source, /key=\{`\$\{bookId\}:\$\{resolution\.bookVersionId\}`\}/)
+  assert.doesNotMatch(source, /key=\{`\$\{bookId\}:\$\{resolution\.bookVersionId\}:\$\{resolution\.pageNo\}/)
+  assert.doesNotMatch(source, /key=\{`\$\{bookId\}:\$\{resolution\.bookVersionId\}:\$\{resolution\.pageNo\}:\$\{location\.search\}`\}/)
+})

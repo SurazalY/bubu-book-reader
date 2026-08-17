@@ -337,6 +337,13 @@ export function closeReadingSummarySessionsForLease(database, input) {
   return closeOpenSummaryRows(database, input)
 }
 
+function expireStaleLeasesForActor(database, actorId, nowIso) {
+  if (!tableExists(database, 'active_reading_leases')) return
+  const expired = database.prepare(`SELECT * FROM active_reading_leases
+    WHERE actor_id = ? AND released_at IS NULL AND expires_at <= ?`).all(actorId, nowIso)
+  for (const stale of expired) expireActiveLease(database, stale, nowIso)
+}
+
 function expireActiveLease(database, active, nowIso) {
   const endedAt = active.expires_at
   database.prepare(`UPDATE active_reading_leases
@@ -673,6 +680,7 @@ function updateSession(database, session, summary, nowIso) {
 
 function processSummary(database, context, summary, now) {
   const nowIso = now.toISOString()
+  expireStaleLeasesForActor(database, context.actorId, nowIso)
   const active = database.prepare(`SELECT * FROM active_reading_leases WHERE id = ? AND released_at IS NULL`)
     .get(summary.leaseId)
   if (active && active.expires_at <= nowIso) expireActiveLease(database, active, nowIso)
@@ -729,12 +737,25 @@ function processSummary(database, context, summary, now) {
   }
 
   if (summary.revision !== 1) throw domainError('REVISION_GAP', '新会话必须从 revision 1 开始')
-  const otherOpen = database.prepare(`SELECT id FROM reading_summary_sessions
+  const otherOpen = database.prepare(`SELECT id, lease_id_at_start, measured_through_at FROM reading_summary_sessions
     WHERE organization_id_at_creation = ? AND actor_id_at_creation = ? AND status = 'open'`)
     .get(context.organizationId, context.actorId)
   const incomingWillBeClosed = LEASE_END_REASONS.has(history.end_reason) || summary.endedAt !== null
   if (otherOpen && !incomingWillBeClosed) {
-    throw domainError('LEASE_CONFLICT', '当前学生已有其他 open 摘要会话')
+    const otherLease = database.prepare('SELECT * FROM active_reading_leases WHERE id = ?')
+      .get(otherOpen.lease_id_at_start)
+    const sameLease = otherOpen.lease_id_at_start === summary.leaseId
+    const otherLeaseDead = !otherLease || otherLease.released_at !== null || otherLease.expires_at <= nowIso
+    if (sameLease || otherLeaseDead) {
+      closeOpenSummaryRows(database, {
+        leaseId: otherOpen.lease_id_at_start,
+        endedAt: otherOpen.measured_through_at,
+        endReason: sameLease ? 'lease_taken_over' : 'lease_ended',
+        updatedAt: nowIso,
+      })
+    } else {
+      throw domainError('LEASE_CONFLICT', '当前学生已有其他 open 摘要会话')
+    }
   }
   insertSession(database, context, context.classId, summary, history, nowIso)
   writePageCoverage(database, context, summary, nowIso)

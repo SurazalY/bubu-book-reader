@@ -308,6 +308,12 @@ export function createReadingDomain(dependencies) {
             && currentHistory.device_id === deviceId
             && currentHistory.book_version_id === bookVersionId
           if (sameHistoryScope) {
+            closeReadingSummarySessionsForLease(context.db, {
+              leaseId: active.id,
+              endedAt: now,
+              endReason: 'lease_taken_over',
+              updatedAt: now,
+            })
             return { leaseId: active.id, expiresAt: active.expires_at, takeover: false }
           }
           run(context.db, `UPDATE active_reading_leases

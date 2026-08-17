@@ -106,6 +106,8 @@ function coordinatorFixture({
   submitSummary,
   renewLease,
   scopeInput = scope,
+  cryptoImpl = webcrypto,
+  onError,
 } = {}) {
   const time = schedulerHarness(startWall)
   const store = memoryStore()
@@ -124,7 +126,8 @@ function coordinatorFixture({
       ids += 1
       return `${prefix}:${ids}`
     },
-    cryptoImpl: webcrypto,
+    cryptoImpl,
+    onError,
     ports: {
       acquireLease: async () => ({ leaseId: 'lease-1', deviceId: 'device-1', expiresAt: new Date(time.wallNow() + 90_000).toISOString() }),
       renewLease: async (input) => renewLease
@@ -287,6 +290,56 @@ test('满载后drain必须低于80%压力线才恢复计时', async () => {
   await fixture.time.advance(10_000)
   await fixture.coordinator.confirmedInteraction()
   assert.equal(fixture.coordinator.getState().activity.cumulativeEffectiveMs, cumulativeAtFull + 10_000)
+  await fixture.coordinator.stop()
+})
+
+test('tickDirect抛错后定时链仍会进行下一次尝试', async () => {
+  let digestCalls = 0
+  const tickErrors = []
+  const fixture = coordinatorFixture({
+    cryptoImpl: {
+      subtle: {
+        digest(algorithm, data) {
+          digestCalls += 1
+          if (digestCalls === 1) {
+            return Promise.reject(Object.assign(new Error('摘要指纹计算失败'), { code: 'DIGEST_FAILED' }))
+          }
+          return webcrypto.subtle.digest(algorithm, data)
+        },
+      },
+    },
+    onError(error, context) {
+      tickErrors.push({ error, context })
+    },
+  })
+  await fixture.coordinator.start()
+  await fixture.time.advance(300_000)
+  assert.equal(fixture.submissions.length, 0)
+  assert.equal(digestCalls, 1)
+  assert.equal(tickErrors.at(-1)?.context?.phase, 'summary_tick')
+  assert.equal(fixture.coordinator.getState().error?.code, 'DIGEST_FAILED')
+  await fixture.time.advance(15_000)
+  assert.ok(fixture.submissions.length >= 1)
+  assert.equal(fixture.submissions.at(-1).summary.revision, 1)
+  await fixture.coordinator.stop()
+})
+
+test('摘要提交LEASE_CONFLICT后定时链不永久停摆', async () => {
+  let calls = 0
+  const fixture = coordinatorFixture({
+    submitSummary: async () => {
+      calls += 1
+      if (calls === 1) throw Object.assign(new Error('当前学生已有其他 open 摘要会话'), { code: 'LEASE_CONFLICT' })
+      return { data: { result: 'accepted' } }
+    },
+  })
+  await fixture.coordinator.start()
+  await fixture.time.advance(300_000)
+  assert.equal(calls, 1)
+  assert.equal(fixture.submissions.length, 1)
+  await fixture.time.advance(300_000)
+  assert.ok(calls >= 2)
+  assert.ok(fixture.submissions.length >= 2)
   await fixture.coordinator.stop()
 })
 
