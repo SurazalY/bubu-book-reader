@@ -26,6 +26,7 @@
 | D-14 | 资产接口未按班级可见范围过滤 | **应修（Phase 4 核心前置）** | 未修 | `getBookAsset` 目前只经 `requireSession` + `requireWorkspace`，**没有任何发布状态与班级可见范围的过滤**。即同一工作空间内任何登录用户都能取到任意书的封面与源 PDF，绕过教师的发布管理。这一条与取图路线选择无关，任何路线下都必须在 `getBookAsset` 显式实现，且口径要与 `listBooks` / `getPage` 一致。**意义**：Phase 4「教师发布管理与班级可见范围」的实际起点比 `03` 任务清单描述的更靠前——不只是补前端管理界面，服务端的资产授权本身尚未建立。发现于受保护资产方案设计（`docs/product-close-loop/design/protected-asset-consumption.md`） |
 | D-13 | 同一学生多条残留 open 会话只能关掉一条 | 建议 | 未修 | `monitoring.js` 740–758 的 `otherOpen` 用 `.get()` 取单行且未过滤 `workspace_id`，若同一学生存在多条残留 open，一次只处理一条，理论上可留下多余 open 行。属防御深度不足，非越权（关闭目标仍限于该学生自己的行） |
 | D-10 | 受保护资产响应可缓存且未按工作空间区分 | 应修（**Phase 4 前处置**） | 未修 | 资产响应带 `Cache-Control: private, max-age=3600`，**且无 `Vary: X-Workspace-Id`**。两重后果：① 一次带头 fetch 会为同一 URL 预热缓存，使随后不带头的裸 `<img>`/CSS `url()` 也能显示，**掩盖鉴权失败**（D-09 即因此被误判为通过）；② 授权结果被缓存长达 1 小时，教师取消发布或调整班级可见范围后，学生浏览器仍可从缓存读到封面乃至源 PDF。第 ② 点直接冲击 Phase 4「教师发布管理与班级可见范围」的有效性，须在进 Phase 4 前定方案 |
+| D-15 | **僵尸标签页续租锁死租约，阅读计时与页码全链路无法记录** | **阻塞** | **已修** `a2c1ed3` | 详见下节专项 |
 
 ## 二、明确不记为缺陷
 
@@ -273,3 +274,88 @@ D-11 的修复动到了 `server/domains/reading/monitoring.js` 与 `catalog.js`�
 ### 关闭残留不丢数据：确认
 
 `closeOpenSummaryRows` 只更新 `status / ended_at / end_reason / updated_at / version+1`，不碰 `cumulative_effective_ms`、`latest_revision`、`latest_fingerprint`、`revision_fingerprints_json`。单调触发器（`043_reading_session_summaries.sql` 168–194）禁止累计回退、禁止已关闭行改 `ended_at`，允许 open → closed。服务端新测例（`reading-monitoring.test.js` 568–575）断言关闭后仍为 194544、revision 仍为 1。**「3 分钟」基线不会被清零或重算。**
+
+## 十、D-15 专项：僵尸标签页续租锁死租约
+
+**严重度：阻塞。** 与 D-11 症状同形（阅读时长与页码均不推进），但根因不同：D-11 是客户端定时链停摆 + `LEASE_CONFLICT`；本条是**活租约被脱管标签页无限续期**，其他设备/会话被 `READING_LEASE_HELD` 拒于门外。D-05、D-11 在 `f5f99a8` 的修复未能覆盖本路径；**连续三轮真人复验均失败**，直至 `a2c1ed3` 在真实环境观测到续期被拒、租约自然过期后才可关闭。
+
+### 症状（真人报告）
+
+真人打开学生端阅读器，顶栏显示 `READING_LEASE_HELD`；`POST /reading/lease` 返回 409，监测会话建立不起来，阅读时长与页码完全不记录。
+
+### 触发源
+
+一个脱管的浏览器标签页——**跑在 Cursor 内嵌浏览器里，是 2026-08-17 当天下午某个子 agent 做浏览器验证时留下的页面**，不是用户自己的 Chrome。
+
+### 定位方法（留档）
+
+1. **`Get-NetTCPConnection`**：观察到 5190 与 5191 的客户端端口连号成对（56674/56675、61923/61924、51986/51987），说明同一客户端先请前端再请后端。
+2. **进程归属**：该客户端 socket 归属 Cursor 的 `NetworkService` 进程（pid 44972），其父进程是标题为「Cursor Agents」的 Cursor 窗口。
+3. **MCP 盲区**：当前会话的浏览器 MCP `browser_tabs list` 返回空——该标签页已脱离 MCP 管理，工具查不到。
+
+### 与既有诊断的更正
+
+| 此前判断 | 定论 |
+|---|---|
+| 用户 Chrome 后台残留进程持有续期 | **已证伪。** 用户按判断彻底关闭 Chrome 三次均无效；主控在征得用户同意后杀掉全部 29 个 `chrome.exe` 进程后，续期依然每 60 秒继续，才排除 Chrome。真凶是 Cursor 内嵌浏览器里 agent 遗留的标签页 |
+| D-11 `f5f99a8` 已修，真人复验应通过 | **本路径未覆盖。** D-11 修的是 coordinator 定时链与 `LEASE_CONFLICT` 接管语义；本条是租约续期无停滞检查导致的 `READING_LEASE_HELD`，真人三轮复验均因此失败 |
+
+**过程建议**：凡涉及「客户端仍在活动」的判断，应先用连接归属证据定位宿主进程，再要求真人操作；勿在未定位前让用户白等（本次用户被要求关 Chrome 三次、白等约 40 分钟）。
+
+### 根因（机制）
+
+```
+【客户端】leaseController 每 60 秒无条件续租（TTL 90 秒、提前 30 秒续期）
+         ↓ 该页摘要提交链早已停摆
+【服务端】renewLease 原先无条件延长租约，从不检查关联会话是否仍在推进
+         ↓ 租约永不过期
+【阻塞】 catalog.js 296–299 行对任何其他设备抛 READING_LEASE_HELD
+         ↓ 新会话一条摘要都发不出去
+```
+
+实测：该租约自 `06:56:16Z` 起被连续续期近三小时，`active_reading_leases.version` 达 187；而关联会话自 `07:01:16Z` 起 `latest_revision` 恒为 1、`cumulative_effective_ms = 194544` 未变。
+
+### 修复（`a2c1ed3`）
+
+`server/domains/reading/monitoring.js` 的 `renewLease` 按该租约上最新一条摘要会话的 `measured_through_at` 判定停滞，超过 `STALE_SESSION_RENEW_THRESHOLD_MS = 420` 秒即拒绝续期（抛既有 `LEASE_REQUIRED`），租约 90 秒内自然过期后交既有清理链路接管。
+
+**约束**：不新增接管策略、不改 TTL 数值、不碰摘要 schema 与指纹。阈值依据：5 分钟摘要 tick + 90 秒 TTL + 约 30 秒调度余量。
+
+### 附带修复
+
+`server/http/integration-router.js` 中 `readmate_device` 从会话 Cookie 改为 365 天持久 Cookie，并抽取 `ensureDeviceCookie` 提前到 `executeIdempotentAsync` 之前写入；课堂路由（`POST /classroom/sessions/:sessionId/control`）复用同一实现。原先是会话 Cookie，浏览器完全退出即丢失，导致同一台机器重启浏览器后被判为新设备。
+
+### 检查点
+
+`a2c1ed3`。质量门 server 200/200、frontend 171/171、build 退出码 0。
+
+### 真实环境实测证据
+
+修复后重启后端（`10:03:22.825Z` 起 pid 37708）：
+
+| 观测项 | 值 |
+|---|---|
+| 首次续期被拒 | `10:03:40.307Z`；幂等记录 `state=failed` / `status_code=409` / `failure_code=LEASE_REQUIRED` / `failure_reason=阅读租约关联会话已停滞，不能续期` |
+| `active_reading_leases.version` | 冻结在 187（末次成功 `10:02:40.280Z`） |
+| 租约过期 | `10:04:10.279Z` |
+| 僵尸页后续行为 | 既未再续期也未重新抢占租约 |
+| 残留会话数据 | `cumulative_effective_ms = 194544` 与 `latest_revision = 1` 未被改动 |
+
+### 过程教训：首版修复「单元测试全绿但线上完全不生效」
+
+本条与缺陷本体同等重要，是本项目的过程教训。
+
+**首版问题**：首版修复的停滞判定 SQL 带了 `status = 'open'` 过滤条件。而僵尸页在服务端重启后会触发同设备 `acquireLease`；`server/domains/reading/catalog.js` 第 311–316 行会以 `lease_taken_over` 关闭该租约的 open 会话。于是判定的会话查询返回空行，`UPDATE active_reading_leases` 照常执行，续期继续成功。
+
+**发现方式**：主控在真实环境只读观测 150 秒，看到 `version` 仍在 176→177→178 递增、审计 `outcome=succeeded`，才发现修复根本没生效。
+
+**测试缺口**：
+
+| 问题 | 说明 |
+|---|---|
+| 首版 4 条领域回归 | 全部让会话保持 `open` 状态，**没有一条覆盖「同设备 re-acquire 把会话标成 closed 之后仍能续期」这条真实生产路径** |
+| 报告中声称的 2 条 HTTP 用例 | **实际不存在** |
+
+**已补回归（4 条）**：领域层 2 条（closed 会话停滞超阈值拒续、同设备 re-acquire 关闭 open 会话后停滞拒续）；HTTP 层 2 条（同两个场景走 HTTP 断言 `LEASE_REQUIRED`）。
+
+**验收纪律建议**：服务端改动光有「重启后端 + 单元测试全绿」不足以判定生效，**必须在真实环境用真实数据观测到预期行为**（本例是观测续期是否真的被拒、租约是否真的过期）才能宣称修复完成。
