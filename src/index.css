@@ -1083,15 +1083,26 @@ select.console-input {
 .student-reader-foot {
   gap: 14px;
 }
-.student-reader-bar--off {
+/* 收起时必须真的退出 flex 流。只设 opacity 的话两条栏仍占着列高度，
+   舞台一点也不会变高、书页一点也不会变大——「轻点正文收起」等于白收（D-19 实测）。
+   改成脱流后收起能把约 116px 还给舞台，扫描页跟着等比放大约 14%。
+   left/right/top/bottom 与 .student-reader 的 padding（12px 18px 14px）对齐，
+   两条栏本就是 pointer-events:none + opacity:0，脱流后不会盖住正文。 */
+.student-reader-bar--off,
+.student-reader-foot--off {
+  position: absolute;
+  left: 18px;
+  right: 18px;
   opacity: 0;
-  transform: translateY(-12px);
   pointer-events: none;
 }
+.student-reader-bar--off {
+  top: 12px;
+  transform: translateY(-12px);
+}
 .student-reader-foot--off {
-  opacity: 0;
+  bottom: 14px;
   transform: translateY(12px);
-  pointer-events: none;
 }
 .student-reader-btn {
   display: inline-flex;
@@ -1187,6 +1198,23 @@ select.console-input {
     transform: none;
   }
 }
+/* 放大档（原版 PDF「大」字号）页高会超过舞台，这里给一层纵向滚动视口。
+   基类刻意不写任何规则：未放大时它就是一个普通 div，
+   既不裁掉书页的投影，也不改变页框尺寸与居中方式。 */
+/* 用 absolute + inset 而不是 max-height:100%：舞台是 grid，隐式行按内容定高，
+   放大后行高会跟着长到 1075px，百分比上限就永远不咬人，结果是整页溢出而不是滚动。
+   舞台自身是 position:relative，所以 inset:0 精确等于舞台可视区。 */
+.student-stage-viewport--zoom {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  /* 必须 flex-start 不能 center：内容比视口高时 center 会把顶部溢出到不可滚动的负方向 */
+  align-items: flex-start;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 .student-flip-shell,
 .student-slide-shell {
   position: relative;
@@ -1270,8 +1298,7 @@ select.console-input {
 }
 .student-pdf-canvas {
   display: block;
-  max-width: 100%;
-  max-height: 100%;
+  /* 显示尺寸由 canvas.style 写死 CSS 像素；不要用 max-* 再缩放高分 backing */
   user-select: none;
 }
 .student-pdf-status,

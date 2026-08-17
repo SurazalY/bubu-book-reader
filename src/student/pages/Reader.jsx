@@ -6,6 +6,7 @@ import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 import { GlassPanel } from '../components/Glass.jsx'
 import BookPage from '../components/BookPage.jsx'
 import PdfBookPage, { useProtectedPdfDocument } from '../components/PdfBookPage.jsx'
+import { applyPdfZoom } from '../pdf-page-design.js'
 import {
   NoteComposer,
   ReaderToast,
@@ -202,6 +203,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   const classroom = useClassroomRuntime(book.classReading, workspaceId)
 
   const stageRef = useRef(null)
+  const stageViewportRef = useRef(null)
   const flipRef = useRef(null)
   const traySeq = useRef(0)
   const [box, setBox] = useState({ w: 0, h: 0 })
@@ -289,17 +291,33 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
     ? { width: pdf.width, height: pdf.height }
     : PAGE_DESIGN, [pdf.height, pdf.width, readerMode])
 
+  // 原版 PDF 的「大」档不是字号而是放大档：扫描件没有字号可调，
+  // 而 D-19 证明按窗口高度铺满时汉字只有约 11 设备像素、低于可读下沿，
+  // 唯一能真正变清的办法就是放大到超出舞台、纵向滚着读。
+  // 文字模式是矢量字，不存在清晰度问题，所以不进这条分支，既有行为一字不改。
+  const pdfZoomed = readerMode === 'original' && !spread
+
   const scale = useMemo(() => {
     if (box.w <= 0 || box.h <= 0) return 0
     const perPage = spread ? (box.w - 26) / 2 : box.w
-    const k = Math.min(box.h / pageDesign.height, perPage / pageDesign.width)
+    const widthLimit = perPage / pageDesign.width
+    const k = Math.min(box.h / pageDesign.height, widthLimit)
+    const fit = Math.max(0.4, Math.min(k, 2))
+    if (pdfZoomed) return applyPdfZoom(fit, widthLimit)
     // 小字号故意留一点余白，视觉上更像手里捧着的书，不顶满屏
     const cap = prefs.fontScale === 'sm' ? 0.92 : 1
-    return Math.max(0.4, Math.min(k, 2)) * cap
-  }, [box, pageDesign, spread, prefs.fontScale])
+    return fit * cap
+  }, [box, pageDesign, pdfZoomed, spread, prefs.fontScale])
 
   const pageW = Math.round(pageDesign.width * scale)
   const pageH = Math.round(pageDesign.height * scale)
+
+  // 放大档翻页后必须回到页首，否则新的一页一上来就停在上一页的滚动位置。
+  // 只动 scrollTop，不进 leaf/pageNo 链路，所以不影响计时与进度归属。
+  useEffect(() => {
+    const viewport = stageViewportRef.current
+    if (viewport && viewport.scrollTop !== 0) viewport.scrollTop = 0
+  }, [leaf])
 
   // —— 翻页 ——
   // 页数、尺寸、单双页变化都要给 HTMLFlipBook 换 key，否则库内部状态会错乱（旧站踩过）
@@ -969,13 +987,20 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
             </div>
           ) : (
             // 「平移」翻页偏好：同一套固定书页，只把过渡换成整页横向平移，
-            // 减少动态效果开启时也走这条，不播三维翻页
-            <div className="student-slide-shell" style={{ width: spread ? pageW * 2 + 26 : pageW, height: pageH }}>
-              {visible.map((i) => (
-                <div key={`${flipKey}-${i}`} className="student-slide-page">
-                  {renderPage(i, true)}
-                </div>
-              ))}
+            // 减少动态效果开启时也走这条，不播三维翻页。
+            // 外面那层滚动视口只在放大档生效（--zoom 才设 overflow），
+            // 未放大时它没有任何 CSS，布局与页框尺寸与之前完全一致。
+            <div
+              ref={stageViewportRef}
+              className={cx('student-stage-viewport', pdfZoomed && 'student-stage-viewport--zoom')}
+            >
+              <div className="student-slide-shell" style={{ width: spread ? pageW * 2 + 26 : pageW, height: pageH }}>
+                {visible.map((i) => (
+                  <div key={`${flipKey}-${i}`} className="student-slide-page">
+                    {renderPage(i, true)}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
 

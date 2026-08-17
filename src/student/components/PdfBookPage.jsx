@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useState } from 'react'
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
+import { pdfCanvasOutputScale, pickPdfPageDesign, samplePdfDesignPageNumbers } from '../pdf-page-design.js'
 import { cx } from '../../shared/cx.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 
@@ -34,14 +35,20 @@ export function useProtectedPdfDocument({ asset, workspaceId, expectedPages, ena
         error.code = 'PDF_PAGE_COUNT_MISMATCH'
         throw error
       }
-      const firstPage = await document.getPage(1)
-      const viewport = firstPage.getViewport({ scale: 1 })
+      const sizes = []
+      for (const samplePageNo of samplePdfDesignPageNumbers(document.numPages)) {
+        if (cancelled) return
+        const samplePage = await document.getPage(samplePageNo)
+        const viewport = samplePage.getViewport({ scale: 1 })
+        sizes.push({ width: viewport.width, height: viewport.height })
+      }
+      const design = pickPdfPageDesign(sizes)
       if (!cancelled) {
         setState({
           status: 'ready',
           document,
-          width: viewport.width,
-          height: viewport.height,
+          width: design.width,
+          height: design.height,
           error: null,
         })
       }
@@ -88,17 +95,23 @@ const PdfBookPage = forwardRef(function PdfBookPage({
     document.getPage(pageNo).then((pdfPage) => {
       if (cancelled) return null
       const base = pdfPage.getViewport({ scale: 1 })
-      const viewport = pdfPage.getViewport({ scale: (designWidth * scale) / base.width })
-      const ratio = Math.max(1, window.devicePixelRatio || 1)
-      canvas.width = Math.ceil(viewport.width * ratio)
-      canvas.height = Math.ceil(viewport.height * ratio)
-      canvas.style.width = `${viewport.width}px`
-      canvas.style.height = `${viewport.height}px`
+      const outputScale = pdfCanvasOutputScale(window.devicePixelRatio)
+      // 页框用的是 Math.round 后的整数 CSS 像素，canvas 也必须取整：
+      // 之前 style.width 是 505.19 这种小数，grid 居中就把 canvas 摆在半像素上，
+      // 合成器要对整张纹理做一次带亚像素相位的重采样，白丢一点锐度（D-19）。
+      // 高度按本页自身的宽高比推，不按 designHeight，否则那 8 本的大封面会被拉变形。
+      const cssWidth = Math.round(designWidth * scale)
+      const cssScale = cssWidth / base.width
+      const cssHeight = Math.round(base.height * cssScale)
+      const viewport = pdfPage.getViewport({ scale: cssScale * outputScale })
+      canvas.width = Math.round(viewport.width)
+      canvas.height = Math.round(viewport.height)
+      canvas.style.width = `${cssWidth}px`
+      canvas.style.height = `${cssHeight}px`
       const canvasContext = canvas.getContext('2d', { alpha: false })
       renderTask = pdfPage.render({
         canvasContext,
         viewport,
-        transform: ratio === 1 ? null : [ratio, 0, 0, ratio, 0, 0],
       })
       return renderTask.promise
     }).then(() => {
