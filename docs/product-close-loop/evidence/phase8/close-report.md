@@ -2,6 +2,7 @@
 
 > 日期：2026-08-18
 > 分支：`feat/product-close-loop`
+> 检查点：`e8cbe4e`（`e8cbe4e32ecc8c21d4e81f99ebd84154f35e8a64`）
 > 结论：实施与 Gate 1–3 已结束。用户称浏览器验收暂时没有问题。未把 G1–G20 写成逐条 L4。未 push。
 
 ## 质量门（收口亲自跑）
@@ -33,6 +34,7 @@
 - 真 5191 未打 draft+grant 租约（无造 draft HTTP）
 - Phase 6 未开始
 - 未 push / 未建 PR
+- 检查点未含 `.trellis/`、`.env`、真库、`dist/`
 
 ## 继任入口
 

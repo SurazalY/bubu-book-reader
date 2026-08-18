@@ -5,7 +5,7 @@
 
 ## 当前结论
 
-**Phase 8 收口（2026-08-18）。T8.2～T8.9 verified；Gate 1–3 已过；用户称浏览器验收暂时没有问题。**
+**Phase 8 收口（2026-08-18）。T8.2～T8.9 verified；Gate 1–3 已过；用户称浏览器验收暂时没有问题。检查点 `e8cbe4e`。**
 
 收口质量门：server 437/437，frontend 270/270，build EXIT 0。见 `close-report.md`。未 push。下一阶段是 Phase 6，须另授权。
 
@@ -723,3 +723,9 @@ changelog 误把登录三字段标成 P8-17R、默认全闭标成 P8-24（应为
 状态：用户称暂时没有问题（2026-08-18）。`04` 已追加收口表，未写逐条 L4。agent：[T8.10 五条 UI 热修](3d056cd0-97cc-465a-ae6b-ebb0410ad831)
 
 只改前端。frontend 270/270。五条源码已对上：登录→`/student/register`、父菜单不左移、选班可退、注册码与内部编号分开。未开浏览器。截图里暴露的学生注册码须校长撤销重签。证据：`t8-10-ui-hotfix-report.md`
+
+## Phase 8 检查点（2026-08-18）
+
+状态：已入库。`e8cbe4e`（`e8cbe4e32ecc8c21d4e81f99ebd84154f35e8a64`）。
+
+未纳入：`.trellis/`、`.env`、真库、`dist/`。未 push。下一阶段 Phase 6 须另授权。
