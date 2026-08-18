@@ -19,7 +19,8 @@ import {
   parseCookies,
 } from '../../middleware/request-context.js'
 
-import { createIdentityService } from './service.js'
+import { listAuthorizedClasses } from './class-scope.js'
+import { createIdentityService, workspaceResourceScope } from './service.js'
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url))
 
@@ -168,6 +169,12 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
     'account.manage',
     (req) => service.getClassScope(req.body?.classId),
   )
+  // 必须带上 classId / gradeId：permissions.js 的 collectScopeIds 认字段名而不是 type 值。
+  const requireWorkspaceClassRead = createRequirePermissionMiddleware(
+    service,
+    'class.read',
+    (req) => workspaceResourceScope(req.identitySession.user, req.workspace),
+  )
 
   router.use(express.json({ limit: '1mb' }))
   router.use(createRequestContextMiddleware())
@@ -275,6 +282,22 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
     route((req, res) =>
       sendData(res, service.listWorkspaces(req.identitySession.user.id), { requestId: req.requestId }),
     ),
+  )
+
+  // B-4：设置书籍可见范围的 UI 只能列出操作者授权范围内的班级。
+  // 与 GET /students 不同，这里直接列 classes 表，刚建好还没有学生的空班也能列出来。
+  router.get(
+    '/classes',
+    requireSession,
+    requireWorkspace,
+    requireWorkspaceClassRead,
+    route((req, res) => sendData(res, {
+      items: listAuthorizedClasses(database, {
+        organizationId: req.workspace.organizationId,
+        userId: req.identitySession.user.id,
+        workspaceId: req.workspace.id,
+      }),
+    }, { requestId: req.requestId })),
   )
 
   router.post(

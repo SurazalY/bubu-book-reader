@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { cx, Icon } from '../../../components/ui.jsx'
+import { useProtectedAssetUrl } from '../../../shared/useProtectedAssetUrl.js'
 import { GlassPanel } from '../../components/Glass.jsx'
 import { Btn, EmptyState, IconBtn, StatusTag } from '../../components/Controls.jsx'
 import { ConfirmModal } from '../../components/Overlay.jsx'
@@ -18,6 +19,9 @@ export default function TeacherReader() {
   const runtime = useTeacherReaderRuntime(bookId)
   const book = runtime.book
   const pages = runtime.pages
+  const coverUrl = typeof book?.cover?.url === 'string' && book.cover.url ? book.cover.url : null
+  const { objectUrl: coverObjectUrl, failed: coverFailed } = useProtectedAssetUrl(coverUrl, runtime.workspaceId)
+  const coverAvailable = Boolean(coverObjectUrl) && !coverFailed
   const [page, setPage] = useState(1)
   const [sync, setSync] = useState('off')
   const [seconds, setSeconds] = useState(0)
@@ -46,6 +50,31 @@ export default function TeacherReader() {
     const syncedPage = Number(runtime.classroom.page ?? runtime.classroom.synced_page_no)
     if (Number.isInteger(syncedPage) && syncedPage > 0) setPage(syncedPage)
   }, [runtime.classroom?.mode, runtime.classroom?.page, runtime.classroom?.synced_page_no])
+
+  if (runtime.status === 'loading') {
+    return (
+      <PagePanel title="教师阅读器" desc="正在读取这本书的书页。">
+        <EmptyState icon="LoaderCircle" title="正在打开教师阅读器" desc="书页会在读取完成后显示。" />
+      </PagePanel>
+    )
+  }
+
+  if (runtime.status === 'error' || (book && pages.length === 0)) {
+    return (
+      <PagePanel title="读不到书页" desc="教师阅读器现在打不开这本书的内容。">
+        <EmptyState
+          icon="FileWarning"
+          title="读不到这本书的书页"
+          desc="如果它刚被下架，请重新发布后再打开。"
+          action={
+            <Btn tone="primary" icon="ArrowLeft" onClick={() => navigate('/console/teaching/books')}>
+              回到书库
+            </Btn>
+          }
+        />
+      </PagePanel>
+    )
+  }
 
   if (!book) {
     return (
@@ -79,7 +108,6 @@ export default function TeacherReader() {
     if (sync === 'syncing') runtime.syncPage(nextPage).catch(() => undefined)
   }
 
-  const coverStyle = book.cover?.url ? { backgroundImage: `url(${book.cover.url})`, backgroundSize: 'cover' } : undefined
   const participantStats = runtime.classroom?.participants || { connected: 0, abnormal: 0, offline: 0 }
 
   return (
@@ -89,10 +117,11 @@ export default function TeacherReader() {
         <div className="flex items-center gap-3">
           <IconBtn icon="ArrowLeft" title="返回书库" onClick={() => navigate('/console/teaching/books')} />
           <span
-            className="w-6 h-8 rounded-[3px] shrink-0 shadow-e1"
-            style={coverStyle}
+            className="w-6 h-8 rounded-[3px] shrink-0 shadow-e1 overflow-hidden bg-ink-200 relative"
             aria-hidden="true"
-          />
+          >
+            {coverAvailable && <img src={coverObjectUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+          </span>
           <div className="min-w-0">
             <h1 className="font-serif text-[16px] font-bold text-ink-900 truncate">{book.title}</h1>
             <p className="text-[11.5px] text-ink-500 truncate">

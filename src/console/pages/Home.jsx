@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { cx } from '../../shared/cx.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
+import { useProtectedAssetUrl } from '../../shared/useProtectedAssetUrl.js'
 import { GlassCard } from '../components/Glass.jsx'
 import MiniChart from '../components/MiniChart.jsx'
 import { useConsole } from '../state/ConsoleContext.jsx'
@@ -101,7 +102,7 @@ export default function Home() {
                       <div className="text-[11px] text-ink-400 mt-0.5">{arrangement.weekday || '—'}</div>
                     </div>
                     <span className="w-7 h-9 rounded-[3px] shrink-0 shadow-e1 overflow-hidden bg-gradient-to-br from-[#d2b47b] to-[#78929c]" aria-hidden="true">
-                      {arrangement.coverUrl && <img src={arrangement.coverUrl} alt="" className="h-full w-full object-cover" />}
+                      <ArrangementCover coverUrl={arrangement.coverUrl} />
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-1.5 min-w-0">
@@ -161,6 +162,13 @@ export default function Home() {
       </div>
     </div>
   )
+}
+
+function ArrangementCover({ coverUrl }) {
+  const { workspace } = useConsole()
+  const { objectUrl, failed } = useProtectedAssetUrl(coverUrl, workspace?.id)
+  if (!objectUrl || failed) return null
+  return <img src={objectUrl} alt="" className="h-full w-full object-cover" />
 }
 
 function DashboardBlock({ block, loading, error, onOpen }) {

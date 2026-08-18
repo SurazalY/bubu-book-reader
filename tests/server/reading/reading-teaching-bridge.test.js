@@ -14,10 +14,20 @@ import { createTeachingDomain } from '../../../server/domains/teaching/classroom
 function createFixture() {
   const directory = mkdtempSync(path.join(tmpdir(), 'bubu-c-reading-'))
   const db = new DatabaseSync(path.join(directory, 'reading.sqlite'))
-  db.exec(`CREATE TABLE organizations (id TEXT PRIMARY KEY);
-    CREATE TABLE users (id TEXT PRIMARY KEY);
-    CREATE TABLE classes (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, workspace_id TEXT NOT NULL);
-    CREATE TABLE role_assignments (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, role_code TEXT NOT NULL, scope_id TEXT NOT NULL);`)
+  // 书籍可见性判定要正向查 role_assignments 与 class_memberships，桩库需要这些身份表的最小列。
+  db.exec(`CREATE TABLE organizations (id TEXT PRIMARY KEY, status TEXT NOT NULL DEFAULT 'active');
+    CREATE TABLE users (id TEXT PRIMARY KEY, organization_id TEXT, status TEXT NOT NULL DEFAULT 'active');
+    CREATE TABLE workspaces (id TEXT PRIMARY KEY, organization_id TEXT, scope_type TEXT, scope_id TEXT,
+      status TEXT NOT NULL DEFAULT 'active');
+    CREATE TABLE workspace_memberships (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, workspace_id TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active');
+    CREATE TABLE classes (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, workspace_id TEXT NOT NULL,
+      grade_id TEXT, status TEXT NOT NULL DEFAULT 'active');
+    CREATE TABLE class_memberships (id TEXT PRIMARY KEY, class_id TEXT NOT NULL, user_id TEXT NOT NULL,
+      membership_role TEXT, status TEXT NOT NULL DEFAULT 'active');
+    CREATE TABLE role_assignments (id TEXT PRIMARY KEY, organization_id TEXT, user_id TEXT NOT NULL,
+      workspace_id TEXT, role_code TEXT NOT NULL, scope_type TEXT, scope_id TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active');`)
   for (const file of ['010_reading_catalog.sql', '011_reading_activity.sql', '012_teaching_bridge.sql', '013_reading_security_scopes.sql', '014_book_catalog_metadata.sql', '015_classroom_participation.sql']) {
     db.exec(readFileSync(new URL(`../../../server/db/migrations/${file}`, import.meta.url), 'utf8'))
   }

@@ -1,66 +1,10 @@
-import { useEffect, useState } from 'react'
-
 import { cx } from '../../shared/cx.js'
+import { useProtectedAssetUrl } from '../../shared/useProtectedAssetUrl.js'
 import { useStudent } from '../state/StudentContext.jsx'
 
-function useProtectedCoverUrl(coverUrl) {
-  const { runtime } = useStudent()
-  const workspaceId = runtime.data?.workspaceId
-  const [objectUrl, setObjectUrl] = useState(null)
-  const [failed, setFailed] = useState(false)
-
-  useEffect(() => {
-    if (!coverUrl) {
-      setObjectUrl(null)
-      setFailed(true)
-      return undefined
-    }
-    if (!workspaceId) {
-      setObjectUrl(null)
-      setFailed(false)
-      return undefined
-    }
-
-    let cancelled = false
-    let created = null
-    setFailed(false)
-    setObjectUrl(null)
-
-    fetch(coverUrl, {
-      credentials: 'include',
-      headers: {
-        Accept: 'image/*',
-        'X-Workspace-Id': workspaceId,
-      },
-    }).then((response) => {
-      if (!response.ok) throw new Error(`封面资源响应 ${response.status}`)
-      return response.blob()
-    }).then((blob) => {
-      if (cancelled) return
-      if (!blob.type.startsWith('image/')) throw new Error('封面资源不是图片')
-      created = URL.createObjectURL(blob)
-      if (cancelled) {
-        URL.revokeObjectURL(created)
-        return
-      }
-      setObjectUrl(created)
-    }).catch(() => {
-      if (cancelled) return
-      setObjectUrl(null)
-      setFailed(true)
-    })
-
-    return () => {
-      cancelled = true
-      if (created) URL.revokeObjectURL(created)
-    }
-  }, [coverUrl, workspaceId])
-
-  return { objectUrl, failed }
-}
-
 export default function BookCover({ book, className }) {
-  const { objectUrl, failed } = useProtectedCoverUrl(book?.coverUrl)
+  const { runtime } = useStudent()
+  const { objectUrl, failed } = useProtectedAssetUrl(book?.coverUrl, runtime.data?.workspaceId)
   const available = Boolean(objectUrl) && !failed
   const unavailable = Boolean(!book?.coverUrl || failed)
 

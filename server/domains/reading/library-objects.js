@@ -1,5 +1,6 @@
 import { withTransaction } from '../../db/database.js'
 import { all, assertPositiveInteger, assertString, createDomainContext, isoNow, one, run } from './sql.js'
+import { isBookVisibleToAudience, resolveBookAudience } from './visibility.js'
 
 const annotationColors = new Set(['violet', 'amber', 'green', 'blue', 'rose'])
 
@@ -315,6 +316,13 @@ export function createStudentLibraryDomain(dependencies = {}) {
 
   async function getSnapshot() {
     const scope = await authorizeScope()
+    // 学生书架与 listBooks 一样是「按组织列出全部已发布书」，必须过同一个班级可见性谓词，
+    // 否则不可见的书仍会带着书名与封面出现在书架上。
+    const audience = resolveBookAudience(context.db, {
+      organizationId: scope.organizationId,
+      userId: scope.actorId,
+      workspaceId: scope.workspaceId,
+    })
     const shelf = all(context.db, `SELECT
         book.id AS book_id, book.title, version.id AS book_version_id, version.page_count,
         progress.last_page_no, progress.updated_from_event_at,
@@ -344,7 +352,11 @@ export function createStudentLibraryDomain(dependencies = {}) {
         AND favorite.book_version_id = version.id
       WHERE membership.user_id = :actorId AND membership.workspace_id = :workspaceId
         AND membership.status = 'active'
-      ORDER BY COALESCE(favorite.position, 2147483647), book.created_at DESC, book.id`, scope).map((row) => ({
+      ORDER BY COALESCE(favorite.position, 2147483647), book.created_at DESC, book.id`, scope).filter((row) => isBookVisibleToAudience(context.db, {
+      bookId: row.book_id,
+      organizationId: scope.organizationId,
+      audience,
+    })).map((row) => ({
       bookId: row.book_id,
       bookVersionId: row.book_version_id,
       title: row.title,

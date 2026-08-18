@@ -129,6 +129,7 @@ function toBook(raw) {
     versionId: firstValue(source.versionId, source.bookVersionId),
     title: firstValue(source.title, source.name),
     author: firstValue(source.author, source.authorName),
+    grade: numberOrNull(source.grade, asRecord(source.metadata).grade),
     cover,
     coverUrl: cover?.url || null,
     assets: asArray(source.assets).map(toAsset).filter(Boolean),

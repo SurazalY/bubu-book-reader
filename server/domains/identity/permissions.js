@@ -29,6 +29,7 @@ const roleActions = {
     'class.read',
     'class.manage',
     'book.read',
+    'book.publish',
     'assignment.read',
     'assignment.manage',
     'classroom.read',
@@ -58,6 +59,7 @@ const roleActions = {
     'book.read',
     'assignment.read',
     'book.import',
+    'book.publish',
     'assignment.manage',
     'classroom.read',
     'reading.read_scope',
@@ -131,9 +133,12 @@ const roleAliases = {
   platform_operator: 'platform_ops',
 }
 
+export function normalizeRoleCode(roleCode) {
+  return roleAliases[roleCode] ?? roleCode
+}
+
 function hasAction(policy, roleCode, action) {
-  const normalizedRole = roleAliases[roleCode] ?? roleCode
-  return (policy[normalizedRole] ?? []).includes(action)
+  return (policy[normalizeRoleCode(roleCode)] ?? []).includes(action)
 }
 
 function collectScopeIds(resourceScope, pluralName, singularName) {

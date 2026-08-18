@@ -1,10 +1,11 @@
-import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BookCover, cx, Icon } from '../../components/ui.jsx'
+import { useProtectedAssetUrl } from '../../shared/useProtectedAssetUrl.js'
 import { GlassPanel } from '../components/Glass.jsx'
 import { ReactionRow, StatusChip } from '../components/Reactions.jsx'
 import { canJumpToPage, POST_STATUS, authorLabel, coverColors, postBook, scopeLabel } from '../community/presentation.js'
 import { useStudentCommunity } from '../community/CommunityRuntimeContext.jsx'
+import { useStudent } from '../state/StudentContext.jsx'
 
 // 帖子详情（规格 §9.5，参考图 student_round1/07）：
 // 横屏左侧主要内容、右侧作者与互动分栏。
@@ -202,17 +203,18 @@ export default function PostDetail({ community: injectedCommunity } = {}) {
 
 // 顶部媒体：有图帖放这本书的真实封面（Codex Q4：不下载外部图），无图帖排版文字封面
 function Media({ post, book }) {
+  const { runtime } = useStudent()
   const [c1, c2] = coverColors(post)
-  const [imgOk, setImgOk] = useState(true)
-  const showImage = post.cover?.type === 'image' && book && imgOk
+  const wantImage = post.cover?.type === 'image' && Boolean(book)
+  const { objectUrl, failed } = useProtectedAssetUrl(wantImage ? book?.coverUrl : null, runtime.data?.workspaceId)
+  const showImage = wantImage && Boolean(objectUrl) && !failed
   return (
     <div className="student-detail-media" style={{ backgroundImage: `linear-gradient(150deg, ${c1}, ${c2})` }}>
       {showImage ? (
         <>
           <img
-            src={`${import.meta.env.BASE_URL}covers/${book.id}.jpg`}
+            src={objectUrl}
             alt={`《${book.title}》的封面`}
-            onError={() => setImgOk(false)}
             className="absolute inset-0 h-full w-full object-cover"
           />
           <span className="student-post-imgtag student-post-imgtag--lg">

@@ -7,6 +7,15 @@ export function createConsoleApi(client = createApiClient()) {
     listStudents: (options = {}) => client.get('/students', { ...options, query: { limit: 100, ...(options.query || {}) } }),
     getUsageSummary: (options = {}) => client.get('/usage/summary', options),
     listBooks: (options = {}) => client.get('/books', { ...options, query: { limit: 100, ...(options.query || {}) } }),
+    listAuthorizedClasses: (options = {}) => client.get('/classes', options),
+    publishBook: (bookId, options = {}) =>
+      client.post(`/books/${encodeURIComponent(bookId)}/publish`, options),
+    unpublishBook: (bookId, options = {}) =>
+      client.post(`/books/${encodeURIComponent(bookId)}/unpublish`, options),
+    getBookVisibility: (bookId, options = {}) =>
+      client.get(`/books/${encodeURIComponent(bookId)}/visibility`, options),
+    setBookVisibility: (bookId, body, options = {}) =>
+      client.put(`/books/${encodeURIComponent(bookId)}/visibility`, { ...options, body }),
     listAssignments: (options = {}) => client.get('/assignments', { ...options, query: { limit: 20, ...(options.query || {}) } }),
     createAssignment: (body, options = {}) => client.post('/assignments', { ...options, body }),
     getBookPage: (bookId, pageNo, options = {}) =>

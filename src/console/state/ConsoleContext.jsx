@@ -49,8 +49,12 @@ export function ConsoleProvider({ children }) {
   return <ConsoleContext.Provider value={value}>{children}</ConsoleContext.Provider>
 }
 
+export function useOptionalConsole() {
+  return useContext(ConsoleContext)
+}
+
 export function useConsole() {
-  const context = useContext(ConsoleContext)
+  const context = useOptionalConsole()
   if (!context) throw new Error('useConsole 必须在 ConsoleProvider 内使用')
   return context
 }

@@ -40,7 +40,7 @@ export function IconBtn({ icon, title, tone = 'ghost', className, ...props }) {
       title={title}
       aria-label={title}
       className={cx(
-        'inline-flex items-center justify-center w-7 h-7 rounded-lg border transition duration-140',
+        'inline-flex items-center justify-center w-7 h-7 rounded-lg border transition duration-140 disabled:opacity-45 disabled:pointer-events-none',
         tone === 'danger'
           ? 'text-ink-400 border-transparent hover:text-danger-600 hover:bg-danger-50'
           : 'text-ink-400 border-transparent hover:text-brand-600 hover:bg-brand-50',

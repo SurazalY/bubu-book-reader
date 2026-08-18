@@ -2,6 +2,7 @@ import { createHash, createHmac } from 'node:crypto'
 
 import { createAiService } from '../domains/ai/service.js'
 import { createAiSafetySqliteAdapter } from '../domains/ai/sqlite-adapter.js'
+import { isBookVisibleToAudience, resolveBookAudience } from '../domains/reading/visibility.js'
 import { createSafetyService } from '../domains/safety/service.js'
 import { createExternalOpenAiProvider } from './external-openai-provider.js'
 
@@ -111,7 +112,7 @@ export function createOpenAiCompatibleProvider({ env = process.env, fetchImpl = 
 
 function readScopeSnapshot(database, input) {
   const page = database.prepare(`
-    SELECT page.id, page.page_no, page.book_version_id
+    SELECT page.id, page.page_no, page.book_version_id, version.book_id
     FROM book_pages AS page
     JOIN book_versions AS version ON version.id = page.book_version_id
     JOIN books AS book ON book.id = version.book_id
@@ -120,6 +121,16 @@ function readScopeSnapshot(database, input) {
       AND book.status = 'published'
   `).get(input.currentPageId, input.bookVersionId, input.organizationId, input.organizationId)
   if (!page) return null
+  // T4.3 第四个入口的二次校验：与 listBooks/getPage/getBookAsset 共用同一个 grants 谓词。
+  if (!isBookVisibleToAudience(database, {
+    bookId: page.book_id,
+    organizationId: input.organizationId,
+    audience: resolveBookAudience(database, {
+      organizationId: input.organizationId,
+      userId: input.userId,
+      workspaceId: input.workspaceId,
+    }),
+  })) return null
   const covered = database.prepare(`
     SELECT page.id AS page_id, page.page_no, coverage.version AS coverage_version
     FROM reading_page_coverage AS coverage
@@ -376,7 +387,7 @@ export function deriveAiRequestScope(database, {
   const normalizedPageNo = Number(currentPageNo)
   if (!Number.isSafeInteger(normalizedPageNo) || normalizedPageNo <= 0) return null
   const page = database.prepare(`
-    SELECT page.id AS page_id, page.book_version_id, page.page_no
+    SELECT page.id AS page_id, page.book_version_id, page.page_no, book.id AS book_id
     FROM books AS book
     JOIN book_versions AS version ON version.book_id = book.id AND version.organization_id_at_creation = book.organization_id_at_creation
     JOIN book_pages AS page ON page.book_version_id = version.id AND page.page_no = ?
@@ -386,6 +397,12 @@ export function deriveAiRequestScope(database, {
     LIMIT 1
   `).get(normalizedPageNo, bookId, organizationId, bookVersionId, bookVersionId)
   if (!page) return null
+  // 学生对不可见书必须表现为“书不存在”：返回 null 会让路由变成 404，而不是 403。
+  if (!isBookVisibleToAudience(database, {
+    bookId: page.book_id,
+    organizationId,
+    audience: resolveBookAudience(database, { organizationId, userId: ownerUserId, workspaceId }),
+  })) return null
   const snapshot = readScopeSnapshot(database, {
     organizationId,
     userId: ownerUserId,

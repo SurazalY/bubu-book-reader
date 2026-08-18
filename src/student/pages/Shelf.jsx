@@ -4,21 +4,7 @@ import { GlassPanel } from '../components/Glass.jsx'
 import BookCard from '../components/BookCard.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 import useRefreshStudentRuntimeOnMount from '../state/useRefreshStudentRuntimeOnMount.js'
-
-const SHELF_FILTERS = [
-  { key: 'all', label: '全部书籍', icon: 'Library', options: [{ key: 'all', label: '全部', match: () => true }] },
-  {
-    key: 'state', label: '书架状态', icon: 'BookOpen', options: [
-      { key: 'liked', label: '我喜欢', match: (book) => book.liked },
-      { key: 'downloaded', label: '已下载', match: (book) => book.downloaded },
-    ],
-  },
-]
-
-function findFilterOption(group, option) {
-  const selectedGroup = SHELF_FILTERS.find((item) => item.key === group) || SHELF_FILTERS[0]
-  return { group: selectedGroup, option: selectedGroup.options.find((item) => item.key === option) || selectedGroup.options[0] }
-}
+import { SHELF_FILTERS, filterShelfBooks, findFilterOption } from './shelfFilters.js'
 
 // 书架（规格 §5.1）：保留底部一级导航，内容区左侧可折叠筛选，右侧书籍与搜索。
 // 学生能在书架看到的书都可以阅读，未开放的书根本不出现在数据里（不做「无权限」灰卡）。
@@ -32,14 +18,10 @@ export default function Shelf() {
 
   const { option: active } = findFilterOption(group, option)
 
-  const result = useMemo(() => {
-    const key = query.trim().toLowerCase()
-    return books.filter(active.match).filter((b) =>
-      !key
-        ? true
-        : [b.title, b.author].some((f) => String(f || '').toLowerCase().includes(key)),
-    )
-  }, [active, books, query])
+  const result = useMemo(
+    () => filterShelfBooks(books, { group, option, query }),
+    [books, group, option, query],
+  )
 
   return (
     <div className="flex min-h-full flex-1 gap-4 pb-2">

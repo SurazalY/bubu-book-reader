@@ -22,12 +22,23 @@ const SURFACE_LOADERS = Object.freeze({
   classDetail: { method: 'getClass', resource: true },
   studentDetail: { method: 'getStudent', resource: true },
   classOverview: { method: 'listClasses', collection: true },
-  bookLibrary: { method: 'listBooks', collection: true },
+  bookLibrary: { method: 'listManagedBooks', collection: true },
   bookDetail: { method: 'getBook', resource: true },
 })
 
 function itemsOf(response) {
   return Array.isArray(response?.data?.items) ? response.data.items : []
+}
+
+export function mergeManagedBookItems(publishedItems, draftItems) {
+  const byId = new Map()
+  for (const book of Array.isArray(draftItems) ? draftItems : []) {
+    if (book?.id) byId.set(book.id, { ...book, status: 'draft' })
+  }
+  for (const book of Array.isArray(publishedItems) ? publishedItems : []) {
+    if (book?.id) byId.set(book.id, { ...book, status: 'published' })
+  }
+  return [...byId.values()]
 }
 
 function groupClasses(students) {
@@ -88,11 +99,37 @@ export function createStage4ConsoleApi(client = createApiClient()) {
         meta: response.meta || {},
       }
     },
-    async getBook(bookId, options = {}) {
-      const response = await api.listBooks(options)
+    async listManagedBooks(options = {}) {
+      const published = await api.listBooks({
+        ...options,
+        query: { ...(options.query || {}), status: 'published' },
+      })
+      const draft = await api.listBooks({
+        ...options,
+        query: { ...(options.query || {}), status: 'draft' },
+      })
       return {
-        data: itemsOf(response).find((entry) => entry.id === bookId) || null,
-        meta: response.meta || {},
+        data: { items: mergeManagedBookItems(itemsOf(published), itemsOf(draft)) },
+        meta: published.meta || draft.meta || {},
+      }
+    },
+    async getBook(bookId, options = {}) {
+      const published = await api.listBooks({
+        ...options,
+        query: { ...(options.query || {}), status: 'published' },
+      })
+      const foundPublished = itemsOf(published).find((entry) => entry.id === bookId)
+      if (foundPublished) {
+        return { data: { ...foundPublished, status: 'published' }, meta: published.meta || {} }
+      }
+      const draft = await api.listBooks({
+        ...options,
+        query: { ...(options.query || {}), status: 'draft' },
+      })
+      const foundDraft = itemsOf(draft).find((entry) => entry.id === bookId)
+      return {
+        data: foundDraft ? { ...foundDraft, status: 'draft' } : null,
+        meta: draft.meta || published.meta || {},
       }
     },
     async loadSurface(surface, { workspaceId, resourceId, query, signal } = {}) {

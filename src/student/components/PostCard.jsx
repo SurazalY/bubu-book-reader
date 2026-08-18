@@ -1,25 +1,27 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { cx, Icon } from '../../components/ui.jsx'
+import { useProtectedAssetUrl } from '../../shared/useProtectedAssetUrl.js'
 import { GlassCard } from './Glass.jsx'
 import { ReactionSummary, StatusChip } from './Reactions.jsx'
 import { authorLabel, coverColors, postBook } from '../community/presentation.js'
+import { useStudent } from '../state/StudentContext.jsx'
 
 // 社区内容卡（规格 §9.2，参考图 student_round1/06）。
 // 视觉骨架与权限端 `CommunityPostCard` 对齐：封面 → 标题 → 摘要 → 身份行 → 书名 → 底部一行，
 // 但**去掉了审核管理按钮**（勾选框、置顶、精选那些都是教师权限，学生端不能出现）。
 //
 // 封面两种（规格 §9.2）：
-// - 有图帖：图片一律取这本书 `public/covers/` 里的真实封面，卡上明写「书封图」，不冒充学生拍的照片
-//   （Codex 第 109 轮 Q4：不下载任何外部图片）。
+// - 有图帖：封面取书目投影的 coverUrl，经共享 hook 带头 fetch；卡上明写「书封图」，不冒充学生拍的照片。
 // - 无图帖：把引文或正文排版成文字封面，字大、行少、留白足，本身就是内容；
 //   此时下方**不再重复正文摘要**，否则同一段话在一张卡上出现两遍。
 export default function PostCard({ post, index = 0, onToggleReaction, showStatus = false }) {
+  const { runtime } = useStudent()
   const book = postBook(post)
   const who = authorLabel(post)
   const [c1, c2] = coverColors(post)
-  const [imgOk, setImgOk] = useState(true)
-  const isImage = post.cover?.type === 'image' && book && imgOk
+  const wantImage = post.cover?.type === 'image' && Boolean(book)
+  const { objectUrl, failed } = useProtectedAssetUrl(wantImage ? book?.coverUrl : null, runtime.data?.workspaceId)
+  const isImage = wantImage && Boolean(objectUrl) && !failed
   const dim = post.status === 'offline' || post.status === 'returned'
 
   return (
@@ -36,10 +38,9 @@ export default function PostCard({ post, index = 0, onToggleReaction, showStatus
           {isImage ? (
             <>
               <img
-                src={`${import.meta.env.BASE_URL}covers/${book.id}.jpg`}
+                src={objectUrl}
                 alt={`《${book.title}》的封面`}
                 loading="lazy"
-                onError={() => setImgOk(false)}
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <span className="student-post-imgtag">

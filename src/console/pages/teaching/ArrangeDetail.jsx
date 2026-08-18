@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { cx, Icon } from '../../../components/ui.jsx'
+import { useProtectedAssetUrl } from '../../../shared/useProtectedAssetUrl.js'
 import { GlassCard } from '../../components/Glass.jsx'
 import { PagePanel } from '../../components/PagePanel.jsx'
 import { Btn, EmptyState, Field, StatusTag, SubHead } from '../../components/Controls.jsx'
@@ -84,7 +85,7 @@ export default function ArrangeDetail() {
       <div className="flex items-start gap-4">
         <button type="button" disabled={!book?.id} onClick={() => book?.id && navigate(`/console/teaching/reader/${book.id}`)} className="shrink-0 w-[92px] group disabled:opacity-50">
           <div className="w-full aspect-[3/4] rounded-lg shadow-e2 relative overflow-hidden bg-ink-100">
-            {book?.coverUrl ? <img src={book.coverUrl} alt={book.title} className="absolute inset-0 h-full w-full object-cover" /> : <span className="absolute inset-0 grid place-items-center px-2 text-center text-[11px] text-ink-500">{book?.title || '服务端未返回封面'}</span>}
+            <PlanBookCover book={book} />
           </div>
           <span className="block text-[11.5px] text-ink-500 group-hover:text-brand-600 transition mt-1 text-center">进入带读</span>
         </button>
@@ -138,6 +139,20 @@ export default function ArrangeDetail() {
         </ol>
       </GlassCard></div>
     </PagePanel>
+  )
+}
+
+function PlanBookCover({ book }) {
+  const { workspace } = useConsole()
+  const { objectUrl, failed } = useProtectedAssetUrl(book?.coverUrl, workspace?.id)
+  const available = Boolean(objectUrl) && !failed
+  if (available) {
+    return <img src={objectUrl} alt={book.title} className="absolute inset-0 h-full w-full object-cover" />
+  }
+  return (
+    <span className="absolute inset-0 grid place-items-center px-2 text-center text-[11px] text-ink-500">
+      {book?.title || '服务端未返回封面'}
+    </span>
   )
 }
 

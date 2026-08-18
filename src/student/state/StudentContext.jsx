@@ -67,8 +67,12 @@ export function StudentProvider({ children }) {
   return <StudentContext.Provider value={value}>{children}</StudentContext.Provider>
 }
 
+export function useOptionalStudent() {
+  return useContext(StudentContext)
+}
+
 export function useStudent() {
-  const context = useContext(StudentContext)
+  const context = useOptionalStudent()
   if (!context) throw new Error('useStudent 必须在 StudentProvider 内使用')
   return context
 }

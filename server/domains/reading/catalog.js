@@ -15,6 +15,17 @@ import {
   findLatestLeaseSession,
   isReadingLeaseWorkStale,
 } from './monitoring.js'
+import {
+  currentBookVersionSubquery,
+  isBookVisibleToAudience,
+  listBookClassGrants,
+  listBookClassGrantTargets,
+  listBookReferences,
+  resolveBookAudience,
+  resolveCurrentBookVersionId,
+  summarizeVisibilityImpact,
+} from './visibility.js'
+import { authorizedClassIdSet } from '../identity/class-scope.js'
 
 const MAX_EVENT_SECONDS = 120
 const DEFAULT_MAX_OFFLINE_AGE_MS = 7 * 24 * 60 * 60 * 1000
@@ -65,6 +76,50 @@ export function createReadingDomain(dependencies) {
       const error = new Error('当前工作空间无权执行此操作')
       error.code = 'PERMISSION_DENIED'
       throw error
+    }
+  }
+
+  // 每个请求解析一次的书库可见性身份。领域实例本身是每请求创建的（domainForRequest）。
+  let resolvedAudience = null
+  function bookAudience() {
+    if (!resolvedAudience) {
+      resolvedAudience = resolveBookAudience(context.db, {
+        organizationId: context.workspace?.organizationId,
+        userId: context.actor?.id,
+        workspaceId: context.workspace?.id,
+      })
+    }
+    return resolvedAudience
+  }
+
+  function requireVisibleBook(bookId, audience, message) {
+    if (isBookVisibleToAudience(context.db, { bookId, organizationId: organizationId(), audience })) return
+    throw scopedResourceNotFound(message)
+  }
+
+  function requireScopedBook(bookId, audience) {
+    const book = one(context.db, `SELECT book.id, book.title, book.status FROM books AS book
+      WHERE book.id = :bookId AND book.organization_id_at_creation = :organizationId
+        AND (:anyBookStatus = 1 OR book.status = 'published')`, {
+      bookId, organizationId: organizationId(), anyBookStatus: audience.unrestricted ? 1 : 0,
+    })
+    if (!book) throw scopedResourceNotFound('书籍不存在或当前不可读取')
+    requireVisibleBook(book.id, audience, '书籍不存在或当前不可读取')
+    return book
+  }
+
+  function bookVisibilitySnapshot(book) {
+    const grants = listBookClassGrants(context.db, { bookId: book.id, organizationId: organizationId() })
+    return {
+      bookId: book.id,
+      bookVersionId: resolveCurrentBookVersionId(context.db, {
+        bookId: book.id,
+        organizationId: organizationId(),
+      }),
+      scope: grants.length > 0 ? 'classes' : 'organization',
+      classIds: grants.map((grant) => grant.classId),
+      classes: grants.map((grant) => ({ id: grant.classId, name: grant.name, gradeId: grant.gradeId })),
+      references: listBookReferences(context.db, { bookId: book.id, organizationId: organizationId() }),
     }
   }
 
@@ -138,21 +193,27 @@ export function createReadingDomain(dependencies) {
 
     async listBooks(input = {}) {
       await authorize('book.read')
-      const status = input.status || 'published'
-      if (!['draft', 'published', 'archived'].includes(status)) throw new TypeError('status 无效')
-      const books = all(context.db, `SELECT b.*, v.id AS book_version_id, v.label AS version_label,
+      const audience = bookAudience()
+      const requestedStatus = input.status || 'published'
+      if (!['draft', 'published', 'archived'].includes(requestedStatus)) throw new TypeError('status 无效')
+      // 学生锁死 published：忽略 ?status=draft，避免通过状态参数列出草稿书。
+      const status = audience.unrestricted ? requestedStatus : 'published'
+      const scoped = all(context.db, `SELECT b.*, v.id AS book_version_id, v.label AS version_label,
           v.source_format, v.page_count, metadata.author, metadata.illustrator,
           metadata.source_page, metadata.usage_label AS catalog_usage_label, metadata.rights_json,
           metadata.grade
         FROM books b
         JOIN book_versions v ON v.id = (
-          SELECT latest.id FROM book_versions latest
-          WHERE latest.book_id = b.id AND latest.organization_id_at_creation = :organizationId
-          ORDER BY latest.created_at DESC, latest.id DESC LIMIT 1
+          ${currentBookVersionSubquery('b.id')}
         )
         LEFT JOIN book_catalog_metadata AS metadata ON metadata.book_id = b.id
         WHERE b.organization_id_at_creation = :organizationId AND b.status = :status
         ORDER BY b.created_at DESC, b.id`, { organizationId: organizationId(), status })
+      const books = scoped.filter((book) => isBookVisibleToAudience(context.db, {
+        bookId: book.id,
+        organizationId: organizationId(),
+        audience,
+      }))
       return books.map((book) => {
         const assets = all(context.db, `SELECT id, asset_type, storage_key, usage_label, mime_type,
             size_bytes, sha256, width, height
@@ -185,6 +246,9 @@ export function createReadingDomain(dependencies) {
     async getBookAsset(assetId) {
       const normalizedAssetId = assertString(assetId, 'assetId')
       await authorize('book.read', { assetId: normalizedAssetId })
+      const audience = bookAudience()
+      // 3.2 已裁决的放宽：教师/管理角色可取本组织任意发布状态书籍的资产（下架后封面仍要能显示）。
+      // 学生仍然严格限 published，并继续走 grants 过滤。
       const asset = one(context.db, `SELECT asset.*, version.book_id
         FROM book_assets AS asset
         JOIN book_versions AS version ON version.id = asset.book_version_id
@@ -192,8 +256,13 @@ export function createReadingDomain(dependencies) {
         WHERE asset.id = :assetId
           AND version.organization_id_at_creation = :organizationId
           AND book.organization_id_at_creation = :organizationId
-          AND book.status = 'published'`, { assetId: normalizedAssetId, organizationId: organizationId() })
+          AND (:anyBookStatus = 1 OR book.status = 'published')`, {
+        assetId: normalizedAssetId,
+        organizationId: organizationId(),
+        anyBookStatus: audience.unrestricted ? 1 : 0,
+      })
       if (!asset) throw scopedResourceNotFound('书籍资产不存在或当前不可读取')
+      requireVisibleBook(asset.book_id, audience, '书籍资产不存在或当前不可读取')
       return asset
     },
 
@@ -213,7 +282,101 @@ export function createReadingDomain(dependencies) {
         error.code = 'RESOURCE_NOT_FOUND'
         throw error
       }
+      requireVisibleBook(page.book_id, bookAudience(), '书页不存在或当前不可读取')
       return { ...page, blocks: all(context.db, 'SELECT * FROM book_blocks WHERE page_id = :pageId ORDER BY char_start, block_key', { pageId: page.id }) }
+    },
+
+    async getBookVisibility(bookId) {
+      const normalizedBookId = assertString(bookId, 'bookId')
+      await authorize('book.read', { bookId: normalizedBookId })
+      const audience = bookAudience()
+      // 这是教师端设置可见范围的读接口：班级授权名单不必对学生公开，
+      // 学生一律按“书不存在”处理（与不可见书同一响应，不泄露存在性）。
+      if (!audience.unrestricted) throw scopedResourceNotFound('书籍不存在或当前不可读取')
+      const book = requireScopedBook(normalizedBookId, audience)
+      return bookVisibilitySnapshot(book)
+    },
+
+    async setBookVisibility(input = {}) {
+      const normalizedBookId = assertString(input.bookId, 'bookId')
+      await authorize('book.publish', { bookId: normalizedBookId })
+      const audience = bookAudience()
+      const book = requireScopedBook(normalizedBookId, audience)
+      const scope = input.scope
+      if (scope !== 'organization' && scope !== 'classes') {
+        throw validationFailed('scope 必须是 organization 或 classes')
+      }
+      const requestedClassIds = normalizeVisibilityClassIds(scope, input.classIds)
+      // grants 必须写在与 listBooks 同一口径解析出的当前版本上。
+      const bookVersionId = resolveCurrentBookVersionId(context.db, {
+        bookId: book.id,
+        organizationId: organizationId(),
+      })
+      if (!bookVersionId) throw scopedResourceNotFound('书籍在当前组织没有可用版本')
+      const grantable = authorizedClassIdSet(context.db, {
+        organizationId: organizationId(),
+        userId: context.actor?.id,
+        workspaceId: context.workspace?.id,
+      })
+      if (scope === 'classes') {
+        const rejected = requestedClassIds.filter((classId) => !grantable.has(classId))
+        if (rejected.length > 0) {
+          throw permissionDenied('存在不属于本组织或超出当前授权范围的班级', { classIds: rejected })
+        }
+      }
+      // F-1：删除侧的对称校验。只校验新增集合，等于「授权给别班被 403、授权给所有班却 200」——
+      // class 范围教师可以用 scope=organization 抹掉校级设定的授权，白拿刚被拒掉的那份访问权。
+      // 因此移除某班的授权同样要求该班在操作者授权范围内。悬空 grants（班级已停用/已删除）豁免，
+      // 否则它们不在任何人的授权集合里，这本书的可见范围会永久无人可改。
+      const retained = new Set(requestedClassIds)
+      const revokedBeyondScope = listBookClassGrantTargets(context.db, {
+        bookId: book.id,
+        organizationId: organizationId(),
+      })
+        .filter((target) => target.activeInOrganization && !retained.has(target.classId))
+        .map((target) => target.classId)
+        .filter((classId) => !grantable.has(classId))
+      if (revokedBeyondScope.length > 0) {
+        throw permissionDenied('存在超出当前授权范围的班级授权需要被移除', { classIds: revokedBeyondScope })
+      }
+      // 3.5 取强解：保存前真实查询课堂锁书与阅读安排引用，回报给前端提示，但不做级联清理。
+      const impact = summarizeVisibilityImpact(
+        listBookReferences(context.db, { bookId: book.id, organizationId: organizationId() }),
+        { scope, classIds: requestedClassIds },
+      )
+      const now = isoNow(context)
+      transaction(context.db, () => {
+        // 规范化写法：先清掉本书所有版本的既有授权，再把请求集合写到当前版本。
+        // scope=organization 即“删除全部 grants”，因为无 grants 行等于全组织可见。
+        // F-4：organization 分支不按 grantee_type 过滤。可见性谓词判定“有没有 grants”时
+        // 有意不看 grantee_type（未知类型按受限处理是 fail closed），所以这条唯一的逃生通道
+        // 必须能清掉任何类型的行，否则一行未知类型 grant 就能让书永久无法恢复可见。
+        run(context.db, `DELETE FROM book_access_grants
+          WHERE book_version_id IN (
+            SELECT version.id FROM book_versions AS version
+            WHERE version.book_id = :bookId AND version.organization_id_at_creation = :organizationId
+          ) AND (:clearAllGranteeTypes = 1 OR grantee_type = 'class')`, {
+          bookId: book.id,
+          organizationId: organizationId(),
+          clearAllGranteeTypes: scope === 'organization' ? 1 : 0,
+        })
+        for (const classId of requestedClassIds) {
+          run(context.db, `INSERT INTO book_access_grants (
+              id, book_version_id, grantee_type, grantee_id,
+              organization_id_at_creation, actor_id_at_creation, created_at, updated_at, version
+            ) VALUES (:id, :bookVersionId, 'class', :classId, :organizationId, :actorId, :now, :now, 1)`, {
+            id: context.idFactory(), bookVersionId, classId, organizationId: organizationId(), actorId: actorId(), now,
+          })
+        }
+      })
+      await context.audit({
+        eventType: 'book.visibility.updated',
+        actorId: actorId(),
+        workspaceId: workspaceId(),
+        resourceType: 'book',
+        resourceId: book.id,
+      })
+      return { ...bookVisibilitySnapshot(book), impact }
     },
 
     async publishBook(bookId) {
@@ -244,6 +407,19 @@ export function createReadingDomain(dependencies) {
       })
       if (result.changes !== 1) throw scopedResourceNotFound('书籍不存在于当前组织或不是可发布草稿')
       await context.audit({ eventType: 'book.published', actorId: actorId(), workspaceId: workspaceId(), resourceId: bookId })
+      return { bookId, status: 'published' }
+    },
+
+    async unpublishBook(bookId) {
+      await authorize('book.publish', { bookId })
+      const now = isoNow(context)
+      const result = run(context.db, `UPDATE books SET status = 'draft', updated_at = :now, version = version + 1
+        WHERE id = :bookId AND organization_id_at_creation = :organizationId AND status = 'published'`, {
+        bookId, organizationId: organizationId(), now,
+      })
+      if (result.changes !== 1) throw scopedResourceNotFound('书籍不存在于当前组织或不是已发布状态')
+      await context.audit({ eventType: 'book.unpublished', actorId: actorId(), workspaceId: workspaceId(), resourceId: bookId })
+      return { bookId, status: 'draft' }
     },
 
     async archiveBook(bookId) {
@@ -932,6 +1108,30 @@ function scopedResourceNotFound(message) {
   const error = new Error(message)
   error.code = 'RESOURCE_NOT_FOUND'
   return error
+}
+
+function permissionDenied(message, details) {
+  const error = new Error(message)
+  error.code = 'PERMISSION_DENIED'
+  error.details = details
+  return error
+}
+
+function normalizeVisibilityClassIds(scope, value) {
+  if (scope === 'organization') {
+    if (Array.isArray(value) ? value.length > 0 : value !== undefined && value !== null) {
+      throw validationFailed('scope 为 organization 时不能提供 classIds')
+    }
+    return []
+  }
+  if (!Array.isArray(value) || value.length === 0) {
+    throw validationFailed('scope 为 classes 时必须提供至少一个 classId')
+  }
+  const normalized = value.map((entry) => {
+    if (typeof entry !== 'string' || entry.trim() === '') throw validationFailed('classIds 只接受非空字符串')
+    return entry.trim()
+  })
+  return [...new Set(normalized)].sort()
 }
 
 function requireScopedBookVersion(db, bookVersionId, organizationId, publishedOnly = false) {

@@ -1,6 +1,8 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as Lucide from 'lucide-react'
+
+import { useProtectedAssetUrl, resolveCoverAssetUrl } from '../shared/useProtectedAssetUrl.js'
+import { useOptionalStudent } from '../student/state/StudentContext.jsx'
 
 const genreMeta = {
   故事: { color: '#FF8A3D', soft: '#FFF1E6' },
@@ -47,11 +49,12 @@ export function SectionHead({ eyebrow, title, desc, center, className }) {
   )
 }
 
-// 书封：优先真实封面图 /covers/<id>.jpg，加载失败回退渐变文字封（无图也美观）
+// 书封：受保护封面走共享 hook 的 fetch + blob；失败时露出渐变文字封。
 export function BookCover({ book, className }) {
-  const [c1, c2] = Array.isArray(book.cover) ? book.cover : ['#4C7DFF', '#3B66F5']
-  const [imgOk, setImgOk] = useState(true)
-  const src = book.coverUrl || book.cover?.url || `${import.meta.env.BASE_URL}covers/${book.id}.jpg`
+  const student = useOptionalStudent()
+  const [c1, c2] = Array.isArray(book?.cover) ? book.cover : ['#4C7DFF', '#3B66F5']
+  const { objectUrl, failed } = useProtectedAssetUrl(resolveCoverAssetUrl(book), student?.runtime?.data?.workspaceId)
+  const available = Boolean(objectUrl) && !failed
   return (
     <div
       className={cx('relative aspect-[3/4] rounded-xl overflow-hidden shadow-e2', className)}
@@ -61,19 +64,17 @@ export function BookCover({ book, className }) {
       <div className="absolute inset-0 bg-hero-sheen opacity-70" />
       <div className="absolute left-0 inset-y-0 w-1.5 bg-white/25" />
       <div className="absolute inset-0 p-4 flex flex-col">
-        <span className="text-[11px] font-semibold text-white/90 tracking-widest">{book.genre}</span>
+        <span className="text-[11px] font-semibold text-white/90 tracking-widest">{book?.genre}</span>
         <div className="mt-auto">
-          <h3 className="font-serif text-white text-xl leading-tight font-bold drop-shadow-sm">{book.title}</h3>
-          <p className="text-white/85 text-xs mt-1.5">{book.author}</p>
+          <h3 className="font-serif text-white text-xl leading-tight font-bold drop-shadow-sm">{book?.title}</h3>
+          <p className="text-white/85 text-xs mt-1.5">{book?.author}</p>
         </div>
       </div>
-      {/* 真实封面：加载成功铺满覆盖渐变；onError 时隐藏，露出下方文字封 */}
-      {imgOk && (
+      {available && (
         <img
-          src={src}
-          alt={book.title}
+          src={objectUrl}
+          alt={book?.title}
           loading="lazy"
-          onError={() => setImgOk(false)}
           className="absolute inset-0 w-full h-full object-cover"
         />
       )}

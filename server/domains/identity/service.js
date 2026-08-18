@@ -62,7 +62,7 @@ const consoleEntryActions = [
   'audit.read_platform',
 ]
 
-function workspaceResourceScope(actor, workspace) {
+export function workspaceResourceScope(actor, workspace) {
   return {
     type: workspace.scopeType,
     id: workspace.scopeId,

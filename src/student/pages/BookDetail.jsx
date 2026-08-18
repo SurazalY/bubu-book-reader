@@ -25,7 +25,7 @@ function toDetailBook(raw, { grade, library }) {
   return {
     ...raw,
     genre: raw.genre || '阅读书目',
-    grade: raw.grade || grade || '当前年级',
+    grade: raw.grade || grade || null,
     subject: raw.subject || '整本书阅读',
     blurb: raw.blurb || raw.description || '书籍资料由服务端真实书目返回。',
     page: Number.isSafeInteger(progress.currentPage) ? progress.currentPage : null,
@@ -167,9 +167,11 @@ export default function BookDetail() {
             <p className="mt-1.5 text-title text-ink-600">{book.author}</p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <GenreTag genre={book.genre} />
-              <span className="rounded-full bg-white/70 px-2.5 py-1 text-micro font-semibold text-ink-600">
-                {book.grade} 年级
-              </span>
+              {book.grade && (
+                <span className="rounded-full bg-white/70 px-2.5 py-1 text-micro font-semibold text-ink-600">
+                  {book.grade} 年级
+                </span>
+              )}
               <span className="rounded-full bg-white/70 px-2.5 py-1 text-micro font-semibold text-ink-600">
                 {book.subject}
               </span>

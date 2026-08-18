@@ -132,6 +132,46 @@ function byteRange(header, size) {
   return { start, end: Math.min(end, size - 1) }
 }
 
+function contentEtag(sha256) {
+  if (typeof sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(sha256)) return null
+  return `"${sha256.toLowerCase()}"`
+}
+
+function opaqueEtagTag(value) {
+  if (typeof value !== 'string') return null
+  const match = /^(?:W\/)?"([^"]+)"$/.exec(value.trim())
+  return match ? match[1] : null
+}
+
+function ifNoneMatchMatches(header, etag) {
+  if (!header || !etag) return false
+  const trimmed = header.trim()
+  if (trimmed === '*') return true
+  const current = opaqueEtagTag(etag)
+  if (!current) return false
+  const tags = []
+  const pattern = /(?:W\/)?"([^"]+)"/g
+  let match
+  while ((match = pattern.exec(trimmed))) tags.push(match[1])
+  return tags.includes(current)
+}
+
+function ifRangeMatches(header, etag) {
+  if (!header || !etag) return false
+  const trimmed = header.trim()
+  if (trimmed.startsWith('W/')) return false
+  const requested = opaqueEtagTag(trimmed)
+  const current = opaqueEtagTag(etag)
+  return Boolean(requested && current && requested === current)
+}
+
+function assetCachePolicy(asset) {
+  if (asset.asset_type === 'cover') {
+    return { cacheControl: 'private, no-store', etag: null }
+  }
+  return { cacheControl: 'private, no-cache', etag: contentEtag(asset.sha256) }
+}
+
 function writeKey(req) {
   const value = req.get('Idempotency-Key')
   if (!value) throw new HttpError(400, 'VALIDATION_FAILED', '写入请求必须提供 Idempotency-Key')
@@ -554,6 +594,30 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
     return sendData(res, { items: projectBooks(database, req.identitySession.user.id, req.workspace.id, rows) }, { requestId: req.requestId })
   }))
 
+  router.post('/books/:bookId/publish', route(async (req, res) => {
+    const key = writeKey(req)
+    const { reading } = domainForRequest(req, database, identityService)
+    const outcome = await executeIdempotentAsync(database, {
+      key,
+      scope: `book.publish:${req.workspace.organizationId}:${req.workspace.id}:${req.params.bookId}`,
+      request: { bookId: req.params.bookId },
+      operation: () => domainWriteOutcome(200, () => reading.publishBook(req.params.bookId)),
+    })
+    return sendOutcome(res, req, outcome)
+  }))
+
+  router.post('/books/:bookId/unpublish', route(async (req, res) => {
+    const key = writeKey(req)
+    const { reading } = domainForRequest(req, database, identityService)
+    const outcome = await executeIdempotentAsync(database, {
+      key,
+      scope: `book.unpublish:${req.workspace.organizationId}:${req.workspace.id}:${req.params.bookId}`,
+      request: { bookId: req.params.bookId },
+      operation: () => domainWriteOutcome(200, () => reading.unpublishBook(req.params.bookId)),
+    })
+    return sendOutcome(res, req, outcome)
+  }))
+
   router.get('/books/assets/:assetId', route(async (req, res) => {
     const { reading } = domainForRequest(req, database, identityService)
     const asset = await reading.getBookAsset(req.params.assetId)
@@ -567,6 +631,21 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
     if (!stat.isFile() || stat.size !== Number(asset.size_bytes)) {
       throw new HttpError(409, 'ASSET_INTEGRITY_MISMATCH', '书籍资产文件大小与登记值不一致')
     }
+    const { cacheControl, etag } = assetCachePolicy(asset)
+    res.set({
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': cacheControl,
+      'Content-Type': asset.mime_type,
+      'Content-Disposition': 'inline',
+      'X-Content-Type-Options': 'nosniff',
+      Vary: 'X-Workspace-Id',
+    })
+    if (etag) res.set('ETag', etag)
+    if (etag && ifNoneMatchMatches(req.get('If-None-Match'), etag)) {
+      res.status(304)
+      res.end()
+      return
+    }
     let range
     try {
       range = byteRange(req.get('Range'), stat.size)
@@ -576,13 +655,10 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
       }
       throw error
     }
-    res.set({
-      'Accept-Ranges': 'bytes',
-      'Cache-Control': 'private, max-age=3600',
-      'Content-Type': asset.mime_type,
-      'Content-Disposition': 'inline',
-      'X-Content-Type-Options': 'nosniff',
-    })
+    const ifRange = req.get('If-Range')
+    if (range && ifRange && etag && ifRange.includes('"') && !ifRangeMatches(ifRange, etag)) {
+      range = null
+    }
     if (range) {
       res.status(206)
       res.set('Content-Range', `bytes ${range.start}-${range.end}/${stat.size}`)
@@ -592,6 +668,28 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
     }
     res.set('Content-Length', String(stat.size))
     await pipeline(createReadStream(filename), res)
+  }))
+
+  // 注册在 /books/assets/:assetId 之后，避免影响已冻结的资产路由解析顺序。
+  router.get('/books/:bookId/visibility', route(async (req, res) => {
+    const { reading } = domainForRequest(req, database, identityService)
+    return sendData(res, await reading.getBookVisibility(req.params.bookId), { requestId: req.requestId })
+  }))
+
+  router.put('/books/:bookId/visibility', route(async (req, res) => {
+    const key = writeKey(req)
+    const { reading } = domainForRequest(req, database, identityService)
+    const outcome = await executeIdempotentAsync(database, {
+      key,
+      scope: `book.visibility:${req.workspace.organizationId}:${req.workspace.id}:${req.params.bookId}`,
+      request: { scope: req.body?.scope, classIds: req.body?.classIds },
+      operation: () => domainWriteOutcome(200, () => reading.setBookVisibility({
+        bookId: req.params.bookId,
+        scope: req.body?.scope,
+        classIds: req.body?.classIds,
+      })),
+    })
+    return sendOutcome(res, req, outcome)
   }))
 
   router.get('/books/:bookId/pages/:pageNo', route(async (req, res) => {

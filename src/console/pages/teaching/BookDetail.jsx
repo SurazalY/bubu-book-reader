@@ -1,13 +1,40 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GlassCard } from '../../components/Glass.jsx'
 import { PagePanel } from '../../components/PagePanel.jsx'
 import { Btn, EmptyState, Field, StatusTag, SubHead } from '../../components/Controls.jsx'
+import { ConfirmModal } from '../../components/Overlay.jsx'
+import { useProtectedAssetUrl } from '../../../shared/useProtectedAssetUrl.js'
 import { useConsole } from '../../state/ConsoleContext.jsx'
 import useAssignmentsData from '../../state/useAssignmentsData.js'
+import useBookWriteActions from '../../state/useBookWriteActions.js'
 import useStage4ConsoleData from '../../state/useStage4ConsoleData.js'
+import { bookGradeValue, bookPublishStatus, DRAFT_BOOK_READER_HINT } from './bookLibraryFilters.js'
+import { formatBookWriteError } from './bookManagement.js'
+import BookVisibilityPanel from './BookVisibilityPanel.jsx'
 
 function text(value, fallback) {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback
+}
+
+function BookCoverFigure({ book, workspaceId }) {
+  const coverUrl = typeof book?.cover?.url === 'string' && book.cover.url ? book.cover.url : null
+  const { objectUrl, failed } = useProtectedAssetUrl(coverUrl, workspaceId)
+  const available = Boolean(objectUrl) && !failed
+  return (
+    <div className="w-full aspect-[3/4] rounded-xl shadow-e3 relative overflow-hidden bg-ink-300">
+      {available && (
+        <img src={objectUrl} alt={text(book.title, '书籍封面')} className="absolute inset-0 h-full w-full object-cover" />
+      )}
+      <span className="console-sheen absolute inset-0" aria-hidden="true" />
+      <span className="absolute left-0 top-0 bottom-0 w-[8px] bg-black/12" aria-hidden="true" />
+      {(!coverUrl || failed) && (
+        <span className="absolute inset-x-3 bottom-4 text-white font-serif text-[15px] font-bold leading-snug drop-shadow">
+          {text(book.title, '服务端未返回书名')}
+        </span>
+      )}
+    </div>
+  )
 }
 
 function numberOrNull(value) {
@@ -21,6 +48,9 @@ export default function BookDetail() {
   const navigate = useNavigate()
   const bookResource = useStage4ConsoleData('bookDetail', { workspaceId: workspace?.id, resourceId: bookId })
   const assignmentsResource = useAssignmentsData(workspace?.id)
+  const writes = useBookWriteActions(workspace?.id)
+  const [ask, setAsk] = useState(null)
+  const [feedback, setFeedback] = useState(null)
 
   if (bookResource.status === 'loading') {
     return (
@@ -49,34 +79,49 @@ export default function BookDetail() {
     ? (assignmentsResource.data?.arrangements || []).filter((plan) => plan.bookId === book.id)
     : []
   const coverUrl = typeof book.cover?.url === 'string' && book.cover.url ? book.cover.url : null
-  const coverStyle = coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined
+  const published = bookPublishStatus(book) === 'published'
+  const gradeValue = bookGradeValue(book)
+  const busy = writes.actionState.status === 'loading' && writes.actionState.bookId === book.id
+
+  const runPublishAction = async () => {
+    try {
+      if (ask === 'unpublish') {
+        await writes.unpublishBook(book.id)
+        setFeedback({ tone: 'success', message: '已下架。学生现在看不到这本书。' })
+      } else {
+        await writes.publishBook(book.id)
+        setFeedback({ tone: 'success', message: '已重新发布。当前可见范围内的学生可以看到这本书。' })
+      }
+      setAsk(null)
+      bookResource.reload()
+    } catch (error) {
+      setFeedback({ tone: 'danger', message: formatBookWriteError(error, ask || 'publish') })
+    }
+  }
 
   return (
     <PagePanel
       title={`${text(book.title, '服务端未返回书名')} · 书目详情`}
-      desc={`${text(book.author, '服务端未返回作者')} · 当前已发布版本`}
+      desc={`${text(book.author, '服务端未返回作者')} · ${published ? '当前已发布版本' : '当前为草稿，学生看不到'}`}
       toolbar={
         <>
           <Btn icon="ArrowLeft" onClick={() => navigate('/console/teaching/books')}>返回书库</Btn>
-          <Btn tone="primary" icon="BookOpen" onClick={() => navigate(`/console/teaching/reader/${book.id}`)}>用教师阅读器打开</Btn>
+          {published ? (
+            <Btn tone="primary" icon="BookOpen" onClick={() => navigate(`/console/teaching/reader/${book.id}`)}>用教师阅读器打开</Btn>
+          ) : (
+            <span title={DRAFT_BOOK_READER_HINT}>
+              <Btn tone="primary" icon="BookOpen" disabled>用教师阅读器打开</Btn>
+            </span>
+          )}
         </>
       }
     >
       <div className="flex items-start gap-5">
         <div className="shrink-0 w-[132px]">
-          <div
-            className="w-full aspect-[3/4] rounded-xl shadow-e3 relative overflow-hidden bg-ink-300 bg-cover bg-center"
-            style={coverStyle}
-          >
-            <span className="console-sheen absolute inset-0" aria-hidden="true" />
-            <span className="absolute left-0 top-0 bottom-0 w-[8px] bg-black/12" aria-hidden="true" />
-            {!coverUrl && (
-              <span className="absolute inset-x-3 bottom-4 text-white font-serif text-[15px] font-bold leading-snug drop-shadow">
-                {text(book.title, '服务端未返回书名')}
-              </span>
-            )}
+          <BookCoverFigure book={book} workspaceId={workspace?.id} />
+          <div className="mt-2 text-center">
+            <StatusTag tone={published ? 'success' : 'warning'} dot>{published ? '已发布' : '草稿'}</StatusTag>
           </div>
-          <div className="mt-2 text-center"><StatusTag tone="success" dot>已发布</StatusTag></div>
         </div>
 
         <div className="min-w-0 flex-1">
@@ -88,6 +133,7 @@ export default function BookDetail() {
               <Field label="作者">{text(book.author, '服务端未返回')}</Field>
               <Field label="插图作者">{text(book.illustrator, '服务端未返回')}</Field>
               <Field label="篇幅">{pages === null ? '服务端未返回' : `${pages} 页`}</Field>
+              <Field label="适用年级">{gradeValue === null ? '未标注年级' : `${gradeValue} 年级`}</Field>
             </div>
             <div>
               <Field label="版本标识">{text(book.versionId, '服务端未返回')}</Field>
@@ -99,9 +145,32 @@ export default function BookDetail() {
         </div>
       </div>
 
+      {feedback && (
+        <p
+          role="alert"
+          className={feedback.tone === 'success' ? 'mt-3 text-[12.5px] text-success-700' : 'mt-3 text-[12.5px] text-danger-700'}
+        >
+          {feedback.message}
+          {feedback.tone === 'danger' && ask && (
+            <Btn size="sm" className="ml-2" onClick={runPublishAction}>重试</Btn>
+          )}
+        </p>
+      )}
+
       <div className="mt-4 pt-3.5 border-t border-ink-150/70 flex items-center gap-2 flex-wrap">
         <Btn icon="CalendarPlus" onClick={() => navigate('/console/teaching/arrangements')}>用它建阅读安排</Btn>
-        <span className="text-[11.5px] text-ink-500">导入、下架、删除和版本回滚尚无已接入的写入契约，本页不伪造管理操作。</span>
+        {published ? (
+          <Btn tone="danger" icon="Archive" disabled={busy} onClick={() => setAsk('unpublish')}>下架</Btn>
+        ) : (
+          <Btn tone="primary" icon="Upload" disabled={busy} onClick={() => setAsk('publish')}>重新发布</Btn>
+        )}
+        {!published && (
+          <span className="text-[11.5px] text-ink-500">{DRAFT_BOOK_READER_HINT}</span>
+        )}
+      </div>
+
+      <div className="mt-4">
+        <BookVisibilityPanel workspaceId={workspace?.id} bookId={book.id} />
       </div>
 
       <div className="mt-4">
@@ -140,6 +209,20 @@ export default function BookDetail() {
           </p>
         </GlassCard>
       </div>
+
+      <ConfirmModal
+        open={Boolean(ask)}
+        onClose={() => !busy && setAsk(null)}
+        onConfirm={runPublishAction}
+        title={ask === 'unpublish' ? '确认下架这本书' : '确认重新发布'}
+        desc={
+          ask === 'unpublish'
+            ? `下架后，学生会立刻看不到《${text(book.title, '这本书')}》。阅读安排不会被删除，但学生无法打开。之后可以重新发布。`
+            : `重新发布后，当前可见范围内的学生将能看到《${text(book.title, '这本书')}》。若质量闸门未通过，需要人工复核后才能发布。`
+        }
+        confirmText={busy ? '处理中…' : ask === 'unpublish' ? '确认下架' : '确认发布'}
+        tone={ask === 'unpublish' ? 'danger' : 'primary'}
+      />
     </PagePanel>
   )
 }

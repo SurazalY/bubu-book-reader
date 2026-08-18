@@ -6,6 +6,7 @@ import { PagePanel } from '../../components/PagePanel.jsx'
 import { Btn, Chip, EmptyState, IconBtn, SearchBox, StatusTag, TableFooter } from '../../components/Controls.jsx'
 import { Modal } from '../../components/Overlay.jsx'
 import { BarProgress } from '../../components/Progress.jsx'
+import { useProtectedAssetUrl } from '../../../shared/useProtectedAssetUrl.js'
 import { useConsole } from '../../state/ConsoleContext.jsx'
 import useAssignmentsData from '../../state/useAssignmentsData.js'
 import { ASSIGNMENT_STATUS, ASSIGNMENT_TYPES } from '../../../adapters/consoleAssignments.js'
@@ -294,21 +295,7 @@ function CreateArrangeModal({ open, onClose, books, classes, createState, onCrea
                   on ? 'border-brand-400 bg-brand-50/70 ring-2 ring-brand-200' : 'border-ink-150 hover:border-ink-300',
                 )}
               >
-                <div
-                  className="w-full aspect-[3/4] rounded-md shadow-e1 relative overflow-hidden"
-                  style={{
-                    backgroundImage: b.coverUrl ? `url("${b.coverUrl}")` : 'none',
-                    backgroundPosition: 'center',
-                    backgroundSize: 'cover',
-                  }}
-                >
-                  <span className="absolute left-0 top-0 bottom-0 w-[5px] bg-black/12" aria-hidden="true" />
-                  {on && (
-                    <span className="absolute right-1 top-1 w-4 h-4 rounded-full bg-brand-600 text-white flex items-center justify-center">
-                      <Icon name="Check" className="w-2.5 h-2.5" strokeWidth={3} />
-                    </span>
-                  )}
-                </div>
+                <ArrangeBookThumb book={b} selected={on} />
                 <p className="text-[11.5px] font-medium text-ink-800 mt-1 truncate">{b.title}</p>
                 <p className="text-[10.5px] text-ink-400 truncate">{b.author}</p>
               </button>
@@ -415,6 +402,23 @@ function CreateArrangeModal({ open, onClose, books, classes, createState, onCrea
         </div>
       )}
     </Modal>
+  )
+}
+
+function ArrangeBookThumb({ book, selected }) {
+  const { workspace } = useConsole()
+  const { objectUrl, failed } = useProtectedAssetUrl(book?.coverUrl, workspace?.id)
+  const available = Boolean(objectUrl) && !failed
+  return (
+    <div className="w-full aspect-[3/4] rounded-md shadow-e1 relative overflow-hidden bg-ink-100">
+      {available && <img src={objectUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+      <span className="absolute left-0 top-0 bottom-0 w-[5px] bg-black/12" aria-hidden="true" />
+      {selected && (
+        <span className="absolute right-1 top-1 w-4 h-4 rounded-full bg-brand-600 text-white flex items-center justify-center">
+          <Icon name="Check" className="w-2.5 h-2.5" strokeWidth={3} />
+        </span>
+      )}
+    </div>
   )
 }
 
