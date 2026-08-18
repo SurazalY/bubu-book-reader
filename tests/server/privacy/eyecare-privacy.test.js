@@ -22,8 +22,8 @@ function createFixture() {
   const timestamp = '2026-08-06T05:00:00.000Z'
 
   for (const [id, name] of [['org-1', '一校'], ['org-2', '二校']]) {
-    database.prepare('INSERT INTO organizations (id, name, status, created_at, updated_at, version) VALUES (?, ?, \'active\', ?, ?, 1)')
-      .run(id, name, timestamp, timestamp)
+    database.prepare('INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version) VALUES (?, ?, ?, \'active\', ?, ?, 1)')
+      .run(id, name, id, timestamp, timestamp)
   }
   const users = [
     ['student-1', 'org-1', 'student-1', '学生甲'],
@@ -35,8 +35,8 @@ function createFixture() {
   ]
   for (const user of users) {
     database.prepare(`INSERT INTO users
-      (id, organization_id, username, display_name, status, created_at, updated_at, version)
-      VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`).run(...user, timestamp, timestamp)
+      (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code)
+      VALUES (?, ?, ?, ?, 'active', ?, ?, 1, ?, ?)`).run(...user, timestamp, timestamp, user[2], `A-${user[0]}`)
   }
   const workspaces = [
     ['workspace-class-1', 'org-1', 'class-teacher', '一班空间', 'class', 'class-1'],

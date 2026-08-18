@@ -23,8 +23,8 @@ function createFixture() {
   let sequence = 0
   const audit = []
   for (const [id, name] of [['org-a', '甲校'], ['org-b', '乙校']]) {
-    database.prepare("INSERT INTO organizations (id, name, status, created_at, updated_at, version) VALUES (?, ?, 'active', ?, ?, 1)")
-      .run(id, name, timestamp, timestamp)
+    database.prepare("INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version) VALUES (?, ?, ?, 'active', ?, ?, 1)")
+      .run(id, name, id, timestamp, timestamp)
   }
   for (const user of [
     ['student-a', 'org-a', 'student-a', '学生甲'],
@@ -32,8 +32,8 @@ function createFixture() {
     ['teacher-a', 'org-a', 'teacher-a', '教师甲'],
     ['outsider-b', 'org-b', 'outsider-b', '外校教师'],
   ]) {
-    database.prepare("INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)")
-      .run(...user, timestamp, timestamp)
+    database.prepare("INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code) VALUES (?, ?, ?, ?, 'active', ?, ?, 1, ?, ?)")
+      .run(...user, timestamp, timestamp, user[2], `A-${user[0]}`)
   }
   for (const workspace of [
     ['workspace-student-a', 'org-a', 'class-teacher', '学生空间', 'own', 'student-a'],

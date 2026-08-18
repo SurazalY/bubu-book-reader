@@ -1,42 +1,36 @@
 import { useCallback, useMemo } from 'react'
 
 import { createConsoleApi } from '../../api/console.js'
-import { asApiError } from '../../api/envelope.js'
 import { useApiResource } from '../../api/useApiResource.js'
+import {
+  readTeacherCount,
+  requireClassShelfApi,
+  shelfItemsOf,
+} from '../pages/teaching/bookManagement.js'
 
-export async function loadBookVisibility(api, { workspaceId, bookId } = {}) {
-  if (!workspaceId || !bookId) return { data: null, meta: {} }
-
-  const [visibilityResult, classesResult] = await Promise.allSettled([
-    api.getBookVisibility(bookId, { workspaceId }),
-    api.listAuthorizedClasses({ workspaceId }),
-  ])
-
-  if (visibilityResult.status === 'rejected') {
-    throw visibilityResult.reason
+export async function loadClassShelf(api, { workspaceId, classId } = {}) {
+  requireClassShelfApi(api)
+  if (!workspaceId || !classId) {
+    return { data: { items: [], teacherCount: null, classId: classId || null }, meta: {} }
   }
 
-  const visibility = visibilityResult.value
-  const classesError = classesResult.status === 'rejected' ? asApiError(classesResult.reason) : null
-  const classes = classesResult.status === 'fulfilled' && Array.isArray(classesResult.value?.data?.items)
-    ? classesResult.value.data.items
-    : []
-
+  const response = await api.getClassShelf(classId, { workspaceId })
+  const items = shelfItemsOf(response.data)
   return {
     data: {
-      visibility: visibility.data || null,
-      classes,
-      classesError,
+      items,
+      teacherCount: readTeacherCount(response.data) ?? readTeacherCount(response),
+      classId,
     },
-    meta: visibility.meta || {},
+    meta: response.meta || {},
   }
 }
 
-export default function useBookVisibility(workspaceId, bookId) {
+export default function useBookVisibility(workspaceId, classId) {
   const api = useMemo(() => createConsoleApi(), [])
   const load = useCallback(
-    () => loadBookVisibility(api, { workspaceId, bookId }),
-    [api, bookId, workspaceId],
+    () => loadClassShelf(api, { workspaceId, classId }),
+    [api, classId, workspaceId],
   )
 
   return useApiResource(load)

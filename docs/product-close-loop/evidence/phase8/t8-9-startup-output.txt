@@ -1,0 +1,15 @@
+# first start (cwd 仓库根, npm run server)
+> book-reader-app@0.1.0 server
+> node server/index.js
+(node:71740) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+[readmate] listening on http://127.0.0.1:5191
+GET /api/v1/health 200 {"data":{"status":"ok","database":"sqlite","migrations":34}}
+# 为确认 alreadyApplied 主动停 PID 71740 树后再启，不是迁移崩溃。
+
+# restart
+> book-reader-app@0.1.0 server
+> node server/index.js
+(node:10340) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+[readmate] listening on http://127.0.0.1:5191
+GET /api/v1/health 200 {"data":{"status":"ok","database":"sqlite","migrations":34}}
+schema_migrations 047-050 applied_at 仍为 2026-08-18T13:49:23.231Z（未重写）

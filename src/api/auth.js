@@ -9,11 +9,11 @@ function idempotencyKey(prefix) {
 
 export function createAuthApi(client = createApiClient()) {
   return {
-    login: (username, password, options = {}) =>
+    login: ({ schoolCode, loginName, password } = {}, options = {}) =>
       client.post('/auth/login', {
         ...options,
         idempotencyKey: options.idempotencyKey || idempotencyKey('auth-login'),
-        body: { username, password },
+        body: { schoolCode, loginName, password },
       }),
     logout: (options = {}) =>
       client.post('/auth/logout', {

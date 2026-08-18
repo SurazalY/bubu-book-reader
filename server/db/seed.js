@@ -46,6 +46,29 @@ function requireId(record, type) {
   return requireText(record?.id, `${type}.id`)
 }
 
+function defaultSchoolCode(record) {
+  if (typeof record.schoolCode === 'string' && record.schoolCode.trim().length > 0) {
+    return record.schoolCode.trim()
+  }
+  if (record.id === 'internal-demo-organization') {
+    return 'internal-demo'
+  }
+  return requireId(record, 'organization')
+}
+
+function defaultAccountCode(userId) {
+  const compact = String(userId).replace(/-/g, '')
+  if (/^[0-9a-fA-F]{12,}$/i.test(compact)) {
+    return `U${compact.slice(0, 12).toUpperCase()}`
+  }
+  let hash = 2166136261
+  for (let index = 0; index < compact.length; index += 1) {
+    hash ^= compact.charCodeAt(index)
+    hash = Math.imul(hash, 16777619) >>> 0
+  }
+  return `U${hash.toString(16).toUpperCase().padStart(12, '0')}`
+}
+
 function optionalText(value, label) {
   if (value === undefined || value === null) {
     return null
@@ -147,6 +170,7 @@ const definitions = {
     values: (record) => ({
       name: requireText(record.name, 'organization.name'),
       status: status(record.status, 'organization.status'),
+      school_code: defaultSchoolCode(record),
     }),
   },
   users: {
@@ -158,6 +182,8 @@ const definitions = {
       username: requireText(record.username, 'user.username'),
       display_name: requireText(record.displayName, 'user.displayName'),
       status: status(record.status, 'user.status'),
+      login_name: requireText(record.loginName ?? record.username, 'user.loginName'),
+      account_code: requireText(record.accountCode ?? defaultAccountCode(record.id), 'user.accountCode'),
     }),
   },
   workspaces: {
@@ -201,12 +227,18 @@ const definitions = {
     name: 'classes',
     label: 'class',
     table: 'classes',
-    values: (record) => ({
-      organization_id: requireText(record.organizationId, 'class.organizationId'),
-      grade_id: optionalText(record.gradeId, 'class.gradeId'),
-      name: requireText(record.name, 'class.name'),
-      status: status(record.status, 'class.status'),
-    }),
+    values: (record) => {
+      const values = {
+        organization_id: requireText(record.organizationId, 'class.organizationId'),
+        grade_id: optionalText(record.gradeId, 'class.gradeId'),
+        name: requireText(record.name, 'class.name'),
+        status: status(record.status, 'class.status'),
+      }
+      if (record.stage !== undefined) values.stage = record.stage
+      if (record.entryYear !== undefined) values.entry_year = record.entryYear
+      if (record.classNumber !== undefined) values.class_number = record.classNumber
+      return values
+    },
   },
   classMemberships: {
     name: 'classMemberships',

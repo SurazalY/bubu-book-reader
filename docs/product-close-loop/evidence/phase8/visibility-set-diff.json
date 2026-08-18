@@ -1,0 +1,18 @@
+{
+  "collectedAt": "2026-08-18T12:44:19.228Z",
+  "allEmpty": true,
+  "students": {
+    "internal-demo-organization::internal-demo-student": {
+      "added": [],
+      "removed": [],
+      "preCount": 49,
+      "postCount": 49,
+      "preClassIds": [
+        "internal-demo-class"
+      ],
+      "postClassIds": [
+        "internal-demo-class"
+      ]
+    }
+  }
+}

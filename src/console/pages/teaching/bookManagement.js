@@ -1,5 +1,7 @@
 export const HUMAN_REVIEW_REQUIRED_MESSAGE = '这本书的质量闸门未通过，需要人工复核后才能重新发布。'
 export const OUT_OF_SCOPE_CLASSES_PREFIX = '这些班级超出你的管理范围'
+export const CLASS_SHELF_EMPTY_MESSAGE = '暂无已投放图书，请联系任课教师'
+export const CLASS_SHELF_API_MISSING_MESSAGE = 'console API 缺少班级书架方法 getClassShelf / putClassShelfBook / deleteClassShelfBook，T8.6B 停手'
 
 export function createWriteKeyBag(randomUUID = () => globalThis.crypto.randomUUID()) {
   const keys = new Map()
@@ -27,6 +29,65 @@ export function classDisplayName(item) {
   return name || '已删除的班级'
 }
 
+export function requireClassShelfApi(api) {
+  if (
+    typeof api?.getClassShelf !== 'function'
+    || typeof api?.putClassShelfBook !== 'function'
+    || typeof api?.deleteClassShelfBook !== 'function'
+  ) {
+    throw new Error(CLASS_SHELF_API_MISSING_MESSAGE)
+  }
+  return api
+}
+
+export function canManageClassShelf(workspace) {
+  return workspace?.scopeType === 'class' && typeof workspace?.scopeId === 'string' && Boolean(workspace.scopeId.trim())
+}
+
+export function classIdOfWorkspace(workspace) {
+  return canManageClassShelf(workspace) ? workspace.scopeId : null
+}
+
+export function readTeacherCount(payload) {
+  if (payload == null || typeof payload !== 'object') return null
+  const candidates = [payload.teacherCount, payload.data?.teacherCount]
+  for (const value of candidates) {
+    if (value == null || value === '') continue
+    const count = Number(value)
+    if (Number.isInteger(count) && count >= 0) return count
+  }
+  return null
+}
+
+export function formatClassTeacherCount(teacherCount) {
+  if (teacherCount == null || teacherCount === '') return '本班有 — 位教师可管理'
+  const count = Number(teacherCount)
+  if (!Number.isInteger(count) || count < 0) return '本班有 — 位教师可管理'
+  return `本班有 ${count} 位教师可管理`
+}
+
+export function shelfItemsOf(payload) {
+  if (Array.isArray(payload?.items)) return payload.items
+  if (Array.isArray(payload?.data?.items)) return payload.data.items
+  if (Array.isArray(payload)) return payload
+  return []
+}
+
+export function shelfBookIdSet(items) {
+  const ids = new Set()
+  for (const item of Array.isArray(items) ? items : []) {
+    const id = typeof item?.bookId === 'string' && item.bookId.trim()
+      ? item.bookId
+      : (typeof item?.id === 'string' && item.id.trim() ? item.id : '')
+    if (id) ids.add(id)
+  }
+  return ids
+}
+
+export function isBookOnClassShelf(items, bookId) {
+  return typeof bookId === 'string' && bookId.trim() ? shelfBookIdSet(items).has(bookId) : false
+}
+
 export function formatBookWriteError(error, action = 'write') {
   if (error?.code === 'HUMAN_REVIEW_REQUIRED') return HUMAN_REVIEW_REQUIRED_MESSAGE
   const deniedIds = Array.isArray(error?.details?.classIds)
@@ -36,9 +97,13 @@ export function formatBookWriteError(error, action = 'write') {
     return `${OUT_OF_SCOPE_CLASSES_PREFIX}：${deniedIds.join('、')}`
   }
   if (error?.code === 'PERMISSION_DENIED') {
+    if (action === 'grant') return '你没有权限把这本书投放到本班。'
+    if (action === 'revoke') return '你没有权限从本班撤下这本书。'
     return action === 'visibility' ? '你没有权限修改这本书的可见范围。' : '你没有权限执行这个发布操作。'
   }
   if (error?.code === 'RESOURCE_NOT_FOUND') {
+    if (action === 'grant') return '这本书不存在、未发布，或不在当前可投放范围。'
+    if (action === 'revoke') return '这本书不存在，或当前不在本班书架上。'
     if (action === 'unpublish') return '这本书不存在，或当前不是已发布状态，无法下架。'
     if (action === 'publish') return '这本书不存在，或当前不是可发布的草稿。'
     return '这本书不在当前组织中。'

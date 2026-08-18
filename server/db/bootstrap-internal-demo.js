@@ -8,9 +8,13 @@ import { importPublicDomainCatalog } from './import-public-domain-catalog.js'
 
 const stable = {
   organizationId: 'internal-demo-organization',
-  gradeId: 'internal-demo-grade',
+  schoolCode: 'internal-demo',
+  gradeId: 'primary:2023',
   classId: 'internal-demo-class',
+  secondClassId: 'internal-demo-class-2',
   workspaceId: 'internal-demo-workspace',
+  secondClassWorkspaceId: 'internal-demo-workspace-2',
+  gradeWorkspaceId: 'internal-demo-grade-workspace',
   schoolWorkspaceId: 'internal-demo-school-workspace',
   platformWorkspaceId: 'internal-demo-platform-workspace',
   studentId: 'internal-demo-student',
@@ -18,6 +22,15 @@ const stable = {
   backupTeacherId: 'internal-teacher-wang',
   principalId: 'internal-principal',
   opsAdminId: 'internal-ops-admin',
+  gradeManagerId: 'internal-grade-manager',
+}
+
+const demoClassIdentity = {
+  stage: 'primary',
+  entryYear: 2023,
+  firstClassNumber: 1,
+  secondClassNumber: 2,
+  gradeId: 'primary:2023',
 }
 
 function parseArguments(values) {
@@ -132,6 +145,29 @@ function prepareStableDemoIdentities(database, updatedAt) {
       UPDATE classes SET name = '三年级一班', updated_at = ?, version = version + 1
       WHERE id = ? AND name <> '三年级一班'
     `).run(updatedAt, stable.classId)
+    database.prepare(`
+      UPDATE classes
+      SET stage = ?, entry_year = ?, class_number = ?, grade_id = ?,
+          updated_at = ?, version = version + 1
+      WHERE id = ?
+        AND (
+          ifnull(stage, '') <> ?
+          OR ifnull(entry_year, 0) <> ?
+          OR ifnull(class_number, 0) <> ?
+          OR ifnull(grade_id, '') <> ?
+        )
+    `).run(
+      demoClassIdentity.stage,
+      demoClassIdentity.entryYear,
+      demoClassIdentity.firstClassNumber,
+      demoClassIdentity.gradeId,
+      updatedAt,
+      stable.classId,
+      demoClassIdentity.stage,
+      demoClassIdentity.entryYear,
+      demoClassIdentity.firstClassNumber,
+      demoClassIdentity.gradeId,
+    )
   }
   retireLegacyActor(database, {
     id: 'internal-demo-teacher',
@@ -183,6 +219,12 @@ export async function bootstrapInternalDemo({
     { id: stable.principalId, username: 'internal-principal', displayName: '陈校长', roleCode: 'school_admin' },
     { id: stable.opsAdminId, username: 'internal-ops-admin', displayName: '内部联调运营管理员', roleCode: 'platform_ops' },
   ]
+  const gradeManager = {
+    id: stable.gradeManagerId,
+    username: 'internal-grade-manager',
+    displayName: '年级主任',
+    roleCode: 'grade_manager',
+  }
   try {
     const preparedAt = new Date().toISOString()
     identity.database.exec('BEGIN IMMEDIATE')
@@ -194,8 +236,27 @@ export async function bootstrapInternalDemo({
       throw error
     }
     identity.service.importSeed({
-      organizations: [{ id: stable.organizationId, name: '读伴公共领域内部联调学校' }],
-      users: users.map((user) => ({ id: user.id, organizationId: stable.organizationId, username: user.username, displayName: user.displayName })),
+      organizations: [{
+        id: stable.organizationId,
+        name: '读伴公共领域内部联调学校',
+        schoolCode: stable.schoolCode,
+      }],
+      users: [
+        ...users.map((user) => ({
+          id: user.id,
+          organizationId: stable.organizationId,
+          username: user.username,
+          displayName: user.displayName,
+          loginName: user.username,
+        })),
+        {
+          id: gradeManager.id,
+          organizationId: stable.organizationId,
+          username: gradeManager.username,
+          displayName: gradeManager.displayName,
+          loginName: gradeManager.username,
+        },
+      ],
       workspaces: [
         {
           id: stable.workspaceId,
@@ -204,6 +265,22 @@ export async function bootstrapInternalDemo({
           name: '公共领域素材联调班级',
           scopeType: 'class',
           scopeId: stable.classId,
+        },
+        {
+          id: stable.secondClassWorkspaceId,
+          organizationId: stable.organizationId,
+          code: 'class-teacher',
+          name: '公共领域素材联调三年级二班',
+          scopeType: 'class',
+          scopeId: stable.secondClassId,
+        },
+        {
+          id: stable.gradeWorkspaceId,
+          organizationId: stable.organizationId,
+          code: 'grade-admin',
+          name: '公共领域素材联调年级管理',
+          scopeType: 'grade',
+          scopeId: demoClassIdentity.gradeId,
         },
         {
           id: stable.schoolWorkspaceId,
@@ -228,8 +305,28 @@ export async function bootstrapInternalDemo({
         { id: `membership-${stable.backupTeacherId}`, userId: stable.backupTeacherId, workspaceId: stable.workspaceId },
         { id: 'membership-internal-principal', userId: stable.principalId, workspaceId: stable.schoolWorkspaceId },
         { id: 'membership-internal-ops-admin', userId: stable.opsAdminId, workspaceId: stable.platformWorkspaceId },
+        { id: 'membership-internal-grade-manager', userId: gradeManager.id, workspaceId: stable.gradeWorkspaceId },
       ],
-      classes: [{ id: stable.classId, organizationId: stable.organizationId, gradeId: stable.gradeId, name: '三年级一班' }],
+      classes: [
+        {
+          id: stable.classId,
+          organizationId: stable.organizationId,
+          gradeId: demoClassIdentity.gradeId,
+          name: '三年级一班',
+          stage: demoClassIdentity.stage,
+          entryYear: demoClassIdentity.entryYear,
+          classNumber: demoClassIdentity.firstClassNumber,
+        },
+        {
+          id: stable.secondClassId,
+          organizationId: stable.organizationId,
+          gradeId: demoClassIdentity.gradeId,
+          name: '三年级二班',
+          stage: demoClassIdentity.stage,
+          entryYear: demoClassIdentity.entryYear,
+          classNumber: demoClassIdentity.secondClassNumber,
+        },
+      ],
       classMemberships: [
         { id: 'class-member-internal-student', classId: stable.classId, userId: stable.studentId, membershipRole: 'student' },
         { id: 'class-member-internal-teacher-li', classId: stable.classId, userId: stable.implicatedTeacherId, membershipRole: 'teacher' },
@@ -263,12 +360,28 @@ export async function bootstrapInternalDemo({
           scopeType: 'platform',
           scopeId: 'readmate-platform',
         },
+        {
+          id: 'role-internal-grade-manager',
+          organizationId: stable.organizationId,
+          userId: gradeManager.id,
+          workspaceId: stable.gradeWorkspaceId,
+          roleCode: 'grade_manager',
+          scopeType: 'grade',
+          scopeId: demoClassIdentity.gradeId,
+        },
       ],
-      credentials: users.map((user) => ({
-        id: `credential-${user.id}`,
-        userId: user.id,
-        passwordHash: passwordHash(identity.database, user.id, password),
-      })),
+      credentials: [
+        ...users.map((user) => ({
+          id: `credential-${user.id}`,
+          userId: user.id,
+          passwordHash: passwordHash(identity.database, user.id, password),
+        })),
+        {
+          id: `credential-${gradeManager.id}`,
+          userId: gradeManager.id,
+          passwordHash: passwordHash(identity.database, gradeManager.id, password),
+        },
+      ],
     })
     const updatedAt = new Date().toISOString()
     identity.database.exec('BEGIN IMMEDIATE')

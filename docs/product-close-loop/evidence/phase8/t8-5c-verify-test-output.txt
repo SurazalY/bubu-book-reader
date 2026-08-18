@@ -1,0 +1,187 @@
+﻿TAP version 13
+# (node:66208) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. console.js 必须有 class-local shelf API，并删除 visibility 写
+ok 1 - F. console.js 必须有 class-local shelf API，并删除 visibility 写
+  ---
+  duration_ms: 1.0063
+  type: 'test'
+  ...
+# Subtest: F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only
+ok 2 - F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only
+  ---
+  duration_ms: 0.3804
+  type: 'test'
+  ...
+# Subtest: F. student.js 必须有 registration / onboarding / enrollment 读方法
+ok 3 - F. student.js 必须有 registration / onboarding / enrollment 读方法
+  ---
+  duration_ms: 0.3851
+  type: 'test'
+  ...
+# (node:64024) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. integration-router 必须注册 class-local 书架路由，且不得调用 listAuthorizedClasses
+ok 4 - B. integration-router 必须注册 class-local 书架路由，且不得调用 listAuthorizedClasses
+  ---
+  duration_ms: 1.3031
+  type: 'test'
+  ...
+# Subtest: B. 教师对本班 PUT/GET/DELETE 书架 200 幂等，只改本班一行
+ok 5 - B. 教师对本班 PUT/GET/DELETE 书架 200 幂等，只改本班一行
+  ---
+  duration_ms: 388.8949
+  type: 'test'
+  ...
+# Subtest: B. 他班或无 C workspace 操作书架必须 403 或 404
+ok 6 - B. 他班或无 C workspace 操作书架必须 403 或 404
+  ---
+  duration_ms: 330.3131
+  type: 'test'
+  ...
+# Subtest: B. 跨组织 classId 与不存在 classId 书架写必须同码同文案 404
+ok 7 - B. 跨组织 classId 与不存在 classId 书架写必须同码同文案 404
+  ---
+  duration_ms: 276.2261
+  type: 'test'
+  ...
+# Subtest: B. 两名教师并发 PUT 同班同书最终只有一行 grant
+ok 8 - B. 两名教师并发 PUT 同班同书最终只有一行 grant
+  ---
+  duration_ms: 314.9363
+  type: 'test'
+  ...
+# Subtest: B. 一班撤下不得删除他班 grant
+ok 9 - B. 一班撤下不得删除他班 grant
+  ---
+  duration_ms: 261.2526
+  type: 'test'
+  ...
+# (node:67656) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. projectCommunityPosts 必须接到与 T8.4 同一 isBookVisibleToAudience
+ok 10 - D. projectCommunityPosts 必须接到与 T8.4 同一 isBookVisibleToAudience
+  ---
+  duration_ms: 1.2569
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 无 grant 时保留帖子但 quote.text=null
+ok 11 - D-21 HTTP：GET /community/posts 无 grant 时保留帖子但 quote.text=null
+  ---
+  duration_ms: 347.3792
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 仅他班 grant 时隐藏原文
+ok 12 - D-21 HTTP：GET /community/posts 仅他班 grant 时隐藏原文
+  ---
+  duration_ms: 268.392
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 对 draft 书隐藏原文
+ok 13 - D-21 HTTP：GET /community/posts 对 draft 书隐藏原文
+  ---
+  duration_ms: 265.4177
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 有本班 grant 仍返原文
+ok 14 - D-21 HTTP：GET /community/posts 有本班 grant 仍返原文
+  ---
+  duration_ms: 257.9886
+  type: 'test'
+  ...
+# (node:60744) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. projectAssignments 必须接到与 T8.4 同一 isBookVisibleToAudience
+ok 15 - E. projectAssignments 必须接到与 T8.4 同一 isBookVisibleToAudience
+  ---
+  duration_ms: 1.055
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：GET /assignments 对学生省略无 grant 的书整项
+ok 16 - D-22 HTTP：GET /assignments 对学生省略无 grant 的书整项
+  ---
+  duration_ms: 351.502
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：GET /assignments 仅他班 grant 或 draft 也整项省略
+ok 17 - D-22 HTTP：GET /assignments 仅他班 grant 或 draft 也整项省略
+  ---
+  duration_ms: 281.3238
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：有本班 grant 返回安排；撤下后消失
+ok 18 - D-22 HTTP：有本班 grant 返回安排；撤下后消失
+  ---
+  duration_ms: 273.1194
+  type: 'test'
+  ...
+# (node:64436) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 临时库路径不得指向真库，独立端口不得为 5191
+ok 19 - G. 临时库路径不得指向真库，独立端口不得为 5191
+  ---
+  duration_ms: 250.718
+  type: 'test'
+  ...
+# Subtest: G. 登录后 GET /books 必须打到 integration-router，不得被 identity 兜底吞掉
+ok 20 - G. 登录后 GET /books 必须打到 integration-router，不得被 identity 兜底吞掉
+  ---
+  duration_ms: 302.8414
+  type: 'test'
+  ...
+# Subtest: G. 书架路由块不得调用 listAuthorizedClasses
+ok 21 - G. 书架路由块不得调用 listAuthorizedClasses
+  ---
+  duration_ms: 0.7837
+  type: 'test'
+  ...
+# (node:63948) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. 教师全局 publish/unpublish 必须 403，且不得改 grants
+ok 22 - C. 教师全局 publish/unpublish 必须 403，且不得改 grants
+  ---
+  duration_ms: 369.5545
+  type: 'test'
+  ...
+# Subtest: C. 校长与年级主任全局 publish 必须 403
+ok 23 - C. 校长与年级主任全局 publish 必须 403
+  ---
+  duration_ms: 325.5994
+  type: 'test'
+  ...
+# Subtest: C. platform publish/unpublish 仍 200，且不得创建或清空 grants
+ok 24 - C. platform publish/unpublish 仍 200，且不得创建或清空 grants
+  ---
+  duration_ms: 283.6543
+  type: 'test'
+  ...
+# (node:67040) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. integration-router 必须删除 GET/PUT /books/:bookId/visibility，无兼容 handler
+ok 25 - A. integration-router 必须删除 GET/PUT /books/:bookId/visibility，无兼容 handler
+  ---
+  duration_ms: 1.4202
+  type: 'test'
+  ...
+# Subtest: A. GET /books/:bookId/visibility 必须是标准 JSON 404，且 integration 链可到达
+ok 26 - A. GET /books/:bookId/visibility 必须是标准 JSON 404，且 integration 链可到达
+  ---
+  duration_ms: 349.0068
+  type: 'test'
+  ...
+# Subtest: A. PUT /books/:bookId/visibility 含 scope=organization 也必须标准 JSON 404，且不得清空他班 grant
+ok 27 - A. PUT /books/:bookId/visibility 含 scope=organization 也必须标准 JSON 404，且不得清空他班 grant
+  ---
+  duration_ms: 277.1294
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1790.5115
+# t8-5c exit_code 0

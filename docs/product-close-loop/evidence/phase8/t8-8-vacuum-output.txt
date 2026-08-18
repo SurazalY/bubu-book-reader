@@ -1,0 +1,17 @@
+source=D:\Project\整书8.15\server\data\readmate.sqlite
+replica=C:\Users\Yak\AppData\Local\Temp\t8-8-gate2-20260818T124417Z\readmate-046-copy.sqlite
+source_sqlite_bytes=108261376
+source_sqlite_sha256=6e3e163d5f2d437c892b2cbfeb44906b6a78dad5a56f9577d0277e6819cff14b
+source_wal_bytes=9723232
+source_wal_sha256=559dc570f00a2463ef9ec816b06fc5aed6244277db5649e273c28623848b675d
+replica_bytes=107020288
+replica_sha256=33561d9ed24831672396a63a0d08ed8210cd80128148309e5d4d69b1964ef64a
+vacuum={
+  "ok": true,
+  "attempts": [
+    {
+      "label": "DatabaseSync(readOnly:true)",
+      "ok": true
+    }
+  ]
+}

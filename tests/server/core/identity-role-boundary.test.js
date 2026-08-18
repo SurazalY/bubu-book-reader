@@ -124,11 +124,11 @@ async function requestJson(baseUrl, path, options = {}) {
   }
 }
 
-async function login(baseUrl, username, password, key) {
+async function login(baseUrl, schoolCode, loginName, password, key) {
   return requestJson(baseUrl, '/auth/login', {
     method: 'POST',
     headers: { 'Idempotency-Key': key },
-    body: { username, password },
+    body: { schoolCode, loginName, password },
   })
 }
 
@@ -163,8 +163,8 @@ test('role assignments stay inside their organization for SQLite writes and HTTP
     removeTemporaryDatabase(temporary)
   })
 
-  const loginA = await login(baseUrl, fixture.adminAUsername, fixture.password, 'role-boundary-login-a')
-  const loginB = await login(baseUrl, fixture.adminBUsername, fixture.password, 'role-boundary-login-b')
+  const loginA = await login(baseUrl, fixture.organizationAId, fixture.adminAUsername, fixture.password, 'role-boundary-login-a')
+  const loginB = await login(baseUrl, fixture.organizationBId, fixture.adminBUsername, fixture.password, 'role-boundary-login-b')
   assert.equal(loginA.status, 200)
   assert.equal(loginB.status, 200)
 
@@ -175,7 +175,9 @@ test('role assignments stay inside their organization for SQLite writes and HTTP
   const otherSchoolRead = await requestJson(baseUrl, `/users/${fixture.targetAId}`, {
     headers: { Cookie: loginB.cookie, 'X-Workspace-Id': fixture.workspaceBId },
   })
-  assert.equal(otherSchoolRead.status, 403)
+  assert.equal(otherSchoolRead.status, 404)
+  assert.equal(otherSchoolRead.payload.error.code, 'RESOURCE_NOT_FOUND')
+  assert.equal(otherSchoolRead.payload.error.message, '账号不存在')
 
   const columns = module.database.prepare('PRAGMA table_info(role_assignments)').all().map((record) => record.name)
   const now = new Date().toISOString()
@@ -228,7 +230,9 @@ test('role assignments stay inside their organization for SQLite writes and HTTP
   const forgedRead = await requestJson(baseUrl, `/users/${fixture.targetBId}`, {
     headers: { Cookie: loginA.cookie, 'X-Workspace-Id': fixture.workspaceAId },
   })
-  assert.equal(forgedRead.status, 403)
+  assert.equal(forgedRead.status, 404)
+  assert.equal(forgedRead.payload.error.code, 'RESOURCE_NOT_FOUND')
+  assert.equal(forgedRead.payload.error.message, '账号不存在')
   const forgedUpdate = await updateUser(
     baseUrl,
     fixture,
@@ -238,7 +242,9 @@ test('role assignments stay inside their organization for SQLite writes and HTTP
     'role-boundary-forged-update',
     'must-not-change',
   )
-  assert.equal(forgedUpdate.status, 403)
+  assert.equal(forgedUpdate.status, 404)
+  assert.equal(forgedUpdate.payload.error.code, 'RESOURCE_NOT_FOUND')
+  assert.equal(forgedUpdate.payload.error.message, '账号不存在')
   assert.equal(module.database.prepare('SELECT display_name FROM users WHERE id = ?').get(fixture.targetBId).display_name, 'target-b')
 
   module.database

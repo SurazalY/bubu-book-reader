@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 import { openSqliteDatabase } from '../../../server/db/database.js'
 import { runMigrations } from '../../../server/db/migrate.js'
+import { grantBookToClass } from '../helpers/phase8-old-fixture.js'
 import {
   createReadingStatisticsDomain,
   deriveClassReadingMetrics,
@@ -22,15 +23,15 @@ const NOW = '2026-08-10T09:00:00.000Z'
 const migrationDirectory = fileURLToPath(new URL('../../../server/db/migrations/', import.meta.url))
 
 function insertOrganization(db, id) {
-  db.prepare(`INSERT INTO organizations (id, name, status, created_at, updated_at, version)
-    VALUES (?, ?, 'active', ?, ?, 1)`).run(id, id, NOW, NOW)
+  db.prepare(`INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version)
+    VALUES (?, ?, ?, 'active', ?, ?, 1)`).run(id, id, id, NOW, NOW)
 }
 
 function insertUser(db, { id, organizationId, displayName = id }) {
   db.prepare(`INSERT INTO users
-      (id, organization_id, username, display_name, status, created_at, updated_at, version)
-    VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`)
-    .run(id, organizationId, id, displayName, NOW, NOW)
+      (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code)
+    VALUES (?, ?, ?, ?, 'active', ?, ?, 1, ?, ?)`)
+    .run(id, organizationId, id, displayName, NOW, NOW, id, `A-${id}`)
 }
 
 function insertClass(db, { id, organizationId, gradeId = 'grade-a' }) {
@@ -136,9 +137,6 @@ function createFixture({ studentCount = 3 } = {}) {
     id: 'student-workspace-a', organizationId: 'org-a', code: 'class-teacher', scopeType: 'class', scopeId: 'class-a',
   })
   insertWorkspace(db, {
-    id: 'teacher-workspace-a', organizationId: 'org-a', code: 'class-teacher', scopeType: 'class', scopeId: 'class-a',
-  })
-  insertWorkspace(db, {
     id: 'school-workspace-a', organizationId: 'org-a', code: 'school-admin', scopeType: 'school', scopeId: 'org-a',
   })
   insertWorkspace(db, {
@@ -147,13 +145,13 @@ function createFixture({ studentCount = 3 } = {}) {
   insertUser(db, { id: 'teacher-a', organizationId: 'org-a', displayName: 'Teacher' })
   insertUser(db, { id: 'admin-a', organizationId: 'org-a', displayName: 'Admin' })
   insertUser(db, { id: 'student-b', organizationId: 'org-b', displayName: 'B Student' })
-  insertWorkspaceMembership(db, 'teacher-a', 'teacher-workspace-a')
+  insertWorkspaceMembership(db, 'teacher-a', 'student-workspace-a')
   insertWorkspaceMembership(db, 'admin-a', 'school-workspace-a')
   insertWorkspaceMembership(db, 'student-b', 'student-workspace-b')
   insertClassMembership(db, 'class-a', 'teacher-a', 'teacher')
   insertClassMembership(db, 'class-b', 'student-b')
   insertRole(db, {
-    id: 'teacher-role', organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'teacher-workspace-a',
+    id: 'teacher-role', organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'student-workspace-a',
     roleCode: 'teacher', scopeType: 'class', scopeId: 'class-a',
   })
   insertRole(db, {
@@ -176,6 +174,9 @@ function createFixture({ studentCount = 3 } = {}) {
   insertBook(db, {
     organizationId: 'org-b', actorId: 'student-b', bookId: 'book-b', versionId: 'version-b', title: 'B Book',
   })
+  grantBookToClass(db, { bookId: 'book-a', classId: 'class-a', organizationId: 'org-a', actorId: 'admin-a', now: NOW, bookVersionId: 'version-a' })
+  grantBookToClass(db, { bookId: 'book-a2', classId: 'class-a', organizationId: 'org-a', actorId: 'admin-a', now: NOW, bookVersionId: 'version-a2' })
+  grantBookToClass(db, { bookId: 'book-b', classId: 'class-b', organizationId: 'org-b', actorId: 'student-b', now: NOW, bookVersionId: 'version-b' })
   return {
     db,
     domain: createReadingStatisticsDomain({
@@ -301,7 +302,7 @@ test('/self 最近书籍不可访问时取下一条，教师身份不能冒充 s
   })
   assert.equal(result.lastReading.bookVersionId, 'version-a')
   await assert.rejects(() => fixture.domain.getStudentSummary({
-    organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'teacher-workspace-a',
+    organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'student-workspace-a',
   }), { code: 'PERMISSION_DENIED' })
 })
 
@@ -328,7 +329,7 @@ test('/scope 50 人一次返回 37/50、七日补零、学生详情与稳定姓�
     actorId: 'student-01', statDate: '2026-08-08', effectiveMs: 300_000, bookVersionId: 'version-a2',
   })
   const result = await fixture.domain.getScopedSummary({
-    organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'teacher-workspace-a',
+    organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'student-workspace-a',
   }, { classId: 'class-a', statDate: '2026-08-10' })
   assert.equal(result.class.activeStudentCount, 50)
   assert.equal(result.summary.checkedInStudentCount, 37)
@@ -398,7 +399,7 @@ test('/scope 空班级使用 null；转班历史 numerator 按发生时班级、
   fixture.db.prepare(`UPDATE class_memberships SET status = 'disabled'
     WHERE class_id = 'class-a' AND user_id = 'student-01'`).run()
   const historical = await fixture.domain.getScopedSummary({
-    organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'teacher-workspace-a',
+    organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'student-workspace-a',
   }, { classId: 'class-a', statDate: '2026-08-10' })
   assert.equal(historical.class.activeStudentCount, 1)
   assert.equal(historical.summary.checkedInStudentCount, 2)
@@ -411,7 +412,7 @@ test('/scope 严格校验必填 query、组织 404、同组织越权 403 和 stu
   const fixture = createFixture({ studentCount: 1 })
   t.after(() => fixture.close())
   const teacherAuth = {
-    organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'teacher-workspace-a',
+    organizationId: 'org-a', userId: 'teacher-a', workspaceId: 'student-workspace-a',
   }
   await assert.rejects(() => fixture.domain.getScopedSummary(teacherAuth, {
     classId: 'class-a', statDate: '2026-08-10', search: 'student',

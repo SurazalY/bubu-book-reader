@@ -1,6 +1,8 @@
 import { normalizeRoleCode } from './permissions.js'
 import { listActiveRoleAssignments } from './repository.js'
 
+export { computeClassLifecycle, computeGradeId } from './lifecycle.js'
+
 // 书库管理侧角色：控制台需要看到本组织全部书，并可设置书籍可见范围。
 // 学生角色不在此集合内，判定因此是 fail closed：查不到管理角色即按学生处理。
 export const BOOK_LIBRARY_MANAGEMENT_ROLES = new Set([

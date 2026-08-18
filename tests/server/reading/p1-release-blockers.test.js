@@ -3,21 +3,49 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
+import { fileURLToPath } from 'node:url'
 import { DatabaseSync } from 'node:sqlite'
+import { openSqliteDatabase } from '../../../server/db/database.js'
+import { runMigrations } from '../../../server/db/migrate.js'
 import { createSchoolbagBridge, createSchoolbagSimulator } from '../../../server/domains/bridge/schoolbag.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
+import { grantBookToClass } from '../helpers/phase8-old-fixture.js'
+
+const NOW = '2026-08-05T10:00:00.000Z'
+const migrationDirectory = fileURLToPath(new URL('../../../server/db/migrations/', import.meta.url))
+
+function seedIdentity(db, { organizationId, userId, workspaceId, classId }) {
+  db.prepare(`INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version)
+    VALUES (?, ?, ?, 'active', ?, ?, 1)`).run(organizationId, organizationId, organizationId, NOW, NOW)
+  db.prepare(`INSERT INTO users
+      (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code)
+    VALUES (?, ?, ?, ?, 'active', ?, ?, 1, ?, ?)`).run(userId, organizationId, userId, userId, NOW, NOW, userId, `A-${userId}`)
+  db.prepare(`INSERT INTO classes
+      (id, organization_id, grade_id, name, status, created_at, updated_at, version)
+    VALUES (?, ?, 'grade-a', ?, 'active', ?, ?, 1)`).run(classId, organizationId, classId, NOW, NOW)
+  db.prepare(`INSERT INTO workspaces
+      (id, organization_id, code, name, scope_type, scope_id, status, created_at, updated_at, version)
+    VALUES (?, ?, 'class-teacher', ?, 'class', ?, 'active', ?, ?, 1)`)
+    .run(workspaceId, organizationId, workspaceId, classId, NOW, NOW)
+  db.prepare(`INSERT INTO workspace_memberships
+      (id, user_id, workspace_id, status, created_at, updated_at, version)
+    VALUES (?, ?, ?, 'active', ?, ?, 1)`).run(`${workspaceId}:${userId}`, userId, workspaceId, NOW, NOW)
+  db.prepare(`INSERT INTO class_memberships
+      (id, class_id, user_id, membership_role, status, created_at, updated_at, version)
+    VALUES (?, ?, ?, 'student', 'active', ?, ?, 1)`).run(`${classId}:${userId}`, classId, userId, NOW, NOW)
+}
 
 function createFixture() {
   const directory = mkdtempSync(path.join(tmpdir(), 'bubu-c-p1-'))
-  const db = new DatabaseSync(path.join(directory, 'p1.sqlite'))
-  db.exec('CREATE TABLE organizations (id TEXT PRIMARY KEY); CREATE TABLE users (id TEXT PRIMARY KEY); CREATE TABLE classes (id TEXT PRIMARY KEY);')
-  const migrationDirectory = new URL('../../../server/db/migrations/', import.meta.url)
-  const migrations = readdirSync(migrationDirectory).filter((file) => /^01[0-3].*\.sql$/.test(file)).sort()
-  for (const file of migrations) db.exec(readFileSync(new URL(file, migrationDirectory), 'utf8'))
-  const dualModeMigration = readFileSync(new URL('044_reader_dual_mode_pilot.sql', migrationDirectory), 'utf8')
-  db.exec(dualModeMigration.slice(0, dualModeMigration.indexOf('CREATE TABLE reading_summary_page_coverage')))
+  const db = openSqliteDatabase(path.join(directory, 'p1.sqlite'))
+  runMigrations(db, migrationDirectory, NOW)
+  seedIdentity(db, { organizationId: 'org-1', userId: 'student-1', workspaceId: 'class-1', classId: 'class-scope-1' })
+  seedIdentity(db, { organizationId: 'org-2', userId: 'student-org-2', workspaceId: 'class-2', classId: 'class-scope-2' })
+  db.prepare(`INSERT INTO users
+      (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code)
+    VALUES (?, ?, ?, ?, 'active', ?, ?, 1, ?, ?)`).run('student-2', 'org-1', 'student-2', 'student-2', NOW, NOW, 'student-2', 'A-student-2')
   let idIndex = 0
-  let now = new Date('2026-08-05T10:00:00.000Z')
+  let now = new Date(NOW)
   const dependencies = {
     db,
     actor: { id: 'student-1' },
@@ -42,6 +70,14 @@ async function createBook(fixture) {
     pages: [{ pageNo: 1, width: 100, height: 100, textContent: 'local integration/internal test', blocks: [] }],
   })
   await reading.publishBook(created.bookId)
+  grantBookToClass(fixture.db, {
+    bookId: created.bookId,
+    classId: fixture.dependencies.workspace.organizationId === 'org-2' ? 'class-scope-2' : 'class-scope-1',
+    organizationId: fixture.dependencies.workspace.organizationId,
+    actorId: fixture.dependencies.actor.id,
+    bookVersionId: created.versionId,
+    now: NOW,
+  })
   return { reading, ...created }
 }
 
@@ -205,6 +241,7 @@ test('P1: offline sequence 唯一键和查询均包含 organization', async (t) 
   fixture.setNow('2026-08-05T10:01:00.000Z')
   const otherDependencies = {
     ...fixture.dependencies,
+    actor: { id: 'student-org-2' },
     workspace: { id: 'class-2', organizationId: 'org-2' },
   }
   const otherReading = createReadingDomain(otherDependencies)
@@ -213,6 +250,14 @@ test('P1: offline sequence 唯一键和查询均包含 organization', async (t) 
     pages: [{ pageNo: 1, width: 100, height: 100, textContent: 'local integration/internal test', blocks: [] }],
   })
   await otherReading.publishBook(otherBook.bookId)
+  grantBookToClass(fixture.db, {
+    bookId: otherBook.bookId,
+    classId: 'class-scope-2',
+    organizationId: 'org-2',
+    actorId: 'student-org-2',
+    bookVersionId: otherBook.versionId,
+    now: NOW,
+  })
   await otherReading.acquireLease({ deviceId: 'shared-tablet', bookVersionId: otherBook.versionId })
   const secondEvent = annotationEvent(otherBook.versionId, {
     id: 'org-2-event', deviceId: 'shared-tablet', clientOccurredAt: '2026-08-05T10:01:00.000Z', offlineSequence: 91,

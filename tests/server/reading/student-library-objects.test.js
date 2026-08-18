@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url'
 import { appendAuditEvent } from '../../../server/db/reliability.js'
 import { openSqliteDatabase } from '../../../server/db/database.js'
 import { runMigrations } from '../../../server/db/migrate.js'
+import { grantBookToClass } from '../helpers/phase8-old-fixture.js'
 
 async function loadDomain() {
   return import('../../../server/domains/reading/library-objects.js')
@@ -15,14 +16,18 @@ async function loadDomain() {
 
 function insertIdentity(db, { organizationId, workspaceId, actorId, username }) {
   const now = '2026-08-06T05:00:00.000Z'
-  db.prepare(`INSERT INTO organizations (id, name, status, created_at, updated_at, version)
-    VALUES (?, ?, 'active', ?, ?, 1)`).run(organizationId, `${organizationId} school`, now, now)
-  db.prepare(`INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version)
-    VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`).run(actorId, organizationId, username, `${actorId} display`, now, now)
+  db.prepare(`INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version)
+    VALUES (?, ?, ?, 'active', ?, ?, 1)`).run(organizationId, `${organizationId} school`, organizationId, now, now)
+  db.prepare(`INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code)
+    VALUES (?, ?, ?, ?, 'active', ?, ?, 1, ?, ?)`).run(actorId, organizationId, username, `${actorId} display`, now, now, username, `A-${actorId}`)
   db.prepare(`INSERT INTO workspaces (id, organization_id, code, name, scope_type, scope_id, status, created_at, updated_at, version)
     VALUES (?, ?, 'class-teacher', ?, 'class', ?, 'active', ?, ?, 1)`).run(workspaceId, organizationId, `${workspaceId} workspace`, `${workspaceId}-class`, now, now)
   db.prepare(`INSERT INTO workspace_memberships (id, user_id, workspace_id, status, created_at, updated_at, version)
     VALUES (?, ?, ?, 'active', ?, ?, 1)`).run(`${workspaceId}:${actorId}`, actorId, workspaceId, now, now)
+  db.prepare(`INSERT INTO classes (id, organization_id, grade_id, name, status, created_at, updated_at, version)
+    VALUES (?, ?, 'grade-a', ?, 'active', ?, ?, 1)`).run(`${workspaceId}-class`, organizationId, `${workspaceId} class`, now, now)
+  db.prepare(`INSERT INTO class_memberships (id, class_id, user_id, membership_role, status, created_at, updated_at, version)
+    VALUES (?, ?, ?, 'student', 'active', ?, ?, 1)`).run(`${workspaceId}-class:${actorId}`, `${workspaceId}-class`, actorId, now, now)
 }
 
 function insertBook(db, { organizationId, actorId, bookId, versionId, title }) {
@@ -41,6 +46,14 @@ function insertBook(db, { organizationId, actorId, bookId, versionId, title }) {
   ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 100, 20, ?, ?, 1)`)
   insertBlock.run(`${versionId}:block:1`, `${versionId}:page:1`, 'paragraph-1', 'paragraph-1', '第一段真实正文，可以保存为摘录。', 0, 16, now, now)
   insertBlock.run(`${versionId}:block:2`, `${versionId}:page:2`, 'paragraph-2', 'paragraph-2', '第二页真实正文。', 0, 8, now, now)
+  grantBookToClass(db, {
+    bookId,
+    classId: `${organizationId === 'org-a' ? 'workspace-a' : 'workspace-b'}-class`,
+    organizationId,
+    actorId,
+    now,
+    bookVersionId: versionId,
+  })
 }
 
 function createFixture() {

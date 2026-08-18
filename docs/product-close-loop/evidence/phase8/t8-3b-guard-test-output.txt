@@ -1,0 +1,458 @@
+TAP version 13
+# (node:34356) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: H. POST /classes 必须用 class.create，resourceScope 必须带服务端计算的 gradeId
+ok 1 - H. POST /classes 必须用 class.create，resourceScope 必须带服务端计算的 gradeId
+  ---
+  duration_ms: 1.37
+  type: 'test'
+  ...
+# Subtest: H. POST /classes body 为 {name,stage,entryYear,classNumber}，服务端生成 gradeId
+ok 2 - H. POST /classes body 为 {name,stage,entryYear,classNumber}，服务端生成 gradeId
+  ---
+  duration_ms: 319.134
+  type: 'test'
+  ...
+# Subtest: H. PATCH 改届别须带 version，并对变更前/后 scope 都校验
+ok 3 - H. PATCH 改届别须带 version，并对变更前/后 scope 都校验
+  ---
+  duration_ms: 278.1287
+  type: 'test'
+  ...
+# Subtest: H. DELETE/restore 软停用 class+workspace，成员与 grants 保留
+ok 4 - H. DELETE/restore 软停用 class+workspace，成员与 grants 保留
+  ---
+  duration_ms: 271.0275
+  type: 'test'
+  ...
+# Subtest: H. 学年计算：固定 now 测 9 月 1 日边界、小学 6 / 初高中 3、upcoming/graduated
+ok 5 - H. 学年计算：固定 now 测 9 月 1 日边界、小学 6 / 初高中 3、upcoming/graduated
+  ---
+  duration_ms: 1.1792
+  type: 'test'
+  ...
+# Subtest: H. grade_group → grade_manager 别名不得再映射
+ok 6 - H. grade_group → grade_manager 别名不得再映射
+  ---
+  duration_ms: 0.4826
+  type: 'test'
+  ...
+# Subtest: H. 教师不得 POST /classes；跨组织 classId 与不存在同码同文案
+ok 7 - H. 教师不得 POST /classes；跨组织 classId 与不存在同码同文案
+  ---
+  duration_ms: 297.5226
+  type: 'test'
+  ...
+# (node:28092) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. 注册后零成员关系、一条 pending
+ok 8 - F. 注册后零成员关系、一条 pending
+  ---
+  duration_ms: 384.0604
+  type: 'test'
+  ...
+# Subtest: F. 批准一次性建学生三关系
+ok 9 - F. 批准一次性建学生三关系
+  ---
+  duration_ms: 280.5003
+  type: 'test'
+  ...
+# Subtest: F. 拒绝后可新申请；终态不可改 → 409 VERSION_CONFLICT
+ok 10 - F. 拒绝后可新申请；终态不可改 → 409 VERSION_CONFLICT
+  ---
+  duration_ms: 290.9857
+  type: 'test'
+  ...
+# Subtest: F. 重复 pending / 已有 active 班 / 教师审别班 / grade_manager 跨届 全部拒绝
+ok 11 - F. 重复 pending / 已有 active 班 / 教师审别班 / grade_manager 跨届 全部拒绝
+  ---
+  duration_ms: 290.6611
+  type: 'test'
+  ...
+# Subtest: F. If-Match 优先于 body version：If-Match 当前 + body 过期 → 200
+ok 12 - F. If-Match 优先于 body version：If-Match 当前 + body 过期 → 200
+  ---
+  duration_ms: 276.1165
+  type: 'test'
+  ...
+# Subtest: F. 并发两个批准：只有一次物化学生三关系，另一次 409
+ok 13 - F. 并发两个批准：只有一次物化学生三关系，另一次 409
+  ---
+  duration_ms: 260.2013
+  type: 'test'
+  ...
+# Subtest: F. If-Match 优先于 body version：If-Match 过期 + body 当前 → 409 VERSION_CONFLICT
+ok 14 - F. If-Match 优先于 body version：If-Match 过期 + body 当前 → 409 VERSION_CONFLICT
+  ---
+  duration_ms: 241.7985
+  type: 'test'
+  ...
+# (node:67248) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\core\\phase8-identity-guards\\harness.guard.test.js
+ok 3 - tests\\server\\core\\phase8-identity-guards\\harness.guard.test.js
+  ---
+  duration_ms: 175.0834
+  type: 'test'
+  ...
+# (node:33848) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. POST /auth/login 只接受 {schoolCode, loginName, password} 且登录成功
+ok 16 - A. POST /auth/login 只接受 {schoolCode, loginName, password} 且登录成功
+  ---
+  duration_ms: 391.1642
+  type: 'test'
+  ...
+# Subtest: A. username-only 登录不得再成功
+ok 17 - A. username-only 登录不得再成功
+  ---
+  duration_ms: 269.0486
+  type: 'test'
+  ...
+# Subtest: A. 登录失败统一 401「学校、账号或密码错误」
+ok 18 - A. 登录失败统一 401「学校、账号或密码错误」
+  ---
+  duration_ms: 348.1427
+  type: 'test'
+  ...
+# Subtest: A. pending 学生登录 200，defaultPath=/student/onboarding，activeWorkspaceId=null
+ok 19 - A. pending 学生登录 200，defaultPath=/student/onboarding，activeWorkspaceId=null
+  ---
+  duration_ms: 294.7417
+  type: 'test'
+  ...
+# Subtest: A. V 成立且零 active 教师班：defaultPath=/console/select-class
+ok 20 - A. V 成立且零 active 教师班：defaultPath=/console/select-class
+  ---
+  duration_ms: 301.5222
+  type: 'test'
+  ...
+# Subtest: A. 不得把空 defaultPath 当成登录失败
+ok 21 - A. 不得把空 defaultPath 当成登录失败
+  ---
+  duration_ms: 289.8445
+  type: 'test'
+  ...
+# (node:64572) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 密码重置矩阵：教师对本班学生允许，对他班学生/本校教师拒绝
+ok 22 - G. 密码重置矩阵：教师对本班学生允许，对他班学生/本校教师拒绝
+  ---
+  duration_ms: 336.3985
+  type: 'test'
+  ...
+# Subtest: G. 密码重置矩阵：年级主任对本届学生+本校教师允许，跨届学生拒绝
+ok 23 - G. 密码重置矩阵：年级主任对本届学生+本校教师允许，跨届学生拒绝
+  ---
+  duration_ms: 289.0539
+  type: 'test'
+  ...
+# Subtest: G. 密码重置矩阵：校长全校允许；platform 对校长允许；跨组织 404
+ok 24 - G. 密码重置矩阵：校长全校允许；platform 对校长允许；跨组织 404
+  ---
+  duration_ms: 294.3222
+  type: 'test'
+  ...
+# Subtest: G. 重置码 30 分钟、撤销、单次；失败密码不消费；旧 session 全失效
+ok 25 - G. 重置码 30 分钟、撤销、单次；失败密码不消费；旧 session 全失效
+  ---
+  duration_ms: 336.8488
+  type: 'test'
+  ...
+# Subtest: G. 审计不含 token/password/hash
+ok 26 - G. 审计不含 token/password/hash
+  ---
+  duration_ms: 304.3909
+  type: 'test'
+  ...
+# (node:58932) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: I. roleActions：teacher 有 shelf 无 catalog；行政无 shelf/catalog；platform 有 catalog 无 shelf
+ok 27 - I. roleActions：teacher 有 shelf 无 catalog；行政无 shelf/catalog；platform 有 catalog 无 shelf
+  ---
+  duration_ms: 1.4996
+  type: 'test'
+  ...
+# Subtest: I. 废止 teacher.affiliation.approve：无 action
+ok 28 - I. 废止 teacher.affiliation.approve：无 action
+  ---
+  duration_ms: 0.3393
+  type: 'test'
+  ...
+# Subtest: I. teacher.affiliation.join_self / leave_self：允许 + 同组织越 scope 拒绝 + 跨组织 404
+ok 29 - I. teacher.affiliation.join_self / leave_self：允许 + 同组织越 scope 拒绝 + 跨组织 404
+  ---
+  duration_ms: 372.4486
+  type: 'test'
+  ...
+# Subtest: I. teacher.affiliation.force_assign / force_remove：允许 + 越 scope 403 + 跨组织 404
+ok 30 - I. teacher.affiliation.force_assign / force_remove：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 301.7148
+  type: 'test'
+  ...
+# Subtest: I. student.enrollment.review：允许 + 越 scope 403 + 跨组织 404
+ok 31 - I. student.enrollment.review：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 288.2471
+  type: 'test'
+  ...
+# Subtest: I. 10.2 写动作在 roleActions 中的允许/拒绝抽样
+ok 32 - I. 10.2 写动作在 roleActions 中的允许/拒绝抽样
+  ---
+  duration_ms: 0.7974
+  type: 'test'
+  ...
+# Subtest: I. registration.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+ok 33 - I. registration.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 279.2368
+  type: 'test'
+  ...
+# Subtest: I. password_reset.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+ok 34 - I. password_reset.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 275.636
+  type: 'test'
+  ...
+# Subtest: I. class.create：允许 + 越 scope 403 + 跨组织 404
+ok 35 - I. class.create：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 265.3658
+  type: 'test'
+  ...
+# Subtest: I. 行政角色指派：platform 指派校长 / 校长指派年级主任；越权 403；跨组织 404
+ok 36 - I. 行政角色指派：platform 指派校长 / 校长指派年级主任；越权 403；跨组织 404
+  ---
+  duration_ms: 254.1374
+  type: 'test'
+  ...
+# (node:67596) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. teacher/student 凭据分开；body 出现 role/organizationId/scopeId → 400
+ok 37 - E. teacher/student 凭据分开；body 出现 role/organizationId/scopeId → 400
+  ---
+  duration_ms: 327.3725
+  type: 'test'
+  ...
+# Subtest: E. 组织只从 token 反查；公开消费原文不落库、不进审计
+ok 38 - E. 组织只从 token 反查；公开消费原文不落库、不进审计
+  ---
+  duration_ms: 319.2632
+  type: 'test'
+  ...
+# Subtest: E. 撤销/到期/用尽公开端统一 404
+ok 39 - E. 撤销/到期/用尽公开端统一 404
+  ---
+  duration_ms: 273.1901
+  type: 'test'
+  ...
+# Subtest: E. 人数上限最后一名额并发只有一个成功；失败不计 use
+ok 40 - E. 人数上限最后一名额并发只有一个成功；失败不计 use
+  ---
+  duration_ms: 307.7173
+  type: 'test'
+  ...
+# Subtest: E. 同 loginName 跨校可注册；同校冲突 409 + details.suggestions 3 个
+ok 41 - E. 同 loginName 跨校可注册；同校冲突 409 + details.suggestions 3 个
+  ---
+  duration_ms: 305.5759
+  type: 'test'
+  ...
+# Subtest: E. 教师/学生默认 TTL 与 max_uses 可被显式覆盖
+ok 42 - E. 教师/学生默认 TTL 与 max_uses 可被显式覆盖
+  ---
+  duration_ms: 255.6052
+  type: 'test'
+  ...
+# Subtest: E. 教师默认 7 天 max_uses=1；学生默认 180 天 max_uses=NULL
+ok 43 - E. 教师默认 7 天 max_uses=1；学生默认 180 天 max_uses=NULL
+  ---
+  duration_ms: 234.7257
+  type: 'test'
+  ...
+# Subtest: E. grade_manager 签发学生凭据必须是自己的 grade scope，body 改 scopeId → 400
+ok 44 - E. grade_manager 签发学生凭据必须是自己的 grade scope，body 改 scopeId → 400
+  ---
+  duration_ms: 219.5489
+  type: 'test'
+  ...
+# Subtest: E. grade_manager 可签发教师凭据（school 例外），但不能跨届建班/改学生
+ok 45 - E. grade_manager 可签发教师凭据（school 例外），但不能跨届建班/改学生
+  ---
+  duration_ms: 217.3437
+  type: 'test'
+  ...
+# (node:59048) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: J. 临时库路径不得是 server/data/readmate.sqlite
+ok 46 - J. 临时库路径不得是 server/data/readmate.sqlite
+  ---
+  duration_ms: 280.0582
+  type: 'test'
+  ...
+# Subtest: J. session-only 与公开注册必须打 identity router，禁止 integration-router
+ok 47 - J. session-only 与公开注册必须打 identity router，禁止 integration-router
+  ---
+  duration_ms: 1.0123
+  type: 'test'
+  ...
+# Subtest: J. 跨组织 id 与不存在 id 同码同文案 404
+ok 48 - J. 跨组织 id 与不存在 id 同码同文案 404
+  ---
+  duration_ms: 289.0436
+  type: 'test'
+  ...
+# Subtest: J. 缺失路由不得 fallback 成 200；POST /students 也不得再 200
+ok 49 - J. 缺失路由不得 fallback 成 200；POST /students 也不得再 200
+  ---
+  duration_ms: 277.5561
+  type: 'test'
+  ...
+# Subtest: J. 本套守卫只声明真库路径，绝不把 createIdentityTestApp 指向它
+ok 50 - J. 本套守卫只声明真库路径，绝不把 createIdentityTestApp 指向它
+  ---
+  duration_ms: 272.661
+  type: 'test'
+  ...
+# (node:64068) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. session-only 路由只挂 identity router，且不经过 requireWorkspace
+ok 51 - C. session-only 路由只挂 identity router，且不经过 requireWorkspace
+  ---
+  duration_ms: 1.5328
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace pending 学生可 GET /onboarding/me（无 X-Workspace-Id）
+ok 52 - C. 零 workspace pending 学生可 GET /onboarding/me（无 X-Workspace-Id）
+  ---
+  duration_ms: 337.2609
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace 的 V 教师可 GET /teacher/class-directory（无 X-Workspace-Id）
+ok 53 - C. 零 workspace 的 V 教师可 GET /teacher/class-directory（无 X-Workspace-Id）
+  ---
+  duration_ms: 283.6893
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace 的 V 教师可 PUT join，且不得为 V 创建 school 范围 teacher role
+ok 54 - C. 零 workspace 的 V 教师可 PUT join，且不得为 V 创建 school 范围 teacher role
+  ---
+  duration_ms: 295.5426
+  type: 'test'
+  ...
+# Subtest: C. 教师调用 GET /classes → 403
+ok 55 - C. 教师调用 GET /classes → 403
+  ---
+  duration_ms: 268.6135
+  type: 'test'
+  ...
+# Subtest: C. GET /classes 仅 S/G 可访问
+ok 56 - C. GET /classes 仅 S/G 可访问
+  ---
+  duration_ms: 285.0345
+  type: 'test'
+  ...
+# Subtest: C. 已入班教师看本班走 GET /classes/:classId + C
+ok 57 - C. 已入班教师看本班走 GET /classes/:classId + C
+  ---
+  duration_ms: 247.9431
+  type: 'test'
+  ...
+# (node:67872) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. identity router 不得再注册 POST /students（无兼容 handler / 假 404 分支）
+ok 58 - B. identity router 不得再注册 POST /students（无兼容 handler / 假 404 分支）
+  ---
+  duration_ms: 0.9559
+  type: 'test'
+  ...
+# Subtest: B. POST /students 必须由标准不存在路由返回 404，且不能再物化已入班学生
+ok 59 - B. POST /students 必须由标准不存在路由返回 404，且不能再物化已入班学生
+  ---
+  duration_ms: 344.3933
+  type: 'test'
+  ...
+# (node:12580) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. join_self：session-only + V，立即生效，已 active 则 200 幂等且不得产生第二组
+ok 60 - D. join_self：session-only + V，立即生效，已 active 则 200 幂等且不得产生第二组
+  ---
+  duration_ms: 352.1783
+  type: 'test'
+  ...
+# Subtest: D. leave_self：不要求 X-Workspace-Id；完整 active → 同事务停用三者 200
+ok 61 - D. leave_self：不要求 X-Workspace-Id；完整 active → 同事务停用三者 200
+  ---
+  duration_ms: 268.9076
+  type: 'test'
+  ...
+# Subtest: D. leave_self：完整 disabled 或三者皆无 → 200 no-op；不得因 disabled/absent 先 403
+ok 62 - D. leave_self：完整 disabled 或三者皆无 → 200 no-op；不得因 disabled/absent 先 403
+  ---
+  duration_ms: 279.9345
+  type: 'test'
+  ...
+# Subtest: D. leave_self：残缺三元组 → 500 IDENTITY_INVARIANT_VIOLATION，且不自动修
+ok 63 - D. leave_self：残缺三元组 → 500 IDENTITY_INVARIANT_VIOLATION，且不自动修
+  ---
+  duration_ms: 269.6139
+  type: 'test'
+  ...
+# Subtest: D. leave_self / join_self：class 不存在与跨组织同码同文案 404
+ok 64 - D. leave_self / join_self：class 不存在与跨组织同码同文案 404
+  ---
+  duration_ms: 280.0508
+  type: 'test'
+  ...
+# Subtest: D. 外校 / disabled / graduated 拒绝加入
+ok 65 - D. 外校 / disabled / graduated 拒绝加入
+  ---
+  duration_ms: 238.7975
+  type: 'test'
+  ...
+# Subtest: D. 并发两个 join 最终只有一组三元组
+ok 66 - D. 并发两个 join 最终只有一组三元组
+  ---
+  duration_ms: 246.9672
+  type: 'test'
+  ...
+# Subtest: D. 任一表故意缺失时不自动修，报不变量错误
+ok 67 - D. 任一表故意缺失时不自动修，报不变量错误
+  ---
+  duration_ms: 215.2676
+  type: 'test'
+  ...
+# Subtest: D. teacher.affiliation.approve 不得存在（无 action、无路由、无 pending 教师审批模型）
+ok 68 - D. teacher.affiliation.approve 不得存在（无 action、无路由、无 pending 教师审批模型）
+  ---
+  duration_ms: 1.1075
+  type: 'test'
+  ...
+# Subtest: D. teacherCount 计完整 active 三元组；三表人数不一致 → IDENTITY_INVARIANT_VIOLATION
+ok 69 - D. teacherCount 计完整 active 三元组；三表人数不一致 → IDENTITY_INVARIANT_VIOLATION
+  ---
+  duration_ms: 216.6642
+  type: 'test'
+  ...
+# Subtest: D. 强制指派/移除：S/G；目标须同校已验证教师；200 幂等；教师调用 403
+ok 70 - D. 强制指派/移除：S/G；目标须同校已验证教师；200 幂等；教师调用 403
+  ---
+  duration_ms: 227.1051
+  type: 'test'
+  ...
+# Subtest: D. 行政纠错 PATCH /students/:userId/class：教师 403；源+目标对称校验；目标即当前班 200 且不掩盖残缺
+ok 71 - D. 行政纠错 PATCH /students/:userId/class：教师 403；源+目标对称校验；目标即当前班 200 且不掩盖残缺
+  ---
+  duration_ms: 214.8015
+  type: 'test'
+  ...
+1..71
+# tests 71
+# suites 0
+# pass 71
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3087.6132

@@ -1,6 +1,8 @@
-import { hasBookLibraryManagementRole } from '../identity/class-scope.js'
-import { findUserScope } from '../identity/repository.js'
+import { findUserScope, listActiveRoleAssignments } from '../identity/repository.js'
 import { all, one } from './sql.js'
+
+const PLATFORM_LIBRARY_ROLES = new Set(['platform_ops', 'platform_operator'])
+const TEACHER_LIBRARY_ROLES = new Set(['teacher', 'class_teacher'])
 
 // T4.3 唯一的“当前版本”口径。listBooks 的 JOIN、可见范围读写、引用检查都由这里生成 SQL，
 // 保证 grants 写入的 book_version_id 与过滤读取解析出的版本永远同源。
@@ -16,24 +18,38 @@ export function resolveCurrentBookVersionId(database, { bookId, organizationId }
 
 // 陷阱一：不使用 context.authorize（默认 fail-open），直接用 role_assignments 做正向角色判定。
 // 陷阱二：学生班级来自 class_memberships，不是请求头里的工作空间 scopeId。
-export function resolveBookAudience(database, { organizationId, userId, workspaceId }) {
-  if (hasBookLibraryManagementRole(database, { organizationId, userId, workspaceId })) {
-    return { unrestricted: true, classIds: [] }
-  }
-  const scope = organizationId && userId ? findUserScope(database, userId) : null
-  if (!scope || scope.organizationId !== organizationId) return { unrestricted: false, classIds: [] }
-  return { unrestricted: false, classIds: scope.classIds }
+// D-25：校长 / 年级主任不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience。
+// 只正向识别 platform / teacher；其余一律 closed（含 school_admin、grade_manager、学生）。
+function resolveLibraryAudienceKind(database, { organizationId, userId, workspaceId }) {
+  if (!organizationId || !userId || !workspaceId) return 'closed'
+  const roles = new Set(
+    listActiveRoleAssignments(database, userId, workspaceId, organizationId)
+      .map((assignment) => assignment.roleCode),
+  )
+  if ([...roles].some((roleCode) => PLATFORM_LIBRARY_ROLES.has(roleCode))) return 'platform'
+  if ([...roles].some((roleCode) => TEACHER_LIBRARY_ROLES.has(roleCode))) return 'teacher'
+  return 'closed'
 }
 
-// F-4：这里有意不过滤 grantee_type。book_access_grants.grantee_type 没有 CHECK 约束，
-// 未来若新增学科/学生粒度的授权类型，「有未知类型的 grant」会被判成“受限”——书对学生消失，
-// 是 fail closed 的安全方向；若收敛成只认 grantee_type='class'，未知类型就变成 fail open
-// （书对全组织敞开），方向反了。与之配套的前提是：scope=organization 的 DELETE 会清除本书
-// 全部版本上的全部类型 grants，所以「恢复全组织可见」这条逃生通道在任何类型下都有效。
-const BOOK_HAS_GRANTS_SQL = `SELECT 1 FROM book_access_grants AS grant_row
-  JOIN book_versions AS version ON version.id = grant_row.book_version_id
-  WHERE version.book_id = :bookId AND version.organization_id_at_creation = :organizationId
-  LIMIT 1`
+export function resolveBookAudience(database, { organizationId, userId, workspaceId }) {
+  const kind = resolveLibraryAudienceKind(database, { organizationId, userId, workspaceId })
+  if (kind === 'platform') {
+    return { bypassClassGrants: true, allowUnpublished: true, classIds: [] }
+  }
+  if (kind === 'teacher') {
+    const scope = userId ? findUserScope(database, userId) : null
+    return {
+      bypassClassGrants: true,
+      allowUnpublished: false,
+      classIds: scope && scope.organizationId === organizationId ? scope.classIds : [],
+    }
+  }
+  const scope = organizationId && userId ? findUserScope(database, userId) : null
+  if (!scope || scope.organizationId !== organizationId) {
+    return { bypassClassGrants: false, allowUnpublished: false, classIds: [] }
+  }
+  return { bypassClassGrants: false, allowUnpublished: false, classIds: scope.classIds }
+}
 
 const BOOK_GRANTED_TO_CLASS_SQL = `SELECT 1 FROM book_access_grants AS grant_row
   JOIN book_versions AS version ON version.id = grant_row.book_version_id
@@ -43,11 +59,13 @@ const BOOK_GRANTED_TO_CLASS_SQL = `SELECT 1 FROM book_access_grants AS grant_row
     AND grant_row.grantee_id IN (SELECT value FROM json_each(:classIdsJson))
   LIMIT 1`
 
-// 四个入口共用的唯一可见性谓词：没有任何 grants 行 → 全组织可见；有 grants 行 → 仅被授权班级可见。
+// 四个入口共用的唯一可见性谓词：只回答 class grant。
+// bypassClassGrants 只绕过班级 grant，不表示可以看 draft。
+// classIds 为空即 false；仅匹配 grantee_type='class' 的 grant 才 true。
+// 未知 grantee_type 不得视为可见，也不得因「无 class grant」退回全开。
 export function isBookVisibleToAudience(database, { bookId, organizationId, audience }) {
-  if (audience?.unrestricted) return true
+  if (audience?.bypassClassGrants) return true
   if (!bookId || !organizationId) return false
-  if (!one(database, BOOK_HAS_GRANTS_SQL, { bookId, organizationId })) return true
   const classIds = audience?.classIds ?? []
   if (classIds.length === 0) return false
   return Boolean(one(database, BOOK_GRANTED_TO_CLASS_SQL, {

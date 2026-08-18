@@ -56,13 +56,13 @@ function seedCleanupDatabase(databasePath) {
   const db = openSqliteDatabase(databasePath)
   runMigrations(db, migrationDirectory, '2026-08-09T00:00:00.000Z')
   const createdAt = '2026-01-01T00:00:00.000Z'
-  db.prepare(`INSERT INTO organizations (id, name, status, created_at, updated_at, version)
-    VALUES ('cleanup-org', '清理命令测试组织', 'active', ?, ?, 1)`).run(createdAt, createdAt)
+  db.prepare(`INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version)
+    VALUES ('cleanup-org', '清理命令测试组织', 'cleanup-org', 'active', ?, ?, 1)`).run(createdAt, createdAt)
   for (const actorId of ['cleanup-student-a', 'cleanup-student-b', 'cleanup-student-c']) {
     db.prepare(`INSERT INTO users (
-        id, organization_id, username, display_name, status, created_at, updated_at, version
-      ) VALUES (?, 'cleanup-org', ?, ?, 'active', ?, ?, 1)`)
-      .run(actorId, actorId, actorId, createdAt, createdAt)
+        id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code
+      ) VALUES (?, 'cleanup-org', ?, ?, 'active', ?, ?, 1, ?, ?)`)
+      .run(actorId, actorId, actorId, createdAt, createdAt, actorId, `A-${actorId}`)
   }
   db.prepare(`INSERT INTO workspaces (
       id, organization_id, code, name, scope_type, scope_id, status, created_at, updated_at, version

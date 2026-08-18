@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 
 import express from 'express'
 
-import { createIdentityModule } from './domains/identity/index.js'
+import { createIdentityModule, sendApiNotFound } from './domains/identity/index.js'
 import { createIntegrationRouter } from './http/integration-router.js'
 
 const serverDirectory = path.dirname(fileURLToPath(import.meta.url))
@@ -41,6 +41,7 @@ export function createReadmateApplication(options = {}) {
   app.disable('x-powered-by')
   app.use('/api/v1', identity.router)
   app.use('/api/v1', integration.router)
+  app.use('/api/v1', sendApiNotFound)
 
   if (options.serveStatic !== false) {
     app.use('/books', (_req, res) => res.status(404).end())

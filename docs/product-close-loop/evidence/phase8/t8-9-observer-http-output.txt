@@ -1,0 +1,13 @@
+HEALTH status=200 {"data":{"status":"ok","database":"sqlite","migrations":34},"meta":{"requestId":"f870d7b1-d043-4d7f-8bc1-95eed1a55700","serverTime":"2026-08-18T14:01:02.842Z"}}
+PASSWORD env INTERNAL_DEMO_PASSWORD present len=20
+OLD_LOGIN status=400 code=VALIDATION_FAILED message=schoolCode、loginName 与 password 均为必填项
+NEW_STUDENT_EXISTING status=200 userId=internal-demo-student workspace=internal-demo-workspace code=
+EXISTING_STUDENT_BOOKS status=200 count=49 first=book-049 last=book-001 vsPostAdded=0 vsPostRemoved=0 vsPreAdded=0 vsPreRemoved=0
+TEACHER_LOGIN status=200 userId=internal-teacher-li workspace=internal-demo-workspace
+TEACHER_PUBLISH status=403 code=PERMISSION_DENIED message=当前工作空间无权执行此操作
+TEACHER_UNPUBLISH status=403 code=PERMISSION_DENIED message=当前工作空间无权执行此操作
+NEW_CLASS_STUDENT_LOGIN status=200 userId=bdb84ff0-fedf-4ffe-bebf-c158875e00be workspace=0e31e8b4-a4b9-4c67-a670-afe195a9754a loginNameLen=8
+NEW_CLASS_STUDENT_BOOKS status=200 count=0 ids=[]
+NEW_CLASS_STUDENT_LEASE status=404 version=book-001-trusted-v1 code=RESOURCE_NOT_FOUND message=书籍不存在或当前不可读取
+OPS_LOGIN status=200 userId=internal-ops-admin workspace=internal-demo-platform-workspace
+OPS_DRAFT_LIST status=200 count=0 ids=[]

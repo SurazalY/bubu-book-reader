@@ -18,6 +18,10 @@ import ClassOverview from './pages/ClassOverview.jsx'
 import EyeCare from './pages/classes/EyeCare.jsx'
 import StudentDetail from './pages/accounts/StudentDetail.jsx'
 import StudentDirectory from './pages/accounts/StudentDirectory.jsx'
+import ClassList from './pages/accounts/ClassList.jsx'
+import ClassDetail from './pages/accounts/ClassDetail.jsx'
+import OrgAccounts from './pages/accounts/OrgAccounts.jsx'
+import SelectClass from './pages/SelectClass.jsx'
 import Privacy from './pages/usage/Privacy.jsx'
 import Sessions from './pages/usage/Sessions.jsx'
 import UsageOverview from './pages/usage/UsageOverview.jsx'
@@ -34,6 +38,7 @@ export default function ConsoleApp() {
       <Backdrop />
       <Routes>
         <Route path="login" element={<Login />} />
+        <Route path="select-class" element={<SelectClass />} />
         <Route path="*" element={<ConsoleRuntime />} />
       </Routes>
     </div>
@@ -59,6 +64,9 @@ function ConsoleRuntime() {
           <Route path="classes/eyecare" element={<EyeCare />} />
           <Route path="accounts/students" element={<StudentDirectory />} />
           <Route path="accounts/students/:studentId" element={<StudentDetail />} />
+          <Route path="accounts/classes" element={<ClassList />} />
+          <Route path="accounts/classes/:classId" element={<ClassDetail />} />
+          <Route path="accounts/org" element={<OrgAccounts />} />
           <Route path="classes" element={<Navigate to="/console/classes/overview" replace />} />
           <Route path="usage/overview" element={<UsageOverview />} />
           <Route path="usage/sessions" element={<Sessions />} />

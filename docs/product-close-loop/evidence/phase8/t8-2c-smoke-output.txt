@@ -1,0 +1,25 @@
+=== T8.2C independent smoke ===
+REAL_DATABASE_PATH=D:\Project\整书8.15\server\data\readmate.sqlite
+SMOKE_SCRIPT_PATH=C:\Users\Yak\AppData\Local\Temp\t8-2c-independent-smoke.mjs
+SMOKE1_DB_PATH=C:\Users\Yak\AppData\Local\Temp\t8-2c-fresh-LsvZEL\fresh.sqlite
+SMOKE1_APPLIED_COUNT=34
+SMOKE1_HAS_047_050=true
+SMOKE1_QUICK_CHECK=["ok"]
+SMOKE1_GRANTS=0
+SMOKE2_DB_PATH=C:\Users\Yak\AppData\Local\Temp\t8-2c-staged-b8Rdjo\staged.sqlite
+SMOKE2_PRE_GRANTS=0
+SMOKE2_PRE_PUBLISHED=49
+SMOKE2_PRE_CLASSES=1
+SMOKE2_APPLIED_047_050=["047_login_and_class_identity.sql","048_registration_credentials.sql","049_enrollment_and_password_reset.sql","050_book_access_grant_backfill.sql"]
+SMOKE2_GRANTS=49
+SMOKE2_QUICK_CHECK=["ok"]
+SMOKE2_CHECKSUMS=[{"id":"047_login_and_class_identity.sql","checksum":"de7d7fcad2926427b7b8ed75e9a4bc3691de8fa3a88f8452c30ab9cf99285f48"},{"id":"048_registration_credentials.sql","checksum":"97dcadc912e5c9593b60ccd84ade4987c7208acdd10f75fe42f2b140cf7fccea"},{"id":"049_enrollment_and_password_reset.sql","checksum":"190cfb10e9fef84991724aeb2fe579c3a77dc6a669a61f637a8b70de7eb5cfff"},{"id":"050_book_access_grant_backfill.sql","checksum":"bbb1a4bd103495acfc5e1ffed1e74cc960aae2fa3c2b0ad3ee31982af5eef763"}]
+SMOKE3_APPLIED=[]
+SMOKE3_ALREADY_APPLIED_047_050=["047_login_and_class_identity.sql","048_registration_credentials.sql","049_enrollment_and_password_reset.sql","050_book_access_grant_backfill.sql"]
+SMOKE3_GRANTS=49
+SMOKE3_QUICK_CHECK=["ok"]
+SMOKE3_CHECKSUMS_UNCHANGED=true
+SMOKE_OPENED_REAL_DB=false
+SMOKE_RESULT=PASS
+
+T8_2C_EXIT_CODE=0

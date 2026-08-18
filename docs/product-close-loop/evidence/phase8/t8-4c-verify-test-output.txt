@@ -1,0 +1,262 @@
+TAP version 13
+# (node:62140) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 删除全量 visibility 写模型：setBookVisibility(scope,classIds) 必须不再可用
+ok 1 - 删除全量 visibility 写模型：setBookVisibility(scope,classIds) 必须不再可用
+  ---
+  duration_ms: 195.3443
+  type: 'test'
+  ...
+# Subtest: class-local grant：只增本 class + 当前版本一行，200 幂等，不替换其他班
+ok 2 - class-local grant：只增本 class + 当前版本一行，200 幂等，不替换其他班
+  ---
+  duration_ms: 195.5772
+  type: 'test'
+  ...
+# Subtest: class-local revoke：只删本 class grant，不动其他班、不动未知 grantee_type
+ok 3 - class-local revoke：只删本 class grant，不动其他班、不动未知 grantee_type
+  ---
+  duration_ms: 195.2182
+  type: 'test'
+  ...
+# Subtest: shelf 领域函数禁止再调用 book.publish / setBookVisibility
+ok 4 - shelf 领域函数禁止再调用 book.publish / setBookVisibility
+  ---
+  duration_ms: 180.375
+  type: 'test'
+  ...
+# Subtest: 两个并发 PUT 同班同书最终一行
+ok 5 - 两个并发 PUT 同班同书最终一行
+  ---
+  duration_ms: 181.5594
+  type: 'test'
+  ...
+# Subtest: 一个班撤下不影响他班
+ok 6 - 一个班撤下不影响他班
+  ---
+  duration_ms: 172.4362
+  type: 'test'
+  ...
+# (node:67680) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-21 getPost：有本班 grant 时 quote.text 仍返回
+ok 7 - D-21 getPost：有本班 grant 时 quote.text 仍返回
+  ---
+  duration_ms: 214.8423
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：无 grant 时保留帖子，quote.text=null 且 availability=unavailable
+ok 8 - D-21 getPost：无 grant 时保留帖子，quote.text=null 且 availability=unavailable
+  ---
+  duration_ms: 197.1122
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：仅他班 grant 时隐藏 quote.text
+ok 9 - D-21 getPost：仅他班 grant 时隐藏 quote.text
+  ---
+  duration_ms: 192.8385
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：draft 即使已给本班 grant 也隐藏 quote.text（失败只归因发布状态）
+ok 10 - D-21 getPost：draft 即使已给本班 grant 也隐藏 quote.text（失败只归因发布状态）
+  ---
+  duration_ms: 191.3266
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：旧帖不改数据库；撤 grant 后读隐藏，恢复 grant 后读恢复
+ok 11 - D-21 getPost：旧帖不改数据库；撤 grant 后读隐藏，恢复 grant 后读恢复
+  ---
+  duration_ms: 192.1307
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：教师对 published 可看 quote.text（即使无 class grant）
+ok 12 - D-21 getPost：教师对 published 可看 quote.text（即使无 class grant）
+  ---
+  duration_ms: 171.998
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：跨组织不泄露帖子或 quote.text
+ok 13 - D-21 getPost：跨组织不泄露帖子或 quote.text
+  ---
+  duration_ms: 167.669
+  type: 'test'
+  ...
+# (node:44988) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-23 acquireLease：published + 本班 grant → 成功并产生 lease
+ok 14 - D-23 acquireLease：published + 本班 grant → 成功并产生 lease
+  ---
+  duration_ms: 216.892
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：published + 无 grant → 404「书籍不存在或当前不可读取」，且不得写 lease
+ok 15 - D-23 acquireLease：published + 无 grant → 404「书籍不存在或当前不可读取」，且不得写 lease
+  ---
+  duration_ms: 209.5581
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：draft + 本班 grant → 404，失败只归因发布状态
+ok 16 - D-23 acquireLease：draft + 本班 grant → 404，失败只归因发布状态
+  ---
+  duration_ms: 187.0298
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：外组织版本 → 同码同文案 404，不泄露存在性
+ok 17 - D-23 acquireLease：外组织版本 → 同码同文案 404，不泄露存在性
+  ---
+  duration_ms: 185.2204
+  type: 'test'
+  ...
+# Subtest: D-23：已取得租约后撤下，现有 lease 可按 90 秒规则续到自然结束，结束后新 acquire 404
+ok 18 - D-23：已取得租约后撤下，现有 lease 可按 90 秒规则续到自然结束，结束后新 acquire 404
+  ---
+  duration_ms: 188.7036
+  type: 'test'
+  ...
+# Subtest: D-23：可见性前置必须在任何 lease 写事务之前
+ok 19 - D-23：可见性前置必须在任何 lease 写事务之前
+  ---
+  duration_ms: 166.0595
+  type: 'test'
+  ...
+# Subtest: D-23：takeOverLease 委托 acquire，自动受同一可见性约束
+ok 20 - D-23：takeOverLease 委托 acquire，自动受同一可见性约束
+  ---
+  duration_ms: 171.0537
+  type: 'test'
+  ...
+# (node:55040) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-25：resolveBookAudience 不再返回 unrestricted，改为 bypassClassGrants/allowUnpublished/classIds
+ok 21 - D-25：resolveBookAudience 不再返回 unrestricted，改为 bypassClassGrants/allowUnpublished/classIds
+  ---
+  duration_ms: 200.7911
+  type: 'test'
+  ...
+# Subtest: D-25：platform 的 audience 为 bypassClassGrants=true 且 allowUnpublished=true
+ok 22 - D-25：platform 的 audience 为 bypassClassGrants=true 且 allowUnpublished=true
+  ---
+  duration_ms: 191.3038
+  type: 'test'
+  ...
+# Subtest: D-25：teacher 的 audience 为 bypassClassGrants=true 且 allowUnpublished=false
+ok 23 - D-25：teacher 的 audience 为 bypassClassGrants=true 且 allowUnpublished=false
+  ---
+  duration_ms: 189.6547
+  type: 'test'
+  ...
+# Subtest: D-25：student 的 audience 为 bypassClassGrants=false 且 allowUnpublished=false
+ok 24 - D-25：student 的 audience 为 bypassClassGrants=false 且 allowUnpublished=false
+  ---
+  duration_ms: 184.1042
+  type: 'test'
+  ...
+# Subtest: D-25：校长不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+ok 25 - D-25：校长不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+  ---
+  duration_ms: 182.8895
+  type: 'test'
+  ...
+# Subtest: D-25：年级主任不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+ok 26 - D-25：年级主任不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+  ---
+  duration_ms: 169.9204
+  type: 'test'
+  ...
+# Subtest: D-25：bypassClassGrants=true 只绕过 class grant，不可以把 draft 当成可见书
+ok 27 - D-25：bypassClassGrants=true 只绕过 class grant，不可以把 draft 当成可见书
+  ---
+  duration_ms: 168.2287
+  type: 'test'
+  ...
+# Subtest: D-25：教师书库只列 published；draft/archived 只对 platform
+ok 28 - D-25：教师书库只列 published；draft/archived 只对 platform
+  ---
+  duration_ms: 170.0536
+  type: 'test'
+  ...
+# Subtest: D-25：教师取 draft 资产必须 404，不得靠旧 unrestricted 放行
+ok 29 - D-25：教师取 draft 资产必须 404，不得靠旧 unrestricted 放行
+  ---
+  duration_ms: 163.5143
+  type: 'test'
+  ...
+# Subtest: D-25：新发布图书不自动投放（publish 不得自动写 grant）
+ok 30 - D-25：新发布图书不自动投放（publish 不得自动写 grant）
+  ---
+  duration_ms: 161.2554
+  type: 'test'
+  ...
+# Subtest: D-25：bypassClassGrants=true 在仅有他班 grant 时仍可见，且这只是 grant 旁路
+ok 31 - D-25：bypassClassGrants=true 在仅有他班 grant 时仍可见，且这只是 grant 旁路
+  ---
+  duration_ms: 165.7318
+  type: 'test'
+  ...
+# (node:61496) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 默认全闭：无 grants 时 isBookVisibleToAudience 必须为 false（删除「无任何 grants 即 true」）
+ok 32 - 默认全闭：无 grants 时 isBookVisibleToAudience 必须为 false（删除「无任何 grants 即 true」）
+  ---
+  duration_ms: 213.2474
+  type: 'test'
+  ...
+# Subtest: 默认全闭：仅他班 class grant 时本班学生不可见
+ok 33 - 默认全闭：仅他班 class grant 时本班学生不可见
+  ---
+  duration_ms: 204.6114
+  type: 'test'
+  ...
+# Subtest: 默认全闭：本班 class grant + published 时学生可见
+ok 34 - 默认全闭：本班 class grant + published 时学生可见
+  ---
+  duration_ms: 182.7524
+  type: 'test'
+  ...
+# Subtest: 默认全闭：audience.classIds 为空必须不可见
+ok 35 - 默认全闭：audience.classIds 为空必须不可见
+  ---
+  duration_ms: 180.0262
+  type: 'test'
+  ...
+# Subtest: 默认全闭：未知 grantee_type 不得当可见，也不得靠兼容兜底变 true
+ok 36 - 默认全闭：未知 grantee_type 不得当可见，也不得靠兼容兜底变 true
+  ---
+  duration_ms: 177.0671
+  type: 'test'
+  ...
+# (node:31632) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 不变量：守卫测试不接触真实业务库
+ok 37 - 不变量：守卫测试不接触真实业务库
+  ---
+  duration_ms: 201.3081
+  type: 'test'
+  ...
+# Subtest: 不变量：冻结阅读摘要表 schema 不得被本阶段改动
+ok 38 - 不变量：冻结阅读摘要表 schema 不得被本阶段改动
+  ---
+  duration_ms: 206.0028
+  type: 'test'
+  ...
+# Subtest: 不变量：不得修改 90s TTL 常量与 renew / session-summaries 路由
+ok 39 - 不变量：不得修改 90s TTL 常量与 renew / session-summaries 路由
+  ---
+  duration_ms: 1.4499
+  type: 'test'
+  ...
+# Subtest: 不变量：25 条旧 visibility 守卫文件必须保持未改（T8.7 所有）
+ok 40 - 不变量：25 条旧 visibility 守卫文件必须保持未改（T8.7 所有）
+  ---
+  duration_ms: 55.317
+  type: 'test'
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 40
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2068.7257

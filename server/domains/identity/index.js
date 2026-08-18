@@ -19,8 +19,11 @@ import {
   parseCookies,
 } from '../../middleware/request-context.js'
 
-import { listAuthorizedClasses } from './class-scope.js'
+import { computeClassLifecycle, computeGradeId } from './lifecycle.js'
 import { createIdentityService, workspaceResourceScope } from './service.js'
+import { RESOURCE_NOT_FOUND_MESSAGE, notFound } from './validation.js'
+
+export { computeClassLifecycle, computeGradeId } from './lifecycle.js'
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url))
 
@@ -61,8 +64,10 @@ function idempotencyKey(req) {
   return value
 }
 
-function loginScope(username) {
-  const fingerprint = createHash('sha256').update(username.trim().toLowerCase(), 'utf8').digest('hex')
+function loginScope(schoolCode, loginName) {
+  const fingerprint = createHash('sha256')
+    .update(`${schoolCode.trim().toLowerCase()}:${loginName.trim().toLowerCase()}`, 'utf8')
+    .digest('hex')
   return `auth.login:${fingerprint}`
 }
 
@@ -148,32 +153,35 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
   const requireAccountRead = createRequirePermissionMiddleware(
     service,
     'account.read',
-    (req) => service.getUserScope(req.params.id),
+    (req) => service.getUserScope(req.params.id, req.workspace),
   )
   const requireAccountManage = createRequirePermissionMiddleware(
     service,
     'account.manage',
-    (req) => service.getUserScope(req.params.id),
+    (req) => service.getUserScope(req.params.id, req.workspace),
   )
-  const requireSchoolClassManage = createRequirePermissionMiddleware(
+  const requireClassCreate = createRequirePermissionMiddleware(
     service,
-    'class.manage',
-    (req) => ({
-      type: 'school',
-      id: req.workspace.organizationId,
-      organizationId: req.workspace.organizationId,
-    }),
+    'class.create',
+    (req) => {
+      const gradeId = computeGradeId(req.body?.stage, req.body?.entryYear)
+      return {
+        type: 'grade',
+        id: gradeId,
+        organizationId: req.workspace.organizationId,
+        gradeId,
+      }
+    },
   )
-  const requireClassAccountManage = createRequirePermissionMiddleware(
+  const requireClassDirectory = createRequirePermissionMiddleware(
     service,
-    'account.manage',
-    (req) => service.getClassScope(req.body?.classId),
+    'class.directory.read',
+    (req) => workspaceResourceScope(req.identitySession.user, req.workspace),
   )
-  // 必须带上 classId / gradeId：permissions.js 的 collectScopeIds 认字段名而不是 type 值。
-  const requireWorkspaceClassRead = createRequirePermissionMiddleware(
+  const requireClassRead = createRequirePermissionMiddleware(
     service,
     'class.read',
-    (req) => workspaceResourceScope(req.identitySession.user, req.workspace),
+    (req) => service.getClassScope(req.params.classId, req.workspace),
   )
 
   router.use(express.json({ limit: '1mb' }))
@@ -187,10 +195,11 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
   router.post(
     '/auth/login',
     route((req, res) => {
-      const username = typeof req.body?.username === 'string' ? req.body.username.trim() : ''
+      const schoolCode = typeof req.body?.schoolCode === 'string' ? req.body.schoolCode.trim() : ''
+      const loginName = typeof req.body?.loginName === 'string' ? req.body.loginName.trim() : ''
       const password = typeof req.body?.password === 'string' ? req.body.password : ''
-      if (!username || !password) {
-        throw new HttpError(400, 'VALIDATION_FAILED', 'username 与 password 均为必填项')
+      if (!schoolCode || !loginName || !password) {
+        throw new HttpError(400, 'VALIDATION_FAILED', 'schoolCode、loginName 与 password 均为必填项')
       }
       if (password.length > MAX_PASSWORD_LENGTH) {
         throw new HttpError(400, 'VALIDATION_FAILED', `password 不能超过 ${MAX_PASSWORD_LENGTH} 个字符`)
@@ -199,15 +208,17 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
       const key = idempotencyKey(req)
       const outcome = executeIdempotent(database, {
         key,
-        scope: loginScope(username),
-        request: { username },
+        scope: loginScope(schoolCode, loginName),
+        request: { schoolCode, loginName },
         requestHash: createRuntimeKeyedRequestHash(sessionSecret, {
-          username: username.toLowerCase(),
+          schoolCode: schoolCode.toLowerCase(),
+          loginName: loginName.toLowerCase(),
           password,
         }),
         operation: ({ createdAt }) =>
           service.login({
-            username,
+            schoolCode,
+            loginName,
             password,
             requestId: req.requestId,
             idempotencyKey: key,
@@ -268,7 +279,7 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
         {
           user: req.identitySession.user,
           workspaces,
-          activeWorkspaceId: navigation.defaultWorkspaceId ?? workspaces[0]?.id ?? null,
+          activeWorkspaceId: navigation.defaultWorkspaceId ?? null,
           navigation,
         },
         { requestId: req.requestId },
@@ -284,37 +295,208 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
     ),
   )
 
-  // B-4：设置书籍可见范围的 UI 只能列出操作者授权范围内的班级。
-  // 与 GET /students 不同，这里直接列 classes 表，刚建好还没有学生的空班也能列出来。
+  router.get(
+    '/onboarding/me',
+    requireSession,
+    route((req, res) => sendData(res, service.getOnboardingMe(req.identitySession.user), { requestId: req.requestId })),
+  )
+
+  router.post(
+    '/onboarding/enrollment-requests',
+    requireSession,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.enrollment.request:${req.identitySession.user.id}`,
+        request: { classId: req.body?.classId },
+        operation: ({ createdAt }) =>
+          service.createEnrollmentRequest({
+            actor: req.identitySession.user,
+            classId: req.body?.classId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.get(
+    '/teacher/class-directory',
+    requireSession,
+    route((req, res) =>
+      sendData(
+        res,
+        { items: service.listTeacherDirectory({ actor: req.identitySession.user, now: new Date().toISOString() }) },
+        { requestId: req.requestId },
+      ),
+    ),
+  )
+
+  router.put(
+    '/teacher/classes/:classId',
+    requireSession,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.teacher.join:${req.identitySession.user.id}:${req.params.classId}`,
+        request: { classId: req.params.classId },
+        operation: ({ createdAt }) =>
+          service.joinTeacherClass({
+            actor: req.identitySession.user,
+            classId: req.params.classId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.delete(
+    '/teacher/classes/:classId',
+    requireSession,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.teacher.leave:${req.identitySession.user.id}:${req.params.classId}`,
+        request: { classId: req.params.classId },
+        operation: ({ createdAt }) =>
+          service.leaveTeacherClass({
+            actor: req.identitySession.user,
+            classId: req.params.classId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.get(
+    '/registration/:token',
+    route((req, res) =>
+      sendData(res, service.inspectRegistrationToken(req.params.token, new Date().toISOString()), { requestId: req.requestId }),
+    ),
+  )
+
+  router.post(
+    '/registration/:token',
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const tokenHash = createHash('sha256').update(String(req.params.token), 'utf8').digest('hex')
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.registration.consume:${tokenHash}`,
+        request: { loginName: req.body?.loginName, displayName: req.body?.displayName, classId: req.body?.classId },
+        requestHash: createRuntimeKeyedRequestHash(sessionSecret, {
+          tokenHash,
+          loginName: req.body?.loginName,
+          displayName: req.body?.displayName,
+          classId: req.body?.classId,
+          classIds: req.body?.classIds,
+          password: req.body?.password,
+        }),
+        operation: ({ createdAt }) =>
+          service.consumeRegistration({
+            token: req.params.token,
+            body: req.body,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.post(
+    '/password-resets/:token/consume',
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const tokenHash = createHash('sha256').update(String(req.params.token), 'utf8').digest('hex')
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.password_reset.consume:${tokenHash}`,
+        request: {},
+        requestHash: createRuntimeKeyedRequestHash(sessionSecret, {
+          tokenHash,
+          newPassword: req.body?.newPassword,
+        }),
+        operation: ({ createdAt }) =>
+          service.consumePasswordReset({
+            token: req.params.token,
+            newPassword: req.body?.newPassword,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
   router.get(
     '/classes',
     requireSession,
     requireWorkspace,
-    requireWorkspaceClassRead,
-    route((req, res) => sendData(res, {
-      items: listAuthorizedClasses(database, {
-        organizationId: req.workspace.organizationId,
-        userId: req.identitySession.user.id,
-        workspaceId: req.workspace.id,
-      }),
-    }, { requestId: req.requestId })),
+    requireClassDirectory,
+    route((req, res) =>
+      sendData(
+        res,
+        { items: service.listManagedClasses({ actor: req.identitySession.user, workspace: req.workspace, now: new Date().toISOString() }) },
+        { requestId: req.requestId },
+      ),
+    ),
+  )
+
+  router.get(
+    '/classes/:classId',
+    requireSession,
+    requireWorkspace,
+    requireClassRead,
+    route((req, res) =>
+      sendData(
+        res,
+        service.getClassDetail({
+          actor: req.identitySession.user,
+          workspace: req.workspace,
+          classId: req.params.classId,
+          now: new Date().toISOString(),
+        }),
+        { requestId: req.requestId },
+      ),
+    ),
   )
 
   router.post(
     '/classes',
     requireSession,
     requireWorkspace,
-    requireSchoolClassManage,
+    requireClassCreate,
     route((req, res) => {
       const key = idempotencyKey(req)
       const outcome = executeIdempotent(database, {
         key,
         scope: `identity.class.create:${req.identitySession.user.id}:${req.workspace.id}`,
-        request: { name: req.body?.name, gradeId: req.body?.gradeId },
+        request: {
+          name: req.body?.name,
+          stage: req.body?.stage,
+          entryYear: req.body?.entryYear,
+          classNumber: req.body?.classNumber,
+        },
         operation: ({ createdAt }) =>
           service.createClass({
             name: req.body?.name,
-            gradeId: req.body?.gradeId,
+            stage: req.body?.stage,
+            entryYear: req.body?.entryYear,
+            classNumber: req.body?.classNumber,
             actor: req.identitySession.user,
             workspace: req.workspace,
             requestId: req.requestId,
@@ -326,35 +508,471 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
     }),
   )
 
-  router.post(
-    '/students',
+  router.patch(
+    '/classes/:classId',
     requireSession,
     requireWorkspace,
-    requireClassAccountManage,
     route((req, res) => {
       const key = idempotencyKey(req)
-      const request = {
-        classId: req.body?.classId,
-        username: req.body?.username,
-        displayName: req.body?.displayName,
-      }
+      const version = expectedVersion(req)
       const outcome = executeIdempotent(database, {
         key,
-        scope: `identity.student.create:${req.identitySession.user.id}:${req.workspace.id}:${req.body?.classId ?? ''}`,
-        request,
-        requestHash: createRuntimeKeyedRequestHash(sessionSecret, {
-          ...request,
-          password: req.body?.password,
-        }),
+        scope: `identity.class.update:${req.identitySession.user.id}:${req.workspace.id}:${req.params.classId}`,
+        request: {
+          name: req.body?.name,
+          stage: req.body?.stage,
+          entryYear: req.body?.entryYear,
+          classNumber: req.body?.classNumber,
+          version,
+        },
         operation: ({ createdAt }) =>
-          service.createStudent({
-            ...request,
-            password: req.body?.password,
+          service.updateClass({
+            classId: req.params.classId,
+            name: req.body?.name,
+            stage: req.body?.stage,
+            entryYear: req.body?.entryYear,
+            classNumber: req.body?.classNumber,
+            expectedVersion: version,
             actor: req.identitySession.user,
             workspace: req.workspace,
             requestId: req.requestId,
             idempotencyKey: key,
             now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.delete(
+    '/classes/:classId',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const version = expectedVersion(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.class.disable:${req.identitySession.user.id}:${req.params.classId}`,
+        request: { version },
+        operation: ({ createdAt }) =>
+          service.setClassDisabled({
+            classId: req.params.classId,
+            expectedVersion: version,
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+            restore: false,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.post(
+    '/classes/:classId/restore',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const version = expectedVersion(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.class.restore:${req.identitySession.user.id}:${req.params.classId}`,
+        request: { version },
+        operation: ({ createdAt }) =>
+          service.setClassDisabled({
+            classId: req.params.classId,
+            expectedVersion: version,
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+            restore: true,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.put(
+    '/classes/:classId/teachers/:userId',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.teacher.force_assign:${req.identitySession.user.id}:${req.params.classId}:${req.params.userId}`,
+        request: { classId: req.params.classId, userId: req.params.userId },
+        operation: ({ createdAt }) =>
+          service.forceTeacherAffiliation({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            classId: req.params.classId,
+            userId: req.params.userId,
+            assign: true,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.delete(
+    '/classes/:classId/teachers/:userId',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.teacher.force_remove:${req.identitySession.user.id}:${req.params.classId}:${req.params.userId}`,
+        request: { classId: req.params.classId, userId: req.params.userId },
+        operation: ({ createdAt }) =>
+          service.forceTeacherAffiliation({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            classId: req.params.classId,
+            userId: req.params.userId,
+            assign: false,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.get(
+    '/classes/:classId/enrollment-requests',
+    requireSession,
+    requireWorkspace,
+    route((req, res) =>
+      sendData(
+        res,
+        {
+          items: service.listClassEnrollmentRequests({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            classId: req.params.classId,
+            status: req.query.status,
+            now: new Date().toISOString(),
+          }),
+        },
+        { requestId: req.requestId },
+      ),
+    ),
+  )
+
+  router.post(
+    '/enrollment-requests/:id/approve',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const version = expectedVersion(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.enrollment.approve:${req.params.id}`,
+        request: { version },
+        operation: ({ createdAt }) =>
+          service.decideEnrollment({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            enrollmentId: req.params.id,
+            decision: 'approve',
+            expectedVersion: version,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.post(
+    '/enrollment-requests/:id/reject',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const version = expectedVersion(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.enrollment.reject:${req.params.id}`,
+        request: { version, reason: req.body?.reason },
+        operation: ({ createdAt }) =>
+          service.decideEnrollment({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            requestId: req.requestId,
+            enrollmentId: req.params.id,
+            decision: 'reject',
+            expectedVersion: version,
+            reason: req.body?.reason,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.patch(
+    '/students/:userId/class',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const version = expectedVersion(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.student.correct:${req.identitySession.user.id}:${req.params.userId}`,
+        request: { targetClassId: req.body?.targetClassId, version, reason: req.body?.reason },
+        operation: ({ createdAt }) =>
+          service.correctStudentClass({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            userId: req.params.userId,
+            targetClassId: req.body?.targetClassId,
+            expectedVersion: version,
+            reason: req.body?.reason,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.get(
+    '/registration-credentials',
+    requireSession,
+    requireWorkspace,
+    route((req, res) =>
+      sendData(
+        res,
+        {
+          items: service.listRegistrationCredentials({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            expectedRole: req.query.expectedRole,
+            now: new Date().toISOString(),
+          }),
+        },
+        { requestId: req.requestId },
+      ),
+    ),
+  )
+
+  router.post(
+    '/registration-credentials',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.registration.issue:${req.identitySession.user.id}:${req.workspace.id}`,
+        request: {
+          expectedRole: req.body?.expectedRole,
+          expiresAt: req.body?.expiresAt,
+          maxUses: req.body?.maxUses,
+        },
+        operation: ({ createdAt }) =>
+          service.issueRegistrationCredential({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            body: req.body,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.post(
+    '/registration-credentials/:id/revoke',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const version = expectedVersion(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.registration.revoke:${req.params.id}`,
+        request: { version, reason: req.body?.reason },
+        operation: ({ createdAt }) =>
+          service.revokeRegistrationCredential({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            credentialId: req.params.id,
+            expectedVersion: version,
+            reason: req.body?.reason,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.get(
+    '/users/:userId/password-reset-credentials',
+    requireSession,
+    requireWorkspace,
+    route((req, res) =>
+      sendData(
+        res,
+        {
+          items: service.listPasswordResetCredentials({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            targetUserId: req.params.userId,
+            now: new Date().toISOString(),
+          }),
+        },
+        { requestId: req.requestId },
+      ),
+    ),
+  )
+
+  router.post(
+    '/users/:userId/password-reset-credentials',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.password_reset.issue:${req.identitySession.user.id}:${req.params.userId}`,
+        request: { targetUserId: req.params.userId },
+        operation: ({ createdAt }) =>
+          service.issuePasswordReset({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            targetUserId: req.params.userId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.put(
+    '/organizations/:organizationId/school-admins/:userId',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.school_admin.assign:${req.params.organizationId}:${req.params.userId}`,
+        request: { organizationId: req.params.organizationId, userId: req.params.userId },
+        operation: ({ createdAt }) =>
+          service.assignSchoolAdmin({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            organizationId: req.params.organizationId,
+            userId: req.params.userId,
+            bodyOrganizationId: req.body?.organizationId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+            remove: false,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.delete(
+    '/organizations/:organizationId/school-admins/:userId',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.school_admin.remove:${req.params.organizationId}:${req.params.userId}`,
+        request: { organizationId: req.params.organizationId, userId: req.params.userId },
+        operation: ({ createdAt }) =>
+          service.assignSchoolAdmin({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            organizationId: req.params.organizationId,
+            userId: req.params.userId,
+            bodyOrganizationId: req.body?.organizationId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+            remove: true,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.put(
+    '/grade-cohorts/:gradeId/managers/:userId',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.grade_manager.assign:${req.params.gradeId}:${req.params.userId}`,
+        request: { gradeId: req.params.gradeId, userId: req.params.userId },
+        operation: ({ createdAt }) =>
+          service.assignGradeManager({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            gradeId: req.params.gradeId,
+            userId: req.params.userId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+            remove: false,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.delete(
+    '/grade-cohorts/:gradeId/managers/:userId',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.grade_manager.remove:${req.params.gradeId}:${req.params.userId}`,
+        request: { gradeId: req.params.gradeId, userId: req.params.userId },
+        operation: ({ createdAt }) =>
+          service.assignGradeManager({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            gradeId: req.params.gradeId,
+            userId: req.params.userId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+            remove: true,
           }),
       })
       return sendIdempotentOutcome(res, req, outcome)
@@ -366,7 +984,7 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
     requireSession,
     requireWorkspace,
     requireAccountRead,
-    route((req, res) => sendData(res, service.getUser(req.params.id), { requestId: req.requestId })),
+    route((req, res) => sendData(res, service.getUser(req.params.id, req.workspace), { requestId: req.requestId })),
   )
 
   router.patch(
@@ -426,9 +1044,14 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
   }
 }
 
+export function sendApiNotFound(req, res) {
+  return sendFailure(res, notFound(RESOURCE_NOT_FOUND_MESSAGE), req.requestId)
+}
+
 export function createIdentityTestApp(options = {}) {
   const module = createIdentityModule(options)
   const app = express()
   app.use('/api/v1', module.router)
+  app.use('/api/v1', sendApiNotFound)
   return { app, module }
 }

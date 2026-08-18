@@ -1,0 +1,310 @@
+{
+  "first": {
+    "port": 62621,
+    "databasePath": "C:\\Users\\Yak\\AppData\\Local\\Temp\\t8-8-gate2-20260818T124417Z\\readmate-046-copy.sqlite",
+    "migrations": {
+      "applied": [],
+      "alreadyApplied": [
+        "000_identity.sql",
+        "001_sessions.sql",
+        "002_reliability.sql",
+        "003_identity_hardening.sql",
+        "004_idempotency_lifecycle_and_scope_integrity.sql",
+        "005_organization_roles_and_idempotency_fencing.sql",
+        "010_reading_catalog.sql",
+        "011_reading_activity.sql",
+        "012_teaching_bridge.sql",
+        "013_reading_security_scopes.sql",
+        "014_book_catalog_metadata.sql",
+        "015_classroom_participation.sql",
+        "020_ai_safety.sql",
+        "021_ai_safety_hardening.sql",
+        "022_ai_safety_sqlite_adapter.sql",
+        "023_ai_safety_tenant_scope.sql",
+        "024_ai_safety_review_generation_and_idempotency_scope.sql",
+        "025_safety_notification_delivery.sql",
+        "026_safety_event_resolution.sql",
+        "030_community_reports_delivery.sql",
+        "031_summary_link_revocations.sql",
+        "032_contact_workspace_delivery_claims.sql",
+        "033_community_multistage_review.sql",
+        "040_student_library_objects.sql",
+        "041_eyecare_privacy.sql",
+        "042_ai_conversation_management.sql",
+        "043_reading_session_summaries.sql",
+        "044_reader_dual_mode_pilot.sql",
+        "045_book_catalog_grade_and_trusted_baseline.sql",
+        "046_reader_mode_preferences.sql",
+        "047_login_and_class_identity.sql",
+        "048_registration_credentials.sql",
+        "049_enrollment_and_password_reset.sql",
+        "050_book_access_grant_backfill.sql"
+      ],
+      "migrationCount": 34
+    },
+    "is5191": false
+  },
+  "restart": {
+    "port": 60171,
+    "databasePath": "C:\\Users\\Yak\\AppData\\Local\\Temp\\t8-8-gate2-20260818T124417Z\\readmate-046-copy.sqlite",
+    "migrations": {
+      "applied": [],
+      "alreadyApplied": [
+        "000_identity.sql",
+        "001_sessions.sql",
+        "002_reliability.sql",
+        "003_identity_hardening.sql",
+        "004_idempotency_lifecycle_and_scope_integrity.sql",
+        "005_organization_roles_and_idempotency_fencing.sql",
+        "010_reading_catalog.sql",
+        "011_reading_activity.sql",
+        "012_teaching_bridge.sql",
+        "013_reading_security_scopes.sql",
+        "014_book_catalog_metadata.sql",
+        "015_classroom_participation.sql",
+        "020_ai_safety.sql",
+        "021_ai_safety_hardening.sql",
+        "022_ai_safety_sqlite_adapter.sql",
+        "023_ai_safety_tenant_scope.sql",
+        "024_ai_safety_review_generation_and_idempotency_scope.sql",
+        "025_safety_notification_delivery.sql",
+        "026_safety_event_resolution.sql",
+        "030_community_reports_delivery.sql",
+        "031_summary_link_revocations.sql",
+        "032_contact_workspace_delivery_claims.sql",
+        "033_community_multistage_review.sql",
+        "040_student_library_objects.sql",
+        "041_eyecare_privacy.sql",
+        "042_ai_conversation_management.sql",
+        "043_reading_session_summaries.sql",
+        "044_reader_dual_mode_pilot.sql",
+        "045_book_catalog_grade_and_trusted_baseline.sql",
+        "046_reader_mode_preferences.sql",
+        "047_login_and_class_identity.sql",
+        "048_registration_credentials.sql",
+        "049_enrollment_and_password_reset.sql",
+        "050_book_access_grant_backfill.sql"
+      ],
+      "migrationCount": 34
+    },
+    "is5191": false
+  },
+  "cases": {
+    "existingStudentLogin": {
+      "status": 200,
+      "userId": "internal-demo-student",
+      "workspaceId": "internal-demo-workspace",
+      "workspaceCount": 1
+    },
+    "existingStudentBooks": {
+      "status": 200,
+      "count": 49,
+      "ids": [
+        "book-001",
+        "book-002",
+        "book-003",
+        "book-004",
+        "book-005",
+        "book-006",
+        "book-007",
+        "book-008",
+        "book-009",
+        "book-010",
+        "book-011",
+        "book-012",
+        "book-013",
+        "book-014",
+        "book-015",
+        "book-016",
+        "book-017",
+        "book-018",
+        "book-019",
+        "book-020",
+        "book-021",
+        "book-022",
+        "book-023",
+        "book-024",
+        "book-025",
+        "book-026",
+        "book-027",
+        "book-028",
+        "book-029",
+        "book-030",
+        "book-031",
+        "book-032",
+        "book-033",
+        "book-034",
+        "book-035",
+        "book-036",
+        "book-037",
+        "book-038",
+        "book-039",
+        "book-040",
+        "book-041",
+        "book-042",
+        "book-043",
+        "book-044",
+        "book-045",
+        "book-046",
+        "book-047",
+        "book-048",
+        "book-049"
+      ]
+    },
+    "existingStudentLibrary": {
+      "status": 200,
+      "count": 0
+    },
+    "d21Existing": {
+      "status": 200,
+      "count": 0,
+      "quotes": []
+    },
+    "d22Existing": {
+      "status": 200,
+      "count": 0,
+      "bookIds": []
+    },
+    "teacherPublish": {
+      "workspaceId": "internal-demo-workspace",
+      "publish": {
+        "status": 403,
+        "code": "PERMISSION_DENIED",
+        "message": "当前工作空间无权执行此操作"
+      },
+      "unpublish": {
+        "status": 403,
+        "code": "PERMISSION_DENIED",
+        "message": "当前工作空间无权执行此操作"
+      }
+    },
+    "secondClassSeed": {
+      "inserted": 7,
+      "unchanged": 0,
+      "entities": {
+        "organizations": {
+          "inserted": 0,
+          "unchanged": 0
+        },
+        "users": {
+          "inserted": 1,
+          "unchanged": 0
+        },
+        "workspaces": {
+          "inserted": 1,
+          "unchanged": 0
+        },
+        "workspaceMemberships": {
+          "inserted": 1,
+          "unchanged": 0
+        },
+        "classes": {
+          "inserted": 1,
+          "unchanged": 0
+        },
+        "classMemberships": {
+          "inserted": 1,
+          "unchanged": 0
+        },
+        "roleAssignments": {
+          "inserted": 1,
+          "unchanged": 0
+        },
+        "credentials": {
+          "inserted": 1,
+          "unchanged": 0
+        }
+      }
+    },
+    "newClassGrantCount": 0,
+    "draftBook": {
+      "bookId": "4b650409-2910-4116-9bd6-913453364876",
+      "versionId": "5d91bb42-cd14-4059-8a5f-0680b979c27c"
+    },
+    "insertedD21Post": true,
+    "insertedD22Assignment": true,
+    "d22VersionId": "book-001-trusted-v1",
+    "newStudentBooks": {
+      "loginStatus": 200,
+      "status": 200,
+      "count": 0,
+      "ids": []
+    },
+    "d21NewClass": {
+      "status": 200,
+      "quotes": []
+    },
+    "d22NewClass": {
+      "status": 200,
+      "count": 0,
+      "items": []
+    },
+    "d23NoGrant": {
+      "status": 404,
+      "code": "RESOURCE_NOT_FOUND",
+      "message": "书籍不存在或当前不可读取",
+      "versionId": "book-001-trusted-v1"
+    },
+    "existingStudentBooksRestart": {
+      "status": 200,
+      "count": 49
+    },
+    "d21ExistingAfterInsert": {
+      "status": 200,
+      "quotes": [
+        {
+          "id": "t8-8-d21-post",
+          "availability": "available",
+          "textNull": false,
+          "hasText": true
+        }
+      ]
+    },
+    "d22ExistingAfterInsert": {
+      "status": 200,
+      "count": 1,
+      "bookIds": [
+        "book-001-trusted-v1"
+      ]
+    },
+    "d23DraftGrant": {
+      "status": 404,
+      "code": "RESOURCE_NOT_FOUND",
+      "message": "书籍不存在或当前不可读取",
+      "versionId": "5d91bb42-cd14-4059-8a5f-0680b979c27c"
+    },
+    "postHttpCounts": {
+      "grants": 50,
+      "quick_check": [
+        "ok"
+      ]
+    }
+  },
+  "envPasswordMatchesReplicaHashes": [
+    {
+      "userId": "internal-demo-student",
+      "loginName": "internal-student",
+      "envPasswordMatches": false
+    },
+    {
+      "userId": "internal-ops-admin",
+      "loginName": "internal-ops-admin",
+      "envPasswordMatches": false
+    },
+    {
+      "userId": "internal-principal",
+      "loginName": "internal-principal",
+      "envPasswordMatches": false
+    },
+    {
+      "userId": "internal-teacher-li",
+      "loginName": "internal-teacher-li",
+      "envPasswordMatches": false
+    },
+    {
+      "userId": "internal-teacher-wang",
+      "loginName": "internal-teacher-wang",
+      "envPasswordMatches": false
+    }
+  ]
+}

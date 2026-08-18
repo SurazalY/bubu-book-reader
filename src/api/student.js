@@ -88,6 +88,16 @@ export function createStudentApi(client = createApiClient()) {
       }),
     submitReadingSessionSummary: (input = {}, options = {}) =>
       client.post('/reading/session-summaries', { ...options, body: readingSummaryBody(input) }),
+    getRegistration: (token, options = {}) =>
+      client.get(`/registration/${encodeURIComponent(token)}`, options),
+    registerWithToken: (token, body, options = {}) =>
+      client.post(`/registration/${encodeURIComponent(token)}`, {
+        ...options,
+        idempotencyKey: options.idempotencyKey || writeIdempotencyKey('registration'),
+        body,
+      }),
+    getOnboardingMe: (options = {}) => client.get('/onboarding/me', options),
+    getMyEnrollment: (options = {}) => client.get('/onboarding/me', options),
     getReadingStatisticsSelf: (options = {}) => client.get('/reading/statistics/self', options),
     submitReadingEvents: (body, options = {}) => client.post('/reading/events/batch', { ...options, body }),
     putReaderPreference: (body = {}, options = {}) => client.put('/reading/reader-preference', {

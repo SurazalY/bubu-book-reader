@@ -1,0 +1,168 @@
+TAP version 13
+# Subtest: 12. 守卫测试不接触真实业务数据库
+ok 1 - 12. 守卫测试不接触真实业务数据库
+  ---
+  duration_ms: 162.3143
+  type: 'test'
+  ...
+# Subtest: 1. 全新库执行 047～050：文件存在、applied 含四 id、表和列存在
+ok 2 - 1. 全新库执行 047～050：文件存在、applied 含四 id、表和列存在
+  ---
+  duration_ms: 159.5878
+  type: 'test'
+  ...
+# Subtest: 2. 046 副本升级至 050：staged <047_ 先跑，插入 046 形基线，再挂 047～050
+ok 3 - 2. 046 副本升级至 050：staged <047_ 先跑，插入 046 形基线，再挂 047～050
+  ---
+  duration_ms: 308.452
+  type: 'test'
+  ...
+# Subtest: 3. 重复启动 alreadyApplied：第二次 applied=[]，alreadyApplied 含 047～050
+ok 4 - 3. 重复启动 alreadyApplied：第二次 applied=[]，alreadyApplied 含 047～050
+  ---
+  duration_ms: 157.7284
+  type: 'test'
+  ...
+# Subtest: 4. checksum 稳定：两次 checksum 相等且长度 64
+ok 5 - 4. checksum 稳定：两次 checksum 相等且长度 64
+  ---
+  duration_ms: 156.002
+  type: 'test'
+  ...
+# Subtest: 5. 047 登录/班级字段回填与唯一索引
+ok 6 - 5. 047 登录/班级字段回填与唯一索引
+  ---
+  duration_ms: 302.0815
+  type: 'test'
+  ...
+# Subtest: 6. 048 注册凭据表与唯一/角色约束，无默认 token
+ok 7 - 6. 048 注册凭据表与唯一/角色约束，无默认 token
+  ---
+  duration_ms: 307.74
+  type: 'test'
+  ...
+# Subtest: 7. 049 审批与重置表 + pending 部分唯一 + 学生单 active 班
+ok 8 - 7. 049 审批与重置表 + pending 部分唯一 + 学生单 active 班
+  ---
+  duration_ms: 308.3223
+  type: 'test'
+  ...
+# Subtest: 8. 050 grants 回填：基线 49 行、draft 不回填、id/actor 格式与当前版本口径
+ok 9 - 8. 050 grants 回填：基线 49 行、draft 不回填、id/actor 格式与当前版本口径
+  ---
+  duration_ms: 307.7294
+  type: 'test'
+  ...
+# Subtest: 9. 当前基线形预期 49 行
+ok 10 - 9. 当前基线形预期 49 行
+  ---
+  duration_ms: 302.7427
+  type: 'test'
+  ...
+# Subtest: 10. 050 不重复插入：第二次 alreadyApplied，checksum 不变，grants 仍 49
+ok 11 - 10. 050 不重复插入：第二次 alreadyApplied，checksum 不变，grants 仍 49
+  ---
+  duration_ms: 306.1475
+  type: 'test'
+  ...
+# Subtest: 11. 不修改冻结阅读表 reading_summary_sessions / reading_daily_book_summaries
+ok 12 - 11. 不修改冻结阅读表 reading_summary_sessions / reading_daily_book_summaries
+  ---
+  duration_ms: 299.469
+  type: 'test'
+  ...
+# Subtest: 050 空库（0 published × 0 班）允许插入 0 行
+ok 13 - 050 空库（0 published × 0 班）允许插入 0 行
+  ---
+  duration_ms: 151.4419
+  type: 'test'
+  ...
+# Subtest: bootstrap：全新库跑完全部迁移后演示数据必须含第二班
+ok 14 - bootstrap：全新库跑完全部迁移后演示数据必须含第二班
+  ---
+  duration_ms: 427.7567
+  type: 'test'
+  ...
+# Subtest: bootstrap：必须有 grade workspace（code=grade-admin, scope_type=grade）
+ok 15 - bootstrap：必须有 grade workspace（code=grade-admin, scope_type=grade）
+  ---
+  duration_ms: 419.4938
+  type: 'test'
+  ...
+# Subtest: bootstrap：必须有 grade_manager 账号与对应 role assignment
+ok 16 - bootstrap：必须有 grade_manager 账号与对应 role assignment
+  ---
+  duration_ms: 422.9438
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本已有 2 个旧班时 047 必须失败
+ok 17 - 负例：046 副本已有 2 个旧班时 047 必须失败
+  ---
+  duration_ms: 238.4083
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本已有 1 条 grant 时 050 必须失败
+ok 18 - 负例：046 副本已有 1 条 grant 时 050 必须失败
+  ---
+  duration_ms: 297.8359
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本某 published 书没有 version 时 050 必须失败
+ok 19 - 负例：046 副本某 published 书没有 version 时 050 必须失败
+  ---
+  duration_ms: 305.0114
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本某学生已有 2 条 active class_memberships 时 049 必须失败
+ok 20 - 负例：046 副本某学生已有 2 条 active class_memberships 时 049 必须失败
+  ---
+  duration_ms: 247.5794
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 空 school_code 必须被触发器拒绝
+ok 21 - 负例：047 之后 INSERT 空 school_code 必须被触发器拒绝
+  ---
+  duration_ms: 156.4952
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 非法 stage 必须被触发器拒绝
+ok 22 - 负例：047 之后 INSERT 非法 stage 必须被触发器拒绝
+  ---
+  duration_ms: 240.0679
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 错误 grade_id 必须被触发器拒绝
+ok 23 - 负例：047 之后 INSERT 错误 grade_id 必须被触发器拒绝
+  ---
+  duration_ms: 235.7369
+  type: 'test'
+  ...
+# Subtest: 负例：049 之后同一学生第二条 pending enrollment 必须失败
+ok 24 - 负例：049 之后同一学生第二条 pending enrollment 必须失败
+  ---
+  duration_ms: 239.7436
+  type: 'test'
+  ...
+# Subtest: 负例：049 之后同一学生第二条 active student membership 必须失败
+ok 25 - 负例：049 之后同一学生第二条 active student membership 必须失败
+  ---
+  duration_ms: 240.3032
+  type: 'test'
+  ...
+# Subtest: 负例：050 不得给 draft 书或 disabled 班插 grant
+ok 26 - 负例：050 不得给 draft 书或 disabled 班插 grant
+  ---
+  duration_ms: 309.609
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7188.152
+
+T8_2C_EXIT_CODE=0

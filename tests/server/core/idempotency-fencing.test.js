@@ -63,12 +63,10 @@ function insertLegacyIdentityData(database) {
   database
     .prepare('INSERT INTO organizations (id, name, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, 1)')
     .run(organizationBId, 'migration-school-b', 'active', now, now)
+  const usernameA = `migration-user-${randomUUID()}`
   database
-    .prepare(`
-      INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version)
-      VALUES (?, ?, ?, ?, 'active', ?, ?, 1)
-    `)
-    .run(userAId, organizationAId, `migration-user-${randomUUID()}`, 'migration-user', now, now)
+    .prepare('INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, 1)')
+    .run(userAId, organizationAId, usernameA, 'migration-user', 'active', now, now)
   const insertWorkspace = database.prepare(`
     INSERT INTO workspaces (
       id, organization_id, code, name, scope_type, scope_id, status, created_at, updated_at, version
@@ -89,10 +87,7 @@ function insertLegacyIdentityData(database) {
   insertAssignment.run(randomUUID(), randomUUID(), workspaceAId, organizationAId, now, now)
   insertAssignment.run(randomUUID(), userAId, missingWorkspaceId, organizationAId, now, now)
   database
-    .prepare(`
-      INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version)
-      VALUES (?, ?, ?, 'missing-organization-user', 'active', ?, ?, 1)
-    `)
+    .prepare("INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version) VALUES (?, ?, ?, 'missing-organization-user', 'active', ?, ?, 1)")
     .run(missingOrganizationUserId, missingOrganizationId, `missing-org-user-${randomUUID()}`, now, now)
   insertWorkspace.run(
     missingOrganizationWorkspaceId,

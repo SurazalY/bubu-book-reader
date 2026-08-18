@@ -7,6 +7,7 @@ import test from 'node:test'
 
 import { hashPassword } from '../../../server/auth/password.js'
 import { createReadmateApplication } from '../../../server/app.js'
+import { grantBookToClass, loginBody } from '../helpers/phase8-old-fixture.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
 import {
   canonicalReadingSummaryFingerprint,
@@ -36,6 +37,7 @@ function identityFixture() {
   ]
   return {
     organizationId,
+    schoolCode: organizationId,
     foreignOrganizationId,
     classId,
     emptyClassId,
@@ -154,7 +156,7 @@ async function login(baseUrl, fixture, userId) {
   const response = await requestJson(baseUrl, jar, '/auth/login', {
     method: 'POST',
     idempotencyKey: `login-${user.id}`,
-    body: { username: user.username, password: fixture.password },
+    body: loginBody(fixture, user),
   })
   assert.equal(response.status, 200, JSON.stringify(response.payload))
   assertRequestId(response)
@@ -181,6 +183,13 @@ async function createPublishedBook(application, fixture, label) {
     ],
   })
   await reading.publishBook(created.bookId)
+  grantBookToClass(application.database, {
+    bookId: created.bookId,
+    classId: fixture.classId,
+    organizationId: fixture.organizationId,
+    actorId: fixture.adminId,
+    bookVersionId: created.versionId,
+  })
   return created
 }
 

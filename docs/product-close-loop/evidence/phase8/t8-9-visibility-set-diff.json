@@ -1,0 +1,14 @@
+{
+  "collectedAt": "2026-08-18T13:52:42.395Z",
+  "pre": "docs/product-close-loop/evidence/phase8/t8-9-pre-visibility-sets.json",
+  "post": "docs/product-close-loop/evidence/phase8/t8-9-post-visibility-sets.json",
+  "checkpointBeforeExtraWrites": true,
+  "students": {
+    "internal-demo-organization::internal-demo-student": {
+      "added": [],
+      "removed": []
+    }
+  },
+  "allEmpty": true,
+  "stopFlags": []
+}

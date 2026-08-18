@@ -1,0 +1,2759 @@
+
+> book-reader-app@0.1.0 test:server
+> node --test tests/server/**/*.test.js
+
+TAP version 13
+# (node:70988) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 只把有效已读页的证据交给模型，并在错误页码引用后仅重试一次
+ok 1 - 只把有效已读页的证据交给模型，并在错误页码引用后仅重试一次
+  ---
+  duration_ms: 8.7865
+  type: 'test'
+  ...
+# Subtest: 第二次无效引用后只保存安全退化引导，不猜测未读剧情
+ok 2 - 第二次无效引用后只保存安全退化引导，不猜测未读剧情
+  ---
+  duration_ms: 0.8981
+  type: 'test'
+  ...
+# Subtest: 无效主模型的真实成本与 fallback 成本都进入账本，学生只扣成功回答一次
+ok 3 - 无效主模型的真实成本与 fallback 成本都进入账本，学生只扣成功回答一次
+  ---
+  duration_ms: 0.8861
+  type: 'test'
+  ...
+# Subtest: 供应商抛错但返回已计费用量时，该次成本也不会从 providerUsage 丢失
+ok 4 - 供应商抛错但返回已计费用量时，该次成本也不会从 providerUsage 丢失
+  ---
+  duration_ms: 0.8446
+  type: 'test'
+  ...
+# Subtest: 失败时 user、assistant、引用、风险和 usage 整笔回滚，同键重试不重复预留或消息
+ok 5 - 失败时 user、assistant、引用、风险和 usage 整笔回滚，同键重试不重复预留或消息
+  ---
+  duration_ms: 2.034
+  type: 'test'
+  ...
+# Subtest: 隐私累计三条只把会话设为私密并进入访问申请规则，危险事件保持为零
+ok 6 - 隐私累计三条只把会话设为私密并进入访问申请规则，危险事件保持为零
+  ---
+  duration_ms: 0.7414
+  type: 'test'
+  ...
+# Subtest: 危险累计任务携带达到阈值的全部消息，第四第五条不为未完成风险重复建任务
+ok 7 - 危险累计任务携带达到阈值的全部消息，第四第五条不为未完成风险重复建任务
+  ---
+  duration_ms: 0.9542
+  type: 'test'
+  ...
+# Subtest: 单条明确自伤信号只进入二次复核，复核上下文能取得原始用户提问
+ok 8 - 单条明确自伤信号只进入二次复核，复核上下文能取得原始用户提问
+  ---
+  duration_ms: 0.9897
+  type: 'test'
+  ...
+# Subtest: 二次复核以原子 claim 防并发重复调用，事件唯一且涉事候选去重
+ok 9 - 二次复核以原子 claim 防并发重复调用，事件唯一且涉事候选去重
+  ---
+  duration_ms: 1.9208
+  type: 'test'
+  ...
+# Subtest: 复核输出缺证据或缺 staff 摘要转人工确认，重复调用不重复建事件
+ok 10 - 复核输出缺证据或缺 staff 摘要转人工确认，重复调用不重复建事件
+  ---
+  duration_ms: 0.7815
+  type: 'test'
+  ...
+# Subtest: 已确认复核缺少 staff 摘要同样不能发布正式待接受事件
+ok 11 - 已确认复核缺少 staff 摘要同样不能发布正式待接受事件
+  ---
+  duration_ms: 0.4127
+  type: 'test'
+  ...
+# Subtest: 没有合格通知人的已确认风险转人工确认，不生成无人可见的待接受事件
+ok 12 - 没有合格通知人的已确认风险转人工确认，不生成无人可见的待接受事件
+  ---
+  duration_ms: 0.3692
+  type: 'test'
+  ...
+# Subtest: 过期的二次复核租约可由后续调用接手并只产一条事件
+ok 13 - 过期的二次复核租约可由后续调用接手并只产一条事件
+  ---
+  duration_ms: 0.9307
+  type: 'test'
+  ...
+# Subtest: 通知链计算失败转人工确认，后续重试不重复调用模型或创建事件
+ok 14 - 通知链计算失败转人工确认，后续重试不重复调用模型或创建事件
+  ---
+  duration_ms: 0.6193
+  type: 'test'
+  ...
+# Subtest: 过期 claim 的失败 worker 不能覆盖并发重试完成的统一落盘结果
+ok 15 - 过期 claim 的失败 worker 不能覆盖并发重试完成的统一落盘结果
+  ---
+  duration_ms: 1.7979
+  type: 'test'
+  ...
+# Subtest: 认证身份与普通请求分离，指纹不保存原问，超长或非法选文不会调用模型
+ok 16 - 认证身份与普通请求分离，指纹不保存原问，超长或非法选文不会调用模型
+  ---
+  duration_ms: 1.1146
+  type: 'test'
+  ...
+# Subtest: 跨页 selections 保留每页锚点并由服务端按 block 重建引用文本
+ok 17 - 跨页 selections 保留每页锚点并由服务端按 block 重建引用文本
+  ---
+  duration_ms: 0.6806
+  type: 'test'
+  ...
+# Subtest: 记忆卡只要求全部来源已读，非 lexical top 的来源仍随卡片带入并可引用
+ok 18 - 记忆卡只要求全部来源已读，非 lexical top 的来源仍随卡片带入并可引用
+  ---
+  duration_ms: 0.4516
+  type: 'test'
+  ...
+# (node:70768) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 标题自动生成并保留显式标题
+ok 19 - 标题自动生成并保留显式标题
+  ---
+  duration_ms: 0.8113
+  type: 'test'
+  ...
+# Subtest: 会话新建、上下文、重命名、私密切换、软删除与恢复均使用版本保护
+ok 20 - 会话新建、上下文、重命名、私密切换、软删除与恢复均使用版本保护
+  ---
+  duration_ms: 531.3861
+  type: 'test'
+  ...
+# Subtest: 跨租户和跨主体修改统一返回不存在，不能通过 conversationId 猜测资源
+ok 21 - 跨租户和跨主体修改统一返回不存在，不能通过 conversationId 猜测资源
+  ---
+  duration_ms: 694.4953
+  type: 'test'
+  ...
+# Subtest: 权限端按班级学生形成三级索引，并支持模糊搜索与书籍 AND 或 OR 约束
+ok 22 - 权限端按班级学生形成三级索引，并支持模糊搜索与书籍 AND 或 OR 约束
+  ---
+  duration_ms: 1041.6161
+  type: 'test'
+  ...
+# Subtest: 普通会话按范围可读，私密会话需要授权，安全会话只返回证据最小上下文
+ok 23 - 普通会话按范围可读，私密会话需要授权，安全会话只返回证据最小上下文
+  ---
+  duration_ms: 712.8597
+  type: 'test'
+  ...
+# (node:67272) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: uses only passed runtime configuration and returns the complete structured contract
+ok 24 - uses only passed runtime configuration and returns the complete structured contract
+  ---
+  duration_ms: 3.9889
+  type: 'test'
+  ...
+# Subtest: normalizes only unambiguous response and citation aliases inside the backend evidence whitelist
+ok 25 - normalizes only unambiguous response and citation aliases inside the backend evidence whitelist
+  ---
+  duration_ms: 0.4981
+  type: 'test'
+  ...
+# Subtest: does not coerce ambiguous spoiler severity strings into the boolean contract
+ok 26 - does not coerce ambiguous spoiler severity strings into the boolean contract
+  ---
+  duration_ms: 0.6591
+  type: 'test'
+  ...
+# Subtest: uses the same explicit external runtime configuration for structured secondary review
+ok 27 - uses the same explicit external runtime configuration for structured secondary review
+  ---
+  duration_ms: 0.8551
+  type: 'test'
+  ...
+# Subtest: 缺少任一证据 assistant 消息时在发出请求前拒绝外部复核
+ok 28 - 缺少任一证据 assistant 消息时在发出请求前拒绝外部复核
+  ---
+  duration_ms: 0.2862
+  type: 'test'
+  ...
+# Subtest: AI runtime keeps external question and review calls on the same OPENAI runtime configuration
+ok 29 - AI runtime keeps external question and review calls on the same OPENAI runtime configuration
+  ---
+  duration_ms: 0.8748
+  type: 'test'
+  ...
+# Subtest: rejects incomplete structured secondary review output before it reaches the safety domain
+    # Subtest: empty staff summary
+    ok 1 - empty staff summary
+      ---
+      duration_ms: 0.3374
+      type: 'test'
+      ...
+    # Subtest: incomplete evidence generation
+    ok 2 - incomplete evidence generation
+      ---
+      duration_ms: 0.2563
+      type: 'test'
+      ...
+    # Subtest: candidate outside backend table
+    ok 3 - candidate outside backend table
+      ---
+      duration_ms: 0.394
+      type: 'test'
+      ...
+    1..3
+ok 30 - rejects incomplete structured secondary review output before it reaches the safety domain
+  ---
+  duration_ms: 1.7986
+  type: 'test'
+  ...
+# Subtest: retries invalid structured JSON a finite number of times and accounts for every attempt
+ok 31 - retries invalid structured JSON a finite number of times and accounts for every attempt
+  ---
+  duration_ms: 0.8061
+  type: 'test'
+  ...
+# Subtest: rejects candidates outside the backend table after the configured parse retries
+ok 32 - rejects candidates outside the backend table after the configured parse retries
+  ---
+  duration_ms: 0.5135
+  type: 'test'
+  ...
+# Subtest: classifies provider refusal and rate limiting without exposing response details
+    # Subtest: content refusal
+    ok 1 - content refusal
+      ---
+      duration_ms: 0.3865
+      type: 'test'
+      ...
+    # Subtest: rate limiting
+    ok 2 - rate limiting
+      ---
+      duration_ms: 0.3442
+      type: 'test'
+      ...
+    1..2
+ok 33 - classifies provider refusal and rate limiting without exposing response details
+  ---
+  duration_ms: 0.9718
+  type: 'test'
+  ...
+# Subtest: classifies network failures without retaining sensitive error text
+ok 34 - classifies network failures without retaining sensitive error text
+  ---
+  duration_ms: 0.6081
+  type: 'test'
+  ...
+# Subtest: stays disabled when runtime configuration is not explicitly passed
+ok 35 - stays disabled when runtime configuration is not explicitly passed
+  ---
+  duration_ms: 0.3544
+  type: 'test'
+  ...
+# (node:64736) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 真实 node:sqlite 临时库可重复应用 020 至 025，且同步事务拒绝 Promise 回调
+ok 36 - 真实 node:sqlite 临时库可重复应用 020 至 025，且同步事务拒绝 Promise 回调
+  ---
+  duration_ms: 264.084
+  type: 'test'
+  ...
+# Subtest: 023 前向迁移发现既有跨租户错绑记录时明确失败且不静默重挂
+ok 37 - 023 前向迁移发现既有跨租户错绑记录时明确失败且不静默重挂
+  ---
+  duration_ms: 471.3895
+  type: 'test'
+  ...
+# Subtest: 024 前向迁移发现既有 ai_message_evidence 孤儿时明确失败且不静默删除或重挂
+ok 38 - 024 前向迁移发现既有 ai_message_evidence 孤儿时明确失败且不静默删除或重挂
+  ---
+  duration_ms: 451.982
+  type: 'test'
+  ...
+# Subtest: 024 迁移后的 citation scope 触发器在关闭 FK 时仍拒绝 missing-message
+ok 39 - 024 迁移后的 citation scope 触发器在关闭 FK 时仍拒绝 missing-message
+  ---
+  duration_ms: 575.2736
+  type: 'test'
+  ...
+# Subtest: 024 对无法从可信账本确定 scope 的旧幂等记录明确失败
+ok 40 - 024 对无法从可信账本确定 scope 的旧幂等记录明确失败
+  ---
+  duration_ms: 498.5872
+  type: 'test'
+  ...
+# Subtest: 024 只从可信 usage 与 conversation 关系回填旧幂等 scope
+ok 41 - 024 只从可信 usage 与 conversation 关系回填旧幂等 scope
+  ---
+  duration_ms: 576.2502
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 中隐私累计三条只转私密访问规则，不创建危险复核任务
+ok 42 - 真实 SQLite 中隐私累计三条只转私密访问规则，不创建危险复核任务
+  ---
+  duration_ms: 982.9972
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 危险任务保存全部阈值证据，原问题可见且并发复核只调用一次 provider
+ok 43 - 真实 SQLite 危险任务保存全部阈值证据，原问题可见且并发复核只调用一次 provider
+  ---
+  duration_ms: 1125.8299
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 隐藏一条复核证据 assistant 消息后转人工确认且不调用 provider
+ok 44 - 真实 SQLite 隐藏一条复核证据 assistant 消息后转人工确认且不调用 provider
+  ---
+  duration_ms: 1284.4296
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite claim 后追加危险证据会 supersede 旧复核，并以最新稳定全量证据重新复核
+ok 45 - 真实 SQLite claim 后追加危险证据会 supersede 旧复核，并以最新稳定全量证据重新复核
+  ---
+  duration_ms: 1627.6532
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 迁移证据缺少请求链接时仍向复核上下文保留 assistant 原文
+ok 46 - 真实 SQLite 迁移证据缺少请求链接时仍向复核上下文保留 assistant 原文
+  ---
+  duration_ms: 1146.6823
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 在安全任务后结算失败会整单回滚，同键重试不重复预留或消息
+ok 47 - 真实 SQLite 在安全任务后结算失败会整单回滚，同键重试不重复预留或消息
+  ---
+  duration_ms: 790.0891
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 过期 lease 的并发重试不能覆盖已完成请求，只保留一组消息与用量
+ok 48 - 真实 SQLite 过期 lease 的并发重试不能覆盖已完成请求，只保留一组消息与用量
+  ---
+  duration_ms: 823.4138
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 幂等键按组织、主体和会话隔离，失败重试与完成状态互不覆盖
+ok 49 - 真实 SQLite 幂等键按组织、主体和会话隔离，失败重试与完成状态互不覆盖
+  ---
+  duration_ms: 645.0763
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 账本保留无效主模型与 fallback 的供应商总成本，学生仅扣成功回答
+ok 50 - 真实 SQLite 账本保留无效主模型与 fallback 的供应商总成本，学生仅扣成功回答
+  ---
+  duration_ms: 467.9907
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 拒绝跨租户或跨主体复用 conversationId，且模型看不到他人历史
+ok 51 - 真实 SQLite 拒绝跨租户或跨主体复用 conversationId，且模型看不到他人历史
+  ---
+  duration_ms: 429.0917
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 的跨租户隐私申请与复核上下文统一返回 RESOURCE_NOT_FOUND
+ok 52 - 真实 SQLite 的跨租户隐私申请与复核上下文统一返回 RESOURCE_NOT_FOUND
+  ---
+  duration_ms: 397.1562
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite open review 并发追加第4第5条及后续证据，不丢失也不重复建任务
+ok 53 - 真实 SQLite open review 并发追加第4第5条及后续证据，不丢失也不重复建任务
+  ---
+  duration_ms: 471.6294
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 本地安全降级不扣学生额度，但保留两次 provider 成本与拦截原因
+ok 54 - 真实 SQLite 本地安全降级不扣学生额度，但保留两次 provider 成本与拦截原因
+  ---
+  duration_ms: 369.6085
+  type: 'test'
+  ...
+# Subtest: 真实 SQLite 将纯剧透风险与引用失败分开记账
+ok 55 - 真实 SQLite 将纯剧透风险与引用失败分开记账
+  ---
+  duration_ms: 359.8993
+  type: 'test'
+  ...
+# (node:67932) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 业务写入与 outbox 同事务，事件入队失败时不留下半成品
+ok 56 - 业务写入与 outbox 同事务，事件入队失败时不留下半成品
+  ---
+  duration_ms: 157.836
+  type: 'test'
+  ...
+# Subtest: 安全链接接受隔离运行域传入的标准二进制签名密钥
+ok 57 - 安全链接接受隔离运行域传入的标准二进制签名密钥
+  ---
+  duration_ms: 85.0138
+  type: 'test'
+  ...
+# Subtest: 032 前向迁移保留旧投递数据并将旧联系人隔离为未归属
+ok 58 - 032 前向迁移保留旧投递数据并将旧联系人隔离为未归属
+  ---
+  duration_ms: 328.7436
+  type: 'test'
+  ...
+# Subtest: 学生投稿经过基础图片校验、人工审核后才能轻互动或收藏
+ok 59 - 学生投稿经过基础图片校验、人工审核后才能轻互动或收藏
+  ---
+  duration_ms: 119.3345
+  type: 'test'
+  ...
+# Subtest: 权限默认拒绝且跨工作空间操作被拒绝
+ok 60 - 权限默认拒绝且跨工作空间操作被拒绝
+  ---
+  duration_ms: 92.5015
+  type: 'test'
+  ...
+# Subtest: 内部报告递归拒绝阅读完成度同义键，并保留合法护眼比例和普通字段
+ok 61 - 内部报告递归拒绝阅读完成度同义键，并保留合法护眼比例和普通字段
+  ---
+  duration_ms: 108.175
+  type: 'test'
+  ...
+# Subtest: 报告版本必须人工审核，失败重试真实落库，短信不产生打开或已读
+ok 62 - 报告版本必须人工审核，失败重试真实落库，短信不产生打开或已读
+  ---
+  duration_ms: 182.9406
+  type: 'test'
+  ...
+# Subtest: 投递审核绑定目标报告版本，已审核旧版本可发送而未审核新版本被拒绝
+ok 63 - 投递审核绑定目标报告版本，已审核旧版本可发送而未审核新版本被拒绝
+  ---
+  duration_ms: 189.2833
+  type: 'test'
+  ...
+# Subtest: 报告、学生、联系人和工作空间在同一事务授权关系中绑定
+ok 64 - 报告、学生、联系人和工作空间在同一事务授权关系中绑定
+  ---
+  duration_ms: 150.5113
+  type: 'test'
+  ...
+# Subtest: 安全链接限制 TTL 并校验签名，撤销、过期和重复打开均失败
+ok 65 - 安全链接限制 TTL 并校验签名，撤销、过期和重复打开均失败
+  ---
+  duration_ms: 315.5771
+  type: 'test'
+  ...
+# Subtest: 小程序回执无验证或验证失败时拒绝，仅接受运行时 verifier 通过的回执
+ok 66 - 小程序回执无验证或验证失败时拒绝，仅接受运行时 verifier 通过的回执
+  ---
+  duration_ms: 262.6655
+  type: 'test'
+  ...
+# Subtest: 短信发送任务使用状态和版本原子领取，第二个并发执行器不能重复外发
+ok 67 - 短信发送任务使用状态和版本原子领取，第二个并发执行器不能重复外发
+  ---
+  duration_ms: 157.3625
+  type: 'test'
+  ...
+# Subtest: 发送租约过期转待对账，迟到结果不能覆盖且对账确认发送后不再外发
+ok 68 - 发送租约过期转待对账，迟到结果不能覆盖且对账确认发送后不再外发
+  ---
+  duration_ms: 149.9746
+  type: 'test'
+  ...
+# Subtest: 适配器确定失败异常落失败尝试，重试使用新的稳定供应商幂等键
+ok 69 - 适配器确定失败异常落失败尝试，重试使用新的稳定供应商幂等键
+  ---
+  duration_ms: 178.3209
+  type: 'test'
+  ...
+# Subtest: 适配器提交后异常进入未知对账，确认未发送后才允许下一幂等尝试
+ok 70 - 适配器提交后异常进入未知对账，确认未发送后才允许下一幂等尝试
+  ---
+  duration_ms: 231.9595
+  type: 'test'
+  ...
+# (node:67724) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 005 quarantines invalid role assignments and makes legacy processing reconciliation-only
+ok 71 - 005 quarantines invalid role assignments and makes legacy processing reconciliation-only
+  ---
+  duration_ms: 176.114
+  type: 'test'
+  ...
+# Subtest: fencing epochs reject stale and expired workers while allowing pre-effect renewal
+ok 72 - fencing epochs reject stale and expired workers while allowing pre-effect renewal
+  ---
+  duration_ms: 719.4039
+  type: 'test'
+  ...
+# (node:71000) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: migrations apply once and replay without mutation against a temporary SQLite file
+ok 73 - migrations apply once and replay without mutation against a temporary SQLite file
+  ---
+  duration_ms: 705.9825
+  type: 'test'
+  ...
+# Subtest: 004 migrates 003 idempotency records to pending and succeeded without rewriting history
+ok 74 - 004 migrates 003 idempotency records to pending and succeeded without rewriting history
+  ---
+  duration_ms: 95.2284
+  type: 'test'
+  ...
+# Subtest: HTTP login persists sessions, protects the login idempotency hash, and enforces input bounds
+ok 75 - HTTP login persists sessions, protects the login idempotency hash, and enforces input bounds
+  ---
+  duration_ms: 1915.6586
+  type: 'test'
+  ...
+# Subtest: disabled organizations block fresh login, replayed login, existing sessions, and school workspaces
+ok 76 - disabled organizations block fresh login, replayed login, existing sessions, and school workspaces
+  ---
+  duration_ms: 1404.6379
+  type: 'test'
+  ...
+# Subtest: a legacy forged cross-organization class membership cannot expand class scope or authorize HTTP access
+ok 77 - a legacy forged cross-organization class membership cannot expand class scope or authorize HTTP access
+  ---
+  duration_ms: 1351.4355
+  type: 'test'
+  ...
+# Subtest: class, grade, own, school, and platform scopes use persisted memberships without widening student actions
+ok 78 - class, grade, own, school, and platform scopes use persisted memberships without widening student actions
+  ---
+  duration_ms: 2488.1227
+  type: 'test'
+  ...
+# Subtest: session TTL rejects invalid values before opening the database
+ok 79 - session TTL rejects invalid values before opening the database
+  ---
+  duration_ms: 13.1569
+  type: 'test'
+  ...
+# Subtest: seed import is strict on drift and the JSON CLI reports nonzero failure without raw credentials
+ok 80 - seed import is strict on drift and the JSON CLI reports nonzero failure without raw credentials
+  ---
+  duration_ms: 2551.016
+  type: 'test'
+  ...
+# Subtest: async idempotency reserves outside external work, replays successes, and recovers expired leases
+ok 81 - async idempotency reserves outside external work, replays successes, and recovers expired leases
+  ---
+  duration_ms: 662.3244
+  type: 'test'
+  ...
+# Subtest: async idempotency persists classified failures and blocks blind replay after unknown external results
+ok 82 - async idempotency persists classified failures and blocks blind replay after unknown external results
+  ---
+  duration_ms: 478.0303
+  type: 'test'
+  ...
+# (node:72304) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: role assignments stay inside their organization for SQLite writes and HTTP target access
+ok 83 - role assignments stay inside their organization for SQLite writes and HTTP target access
+  ---
+  duration_ms: 1913.1752
+  type: 'test'
+  ...
+# (node:25892) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: H. POST /classes 必须用 class.create，resourceScope 必须带服务端计算的 gradeId
+ok 84 - H. POST /classes 必须用 class.create，resourceScope 必须带服务端计算的 gradeId
+  ---
+  duration_ms: 4.1286
+  type: 'test'
+  ...
+# Subtest: H. POST /classes body 为 {name,stage,entryYear,classNumber}，服务端生成 gradeId
+ok 85 - H. POST /classes body 为 {name,stage,entryYear,classNumber}，服务端生成 gradeId
+  ---
+  duration_ms: 1035.8338
+  type: 'test'
+  ...
+# Subtest: H. PATCH 改届别须带 version，并对变更前/后 scope 都校验
+ok 86 - H. PATCH 改届别须带 version，并对变更前/后 scope 都校验
+  ---
+  duration_ms: 1155.061
+  type: 'test'
+  ...
+# Subtest: H. DELETE/restore 软停用 class+workspace，成员与 grants 保留
+ok 87 - H. DELETE/restore 软停用 class+workspace，成员与 grants 保留
+  ---
+  duration_ms: 1048.6109
+  type: 'test'
+  ...
+# Subtest: H. 学年计算：固定 now 测 9 月 1 日边界、小学 6 / 初高中 3、upcoming/graduated
+ok 88 - H. 学年计算：固定 now 测 9 月 1 日边界、小学 6 / 初高中 3、upcoming/graduated
+  ---
+  duration_ms: 7.1232
+  type: 'test'
+  ...
+# Subtest: H. grade_group → grade_manager 别名不得再映射
+ok 89 - H. grade_group → grade_manager 别名不得再映射
+  ---
+  duration_ms: 1.1534
+  type: 'test'
+  ...
+# Subtest: H. 教师不得 POST /classes；跨组织 classId 与不存在同码同文案
+ok 90 - H. 教师不得 POST /classes；跨组织 classId 与不存在同码同文案
+  ---
+  duration_ms: 1185.4219
+  type: 'test'
+  ...
+# (node:71592) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. 注册后零成员关系、一条 pending
+ok 91 - F. 注册后零成员关系、一条 pending
+  ---
+  duration_ms: 1963.8969
+  type: 'test'
+  ...
+# Subtest: F. 批准一次性建学生三关系
+ok 92 - F. 批准一次性建学生三关系
+  ---
+  duration_ms: 1143.2323
+  type: 'test'
+  ...
+# Subtest: F. 拒绝后可新申请；终态不可改 → 409 VERSION_CONFLICT
+ok 93 - F. 拒绝后可新申请；终态不可改 → 409 VERSION_CONFLICT
+  ---
+  duration_ms: 1307.0363
+  type: 'test'
+  ...
+# Subtest: F. 重复 pending / 已有 active 班 / 教师审别班 / grade_manager 跨届 全部拒绝
+ok 94 - F. 重复 pending / 已有 active 班 / 教师审别班 / grade_manager 跨届 全部拒绝
+  ---
+  duration_ms: 1478.5447
+  type: 'test'
+  ...
+# Subtest: F. If-Match 优先于 body version：If-Match 当前 + body 过期 → 200
+ok 95 - F. If-Match 优先于 body version：If-Match 当前 + body 过期 → 200
+  ---
+  duration_ms: 1329.1502
+  type: 'test'
+  ...
+# Subtest: F. 并发两个批准：只有一次物化学生三关系，另一次 409
+ok 96 - F. 并发两个批准：只有一次物化学生三关系，另一次 409
+  ---
+  duration_ms: 1313.6526
+  type: 'test'
+  ...
+# Subtest: F. If-Match 优先于 body version：If-Match 过期 + body 当前 → 409 VERSION_CONFLICT
+ok 97 - F. If-Match 优先于 body version：If-Match 过期 + body 当前 → 409 VERSION_CONFLICT
+  ---
+  duration_ms: 1172.2945
+  type: 'test'
+  ...
+# (node:63280) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\core\\phase8-identity-guards\\harness.guard.test.js
+ok 11 - tests\\server\\core\\phase8-identity-guards\\harness.guard.test.js
+  ---
+  duration_ms: 346.1066
+  type: 'test'
+  ...
+# (node:70312) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. POST /auth/login 只接受 {schoolCode, loginName, password} 且登录成功
+ok 99 - A. POST /auth/login 只接受 {schoolCode, loginName, password} 且登录成功
+  ---
+  duration_ms: 1856.6172
+  type: 'test'
+  ...
+# Subtest: A. username-only 登录不得再成功
+ok 100 - A. username-only 登录不得再成功
+  ---
+  duration_ms: 1212.1777
+  type: 'test'
+  ...
+# Subtest: A. 登录失败统一 401「学校、账号或密码错误」
+ok 101 - A. 登录失败统一 401「学校、账号或密码错误」
+  ---
+  duration_ms: 1523.6427
+  type: 'test'
+  ...
+# Subtest: A. pending 学生登录 200，defaultPath=/student/onboarding，activeWorkspaceId=null
+ok 102 - A. pending 学生登录 200，defaultPath=/student/onboarding，activeWorkspaceId=null
+  ---
+  duration_ms: 1543.3685
+  type: 'test'
+  ...
+# Subtest: A. V 成立且零 active 教师班：defaultPath=/console/select-class
+ok 103 - A. V 成立且零 active 教师班：defaultPath=/console/select-class
+  ---
+  duration_ms: 1825.6436
+  type: 'test'
+  ...
+# Subtest: A. 不得把空 defaultPath 当成登录失败
+ok 104 - A. 不得把空 defaultPath 当成登录失败
+  ---
+  duration_ms: 1390.7922
+  type: 'test'
+  ...
+# (node:65460) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 密码重置矩阵：教师对本班学生允许，对他班学生/本校教师拒绝
+ok 105 - G. 密码重置矩阵：教师对本班学生允许，对他班学生/本校教师拒绝
+  ---
+  duration_ms: 1093.7124
+  type: 'test'
+  ...
+# Subtest: G. 密码重置矩阵：年级主任对本届学生+本校教师允许，跨届学生拒绝
+ok 106 - G. 密码重置矩阵：年级主任对本届学生+本校教师允许，跨届学生拒绝
+  ---
+  duration_ms: 1167.529
+  type: 'test'
+  ...
+# Subtest: G. 密码重置矩阵：校长全校允许；platform 对校长允许；跨组织 404
+ok 107 - G. 密码重置矩阵：校长全校允许；platform 对校长允许；跨组织 404
+  ---
+  duration_ms: 1092.7285
+  type: 'test'
+  ...
+# Subtest: G. 重置码 30 分钟、撤销、单次；失败密码不消费；旧 session 全失效
+ok 108 - G. 重置码 30 分钟、撤销、单次；失败密码不消费；旧 session 全失效
+  ---
+  duration_ms: 1306.3398
+  type: 'test'
+  ...
+# Subtest: G. 审计不含 token/password/hash
+ok 109 - G. 审计不含 token/password/hash
+  ---
+  duration_ms: 1353.6479
+  type: 'test'
+  ...
+# (node:62972) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: I. roleActions：teacher 有 shelf 无 catalog；行政无 shelf/catalog；platform 有 catalog 无 shelf
+ok 110 - I. roleActions：teacher 有 shelf 无 catalog；行政无 shelf/catalog；platform 有 catalog 无 shelf
+  ---
+  duration_ms: 6.3587
+  type: 'test'
+  ...
+# Subtest: I. 废止 teacher.affiliation.approve：无 action
+ok 111 - I. 废止 teacher.affiliation.approve：无 action
+  ---
+  duration_ms: 0.5865
+  type: 'test'
+  ...
+# Subtest: I. teacher.affiliation.join_self / leave_self：允许 + 同组织越 scope 拒绝 + 跨组织 404
+ok 112 - I. teacher.affiliation.join_self / leave_self：允许 + 同组织越 scope 拒绝 + 跨组织 404
+  ---
+  duration_ms: 1712.7924
+  type: 'test'
+  ...
+# Subtest: I. teacher.affiliation.force_assign / force_remove：允许 + 越 scope 403 + 跨组织 404
+ok 113 - I. teacher.affiliation.force_assign / force_remove：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 988.1991
+  type: 'test'
+  ...
+# Subtest: I. student.enrollment.review：允许 + 越 scope 403 + 跨组织 404
+ok 114 - I. student.enrollment.review：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 1349.3435
+  type: 'test'
+  ...
+# Subtest: I. 10.2 写动作在 roleActions 中的允许/拒绝抽样
+ok 115 - I. 10.2 写动作在 roleActions 中的允许/拒绝抽样
+  ---
+  duration_ms: 1.0186
+  type: 'test'
+  ...
+# Subtest: I. registration.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+ok 116 - I. registration.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 1474.2169
+  type: 'test'
+  ...
+# Subtest: I. password_reset.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+ok 117 - I. password_reset.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 1377.6182
+  type: 'test'
+  ...
+# Subtest: I. class.create：允许 + 越 scope 403 + 跨组织 404
+ok 118 - I. class.create：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 1429.6239
+  type: 'test'
+  ...
+# Subtest: I. 行政角色指派：platform 指派校长 / 校长指派年级主任；越权 403；跨组织 404
+ok 119 - I. 行政角色指派：platform 指派校长 / 校长指派年级主任；越权 403；跨组织 404
+  ---
+  duration_ms: 1317.8177
+  type: 'test'
+  ...
+# (node:65072) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. teacher/student 凭据分开；body 出现 role/organizationId/scopeId → 400
+ok 120 - E. teacher/student 凭据分开；body 出现 role/organizationId/scopeId → 400
+  ---
+  duration_ms: 1228.2378
+  type: 'test'
+  ...
+# Subtest: E. 组织只从 token 反查；公开消费原文不落库、不进审计
+ok 121 - E. 组织只从 token 反查；公开消费原文不落库、不进审计
+  ---
+  duration_ms: 1239.9571
+  type: 'test'
+  ...
+# Subtest: E. 撤销/到期/用尽公开端统一 404
+ok 122 - E. 撤销/到期/用尽公开端统一 404
+  ---
+  duration_ms: 1075.1806
+  type: 'test'
+  ...
+# Subtest: E. 人数上限最后一名额并发只有一个成功；失败不计 use
+ok 123 - E. 人数上限最后一名额并发只有一个成功；失败不计 use
+  ---
+  duration_ms: 1283.1622
+  type: 'test'
+  ...
+# Subtest: E. 同 loginName 跨校可注册；同校冲突 409 + details.suggestions 3 个
+ok 124 - E. 同 loginName 跨校可注册；同校冲突 409 + details.suggestions 3 个
+  ---
+  duration_ms: 1419.5051
+  type: 'test'
+  ...
+# Subtest: E. 教师/学生默认 TTL 与 max_uses 可被显式覆盖
+ok 125 - E. 教师/学生默认 TTL 与 max_uses 可被显式覆盖
+  ---
+  duration_ms: 1579.8847
+  type: 'test'
+  ...
+# Subtest: E. 教师默认 7 天 max_uses=1；学生默认 180 天 max_uses=NULL
+ok 126 - E. 教师默认 7 天 max_uses=1；学生默认 180 天 max_uses=NULL
+  ---
+  duration_ms: 1098.0694
+  type: 'test'
+  ...
+# Subtest: E. grade_manager 签发学生凭据必须是自己的 grade scope，body 改 scopeId → 400
+ok 127 - E. grade_manager 签发学生凭据必须是自己的 grade scope，body 改 scopeId → 400
+  ---
+  duration_ms: 1008.1612
+  type: 'test'
+  ...
+# Subtest: E. grade_manager 可签发教师凭据（school 例外），但不能跨届建班/改学生
+ok 128 - E. grade_manager 可签发教师凭据（school 例外），但不能跨届建班/改学生
+  ---
+  duration_ms: 1000.3098
+  type: 'test'
+  ...
+# (node:62664) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: J. 临时库路径不得是 server/data/readmate.sqlite
+ok 129 - J. 临时库路径不得是 server/data/readmate.sqlite
+  ---
+  duration_ms: 1189.9101
+  type: 'test'
+  ...
+# Subtest: J. session-only 与公开注册必须打 identity router，禁止 integration-router
+ok 130 - J. session-only 与公开注册必须打 identity router，禁止 integration-router
+  ---
+  duration_ms: 8.3519
+  type: 'test'
+  ...
+# Subtest: J. 跨组织 id 与不存在 id 同码同文案 404
+ok 131 - J. 跨组织 id 与不存在 id 同码同文案 404
+  ---
+  duration_ms: 1064.5252
+  type: 'test'
+  ...
+# Subtest: J. 缺失路由不得 fallback 成 200；POST /students 也不得再 200
+ok 132 - J. 缺失路由不得 fallback 成 200；POST /students 也不得再 200
+  ---
+  duration_ms: 1404.208
+  type: 'test'
+  ...
+# Subtest: J. 本套守卫只声明真库路径，绝不把 createIdentityTestApp 指向它
+ok 133 - J. 本套守卫只声明真库路径，绝不把 createIdentityTestApp 指向它
+  ---
+  duration_ms: 1268.8191
+  type: 'test'
+  ...
+# (node:70424) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. session-only 路由只挂 identity router，且不经过 requireWorkspace
+ok 134 - C. session-only 路由只挂 identity router，且不经过 requireWorkspace
+  ---
+  duration_ms: 6.0165
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace pending 学生可 GET /onboarding/me（无 X-Workspace-Id）
+ok 135 - C. 零 workspace pending 学生可 GET /onboarding/me（无 X-Workspace-Id）
+  ---
+  duration_ms: 1129.0244
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace 的 V 教师可 GET /teacher/class-directory（无 X-Workspace-Id）
+ok 136 - C. 零 workspace 的 V 教师可 GET /teacher/class-directory（无 X-Workspace-Id）
+  ---
+  duration_ms: 1022.4527
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace 的 V 教师可 PUT join，且不得为 V 创建 school 范围 teacher role
+ok 137 - C. 零 workspace 的 V 教师可 PUT join，且不得为 V 创建 school 范围 teacher role
+  ---
+  duration_ms: 1003.5545
+  type: 'test'
+  ...
+# Subtest: C. 教师调用 GET /classes → 403
+ok 138 - C. 教师调用 GET /classes → 403
+  ---
+  duration_ms: 1023.0417
+  type: 'test'
+  ...
+# Subtest: C. GET /classes 仅 S/G 可访问
+ok 139 - C. GET /classes 仅 S/G 可访问
+  ---
+  duration_ms: 1356.8237
+  type: 'test'
+  ...
+# Subtest: C. 已入班教师看本班走 GET /classes/:classId + C
+ok 140 - C. 已入班教师看本班走 GET /classes/:classId + C
+  ---
+  duration_ms: 1445.2265
+  type: 'test'
+  ...
+# (node:35748) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. identity router 不得再注册 POST /students（无兼容 handler / 假 404 分支）
+ok 141 - B. identity router 不得再注册 POST /students（无兼容 handler / 假 404 分支）
+  ---
+  duration_ms: 2.1001
+  type: 'test'
+  ...
+# Subtest: B. POST /students 必须由标准不存在路由返回 404，且不能再物化已入班学生
+ok 142 - B. POST /students 必须由标准不存在路由返回 404，且不能再物化已入班学生
+  ---
+  duration_ms: 1228.6797
+  type: 'test'
+  ...
+# (node:67708) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. join_self：session-only + V，立即生效，已 active 则 200 幂等且不得产生第二组
+ok 143 - D. join_self：session-only + V，立即生效，已 active 则 200 幂等且不得产生第二组
+  ---
+  duration_ms: 1255.8066
+  type: 'test'
+  ...
+# Subtest: D. leave_self：不要求 X-Workspace-Id；完整 active → 同事务停用三者 200
+ok 144 - D. leave_self：不要求 X-Workspace-Id；完整 active → 同事务停用三者 200
+  ---
+  duration_ms: 1031.8403
+  type: 'test'
+  ...
+# Subtest: D. leave_self：完整 disabled 或三者皆无 → 200 no-op；不得因 disabled/absent 先 403
+ok 145 - D. leave_self：完整 disabled 或三者皆无 → 200 no-op；不得因 disabled/absent 先 403
+  ---
+  duration_ms: 1057.1856
+  type: 'test'
+  ...
+# Subtest: D. leave_self：残缺三元组 → 500 IDENTITY_INVARIANT_VIOLATION，且不自动修
+ok 146 - D. leave_self：残缺三元组 → 500 IDENTITY_INVARIANT_VIOLATION，且不自动修
+  ---
+  duration_ms: 1005.957
+  type: 'test'
+  ...
+# Subtest: D. leave_self / join_self：class 不存在与跨组织同码同文案 404
+ok 147 - D. leave_self / join_self：class 不存在与跨组织同码同文案 404
+  ---
+  duration_ms: 1330.8502
+  type: 'test'
+  ...
+# Subtest: D. 外校 / disabled / graduated 拒绝加入
+ok 148 - D. 外校 / disabled / graduated 拒绝加入
+  ---
+  duration_ms: 1350.6012
+  type: 'test'
+  ...
+# Subtest: D. 并发两个 join 最终只有一组三元组
+ok 149 - D. 并发两个 join 最终只有一组三元组
+  ---
+  duration_ms: 1043.7535
+  type: 'test'
+  ...
+# Subtest: D. 任一表故意缺失时不自动修，报不变量错误
+ok 150 - D. 任一表故意缺失时不自动修，报不变量错误
+  ---
+  duration_ms: 1126.3722
+  type: 'test'
+  ...
+# Subtest: D. teacher.affiliation.approve 不得存在（无 action、无路由、无 pending 教师审批模型）
+ok 151 - D. teacher.affiliation.approve 不得存在（无 action、无路由、无 pending 教师审批模型）
+  ---
+  duration_ms: 6.8525
+  type: 'test'
+  ...
+# Subtest: D. teacherCount 计完整 active 三元组；三表人数不一致 → IDENTITY_INVARIANT_VIOLATION
+ok 152 - D. teacherCount 计完整 active 三元组；三表人数不一致 → IDENTITY_INVARIANT_VIOLATION
+  ---
+  duration_ms: 1006.9662
+  type: 'test'
+  ...
+# Subtest: D. 强制指派/移除：S/G；目标须同校已验证教师；200 幂等；教师调用 403
+ok 153 - D. 强制指派/移除：S/G；目标须同校已验证教师；200 幂等；教师调用 403
+  ---
+  duration_ms: 853.2379
+  type: 'test'
+  ...
+# Subtest: D. 行政纠错 PATCH /students/:userId/class：教师 403；源+目标对称校验；目标即当前班 200 且不掩盖残缺
+ok 154 - D. 行政纠错 PATCH /students/:userId/class：教师 403；源+目标对称校验；目标即当前班 200 且不掩盖残缺
+  ---
+  duration_ms: 655.5729
+  type: 'test'
+  ...
+# (node:72272) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: GET /classes/:classId/enrollment-requests：本班允许、越 scope 403、跨组织 404
+ok 155 - GET /classes/:classId/enrollment-requests：本班允许、越 scope 403、跨组织 404
+  ---
+  duration_ms: 1648.9052
+  type: 'test'
+  ...
+# Subtest: GET /registration-credentials：校长允许、教师越 scope 403、不回显 hash/rawToken
+ok 156 - GET /registration-credentials：校长允许、教师越 scope 403、不回显 hash/rawToken
+  ---
+  duration_ms: 1189.4372
+  type: 'test'
+  ...
+# Subtest: GET /users/:userId/password-reset-credentials：本班允许、越 scope 403、跨组织 404
+ok 157 - GET /users/:userId/password-reset-credentials：本班允许、越 scope 403、跨组织 404
+  ---
+  duration_ms: 1347.9624
+  type: 'test'
+  ...
+# (node:71604) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 删除全量 visibility 写模型：setBookVisibility(scope,classIds) 必须不再可用
+ok 158 - 删除全量 visibility 写模型：setBookVisibility(scope,classIds) 必须不再可用
+  ---
+  duration_ms: 619.3479
+  type: 'test'
+  ...
+# Subtest: class-local grant：只增本 class + 当前版本一行，200 幂等，不替换其他班
+ok 159 - class-local grant：只增本 class + 当前版本一行，200 幂等，不替换其他班
+  ---
+  duration_ms: 769.1294
+  type: 'test'
+  ...
+# Subtest: class-local revoke：只删本 class grant，不动其他班、不动未知 grantee_type
+ok 160 - class-local revoke：只删本 class grant，不动其他班、不动未知 grantee_type
+  ---
+  duration_ms: 750.7327
+  type: 'test'
+  ...
+# Subtest: shelf 领域函数禁止再调用 book.publish / setBookVisibility
+ok 161 - shelf 领域函数禁止再调用 book.publish / setBookVisibility
+  ---
+  duration_ms: 741.768
+  type: 'test'
+  ...
+# Subtest: 两个并发 PUT 同班同书最终一行
+ok 162 - 两个并发 PUT 同班同书最终一行
+  ---
+  duration_ms: 875.976
+  type: 'test'
+  ...
+# Subtest: 一个班撤下不影响他班
+ok 163 - 一个班撤下不影响他班
+  ---
+  duration_ms: 864.5502
+  type: 'test'
+  ...
+# (node:69340) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-21 getPost：有本班 grant 时 quote.text 仍返回
+ok 164 - D-21 getPost：有本班 grant 时 quote.text 仍返回
+  ---
+  duration_ms: 815.1194
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：无 grant 时保留帖子，quote.text=null 且 availability=unavailable
+ok 165 - D-21 getPost：无 grant 时保留帖子，quote.text=null 且 availability=unavailable
+  ---
+  duration_ms: 808.8333
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：仅他班 grant 时隐藏 quote.text
+ok 166 - D-21 getPost：仅他班 grant 时隐藏 quote.text
+  ---
+  duration_ms: 861.2857
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：draft 即使已给本班 grant 也隐藏 quote.text（失败只归因发布状态）
+ok 167 - D-21 getPost：draft 即使已给本班 grant 也隐藏 quote.text（失败只归因发布状态）
+  ---
+  duration_ms: 835.3576
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：旧帖不改数据库；撤 grant 后读隐藏，恢复 grant 后读恢复
+ok 168 - D-21 getPost：旧帖不改数据库；撤 grant 后读隐藏，恢复 grant 后读恢复
+  ---
+  duration_ms: 1070.019
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：教师对 published 可看 quote.text（即使无 class grant）
+ok 169 - D-21 getPost：教师对 published 可看 quote.text（即使无 class grant）
+  ---
+  duration_ms: 1134.3537
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：跨组织不泄露帖子或 quote.text
+ok 170 - D-21 getPost：跨组织不泄露帖子或 quote.text
+  ---
+  duration_ms: 1014.2845
+  type: 'test'
+  ...
+# (node:71444) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-23 acquireLease：published + 本班 grant → 成功并产生 lease
+ok 171 - D-23 acquireLease：published + 本班 grant → 成功并产生 lease
+  ---
+  duration_ms: 751.0989
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：published + 无 grant → 404「书籍不存在或当前不可读取」，且不得写 lease
+ok 172 - D-23 acquireLease：published + 无 grant → 404「书籍不存在或当前不可读取」，且不得写 lease
+  ---
+  duration_ms: 1017.1182
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：draft + 本班 grant → 404，失败只归因发布状态
+ok 173 - D-23 acquireLease：draft + 本班 grant → 404，失败只归因发布状态
+  ---
+  duration_ms: 811.4078
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：外组织版本 → 同码同文案 404，不泄露存在性
+ok 174 - D-23 acquireLease：外组织版本 → 同码同文案 404，不泄露存在性
+  ---
+  duration_ms: 785.1945
+  type: 'test'
+  ...
+# Subtest: D-23：已取得租约后撤下，现有 lease 可按 90 秒规则续到自然结束，结束后新 acquire 404
+ok 175 - D-23：已取得租约后撤下，现有 lease 可按 90 秒规则续到自然结束，结束后新 acquire 404
+  ---
+  duration_ms: 792.5736
+  type: 'test'
+  ...
+# Subtest: D-23：可见性前置必须在任何 lease 写事务之前
+ok 176 - D-23：可见性前置必须在任何 lease 写事务之前
+  ---
+  duration_ms: 831.1832
+  type: 'test'
+  ...
+# Subtest: D-23：takeOverLease 委托 acquire，自动受同一可见性约束
+ok 177 - D-23：takeOverLease 委托 acquire，自动受同一可见性约束
+  ---
+  duration_ms: 1018.0729
+  type: 'test'
+  ...
+# (node:33816) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-25：resolveBookAudience 不再返回 unrestricted，改为 bypassClassGrants/allowUnpublished/classIds
+ok 178 - D-25：resolveBookAudience 不再返回 unrestricted，改为 bypassClassGrants/allowUnpublished/classIds
+  ---
+  duration_ms: 753.3326
+  type: 'test'
+  ...
+# Subtest: D-25：platform 的 audience 为 bypassClassGrants=true 且 allowUnpublished=true
+ok 179 - D-25：platform 的 audience 为 bypassClassGrants=true 且 allowUnpublished=true
+  ---
+  duration_ms: 678.1936
+  type: 'test'
+  ...
+# Subtest: D-25：teacher 的 audience 为 bypassClassGrants=true 且 allowUnpublished=false
+ok 180 - D-25：teacher 的 audience 为 bypassClassGrants=true 且 allowUnpublished=false
+  ---
+  duration_ms: 802.8045
+  type: 'test'
+  ...
+# Subtest: D-25：student 的 audience 为 bypassClassGrants=false 且 allowUnpublished=false
+ok 181 - D-25：student 的 audience 为 bypassClassGrants=false 且 allowUnpublished=false
+  ---
+  duration_ms: 782.7055
+  type: 'test'
+  ...
+# Subtest: D-25：校长不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+ok 182 - D-25：校长不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+  ---
+  duration_ms: 1025.695
+  type: 'test'
+  ...
+# Subtest: D-25：年级主任不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+ok 183 - D-25：年级主任不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+  ---
+  duration_ms: 965.0276
+  type: 'test'
+  ...
+# Subtest: D-25：bypassClassGrants=true 只绕过 class grant，不可以把 draft 当成可见书
+ok 184 - D-25：bypassClassGrants=true 只绕过 class grant，不可以把 draft 当成可见书
+  ---
+  duration_ms: 1036.4455
+  type: 'test'
+  ...
+# Subtest: D-25：教师书库只列 published；draft/archived 只对 platform
+ok 185 - D-25：教师书库只列 published；draft/archived 只对 platform
+  ---
+  duration_ms: 1043.3576
+  type: 'test'
+  ...
+# Subtest: D-25：教师取 draft 资产必须 404，不得靠旧 unrestricted 放行
+ok 186 - D-25：教师取 draft 资产必须 404，不得靠旧 unrestricted 放行
+  ---
+  duration_ms: 963.5911
+  type: 'test'
+  ...
+# Subtest: D-25：新发布图书不自动投放（publish 不得自动写 grant）
+ok 187 - D-25：新发布图书不自动投放（publish 不得自动写 grant）
+  ---
+  duration_ms: 1015.6239
+  type: 'test'
+  ...
+# Subtest: D-25：bypassClassGrants=true 在仅有他班 grant 时仍可见，且这只是 grant 旁路
+ok 188 - D-25：bypassClassGrants=true 在仅有他班 grant 时仍可见，且这只是 grant 旁路
+  ---
+  duration_ms: 848.8145
+  type: 'test'
+  ...
+# (node:71328) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 默认全闭：无 grants 时 isBookVisibleToAudience 必须为 false（删除「无任何 grants 即 true」）
+ok 189 - 默认全闭：无 grants 时 isBookVisibleToAudience 必须为 false（删除「无任何 grants 即 true」）
+  ---
+  duration_ms: 743.6609
+  type: 'test'
+  ...
+# Subtest: 默认全闭：仅他班 class grant 时本班学生不可见
+ok 190 - 默认全闭：仅他班 class grant 时本班学生不可见
+  ---
+  duration_ms: 624.6605
+  type: 'test'
+  ...
+# Subtest: 默认全闭：本班 class grant + published 时学生可见
+ok 191 - 默认全闭：本班 class grant + published 时学生可见
+  ---
+  duration_ms: 782.5838
+  type: 'test'
+  ...
+# Subtest: 默认全闭：audience.classIds 为空必须不可见
+ok 192 - 默认全闭：audience.classIds 为空必须不可见
+  ---
+  duration_ms: 667.7904
+  type: 'test'
+  ...
+# Subtest: 默认全闭：未知 grantee_type 不得当可见，也不得靠兼容兜底变 true
+ok 193 - 默认全闭：未知 grantee_type 不得当可见，也不得靠兼容兜底变 true
+  ---
+  duration_ms: 876.2968
+  type: 'test'
+  ...
+# (node:72060) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 不变量：守卫测试不接触真实业务库
+ok 194 - 不变量：守卫测试不接触真实业务库
+  ---
+  duration_ms: 750.8724
+  type: 'test'
+  ...
+# Subtest: 不变量：冻结阅读摘要表 schema 不得被本阶段改动
+ok 195 - 不变量：冻结阅读摘要表 schema 不得被本阶段改动
+  ---
+  duration_ms: 688.418
+  type: 'test'
+  ...
+# Subtest: 不变量：不得修改 90s TTL 常量与 renew / session-summaries 路由
+ok 196 - 不变量：不得修改 90s TTL 常量与 renew / session-summaries 路由
+  ---
+  duration_ms: 6.0634
+  type: 'test'
+  ...
+# Subtest: 不变量：三份 visibility 文件由 T8.7 拥有，不再要求对初始 HEAD 干净
+ok 197 - 不变量：三份 visibility 文件由 T8.7 拥有，不再要求对初始 HEAD 干净
+  ---
+  duration_ms: 6.991
+  type: 'test'
+  ...
+# (node:68440) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\core\\phase8-reading-guards\\shared-harness.guard.test.js
+ok 27 - tests\\server\\core\\phase8-reading-guards\\shared-harness.guard.test.js
+  ---
+  duration_ms: 170.9749
+  type: 'test'
+  ...
+# (node:32252) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: book-package/v2 只接受已过人工闸门且可追溯的精确页块
+ok 199 - book-package/v2 只接受已过人工闸门且可追溯的精确页块
+  ---
+  duration_ms: 225.1682
+  type: 'test'
+  ...
+# Subtest: book-package/v2 内容被改写后必须因 SHA-256 不一致失败
+ok 200 - book-package/v2 内容被改写后必须因 SHA-256 不一致失败
+  ---
+  duration_ms: 287.2891
+  type: 'test'
+  ...
+# Subtest: book-package/v2 即使哈希重算，缺少逐块校订台账仍不得导入
+ok 201 - book-package/v2 即使哈希重算，缺少逐块校订台账仍不得导入
+  ---
+  duration_ms: 88.5225
+  type: 'test'
+  ...
+# Subtest: book-package/v2 重算包哈希也不能伪造校订原文哈希
+ok 202 - book-package/v2 重算包哈希也不能伪造校订原文哈希
+  ---
+  duration_ms: 87.2483
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包在 --accept-trusted 下被接受且保留真实质量状态
+ok 203 - trusted-baseline 包在 --accept-trusted 下被接受且保留真实质量状态
+  ---
+  duration_ms: 537.0748
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包在没有 --accept-trusted 时必须被人工闸门拒绝
+ok 204 - trusted-baseline 包在没有 --accept-trusted 时必须被人工闸门拒绝
+  ---
+  duration_ms: 199.2716
+  type: 'test'
+  ...
+# Subtest: --accept-trusted 不放宽 passed 路径：未过人工闸门的包仍被拒绝
+ok 205 - --accept-trusted 不放宽 passed 路径：未过人工闸门的包仍被拒绝
+  ---
+  duration_ms: 70.2035
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包不得伪造人工复核记录
+ok 206 - trusted-baseline 包不得伪造人工复核记录
+  ---
+  duration_ms: 109.8809
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包缺少 grade 必须被拒绝
+ok 207 - trusted-baseline 包缺少 grade 必须被拒绝
+  ---
+  duration_ms: 92.0613
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包物理页缺号必须被拒绝
+ok 208 - trusted-baseline 包物理页缺号必须被拒绝
+  ---
+  duration_ms: 129.0721
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包文件哈希不符必须被拒绝
+ok 209 - trusted-baseline 包文件哈希不符必须被拒绝
+  ---
+  duration_ms: 80.6391
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包封面哈希不符必须被拒绝
+ok 210 - trusted-baseline 包封面哈希不符必须被拒绝
+  ---
+  duration_ms: 85.8938
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包 PDF 物理页数与 pageCount 不符必须被拒绝
+ok 211 - trusted-baseline 包 PDF 物理页数与 pageCount 不符必须被拒绝
+  ---
+  duration_ms: 77.704
+  type: 'test'
+  ...
+# (node:16284) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: trusted-baseline 包用 --accept-trusted 端到端导入并登记封面与年级
+ok 212 - trusted-baseline 包用 --accept-trusted 端到端导入并登记封面与年级
+  ---
+  duration_ms: 2478.7944
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 包在没有 --accept-trusted 时导入被拒绝且不落库不落盘
+ok 213 - trusted-baseline 包在没有 --accept-trusted 时导入被拒绝且不落库不落盘
+  ---
+  duration_ms: 2071.7146
+  type: 'test'
+  ...
+# Subtest: 同一 trusted 包重复导入保持幂等
+ok 214 - 同一 trusted 包重复导入保持幂等
+  ---
+  duration_ms: 2478.331
+  type: 'test'
+  ...
+# Subtest: GET /books 投影带出编目年级且保留既有字段
+ok 215 - GET /books 投影带出编目年级且保留既有字段
+  ---
+  duration_ms: 2013.8502
+  type: 'test'
+  ...
+# Subtest: publishBook 接受 trusted-baseline 但仍拒绝未通过人工闸门的 v2 包
+ok 216 - publishBook 接受 trusted-baseline 但仍拒绝未通过人工闸门的 v2 包
+  ---
+  duration_ms: 1517.2543
+  type: 'test'
+  ...
+# (node:70880) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 内部演示初始化升级稳定师生校长身份并保留运营边界
+ok 217 - 内部演示初始化升级稳定师生校长身份并保留运营边界
+  ---
+  duration_ms: 5210.3359
+  type: 'test'
+  ...
+# (node:71508) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: bootstrapInternalDemo 成功返回后立即释放数据库及 WAL/SHM
+ok 218 - bootstrapInternalDemo 成功返回后立即释放数据库及 WAL/SHM
+  ---
+  duration_ms: 2094.0856
+  type: 'test'
+  ...
+# Subtest: bootstrapInternalDemo 初始化失败后也释放已取得所有权的数据库连接
+ok 219 - bootstrapInternalDemo 初始化失败后也释放已取得所有权的数据库连接
+  ---
+  duration_ms: 69.0736
+  type: 'test'
+  ...
+# Subtest: identity close 可重复调用且释放自有数据库连接
+ok 220 - identity close 可重复调用且释放自有数据库连接
+  ---
+  duration_ms: 732.9593
+  type: 'test'
+  ...
+# (node:70256) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 12. 守卫测试不接触真实业务数据库
+ok 221 - 12. 守卫测试不接触真实业务数据库
+  ---
+  duration_ms: 908.0087
+  type: 'test'
+  ...
+# Subtest: 1. 全新库执行 047～050：文件存在、applied 含四 id、表和列存在
+ok 222 - 1. 全新库执行 047～050：文件存在、applied 含四 id、表和列存在
+  ---
+  duration_ms: 685.7561
+  type: 'test'
+  ...
+# Subtest: 2. 046 副本升级至 050：staged <047_ 先跑，插入 046 形基线，再挂 047～050
+ok 223 - 2. 046 副本升级至 050：staged <047_ 先跑，插入 046 形基线，再挂 047～050
+  ---
+  duration_ms: 1530.5768
+  type: 'test'
+  ...
+# Subtest: 3. 重复启动 alreadyApplied：第二次 applied=[]，alreadyApplied 含 047～050
+ok 224 - 3. 重复启动 alreadyApplied：第二次 applied=[]，alreadyApplied 含 047～050
+  ---
+  duration_ms: 1034.9584
+  type: 'test'
+  ...
+# Subtest: 4. checksum 稳定：两次 checksum 相等且长度 64
+ok 225 - 4. checksum 稳定：两次 checksum 相等且长度 64
+  ---
+  duration_ms: 1063.2438
+  type: 'test'
+  ...
+# Subtest: 5. 047 登录/班级字段回填与唯一索引
+ok 226 - 5. 047 登录/班级字段回填与唯一索引
+  ---
+  duration_ms: 2405.1724
+  type: 'test'
+  ...
+# Subtest: 6. 048 注册凭据表与唯一/角色约束，无默认 token
+ok 227 - 6. 048 注册凭据表与唯一/角色约束，无默认 token
+  ---
+  duration_ms: 1566.2477
+  type: 'test'
+  ...
+# Subtest: 7. 049 审批与重置表 + pending 部分唯一 + 学生单 active 班
+ok 228 - 7. 049 审批与重置表 + pending 部分唯一 + 学生单 active 班
+  ---
+  duration_ms: 1180.3513
+  type: 'test'
+  ...
+# Subtest: 8. 050 grants 回填：基线 49 行、draft 不回填、id/actor 格式与当前版本口径
+ok 229 - 8. 050 grants 回填：基线 49 行、draft 不回填、id/actor 格式与当前版本口径
+  ---
+  duration_ms: 815.1482
+  type: 'test'
+  ...
+# Subtest: 9. 当前基线形预期 49 行
+ok 230 - 9. 当前基线形预期 49 行
+  ---
+  duration_ms: 669.3424
+  type: 'test'
+  ...
+# Subtest: 10. 050 不重复插入：第二次 alreadyApplied，checksum 不变，grants 仍 49
+ok 231 - 10. 050 不重复插入：第二次 alreadyApplied，checksum 不变，grants 仍 49
+  ---
+  duration_ms: 646.8429
+  type: 'test'
+  ...
+# Subtest: 11. 不修改冻结阅读表 reading_summary_sessions / reading_daily_book_summaries
+ok 232 - 11. 不修改冻结阅读表 reading_summary_sessions / reading_daily_book_summaries
+  ---
+  duration_ms: 605.287
+  type: 'test'
+  ...
+# Subtest: 050 空库（0 published × 0 班）允许插入 0 行
+ok 233 - 050 空库（0 published × 0 班）允许插入 0 行
+  ---
+  duration_ms: 303.3317
+  type: 'test'
+  ...
+# Subtest: bootstrap：全新库跑完全部迁移后演示数据必须含第二班
+ok 234 - bootstrap：全新库跑完全部迁移后演示数据必须含第二班
+  ---
+  duration_ms: 773.2908
+  type: 'test'
+  ...
+# Subtest: bootstrap：必须有 grade workspace（code=grade-admin, scope_type=grade）
+ok 235 - bootstrap：必须有 grade workspace（code=grade-admin, scope_type=grade）
+  ---
+  duration_ms: 631.6611
+  type: 'test'
+  ...
+# Subtest: bootstrap：必须有 grade_manager 账号与对应 role assignment
+ok 236 - bootstrap：必须有 grade_manager 账号与对应 role assignment
+  ---
+  duration_ms: 609.5281
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本已有 2 个旧班时 047 必须失败
+ok 237 - 负例：046 副本已有 2 个旧班时 047 必须失败
+  ---
+  duration_ms: 346.0998
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本已有 1 条 grant 时 050 必须失败
+ok 238 - 负例：046 副本已有 1 条 grant 时 050 必须失败
+  ---
+  duration_ms: 430.9739
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本某 published 书没有 version 时 050 必须失败
+ok 239 - 负例：046 副本某 published 书没有 version 时 050 必须失败
+  ---
+  duration_ms: 430.7582
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本某学生已有 2 条 active class_memberships 时 049 必须失败
+ok 240 - 负例：046 副本某学生已有 2 条 active class_memberships 时 049 必须失败
+  ---
+  duration_ms: 333.4638
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 空 school_code 必须被触发器拒绝
+ok 241 - 负例：047 之后 INSERT 空 school_code 必须被触发器拒绝
+  ---
+  duration_ms: 217.7647
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 非法 stage 必须被触发器拒绝
+ok 242 - 负例：047 之后 INSERT 非法 stage 必须被触发器拒绝
+  ---
+  duration_ms: 325.7629
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 错误 grade_id 必须被触发器拒绝
+ok 243 - 负例：047 之后 INSERT 错误 grade_id 必须被触发器拒绝
+  ---
+  duration_ms: 311.9739
+  type: 'test'
+  ...
+# Subtest: 负例：049 之后同一学生第二条 pending enrollment 必须失败
+ok 244 - 负例：049 之后同一学生第二条 pending enrollment 必须失败
+  ---
+  duration_ms: 322.2091
+  type: 'test'
+  ...
+# Subtest: 负例：049 之后同一学生第二条 active student membership 必须失败
+ok 245 - 负例：049 之后同一学生第二条 active student membership 必须失败
+  ---
+  duration_ms: 323.2759
+  type: 'test'
+  ...
+# Subtest: 负例：050 不得给 draft 书或 disabled 班插 grant
+ok 246 - 负例：050 不得给 draft 书或 disabled 班插 grant
+  ---
+  duration_ms: 435.7361
+  type: 'test'
+  ...
+# (node:47988) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 书目已存在但公开封面丢失时幂等导入会恢复素材
+ok 247 - 书目已存在但公开封面丢失时幂等导入会恢复素材
+  ---
+  duration_ms: 2334.884
+  type: 'test'
+  ...
+# (node:60852) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 044 在全新数据库顺序执行并由迁移账本重复启动校验和保护
+ok 248 - 044 在全新数据库顺序执行并由迁移账本重复启动校验和保护
+  ---
+  duration_ms: 833.9132
+  type: 'test'
+  ...
+# Subtest: 043 与 044 可从已执行 042 的干净数据库前向升级并保留 reading_progress
+ok 249 - 043 与 044 可从已执行 042 的干净数据库前向升级并保留 reading_progress
+  ---
+  duration_ms: 1059.0413
+  type: 'test'
+  ...
+# Subtest: 043 强制范围、连续指纹、open 唯一、页码和单调更新约束
+ok 250 - 043 强制范围、连续指纹、open 唯一、页码和单调更新约束
+  ---
+  duration_ms: 751.7151
+  type: 'test'
+  ...
+# Subtest: request context accepts only bounded safe caller request ids
+ok 251 - request context accepts only bounded safe caller request ids
+  ---
+  duration_ms: 3.0908
+  type: 'test'
+  ...
+# Subtest: success envelope contains request metadata and optional cursor
+ok 252 - success envelope contains request metadata and optional cursor
+  ---
+  duration_ms: 3.5878
+  type: 'test'
+  ...
+# Subtest: known API errors preserve safe details and status
+ok 253 - known API errors preserve safe details and status
+  ---
+  duration_ms: 0.7335
+  type: 'test'
+  ...
+# Subtest: unexpected errors never expose internal messages or secrets
+ok 254 - unexpected errors never expose internal messages or secrets
+  ---
+  duration_ms: 0.8434
+  type: 'test'
+  ...
+# (node:67048) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 受保护书籍资产按类型设置缓存头，并在真实 HTTP 链路上处理条件请求
+    # Subtest: 封面 Cache-Control 含 no-store 且不含 max-age=3600
+    ok 1 - 封面 Cache-Control 含 no-store 且不含 max-age=3600
+      ---
+      duration_ms: 39.3987
+      type: 'test'
+      ...
+    # Subtest: 源 PDF Cache-Control 含 no-cache 且带非空 ETag
+    ok 2 - 源 PDF Cache-Control 含 no-cache 且带非空 ETag
+      ---
+      duration_ms: 59.5773
+      type: 'test'
+      ...
+    # Subtest: 源 PDF 匹配 If-None-Match 返回 304 且无响应体
+    ok 3 - 源 PDF 匹配 If-None-Match 返回 304 且无响应体
+      ---
+      duration_ms: 42.3248
+      type: 'test'
+      ...
+    # Subtest: 源 PDF 不匹配 If-None-Match 返回 200 完整内容
+    ok 4 - 源 PDF 不匹配 If-None-Match 返回 200 完整内容
+      ---
+      duration_ms: 26.4831
+      type: 'test'
+      ...
+    # Subtest: Range 请求仍返回 206 且 Content-Range 正确
+    ok 5 - Range 请求仍返回 206 且 Content-Range 正确
+      ---
+      duration_ms: 17.8053
+      type: 'test'
+      ...
+    # Subtest: Range 加匹配 If-None-Match 返回 304 而不是 206
+    ok 6 - Range 加匹配 If-None-Match 返回 304 而不是 206
+      ---
+      duration_ms: 13.4697
+      type: 'test'
+      ...
+    # Subtest: 缺 X-Workspace-Id 仍返回 400
+    ok 7 - 缺 X-Workspace-Id 仍返回 400
+      ---
+      duration_ms: 8.0932
+      type: 'test'
+      ...
+    # Subtest: 完全未登录仍返回 401
+    ok 8 - 完全未登录仍返回 401
+      ---
+      duration_ms: 11.61
+      type: 'test'
+      ...
+    # Subtest: 未枚举类型默认 no-cache+ETag，禁止把默认分支改回 max-age
+    ok 9 - 未枚举类型默认 no-cache+ETag，禁止把默认分支改回 max-age
+      ---
+      duration_ms: 41.4286
+      type: 'test'
+      ...
+    1..9
+ok 255 - 受保护书籍资产按类型设置缓存头，并在真实 HTTP 链路上处理条件请求
+  ---
+  duration_ms: 1956.5104
+  type: 'test'
+  ...
+# (node:69280) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: workspaceResourceScope 为 class 工作空间带上 classId，供 scopeAllows 比对
+ok 256 - workspaceResourceScope 为 class 工作空间带上 classId，供 scopeAllows 比对
+  ---
+  duration_ms: 7.8026
+  type: 'test'
+  ...
+# Subtest: 学生带合法会话和工作空间头调用发布/下架必须 403
+ok 257 - 学生带合法会话和工作空间头调用发布/下架必须 403
+  ---
+  duration_ms: 1452.8756
+  type: 'test'
+  ...
+# Subtest: 平台运营经真实 HTTP 发布和下架，并写入审计
+ok 258 - 平台运营经真实 HTTP 发布和下架，并写入审计
+  ---
+  duration_ms: 1180.0316
+  type: 'test'
+  ...
+# Subtest: 发布接口要求幂等键，重放不二次变更也不二次审计
+ok 259 - 发布接口要求幂等键，重放不二次变更也不二次审计
+  ---
+  duration_ms: 1463.1654
+  type: 'test'
+  ...
+# Subtest: trusted-baseline v2 包经真实 HTTP 下架后再发布能通过质量闸门
+ok 260 - trusted-baseline v2 包经真实 HTTP 下架后再发布能通过质量闸门
+  ---
+  duration_ms: 1609.2618
+  type: 'test'
+  ...
+# Subtest: 跨组织发布返回 404，对草稿下架也返回 404
+ok 261 - 跨组织发布返回 404，对草稿下架也返回 404
+  ---
+  duration_ms: 1271.8941
+  type: 'test'
+  ...
+# (node:65936) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 【攻击面 1.1/1.2】学生伪造 X-Workspace-Id 不能改变班级可见范围，且换头失败时不泄露书是否存在
+ok 262 - 【攻击面 1.1/1.2】学生伪造 X-Workspace-Id 不能改变班级可见范围，且换头失败时不泄露书是否存在
+  ---
+  duration_ms: 2531.7108
+  type: 'test'
+  ...
+# Subtest: 【攻击面 1.3】孤儿学生（无任何 class_memberships）：无 grant 不可见；只 grant 本班仍不可见（原因：无 class_memberships）
+ok 263 - 【攻击面 1.3】孤儿学生（无任何 class_memberships）：无 grant 不可见；只 grant 本班仍不可见（原因：无 class_memberships）
+  ---
+  duration_ms: 2470.0918
+  type: 'test'
+  ...
+# Subtest: 【攻击面 1.4·现状记录】班级被停用后，该班 grant 仍在但学生不可见（原因：班级已停用）
+ok 264 - 【攻击面 1.4·现状记录】班级被停用后，该班 grant 仍在但学生不可见（原因：班级已停用）
+  ---
+  duration_ms: 2071.1176
+  type: 'test'
+  ...
+# Subtest: 【攻击面 1.4·现状记录】学生本身就在停用班里：无 grant 不可见；只 grant 他班也不可见
+ok 265 - 【攻击面 1.4·现状记录】学生本身就在停用班里：无 grant 不可见；只 grant 他班也不可见
+  ---
+  duration_ms: 1154.0367
+  type: 'test'
+  ...
+# Subtest: 【攻击面 1.5/1.6】教师三元组可绕过 class grant 但不能看 draft；校长/年级主任/grade_group 不是书库正例；停权教师 fail closed
+ok 266 - 【攻击面 1.5/1.6】教师三元组可绕过 class grant 但不能看 draft；校长/年级主任/grade_group 不是书库正例；停权教师 fail closed
+  ---
+  duration_ms: 1398.307
+  type: 'test'
+  ...
+# Subtest: 【攻击面 2.7/2.8/2.9】收窄后新增版本：未授权班仍读不到旧版本页/旧资产，被授权班不被误伤
+ok 267 - 【攻击面 2.7/2.8/2.9】收窄后新增版本：未授权班仍读不到旧版本页/旧资产，被授权班不被误伤
+  ---
+  duration_ms: 716.698
+  type: 'test'
+  ...
+# Subtest: 【攻击面 3.10/3.11】跨组织显式两组织两班各自 grant 后仍互不可见；外组织 classId 与不存在 classId 同码同文案
+ok 268 - 【攻击面 3.10/3.11】跨组织显式两组织两班各自 grant 后仍互不可见；外组织 classId 与不存在 classId 同码同文案
+  ---
+  duration_ms: 1047.8115
+  type: 'test'
+  ...
+# Subtest: 【攻击面 4.12/4.13/4.14】书架只认当前 class workspace：教师不能跨班；年级主任/校长/平台无书架
+ok 269 - 【攻击面 4.12/4.13/4.14】书架只认当前 class workspace：教师不能跨班；年级主任/校长/平台无书架
+  ---
+  duration_ms: 887.4833
+  type: 'test'
+  ...
+# Subtest: 【攻击面 4.15】学生打管理接口时，存在的书与不存在的书必须同码同文案（不泄露存在性）
+ok 270 - 【攻击面 4.15】学生打管理接口时，存在的书与不存在的书必须同码同文案（不泄露存在性）
+  ---
+  duration_ms: 462.1325
+  type: 'test'
+  ...
+# Subtest: 【攻击面 5.16】学生的 ?status 参数被静默锁死为 published；教师不得看 draft 资产；platform 才是 draft 正例
+ok 271 - 【攻击面 5.16】学生的 ?status 参数被静默锁死为 published；教师不得看 draft 资产；platform 才是 draft 正例
+  ---
+  duration_ms: 3576.5414
+  type: 'test'
+  ...
+# Subtest: 【攻击面 5.17/5.18】书架幂等：缺键 400、同键重放不增行/审计；旧 visibility 同键异体 404 且不得改 grants
+ok 272 - 【攻击面 5.17/5.18】书架幂等：缺键 400、同键重放不增行/审计；旧 visibility 同键异体 404 且不得改 grants
+  ---
+  duration_ms: 555.4424
+  type: 'test'
+  ...
+# Subtest: 【攻击面 5.19】本班投放/撤下反复切换后状态干净；不得再用 organization 全开
+ok 273 - 【攻击面 5.19】本班投放/撤下反复切换后状态干净；不得再用 organization 全开
+  ---
+  duration_ms: 844.2791
+  type: 'test'
+  ...
+# Subtest: 【攻击面 6.21】旧 visibility 参数边界一律 404，不得再写 grants
+ok 274 - 【攻击面 6.21】旧 visibility 参数边界一律 404，不得再写 grants
+  ---
+  duration_ms: 472.0183
+  type: 'test'
+  ...
+# Subtest: 【攻击面 6.20/6.22】悬空 grant 对学生不可见（原因：学生不在该班）；draft 门先 grant 后仍不可见
+ok 275 - 【攻击面 6.20/6.22】悬空 grant 对学生不可见（原因：学生不在该班）；draft 门先 grant 后仍不可见
+  ---
+  duration_ms: 698.6706
+  type: 'test'
+  ...
+# Subtest: 【D-22/D-23】安排整项省略；租约 published+本班 grant 200，无 grant/draft/外组织 404
+ok 276 - 【D-22/D-23】安排整项省略；租约 published+本班 grant 200，无 grant/draft/外组织 404
+  ---
+  duration_ms: 504.6035
+  type: 'test'
+  ...
+# Subtest: 【F-1 已收口】教师不能用旧 organization/visibility 清掉他班 grant，也不能全局 unpublish
+ok 277 - 【F-1 已收口】教师不能用旧 organization/visibility 清掉他班 grant，也不能全局 unpublish
+  ---
+  duration_ms: 456.2245
+  type: 'test'
+  ...
+# Subtest: GET /classes 权限矩阵：多种学生人格一律 403；platform_ops 缺 class.read 的实际表现
+ok 278 - GET /classes 权限矩阵：多种学生人格一律 403；platform_ops 缺 class.read 的实际表现
+  ---
+  duration_ms: 610.0707
+  type: 'test'
+  ...
+# Subtest: 【F-4 已收口】非 class 类型 grant 不得当可见；旧 organization 不得再清空
+ok 279 - 【F-4 已收口】非 class 类型 grant 不得当可见；旧 organization 不得再清空
+  ---
+  duration_ms: 468.6576
+  type: 'test'
+  ...
+# (node:9028) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 只 grant 他班后，本班学生四个入口全部表现为书不存在（404，不是 403）；无 grant 也不可见
+ok 280 - 只 grant 他班后，本班学生四个入口全部表现为书不存在（404，不是 403）；无 grant 也不可见
+  ---
+  duration_ms: 1514.3972
+  type: 'test'
+  ...
+# Subtest: grants 到本班后，本班学生四个入口全部可读；别班学生仍然 404
+ok 281 - grants 到本班后，本班学生四个入口全部可读；别班学生仍然 404
+  ---
+  duration_ms: 2028.6187
+  type: 'test'
+  ...
+# Subtest: 教师可绕过 class grant 看 published，但不能列 draft；platform 才是 draft 正例；学生只看本班 grant
+ok 282 - 教师可绕过 class grant 看 published，但不能列 draft；platform 才是 draft 正例；学生只看本班 grant
+  ---
+  duration_ms: 1899.6683
+  type: 'test'
+  ...
+# Subtest: 教师 unpublish 403；platform 下架后教师/学生都不得取未发布资产
+ok 283 - 教师 unpublish 403；platform 下架后教师/学生都不得取未发布资产
+  ---
+  duration_ms: 1765.8633
+  type: 'test'
+  ...
+# Subtest: PUT 书架要求幂等键，同键重放不产生第二行 grants；旧 visibility 缺键 404
+ok 284 - PUT 书架要求幂等键，同键重放不产生第二行 grants；旧 visibility 缺键 404
+  ---
+  duration_ms: 1143.5069
+  type: 'test'
+  ...
+# Subtest: 班级校验：外校/他班书架被拒，年级主任与校长无书架，学生旧 visibility 404 同文案
+ok 285 - 班级校验：外校/他班书架被拒，年级主任与校长无书架，学生旧 visibility 404 同文案
+  ---
+  duration_ms: 1050.9968
+  type: 'test'
+  ...
+# Subtest: grants 写入的 book_version_id 与过滤读取解析的当前版本同源，旧版本不能绕过
+ok 286 - grants 写入的 book_version_id 与过滤读取解析的当前版本同源，旧版本不能绕过
+  ---
+  duration_ms: 751.211
+  type: 'test'
+  ...
+# Subtest: GET /books/:bookId/visibility 已删除，安排本身不级联清理
+ok 287 - GET /books/:bookId/visibility 已删除，安排本身不级联清理
+  ---
+  duration_ms: 520.1687
+  type: 'test'
+  ...
+# Subtest: GET /classes 按操作者授权范围列班级，空班也能列出，学生无权访问
+ok 288 - GET /classes 按操作者授权范围列班级，空班也能列出，学生无权访问
+  ---
+  duration_ms: 714.1663
+  type: 'test'
+  ...
+# Subtest: PUT 可见范围拒绝无效 scope 与空班级列表，跨组织书籍按不存在处理
+ok 289 - PUT 可见范围拒绝无效 scope 与空班级列表，跨组织书籍按不存在处理
+  ---
+  duration_ms: 524.1758
+  type: 'test'
+  ...
+# (node:63536) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F-1 需求 1/2/8：C 班 grant 后，A 班教师的旧 organization/DELETE 他班都被拒，C 班 grant 仍在
+ok 290 - F-1 需求 1/2/8：C 班 grant 后，A 班教师的旧 organization/DELETE 他班都被拒，C 班 grant 仍在
+  ---
+  duration_ms: 1899.8127
+  type: 'test'
+  ...
+# Subtest: F-1 需求 3/4：教师可投放/撤下本班；撤下后默认全闭，不得 organization 全开
+ok 291 - F-1 需求 3/4：教师可投放/撤下本班；撤下后默认全闭，不得 organization 全开
+  ---
+  duration_ms: 2428.0609
+  type: 'test'
+  ...
+# Subtest: F-1 需求 5：悬空 grants 对学生不可见（原因：学生不在该班）；旧 organization 不得再清空
+ok 292 - F-1 需求 5：悬空 grants 对学生不可见（原因：学生不在该班）；旧 organization 不得再清空
+  ---
+  duration_ms: 2027.3385
+  type: 'test'
+  ...
+# Subtest: F-1 需求 6：校长不得改班级书架；旧 visibility 任意组合都 404 且不得改 grants
+ok 293 - F-1 需求 6：校长不得改班级书架；旧 visibility 任意组合都 404 且不得改 grants
+  ---
+  duration_ms: 1379.9279
+  type: 'test'
+  ...
+# Subtest: F-1 收紧的边界：年级主任对本届/跨届书架都必须 403，不得改既有他班 grant
+ok 294 - F-1 收紧的边界：年级主任对本届/跨届书架都必须 403，不得改既有他班 grant
+  ---
+  duration_ms: 857.758
+  type: 'test'
+  ...
+# Subtest: F-4 需求 7：非 class 类型 grant 不得当可见；旧 organization 不得清除
+ok 295 - F-4 需求 7：非 class 类型 grant 不得当可见；旧 organization 不得清除
+  ---
+  duration_ms: 773.367
+  type: 'test'
+  ...
+# Subtest: F-4 边界：scope=classes 只改班级维度，不牵连非 class 类型的 grants 行
+ok 296 - F-4 边界：scope=classes 只改班级维度，不牵连非 class 类型的 grants 行
+  ---
+  duration_ms: 3716.2086
+  type: 'test'
+  ...
+# (node:68900) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 学生 GET /books 投影快照：冻结 key 必须在，允许新增，类型不得改种
+ok 297 - 学生 GET /books 投影快照：冻结 key 必须在，允许新增，类型不得改种
+  ---
+  duration_ms: 1457.0269
+  type: 'test'
+  ...
+# Subtest: 计时摘要三表列快照不得增删改名改类型改 notnull
+ok 298 - 计时摘要三表列快照不得增删改名改类型改 notnull
+  ---
+  duration_ms: 1025.7824
+  type: 'test'
+  ...
+# Subtest: FINGERPRINT_FIELDS 顺序冻结，计时写路径不得出现 reader_mode
+ok 299 - FINGERPRINT_FIELDS 顺序冻结，计时写路径不得出现 reader_mode
+  ---
+  duration_ms: 13.1757
+  type: 'test'
+  ...
+# (node:70092) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许相关角色刷新读取
+ok 300 - 真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许相关角色刷新读取
+  ---
+  duration_ms: 2001.167
+  type: 'test'
+  ...
+# Subtest: 受保护 manual_demo_test 走正式安全复核并执行涉事教师回避
+ok 301 - 受保护 manual_demo_test 走正式安全复核并执行涉事教师回避
+  ---
+  duration_ms: 5038.0528
+  type: 'test'
+  ...
+# Subtest: 学校社区必须经过班级教师一审和学校管理员二审，且真实 SQLite 状态、审计与 outbox 一致
+ok 302 - 学校社区必须经过班级教师一审和学校管理员二审，且真实 SQLite 状态、审计与 outbox 一致
+  ---
+  duration_ms: 1144.2567
+  type: 'test'
+  ...
+# Subtest: 真实 HTTP 管理员创建班级和学生后，学生重新登录并在新工作空间读取书目
+ok 303 - 真实 HTTP 管理员创建班级和学生后，学生重新登录并在新工作空间读取书目
+  ---
+  duration_ms: 891.0241
+  type: 'test'
+  ...
+# Subtest: 真实 HTTP 教学链创建安排、控制课堂、同步页面并只广播一次
+ok 304 - 真实 HTTP 教学链创建安排、控制课堂、同步页面并只广播一次
+  ---
+  duration_ms: 712.806
+  type: 'test'
+  ...
+# Subtest: 真实 HTTP 家长触达确定失败后重试成功并保存安全链接回执
+ok 305 - 真实 HTTP 家长触达确定失败后重试成功并保存安全链接回执
+  ---
+  duration_ms: 566.0211
+  type: 'test'
+  ...
+# Subtest: 真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状态并持久化
+ok 306 - 真实 HTTP AI 与安全链返回引用、阈值、累计数和复核状态并持久化
+  ---
+  duration_ms: 761.2532
+  type: 'test'
+  ...
+# Subtest: Stage 4 真实 HTTP 多会话、私密申请、护眼与阅读统计刷新后仍由 SQLite 驱动
+ok 307 - Stage 4 真实 HTTP 多会话、私密申请、护眼与阅读统计刷新后仍由 SQLite 驱动
+  ---
+  duration_ms: 1722.3886
+  type: 'test'
+  ...
+# Subtest: Stage 5 真实 HTTP 学生阅读对象路由持久化喜欢、书单、书签、摘录和批注
+ok 308 - Stage 5 真实 HTTP 学生阅读对象路由持久化喜欢、书单、书签、摘录和批注
+  ---
+  duration_ms: 611.7159
+  type: 'test'
+  ...
+# (node:69464) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 已锁攻击只引用 T8.3A/T8.5A，不在本文件复制弱化版
+ok 309 - 已锁攻击只引用 T8.3A/T8.5A，不在本文件复制弱化版
+  ---
+  duration_ms: 4.2944
+  type: 'test'
+  ...
+# Subtest: 教师未加入班不得操作本班书架（零 workspace 教师）
+ok 310 - 教师未加入班不得操作本班书架（零 workspace 教师）
+  ---
+  duration_ms: 1477.9776
+  type: 'test'
+  ...
+# Subtest: 教师未加入班不得审批该班成员
+ok 311 - 教师未加入班不得审批该班成员
+  ---
+  duration_ms: 1131.9274
+  type: 'test'
+  ...
+# Subtest: 年级主任 school 例外不扩散到本届/跨届书架
+ok 312 - 年级主任 school 例外不扩散到本届/跨届书架
+  ---
+  duration_ms: 1638.67
+  type: 'test'
+  ...
+# (node:70392) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. console.js 必须有 class-local shelf API，并删除 visibility 写
+ok 313 - F. console.js 必须有 class-local shelf API，并删除 visibility 写
+  ---
+  duration_ms: 2.5737
+  type: 'test'
+  ...
+# Subtest: F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only
+ok 314 - F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only
+  ---
+  duration_ms: 1.1494
+  type: 'test'
+  ...
+# Subtest: F. student.js 必须有 registration / onboarding / enrollment 读方法
+ok 315 - F. student.js 必须有 registration / onboarding / enrollment 读方法
+  ---
+  duration_ms: 1.2541
+  type: 'test'
+  ...
+# (node:68344) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. integration-router 必须注册 class-local 书架路由，且不得调用 listAuthorizedClasses
+ok 316 - B. integration-router 必须注册 class-local 书架路由，且不得调用 listAuthorizedClasses
+  ---
+  duration_ms: 4.6659
+  type: 'test'
+  ...
+# Subtest: B. 教师对本班 PUT/GET/DELETE 书架 200 幂等，只改本班一行
+ok 317 - B. 教师对本班 PUT/GET/DELETE 书架 200 幂等，只改本班一行
+  ---
+  duration_ms: 1523.4627
+  type: 'test'
+  ...
+# Subtest: B. 他班或无 C workspace 操作书架必须 403 或 404
+ok 318 - B. 他班或无 C workspace 操作书架必须 403 或 404
+  ---
+  duration_ms: 1555.5384
+  type: 'test'
+  ...
+# Subtest: B. 跨组织 classId 与不存在 classId 书架写必须同码同文案 404
+ok 319 - B. 跨组织 classId 与不存在 classId 书架写必须同码同文案 404
+  ---
+  duration_ms: 1542.926
+  type: 'test'
+  ...
+# Subtest: B. 两名教师并发 PUT 同班同书最终只有一行 grant
+ok 320 - B. 两名教师并发 PUT 同班同书最终只有一行 grant
+  ---
+  duration_ms: 1611.1421
+  type: 'test'
+  ...
+# Subtest: B. 一班撤下不得删除他班 grant
+ok 321 - B. 一班撤下不得删除他班 grant
+  ---
+  duration_ms: 1090.611
+  type: 'test'
+  ...
+# (node:70496) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. projectCommunityPosts 必须接到与 T8.4 同一 isBookVisibleToAudience
+ok 322 - D. projectCommunityPosts 必须接到与 T8.4 同一 isBookVisibleToAudience
+  ---
+  duration_ms: 4.0041
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 无 grant 时保留帖子但 quote.text=null
+ok 323 - D-21 HTTP：GET /community/posts 无 grant 时保留帖子但 quote.text=null
+  ---
+  duration_ms: 1281.6671
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 仅他班 grant 时隐藏原文
+ok 324 - D-21 HTTP：GET /community/posts 仅他班 grant 时隐藏原文
+  ---
+  duration_ms: 1164.045
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 对 draft 书隐藏原文
+ok 325 - D-21 HTTP：GET /community/posts 对 draft 书隐藏原文
+  ---
+  duration_ms: 1377.6576
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 有本班 grant 仍返原文
+ok 326 - D-21 HTTP：GET /community/posts 有本班 grant 仍返原文
+  ---
+  duration_ms: 1189.0569
+  type: 'test'
+  ...
+# (node:66796) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. projectAssignments 必须接到与 T8.4 同一 isBookVisibleToAudience
+ok 327 - E. projectAssignments 必须接到与 T8.4 同一 isBookVisibleToAudience
+  ---
+  duration_ms: 3.1226
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：GET /assignments 对学生省略无 grant 的书整项
+ok 328 - D-22 HTTP：GET /assignments 对学生省略无 grant 的书整项
+  ---
+  duration_ms: 1491.1626
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：GET /assignments 仅他班 grant 或 draft 也整项省略
+ok 329 - D-22 HTTP：GET /assignments 仅他班 grant 或 draft 也整项省略
+  ---
+  duration_ms: 1234.5184
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：有本班 grant 返回安排；撤下后消失
+ok 330 - D-22 HTTP：有本班 grant 返回安排；撤下后消失
+  ---
+  duration_ms: 1504.3204
+  type: 'test'
+  ...
+# (node:71088) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 临时库路径不得指向真库，独立端口不得为 5191
+ok 331 - G. 临时库路径不得指向真库，独立端口不得为 5191
+  ---
+  duration_ms: 1006.2034
+  type: 'test'
+  ...
+# Subtest: G. 登录后 GET /books 必须打到 integration-router，不得被 identity 兜底吞掉
+ok 332 - G. 登录后 GET /books 必须打到 integration-router，不得被 identity 兜底吞掉
+  ---
+  duration_ms: 1182.4564
+  type: 'test'
+  ...
+# Subtest: G. 书架路由块不得调用 listAuthorizedClasses
+ok 333 - G. 书架路由块不得调用 listAuthorizedClasses
+  ---
+  duration_ms: 3.4265
+  type: 'test'
+  ...
+# (node:69876) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. 教师全局 publish/unpublish 必须 403，且不得改 grants
+ok 334 - C. 教师全局 publish/unpublish 必须 403，且不得改 grants
+  ---
+  duration_ms: 1556.1843
+  type: 'test'
+  ...
+# Subtest: C. 校长与年级主任全局 publish 必须 403
+ok 335 - C. 校长与年级主任全局 publish 必须 403
+  ---
+  duration_ms: 1744.5201
+  type: 'test'
+  ...
+# Subtest: C. platform publish/unpublish 仍 200，且不得创建或清空 grants
+ok 336 - C. platform publish/unpublish 仍 200，且不得创建或清空 grants
+  ---
+  duration_ms: 1423.8481
+  type: 'test'
+  ...
+# (node:70580) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\http\\phase8-http-guards\\shared-harness.guard.test.js
+ok 50 - tests\\server\\http\\phase8-http-guards\\shared-harness.guard.test.js
+  ---
+  duration_ms: 852.249
+  type: 'test'
+  ...
+# (node:69576) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. integration-router 必须删除 GET/PUT /books/:bookId/visibility，无兼容 handler
+ok 338 - A. integration-router 必须删除 GET/PUT /books/:bookId/visibility，无兼容 handler
+  ---
+  duration_ms: 4.1101
+  type: 'test'
+  ...
+# Subtest: A. GET /books/:bookId/visibility 必须是标准 JSON 404，且 integration 链可到达
+ok 339 - A. GET /books/:bookId/visibility 必须是标准 JSON 404，且 integration 链可到达
+  ---
+  duration_ms: 1355.0033
+  type: 'test'
+  ...
+# Subtest: A. PUT /books/:bookId/visibility 含 scope=organization 也必须标准 JSON 404，且不得清空他班 grant
+ok 340 - A. PUT /books/:bookId/visibility 含 scope=organization 也必须标准 JSON 404，且不得清空他班 grant
+  ---
+  duration_ms: 1259.8386
+  type: 'test'
+  ...
+# Subtest: 公开报告页不渲染页数、开始书目、进度或完成度，仅展示合法指标
+ok 341 - 公开报告页不渲染页数、开始书目、进度或完成度，仅展示合法指标
+  ---
+  duration_ms: 3.772
+  type: 'test'
+  ...
+# Subtest: 公开报告 JSON 投影同样删除开始书目、旧页数和完成度字段
+ok 342 - 公开报告 JSON 投影同样删除开始书目、旧页数和完成度字段
+  ---
+  duration_ms: 2.4848
+  type: 'test'
+  ...
+# Subtest: 公开报告顶层数组不能绕过 JSON 与 HTML 递归净化
+ok 343 - 公开报告顶层数组不能绕过 JSON 与 HTML 递归净化
+  ---
+  duration_ms: 1.2139
+  type: 'test'
+  ...
+# (node:53708) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 新表 reader_mode_preferences 只有契约五列，且未占用 030
+ok 344 - 新表 reader_mode_preferences 只有契约五列，且未占用 030
+  ---
+  duration_ms: 942.8755
+  type: 'test'
+  ...
+# Subtest: 无偏好时 GET /books 带 preferredReaderMode=null，且不塞进 progress
+ok 345 - 无偏好时 GET /books 带 preferredReaderMode=null，且不塞进 progress
+  ---
+  duration_ms: 1281.3499
+  type: 'test'
+  ...
+# Subtest: 学生 PUT 偏好后刷新 GET /books 仍带本人偏好，且不能写别人的行
+ok 346 - 学生 PUT 偏好后刷新 GET /books 仍带本人偏好，且不能写别人的行
+  ---
+  duration_ms: 1682.6303
+  type: 'test'
+  ...
+# (node:66428) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G2-18 HTTP 续租要求幂等键和可信设备，并映射 lease/validation 错误
+ok 347 - G2-18 HTTP 续租要求幂等键和可信设备，并映射 lease/validation 错误
+  ---
+  duration_ms: 1799.2048
+  type: 'test'
+  ...
+# Subtest: G2-18 HTTP 摘要返回 accepted/replayed/superseded，并冻结 revision 与未知字段错误
+ok 348 - G2-18 HTTP 摘要返回 accepted/replayed/superseded，并冻结 revision 与未知字段错误
+  ---
+  duration_ms: 1511.1957
+  type: 'test'
+  ...
+# Subtest: G2-18 HTTP self/scope 严格返回新 DTO，并区分空态、权限、跨组织和未知 query
+ok 349 - G2-18 HTTP self/scope 严格返回新 DTO，并区分空态、权限、跨组织和未知 query
+  ---
+  duration_ms: 1588.1939
+  type: 'test'
+  ...
+# Subtest: READING_LEASE_HELD 409 仍下发持久 readmate_device Cookie
+ok 350 - READING_LEASE_HELD 409 仍下发持久 readmate_device Cookie
+  ---
+  duration_ms: 815.8022
+  type: 'test'
+  ...
+# Subtest: HTTP 过期租约残留 open 会话时新设备 acquire 成功
+ok 351 - HTTP 过期租约残留 open 会话时新设备 acquire 成功
+  ---
+  duration_ms: 839.1494
+  type: 'test'
+  ...
+# Subtest: HTTP 关联 open 会话停滞超阈值时续期返回 LEASE_REQUIRED
+ok 352 - HTTP 关联 open 会话停滞超阈值时续期返回 LEASE_REQUIRED
+  ---
+  duration_ms: 529.5774
+  type: 'test'
+  ...
+# Subtest: HTTP re-acquire 关闭 open 会话后 measured_through_at 停滞时续期返回 LEASE_REQUIRED
+ok 353 - HTTP re-acquire 关闭 open 会话后 measured_through_at 停滞时续期返回 LEASE_REQUIRED
+  ---
+  duration_ms: 546.6088
+  type: 'test'
+  ...
+# Subtest: HTTP 拿到租约但从未创建会话，超过停滞阈值后续期返回 LEASE_REQUIRED
+ok 354 - HTTP 拿到租约但从未创建会话，超过停滞阈值后续期返回 LEASE_REQUIRED
+  ---
+  duration_ms: 459.2941
+  type: 'test'
+  ...
+# Subtest: HTTP 在位者活跃提交时另一设备 takeover 返回 READING_LEASE_HELD
+ok 355 - HTTP 在位者活跃提交时另一设备 takeover 返回 READING_LEASE_HELD
+  ---
+  duration_ms: 532.9576
+  type: 'test'
+  ...
+# Subtest: HTTP 在位者会话停滞时另一设备仍可接管
+ok 356 - HTTP 在位者会话停滞时另一设备仍可接管
+  ---
+  duration_ms: 459.0343
+  type: 'test'
+  ...
+# (node:71556) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 书籍资产不再由公开静态路径暴露，受保护端点要求会话
+ok 357 - 书籍资产不再由公开静态路径暴露，受保护端点要求会话
+  ---
+  duration_ms: 903.6691
+  type: 'test'
+  ...
+# (node:55864) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 护眼状态按真实聚合进入提醒、强制休息并在到时后自动恢复
+ok 358 - 护眼状态按真实聚合进入提醒、强制休息并在到时后自动恢复
+  ---
+  duration_ms: 907.4396
+  type: 'test'
+  ...
+# Subtest: 教师与学校管理员只能读取真实范围并且只能按误判解除强制休息
+ok 359 - 教师与学校管理员只能读取真实范围并且只能按误判解除强制休息
+  ---
+  duration_ms: 897.9044
+  type: 'test'
+  ...
+# Subtest: 普通私密会话必须经学生授权，超时按已告知规则同意并保留水印与访问历史
+ok 360 - 普通私密会话必须经学生授权，超时按已告知规则同意并保留水印与访问历史
+  ---
+  duration_ms: 808.9392
+  type: 'test'
+  ...
+# Subtest: 安全标记会话只返回证据最小上下文，涉事教师被后端拒绝且学生端不感知危险事件
+ok 361 - 安全标记会话只返回证据最小上下文，涉事教师被后端拒绝且学生端不感知危险事件
+  ---
+  duration_ms: 885.328
+  type: 'test'
+  ...
+# Subtest: 私密会话查询始终绑定认证组织和真实工作空间范围
+ok 362 - 私密会话查询始终绑定认证组织和真实工作空间范围
+  ---
+  duration_ms: 794.9598
+  type: 'test'
+  ...
+# (node:56048) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: P1: 同事件 ID 修改 annotation 业务 payload 必须冲突
+ok 363 - P1: 同事件 ID 修改 annotation 业务 payload 必须冲突
+  ---
+  duration_ms: 766.6121
+  type: 'test'
+  ...
+# Subtest: P1: 未知 payload 字段必须拒绝而不是忽略
+ok 364 - P1: 未知 payload 字段必须拒绝而不是忽略
+  ---
+  duration_ms: 807.6872
+  type: 'test'
+  ...
+# Subtest: P1: selection 与 ai_question 完整业务 payload 参与事件指纹
+ok 365 - P1: selection 与 ai_question 完整业务 payload 参与事件指纹
+  ---
+  duration_ms: 881.4231
+  type: 'test'
+  ...
+# Subtest: P1: 不支持 eventType 与未知顶层字段必须明确拒绝
+ok 366 - P1: 不支持 eventType 与未知顶层字段必须明确拒绝
+  ---
+  duration_ms: 777.6125
+  type: 'test'
+  ...
+# Subtest: P0: 无租约设备事件不得进入统计
+ok 367 - P0: 无租约设备事件不得进入统计
+  ---
+  duration_ms: 856.2608
+  type: 'test'
+  ...
+# Subtest: P0: 2035 未来事件不得进入统计
+ok 368 - P0: 2035 未来事件不得进入统计
+  ---
+  duration_ms: 671.8221
+  type: 'test'
+  ...
+# Subtest: P0: 事件按发生时间匹配已释放租约历史并拒绝租约前后越界
+ok 369 - P0: 事件按发生时间匹配已释放租约历史并拒绝租约前后越界
+  ---
+  duration_ms: 525.27
+  type: 'test'
+  ...
+# Subtest: P0: 过旧事件和越过配置硬上限均被拒绝
+ok 370 - P0: 过旧事件和越过配置硬上限均被拒绝
+  ---
+  duration_ms: 451.2261
+  type: 'test'
+  ...
+# Subtest: P1: offline sequence 唯一键和查询均包含 organization
+ok 371 - P1: offline sequence 唯一键和查询均包含 organization
+  ---
+  duration_ms: 399.7339
+  type: 'test'
+  ...
+# Subtest: P0: schoolbag 跨 subject/workspace 写回必须拒绝
+ok 372 - P0: schoolbag 跨 subject/workspace 写回必须拒绝
+  ---
+  duration_ms: 339.5167
+  type: 'test'
+  ...
+# Subtest: P0: schoolbag 写回重新验过期并拒绝同 subject 的错误课堂令牌
+ok 373 - P0: schoolbag 写回重新验过期并拒绝同 subject 的错误课堂令牌
+  ---
+  duration_ms: 342.373
+  type: 'test'
+  ...
+# Subtest: P1: 013 可从 010-012 前向升级且重复执行保持数据与约束
+ok 374 - P1: 013 可从 010-012 前向升级且重复执行保持数据与约束
+  ---
+  duration_ms: 267.9199
+  type: 'test'
+  ...
+# (node:28940) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: maintenance cleanup 命令真实处理 cutoff、等值保留、历史 open、异常报告且幂等
+ok 375 - maintenance cleanup 命令真实处理 cutoff、等值保留、历史 open、异常报告且幂等
+  ---
+  duration_ms: 2175.5338
+  type: 'test'
+  ...
+# Subtest: maintenance cleanup 命令参数错误时非零退出并给出稳定错误前缀
+ok 376 - maintenance cleanup 命令参数错误时非零退出并给出稳定错误前缀
+  ---
+  duration_ms: 1518.0284
+  type: 'test'
+  ...
+# (node:34264) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 北京时间 04:00、日期范围和六个日历月 cutoff 使用冻结边界
+ok 377 - 北京时间 04:00、日期范围和六个日历月 cutoff 使用冻结边界
+  ---
+  duration_ms: 5.0408
+  type: 'test'
+  ...
+# Subtest: acquire 不原地换 scope 或续期，renew 仅延长原范围且 TTL 固定 90 秒
+ok 378 - acquire 不原地换 scope 或续期，renew 仅延长原范围且 TTL 固定 90 秒
+  ---
+  duration_ms: 1437.619
+  type: 'test'
+  ...
+# Subtest: 摘要 accepted/replayed/superseded、历史指纹、连续 revision 与事务 delta 不重复计时
+ok 379 - 摘要 accepted/replayed/superseded、历史指纹、连续 revision 与事务 delta 不重复计时
+  ---
+  duration_ms: 1415.8837
+  type: 'test'
+  ...
+# Subtest: 逐页覆盖按 original/text 与确认交互持久化，重放不重复且不能由 lastPageNo 推导
+ok 380 - 逐页覆盖按 original/text 与确认交互持久化，重放不重复且不能由 lastPageNo 推导
+  ---
+  duration_ms: 1440.8966
+  type: 'test'
+  ...
+# Subtest: G5-01 旧事件只贡献护眼，不写阅读时长且不能覆盖摘要每日事实和位置
+ok 381 - G5-01 旧事件只贡献护眼，不写阅读时长且不能覆盖摘要每日事实和位置
+  ---
+  duration_ms: 1051.5638
+  type: 'test'
+  ...
+# Subtest: 摘要严格拒绝未知字段、非规范时间、未来时间、墙钟超额、错统计日和错指纹
+ok 382 - 摘要严格拒绝未知字段、非规范时间、未来时间、墙钟超额、错统计日和错指纹
+  ---
+  duration_ms: 809.7089
+  type: 'test'
+  ...
+# Subtest: 仅 stat_date_change 可把 endedAt 精确放在下一统计日 04:00 边界
+ok 383 - 仅 stat_date_change 可把 endedAt 精确放在下一统计日 04:00 边界
+  ---
+  duration_ms: 756.8663
+  type: 'test'
+  ...
+# Subtest: 旧租约首次晚到直接 closed，且允许截止前连续晚到 revision
+ok 384 - 旧租约首次晚到直接 closed，且允许截止前连续晚到 revision
+  ---
+  duration_ms: 674.1429
+  type: 'test'
+  ...
+# Subtest: 同租约残留open会话不挡新会话，且不覆盖旧累计毫秒
+ok 385 - 同租约残留open会话不挡新会话，且不覆盖旧累计毫秒
+  ---
+  duration_ms: 758.3228
+  type: 'test'
+  ...
+# Subtest: 过期租约残留 open 会话时新设备 acquire 成功并关闭残留会话
+ok 386 - 过期租约残留 open 会话时新设备 acquire 成功并关闭残留会话
+  ---
+  duration_ms: 526.0494
+  type: 'test'
+  ...
+# Subtest: 关联 open 会话未超停滞阈值时续期正常成功
+ok 387 - 关联 open 会话未超停滞阈值时续期正常成功
+  ---
+  duration_ms: 493.6646
+  type: 'test'
+  ...
+# Subtest: 关联 open 会话停滞超阈值时续期被拒
+ok 388 - 关联 open 会话停滞超阈值时续期被拒
+  ---
+  duration_ms: 464.5187
+  type: 'test'
+  ...
+# Subtest: 关联 closed 会话 measured_through_at 停滞超阈值时续期被拒
+ok 389 - 关联 closed 会话 measured_through_at 停滞超阈值时续期被拒
+  ---
+  duration_ms: 481.3379
+  type: 'test'
+  ...
+# Subtest: 同设备 re-acquire 关闭 open 会话后 measured_through_at 停滞时续期被拒
+ok 390 - 同设备 re-acquire 关闭 open 会话后 measured_through_at 停滞时续期被拒
+  ---
+  duration_ms: 479.4879
+  type: 'test'
+  ...
+# Subtest: 刚获取租约尚无 open 会话时续期正常成功
+ok 391 - 刚获取租约尚无 open 会话时续期正常成功
+  ---
+  duration_ms: 449.91
+  type: 'test'
+  ...
+# Subtest: 拿到租约但从未创建任何会话，超过停滞阈值后续期被拒
+ok 392 - 拿到租约但从未创建任何会话，超过停滞阈值后续期被拒
+  ---
+  duration_ms: 430.8749
+  type: 'test'
+  ...
+# Subtest: 在位者活跃提交时另一设备接管被拒
+ok 393 - 在位者活跃提交时另一设备接管被拒
+  ---
+  duration_ms: 425.2662
+  type: 'test'
+  ...
+# Subtest: 在位者会话停滞时另一设备仍可正常接管
+ok 394 - 在位者会话停滞时另一设备仍可正常接管
+  ---
+  duration_ms: 454.6206
+  type: 'test'
+  ...
+# Subtest: 在位者无会话且已停滞时另一设备无需 takeover 即可获取
+ok 395 - 在位者无会话且已停滞时另一设备无需 takeover 即可获取
+  ---
+  duration_ms: 421.8327
+  type: 'test'
+  ...
+# Subtest: 跨 session 晚到正常累加 delta/OR，但较旧位置不回退
+ok 396 - 跨 session 晚到正常累加 delta/OR，但较旧位置不回退
+  ---
+  duration_ms: 496.9227
+  type: 'test'
+  ...
+# Subtest: 位置测量时间精确相同时仅以更大页码稳定破同值
+ok 397 - 位置测量时间精确相同时仅以更大页码稳定破同值
+  ---
+  duration_ms: 428.8046
+  type: 'test'
+  ...
+# Subtest: 班级在会话创建时快照，转班后的新会话归入新班级且旧事实不改写
+ok 398 - 班级在会话创建时快照，转班后的新会话归入新班级且旧事实不改写
+  ---
+  duration_ms: 466.8147
+  type: 'test'
+  ...
+# Subtest: 每日汇总失败时会话和位置均回滚，不产生半写
+ok 399 - 每日汇总失败时会话和位置均回滚，不产生半写
+  ---
+  duration_ms: 446.6964
+  type: 'test'
+  ...
+# Subtest: reading-domain 删除按组织隔离；六个月 cleanup 先关历史已结束 open、严格删除 cutoff 前 closed 且幂等
+ok 400 - reading-domain 删除按组织隔离；六个月 cleanup 先关历史已结束 open、严格删除 cutoff 前 closed 且幂等
+  ---
+  duration_ms: 440.4437
+  type: 'test'
+  ...
+# (node:63668) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 书籍坐标、设备租约和离线阅读事件真实持久化且幂等
+ok 401 - 书籍坐标、设备租约和离线阅读事件真实持久化且幂等
+  ---
+  duration_ms: 1344.0393
+  type: 'test'
+  ...
+# Subtest: 真实书目资产同事务登记、校验并按组织范围提供查询端口
+ok 402 - 真实书目资产同事务登记、校验并按组织范围提供查询端口
+  ---
+  duration_ms: 1090.6363
+  type: 'test'
+  ...
+# Subtest: 离线事件按时间并集重算护眼，乱序上传不写阅读进度且冲突不静默重放
+ok 403 - 离线事件按时间并集重算护眼，乱序上传不写阅读进度且冲突不静默重放
+  ---
+  duration_ms: 1134.6767
+  type: 'test'
+  ...
+# Subtest: 书籍与安排按不可变组织范围拒绝跨组织访问
+ok 404 - 书籍与安排按不可变组织范围拒绝跨组织访问
+  ---
+  duration_ms: 746.4686
+  type: 'test'
+  ...
+# Subtest: 多班安排、唯一课堂控制端和单次 AI 广播 outbox
+ok 405 - 多班安排、唯一课堂控制端和单次 AI 广播 outbox
+  ---
+  duration_ms: 694.1488
+  type: 'test'
+  ...
+# Subtest: 学生课堂加入、同步、广播回执、掉线与结束状态形成同一持久闭环
+ok 406 - 学生课堂加入、同步、广播回执、掉线与结束状态形成同一持久闭环
+  ---
+  duration_ms: 603.9515
+  type: 'test'
+  ...
+# Subtest: 阅读安排与 outbox、审计同事务，通知入队失败时不留下半成品
+ok 407 - 阅读安排与 outbox、审计同事务，通知入队失败时不留下半成品
+  ---
+  duration_ms: 594.1474
+  type: 'test'
+  ...
+# Subtest: 课堂权限以真实班级资源覆盖授权教师、学校管理员和越权角色
+ok 408 - 课堂权限以真实班级资源覆盖授权教师、学校管理员和越权角色
+  ---
+  duration_ms: 529.9426
+  type: 'test'
+  ...
+# Subtest: 电子书包本地模拟器签名、权限、nonce 防重放与返回契约
+ok 409 - 电子书包本地模拟器签名、权限、nonce 防重放与返回契约
+  ---
+  duration_ms: 590.1514
+  type: 'test'
+  ...
+# Subtest: 同步 SQLite 事务拒绝 Promise 回调并回滚已执行写入
+ok 410 - 同步 SQLite 事务拒绝 Promise 回调并回滚已执行写入
+  ---
+  duration_ms: 404.841
+  type: 'test'
+  ...
+# (node:64968) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 打卡、正负 10%、连续天数、上周和七日补零纯函数固定边界
+ok 411 - 打卡、正负 10%、连续天数、上周和七日补零纯函数固定边界
+  ---
+  duration_ms: 11.4986
+  type: 'test'
+  ...
+# Subtest: 班级纯函数对空班级返回 null，并以全体有效名单作为人均分母
+ok 412 - 班级纯函数对空班级返回 null，并以全体有效名单作为人均分母
+  ---
+  duration_ms: 1.0272
+  type: 'test'
+  ...
+# Subtest: /self 严格返回新 DTO、空事实语义和隐私边界
+ok 413 - /self 严格返回新 DTO、空事实语义和隐私边界
+  ---
+  duration_ms: 1011.1489
+  type: 'test'
+  ...
+# Subtest: /self 最近书籍不可访问时取下一条，教师身份不能冒充 self
+ok 414 - /self 最近书籍不可访问时取下一条，教师身份不能冒充 self
+  ---
+  duration_ms: 726.2795
+  type: 'test'
+  ...
+# Subtest: /scope 50 人一次返回 37/50、七日补零、学生详情与稳定姓名排序
+ok 415 - /scope 50 人一次返回 37/50、七日补零、学生详情与稳定姓名排序
+  ---
+  duration_ms: 1165.1873
+  type: 'test'
+  ...
+# Subtest: /scope 空班级使用 null；转班历史 numerator 按发生时班级、分母使用当前名单
+ok 416 - /scope 空班级使用 null；转班历史 numerator 按发生时班级、分母使用当前名单
+  ---
+  duration_ms: 819.2801
+  type: 'test'
+  ...
+# Subtest: /scope 严格校验必填 query、组织 404、同组织越权 403 和 student 403
+ok 417 - /scope 严格校验必填 query、组织 404、同组织越权 403 和 student 403
+  ---
+  duration_ms: 598.2602
+  type: 'test'
+  ...
+# (node:66784) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 喜欢、书单、书签、摘录和批注同域持久化，旧事件不作为页面证据返回
+ok 418 - 喜欢、书单、书签、摘录和批注同域持久化，旧事件不作为页面证据返回
+  ---
+  duration_ms: 847.7141
+  type: 'test'
+  ...
+# Subtest: 摘录与批注锚点必须完整且精确匹配同页正文块，无锚点旧写入仍兼容
+ok 419 - 摘录与批注锚点必须完整且精确匹配同页正文块，无锚点旧写入仍兼容
+  ---
+  duration_ms: 917.6619
+  type: 'test'
+  ...
+# Subtest: 排序修改删除要求当前版本与当前租户归属
+ok 420 - 排序修改删除要求当前版本与当前租户归属
+  ---
+  duration_ms: 819.162
+  type: 'test'
+  ...
+# Subtest: 审计写入失败会回滚领域写入，跨组织数据不会泄露
+ok 421 - 审计写入失败会回滚领域写入，跨组织数据不会泄露
+  ---
+  duration_ms: 830.7172
+  type: 'test'
+  ...
+# Subtest: server defaults to loopback and only changes host through an explicit override
+ok 422 - server defaults to loopback and only changes host through an explicit override
+  ---
+  duration_ms: 4.6976
+  type: 'test'
+  ...
+# Subtest: root and server packages declare the node:sqlite runtime floor
+ok 423 - root and server packages declare the node:sqlite runtime floor
+  ---
+  duration_ms: 28.2143
+  type: 'test'
+  ...
+1..423
+# tests 437
+# suites 0
+# pass 437
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24271.9669

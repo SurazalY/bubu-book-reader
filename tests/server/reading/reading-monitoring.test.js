@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 import { openSqliteDatabase } from '../../../server/db/database.js'
 import { runMigrations } from '../../../server/db/migrate.js'
+import { grantBookToClass } from '../helpers/phase8-old-fixture.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
 import {
   addStatDates,
@@ -23,15 +24,15 @@ const migrationDirectory = fileURLToPath(new URL('../../../server/db/migrations/
 const BASE_NOW = '2026-08-10T00:00:00.000Z'
 
 function insertOrganization(db, id) {
-  db.prepare(`INSERT INTO organizations (id, name, status, created_at, updated_at, version)
-    VALUES (?, ?, 'active', ?, ?, 1)`).run(id, id, BASE_NOW, BASE_NOW)
+  db.prepare(`INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version)
+    VALUES (?, ?, ?, 'active', ?, ?, 1)`).run(id, id, id, BASE_NOW, BASE_NOW)
 }
 
 function insertUser(db, id, organizationId, displayName = id) {
   db.prepare(`INSERT INTO users
-      (id, organization_id, username, display_name, status, created_at, updated_at, version)
-    VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`)
-    .run(id, organizationId, id, displayName, BASE_NOW, BASE_NOW)
+      (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code)
+    VALUES (?, ?, ?, ?, 'active', ?, ?, 1, ?, ?)`)
+    .run(id, organizationId, id, displayName, BASE_NOW, BASE_NOW, id, `A-${id}`)
 }
 
 function insertClassScope(db, { organizationId, classId, workspaceId, studentIds }) {
@@ -103,6 +104,9 @@ function createFixture() {
   insertBook(db, {
     organizationId: 'org-b', actorId: 'student-b', bookId: 'book-b', versionId: 'version-b',
   })
+  grantBookToClass(db, { bookId: 'book-a', classId: 'class-a', organizationId: 'org-a', actorId: 'student-a', now: BASE_NOW, bookVersionId: 'version-a' })
+  grantBookToClass(db, { bookId: 'book-a2', classId: 'class-a', organizationId: 'org-a', actorId: 'student-a', now: BASE_NOW, bookVersionId: 'version-a2' })
+  grantBookToClass(db, { bookId: 'book-b', classId: 'class-b', organizationId: 'org-b', actorId: 'student-b', now: BASE_NOW, bookVersionId: 'version-b' })
   let current = new Date(BASE_NOW)
   let id = 0
   const dependencies = {
@@ -899,6 +903,14 @@ test('班级在会话创建时快照，转班后的新会话归入新班级且�
     classId: 'class-new',
     workspaceId: 'workspace-new',
     studentIds: ['student-a'],
+  })
+  grantBookToClass(fixture.db, {
+    bookId: 'book-a',
+    classId: 'class-new',
+    organizationId: 'org-a',
+    actorId: 'student-a',
+    now: BASE_NOW,
+    bookVersionId: 'version-a',
   })
   fixture.setNow('2026-08-10T00:00:40.000Z')
   const moved = fixture.forStudent('student-a', 'org-a', 'workspace-new')

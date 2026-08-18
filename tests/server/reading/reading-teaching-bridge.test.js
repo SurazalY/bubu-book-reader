@@ -34,6 +34,25 @@ function createFixture() {
   const dualModeMigration = readFileSync(new URL('../../../server/db/migrations/044_reader_dual_mode_pilot.sql', import.meta.url), 'utf8')
   db.exec(dualModeMigration.slice(0, dualModeMigration.indexOf('CREATE TABLE reading_summary_page_coverage')))
   db.exec(readFileSync(new URL('../../../server/db/migrations/045_book_catalog_grade_and_trusted_baseline.sql', import.meta.url), 'utf8'))
+  db.exec(`
+    INSERT INTO organizations (id, status) VALUES ('org-1', 'active'), ('org-2', 'active');
+    INSERT INTO users (id, organization_id, status) VALUES
+      ('student-1', 'org-1', 'active'),
+      ('student-2', 'org-1', 'active'),
+      ('teacher-1', 'org-1', 'active');
+    INSERT INTO workspaces (id, organization_id, scope_type, scope_id, status) VALUES
+      ('class-1', 'org-1', 'class', 'class-a', 'active'),
+      ('class-2', 'org-1', 'class', 'class-b', 'active'),
+      ('class-other', 'org-2', 'class', 'class-other', 'active');
+    INSERT INTO workspace_memberships (id, user_id, workspace_id, status) VALUES
+      ('wm-student-1', 'student-1', 'class-1', 'active'),
+      ('wm-student-2', 'student-2', 'class-1', 'active'),
+      ('wm-teacher-1', 'teacher-1', 'class-1', 'active');
+    INSERT INTO role_assignments (id, organization_id, user_id, workspace_id, role_code, scope_type, scope_id, status) VALUES
+      ('ra-student-1', 'org-1', 'student-1', 'class-1', 'teacher', 'class', 'class-a', 'active'),
+      ('ra-student-2', 'org-1', 'student-2', 'class-1', 'teacher', 'class', 'class-a', 'active'),
+      ('ra-teacher-1', 'org-1', 'teacher-1', 'class-1', 'teacher', 'class', 'class-a', 'active');
+  `)
   let index = 0
   let now = new Date('2026-08-04T20:01:00.000Z')
   const auditEvents = []

@@ -1,0 +1,103 @@
+{
+  "task": "T8.9-observer",
+  "verdict": "Gate 3 后半 通过",
+  "collectedAt": "2026-08-18T14:01:02.820Z",
+  "git": {
+    "branch": "feat/product-close-loop",
+    "head": "b3cd4b532cd4e7e44398bd465112e9ff84a9684e"
+  },
+  "listen": {
+    "host": "127.0.0.1",
+    "port": 5191,
+    "listenCount": 1,
+    "pid": 10340,
+    "pidMatchesMigrateReport": true,
+    "commandLine": "node  server/index.js",
+    "pidUnchangedAfterHttp": true,
+    "vite5190Untouched": true
+  },
+  "health": {
+    "httpStatus": 200,
+    "status": "ok",
+    "database": "sqlite",
+    "migrations": 34
+  },
+  "backup": {
+    "path": "C:\\Users\\Yak\\AppData\\Local\\Temp\\t8-9-gate3-20260818T134900Z\\readmate-046-official.sqlite",
+    "exists": true,
+    "bytes": 107028480,
+    "sha256": "44d55384ba2b49c4468fd8d42693a3b97cd9ec67bd3d8cb1c48b38bfb050167b",
+    "matchesReport": true,
+    "openedAsBusinessDb": false
+  },
+  "database": {
+    "path": "D:\\Project\\整书8.15\\server\\data\\readmate.sqlite",
+    "openedWith": "DatabaseSync(readOnly:true)",
+    "quick_check": "ok",
+    "migrationCount": 34,
+    "maxMigration": "050_book_access_grant_backfill.sql",
+    "checksums": {
+      "047_login_and_class_identity.sql": "de7d7fcad2926427b7b8ed75e9a4bc3691de8fa3a88f8452c30ab9cf99285f48",
+      "048_registration_credentials.sql": "97dcadc912e5c9593b60ccd84ade4987c7208acdd10f75fe42f2b140cf7fccea",
+      "049_enrollment_and_password_reset.sql": "190cfb10e9fef84991724aeb2fe579c3a77dc6a669a61f637a8b70de7eb5cfff",
+      "050_book_access_grant_backfill.sql": "bbb1a4bd103495acfc5e1ffed1e74cc960aae2fa3c2b0ad3ee31982af5eef763"
+    },
+    "checksumsMatchDiskAndReportAndT88": true,
+    "appliedAt": "2026-08-18T13:49:23.231Z",
+    "grantsTotal": 49,
+    "demoClassGrants": 49,
+    "newClassGrants": 0,
+    "grantBackfillIds": 49,
+    "grantOtherIds": 0,
+    "grantActors": ["phase8-migration-050"],
+    "published": 49,
+    "draft": 0,
+    "versions": 49,
+    "activeClasses": 2,
+    "grade_manager": 0,
+    "brokenTriples": 0,
+    "crossOrg": 0,
+    "handwrittenSqlTraces": false
+  },
+  "visibilityFiles": {
+    "prePostDiffEmpty": true,
+    "preEqualsBook001to049": true,
+    "postEqualsBook001to049": true,
+    "httpExistingStudentEqualsFiles": true
+  },
+  "http": {
+    "oldBodyStudent": 400,
+    "newBodyExistingStudent": 200,
+    "existingStudentBooks": { "status": 200, "count": 49, "setDiffEmpty": true },
+    "teacherPublish": 403,
+    "teacherUnpublish": 403,
+    "newStudentUserId": "bdb84ff0-fedf-4ffe-bebf-c158875e00be",
+    "newStudentBooks": { "status": 200, "count": 0 },
+    "acquireLeaseNoGrant": {
+      "status": 404,
+      "code": "RESOURCE_NOT_FOUND",
+      "message": "书籍不存在或当前不可读取",
+      "leaseDelta": 0
+    },
+    "opsDraftList": { "status": 200, "count": 0 }
+  },
+  "e3": {
+    "executed": false,
+    "reason": "no-draft-on-live-5191",
+    "classification": "gap-not-gate3-blocker",
+    "draftBooksInDb": 0
+  },
+  "rollbackStillValid": false,
+  "stop": {
+    "hit": false,
+    "section_16_18": false,
+    "section_16_19": false,
+    "reasons": []
+  },
+  "passwordWrittenToEvidence": false,
+  "tokenWrittenToEvidence": false,
+  "businessSourceTouched": false,
+  "wroteDatabase": false,
+  "restoredBackup": false,
+  "stoppedOrReplaced5191": false
+}

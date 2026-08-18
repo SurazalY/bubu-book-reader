@@ -8,6 +8,7 @@ import test from 'node:test'
 
 import { hashPassword } from '../../../server/auth/password.js'
 import { createReadmateApplication } from '../../../server/app.js'
+import { grantBookToClass, loginBody } from '../helpers/phase8-old-fixture.js'
 import { bootstrapInternalDemo } from '../../../server/db/bootstrap-internal-demo.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
 import {
@@ -38,6 +39,7 @@ function identityFixture() {
   ]
   return {
     organizationId,
+    schoolCode: organizationId,
     classId,
     gradeId,
     workspaceId,
@@ -154,7 +156,7 @@ async function login(baseUrl, fixture, user) {
   const response = await requestJson(baseUrl, jar, '/auth/login', {
     method: 'POST',
     idempotencyKey: `login-${user.id}`,
-    body: { username: user.username, password: fixture.password },
+    body: loginBody(fixture, user),
   })
   assert.equal(response.status, 200, JSON.stringify(response.payload))
   jar.loginResponse = response.payload
@@ -220,6 +222,13 @@ async function createPublishedBook(application, fixture, assetFixture = null) {
     ],
   })
   await reading.publishBook(created.bookId)
+  grantBookToClass(application.database, {
+    bookId: created.bookId,
+    classId: fixture.classId,
+    organizationId: fixture.organizationId,
+    actorId: fixture.adminId,
+    bookVersionId: created.versionId,
+  })
   return created
 }
 
@@ -283,6 +292,7 @@ async function startInternalDemoSafetyHarness(t, { internalDemoMode }) {
   const password = randomBytes(24).toString('base64url')
   const fixture = {
     organizationId: 'internal-demo-organization',
+    schoolCode: 'internal-demo',
     classId: 'internal-demo-class',
     gradeId: 'internal-demo-grade',
     workspaceId: 'internal-demo-workspace',
@@ -753,44 +763,83 @@ test('真实 HTTP 管理员创建班级和学生后，学生重新登录并在�
     method: 'POST',
     workspaceId: fixture.schoolWorkspaceId,
     idempotencyKey: 'identity-create-class-1',
-    body: { name: '真实新建一班', gradeId: fixture.gradeId },
+    body: { name: '真实新建一班', stage: 'primary', entryYear: 2023, classNumber: 8 },
   })
   assert.equal(createdClass.status, 201, JSON.stringify(createdClass.payload))
-  assert.equal(createdClass.payload.data.organizationId, fixture.organizationId)
   assert.equal(createdClass.payload.data.status, 'active')
-  assert.ok(createdClass.payload.data.workspaceId)
+  assert.equal(createdClass.payload.data.name, '真实新建一班')
+  assert.equal(createdClass.payload.data.stage, 'primary')
+  assert.equal(createdClass.payload.data.entryYear, 2023)
+  assert.equal(createdClass.payload.data.classNumber, 8)
+  const createdClassRow = application.database.prepare(`
+    SELECT classes.organization_id, workspaces.id AS workspace_id
+    FROM classes
+    JOIN workspaces
+      ON workspaces.organization_id = classes.organization_id
+      AND workspaces.scope_type = 'class'
+      AND workspaces.scope_id = classes.id
+    WHERE classes.id = ?
+  `).get(createdClass.payload.data.id)
+  assert.equal(createdClassRow.organization_id, fixture.organizationId)
+  assert.ok(createdClassRow.workspace_id)
 
   const studentPassword = randomBytes(24).toString('base64url')
-  const studentUsername = `new-student-${randomUUID()}`
-  const denied = await requestJson(baseUrl, teacherJar, '/students', {
+  const studentLoginName = `ns${randomUUID().replaceAll('-', '').slice(0, 16)}`
+  const retired = await requestJson(baseUrl, teacherJar, '/students', {
     method: 'POST',
     workspaceId: fixture.workspaceId,
     idempotencyKey: 'identity-cross-class-student-1',
     body: {
       classId: createdClass.payload.data.id,
-      username: studentUsername,
+      username: studentLoginName,
       displayName: '不应创建的学生',
       password: studentPassword,
     },
   })
-  assert.equal(denied.status, 403, JSON.stringify(denied.payload))
+  assert.equal(retired.status, 404, JSON.stringify(retired.payload))
 
-  const createdStudent = await requestJson(baseUrl, adminJar, '/students', {
+  const issued = await requestJson(baseUrl, adminJar, '/registration-credentials', {
     method: 'POST',
     workspaceId: fixture.schoolWorkspaceId,
-    idempotencyKey: 'identity-create-student-1',
+    idempotencyKey: 'identity-issue-student-1',
+    body: { expectedRole: 'student' },
+  })
+  assert.equal(issued.status, 201, JSON.stringify(issued.payload))
+  const rawToken = issued.payload.data.rawToken
+
+  const registered = await requestJson(baseUrl, new Map(), `/registration/${rawToken}`, {
+    method: 'POST',
+    idempotencyKey: 'identity-register-student-1',
     body: {
-      classId: createdClass.payload.data.id,
-      username: studentUsername,
+      loginName: studentLoginName,
       displayName: '真实新建学生',
       password: studentPassword,
+      classId: createdClass.payload.data.id,
     },
   })
-  assert.equal(createdStudent.status, 201, JSON.stringify(createdStudent.payload))
-  assert.equal(createdStudent.payload.data.classId, createdClass.payload.data.id)
-  assert.equal(createdStudent.payload.data.workspaceId, createdClass.payload.data.workspaceId)
-  assert.equal(createdStudent.payload.data.user.username, studentUsername)
-  assert.equal('password' in createdStudent.payload.data, false)
+  assert.equal(registered.status, 201, JSON.stringify(registered.payload))
+  assert.equal('password' in registered.payload.data, false)
+
+  const enrollment = application.database.prepare(`
+    SELECT id, version FROM student_enrollment_requests
+    WHERE student_user_id = ? AND status = 'pending'
+  `).get(registered.payload.data.user.id)
+  const approved = await requestJson(baseUrl, adminJar, `/enrollment-requests/${enrollment.id}/approve`, {
+    method: 'POST',
+    workspaceId: fixture.schoolWorkspaceId,
+    idempotencyKey: 'identity-approve-student-1',
+    headers: { 'If-Match': String(enrollment.version) },
+    body: { version: enrollment.version },
+  })
+  assert.equal(approved.status, 200, JSON.stringify(approved.payload))
+
+  grantBookToClass(application.database, {
+    bookId: book.bookId,
+    classId: createdClass.payload.data.id,
+    organizationId: fixture.organizationId,
+    actorId: fixture.adminId,
+    bookVersionId: book.versionId,
+  })
 
   const assignment = await requestJson(baseUrl, adminJar, '/assignments', {
     method: 'POST',
@@ -804,12 +853,15 @@ test('真实 HTTP 管理员创建班级和学生后，学生重新登录并在�
   })
   assert.equal(assignment.status, 201, JSON.stringify(assignment.payload))
 
-  const studentJar = await login(baseUrl, { password: studentPassword }, createdStudent.payload.data.user)
+  const studentJar = await login(baseUrl, {
+    schoolCode: fixture.schoolCode,
+    password: studentPassword,
+  }, { loginName: studentLoginName, username: studentLoginName })
   const session = await requestJson(baseUrl, studentJar, '/session')
   assert.equal(session.status, 200)
-  assert.equal(session.payload.data.activeWorkspaceId, createdClass.payload.data.workspaceId)
+  assert.equal(session.payload.data.activeWorkspaceId, createdClassRow.workspace_id)
   const books = await requestJson(baseUrl, studentJar, '/books', {
-    workspaceId: createdClass.payload.data.workspaceId,
+    workspaceId: createdClassRow.workspace_id,
   })
   assert.equal(books.status, 200, JSON.stringify(books.payload))
   assert.ok(books.payload.data.items.some((item) => item.id === book.bookId))
@@ -835,10 +887,10 @@ test('真实 HTTP 管理员创建班级和学生后，学生重新登录并在�
       ON role_assignments.user_id = users.id
       AND role_assignments.workspace_id = workspaces.id
       AND role_assignments.organization_id = users.organization_id
-    WHERE users.username = ?
-  `).get(studentUsername)
+    WHERE users.login_name = ?
+  `).get(studentLoginName)
   assert.equal(persisted.class_id, createdClass.payload.data.id)
-  assert.equal(persisted.workspace_id, createdClass.payload.data.workspaceId)
+  assert.equal(persisted.workspace_id, createdClassRow.workspace_id)
   assert.equal(persisted.role_code, 'student')
   assert.equal(persisted.membership_role, 'student')
   assert.equal(application.database.prepare(`
@@ -846,8 +898,9 @@ test('真实 HTTP 管理员创建班级和学生后，学生重新登录并在�
     FROM assignment_classes
     WHERE assignment_id = ? AND class_id = ?
   `).get(assignment.payload.data.assignmentId, createdClass.payload.data.id).count, 1)
-  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM audit_events WHERE event_type IN ('identity.class.created', 'identity.student.created')").get().count, 2)
-  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM outbox_events WHERE topic IN ('identity.class.created', 'identity.student.created')").get().count, 2)
+  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM audit_events WHERE event_type = 'identity.class.created'").get().count, 1)
+  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM audit_events WHERE event_type = 'identity.enrollment.approved'").get().count, 1)
+  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM outbox_events WHERE topic = 'identity.class.created'").get().count, 1)
 })
 
 test('真实 HTTP 教学链创建安排、控制课堂、同步页面并只广播一次', async (t) => {

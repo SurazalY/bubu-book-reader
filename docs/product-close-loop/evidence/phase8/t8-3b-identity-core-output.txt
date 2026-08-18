@@ -1,0 +1,80 @@
+TAP version 13
+# (node:67060) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: migrations apply once and replay without mutation against a temporary SQLite file
+ok 1 - migrations apply once and replay without mutation against a temporary SQLite file
+  ---
+  duration_ms: 167.264
+  type: 'test'
+  ...
+# Subtest: 004 migrates 003 idempotency records to pending and succeeded without rewriting history
+ok 2 - 004 migrates 003 idempotency records to pending and succeeded without rewriting history
+  ---
+  duration_ms: 29.7279
+  type: 'test'
+  ...
+# Subtest: HTTP login persists sessions, protects the login idempotency hash, and enforces input bounds
+ok 3 - HTTP login persists sessions, protects the login idempotency hash, and enforces input bounds
+  ---
+  duration_ms: 361.7395
+  type: 'test'
+  ...
+# Subtest: disabled organizations block fresh login, replayed login, existing sessions, and school workspaces
+ok 4 - disabled organizations block fresh login, replayed login, existing sessions, and school workspaces
+  ---
+  duration_ms: 298.7506
+  type: 'test'
+  ...
+# Subtest: a legacy forged cross-organization class membership cannot expand class scope or authorize HTTP access
+ok 5 - a legacy forged cross-organization class membership cannot expand class scope or authorize HTTP access
+  ---
+  duration_ms: 258.5042
+  type: 'test'
+  ...
+# Subtest: class, grade, own, school, and platform scopes use persisted memberships without widening student actions
+ok 6 - class, grade, own, school, and platform scopes use persisted memberships without widening student actions
+  ---
+  duration_ms: 454.9414
+  type: 'test'
+  ...
+# Subtest: session TTL rejects invalid values before opening the database
+ok 7 - session TTL rejects invalid values before opening the database
+  ---
+  duration_ms: 1.7747
+  type: 'test'
+  ...
+# Subtest: seed import is strict on drift and the JSON CLI reports nonzero failure without raw credentials
+ok 8 - seed import is strict on drift and the JSON CLI reports nonzero failure without raw credentials
+  ---
+  duration_ms: 552.9252
+  type: 'test'
+  ...
+# Subtest: async idempotency reserves outside external work, replays successes, and recovers expired leases
+ok 9 - async idempotency reserves outside external work, replays successes, and recovers expired leases
+  ---
+  duration_ms: 158.4389
+  type: 'test'
+  ...
+# Subtest: async idempotency persists classified failures and blocks blind replay after unknown external results
+ok 10 - async idempotency persists classified failures and blocks blind replay after unknown external results
+  ---
+  duration_ms: 160.3267
+  type: 'test'
+  ...
+# (node:57208) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: role assignments stay inside their organization for SQLite writes and HTTP target access
+ok 11 - role assignments stay inside their organization for SQLite writes and HTTP target access
+  ---
+  duration_ms: 363.1814
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2615.0151

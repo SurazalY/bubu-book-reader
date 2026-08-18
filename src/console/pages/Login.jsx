@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { createAuthApi } from '../../api/auth.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 import { cx } from '../../shared/cx.js'
 import { GlassPanel } from '../components/Glass.jsx'
 import { BrandMark, DiamondRule } from '../components/BrandMark.jsx'
+import { resolveLoginDestination } from './accounts/identityUi.js'
 
 const states = {
   normal: { icon: 'Wifi', text: '网络连接正常', iconClass: 'text-[#3E9E8F]', textClass: 'text-ink-600' },
@@ -19,6 +20,7 @@ const authApi = createAuthApi()
 
 export default function Login() {
   const navigate = useNavigate()
+  const [school, setSchool] = useState('')
   const [account, setAccount] = useState('')
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd] = useState(false)
@@ -33,19 +35,19 @@ export default function Login() {
 
   async function submit(event) {
     event.preventDefault()
-    const username = account.trim()
-    if (!username || !password) {
+    const schoolCode = school.trim()
+    const loginName = account.trim()
+    if (!schoolCode || !loginName || !password) {
       setStatus('error')
-      setNote('请输入账号和密码')
+      setNote('请输入学校码、登录名和密码')
       return
     }
     setSubmitting(true)
     try {
-      const response = await authApi.login(username, password)
-      const destination = response.data?.navigation?.defaultPath
-      if (!destination) throw new Error('当前账号没有可用的权限端入口，请联系学校管理员')
+      const response = await authApi.login({ schoolCode, loginName, password })
+      const destination = resolveLoginDestination(response.data?.navigation)
       clearFeedback()
-      navigate(destination, { replace: true })
+      if (destination) navigate(destination, { replace: true })
     } catch (cause) {
       setStatus(cause?.code === 'ACCOUNT_RESTRICTED' ? 'locked' : 'error')
       setNote(cause?.message || '登录服务暂不可用，请稍后重试')
@@ -86,13 +88,36 @@ export default function Login() {
           >
             <Icon name="User" className="w-5 h-5 text-ink-400 shrink-0" strokeWidth={1.6} />
             <input
+              value={school}
+              onChange={(event) => {
+                setSchool(event.target.value)
+                clearFeedback()
+              }}
+              placeholder="学校码"
+              aria-label="学校码"
+              autoComplete="organization"
+              className="flex-1 bg-transparent text-base text-ink-800 placeholder:text-ink-400 outline-none"
+            />
+          </div>
+
+          <div
+            className={cx(
+              fieldBase,
+              'mt-5',
+              invalid
+                ? 'border-danger-500/45 bg-danger-50/45'
+                : 'border-white/75 bg-white/62 focus-within:border-brand-300/70 focus-within:bg-white/75',
+            )}
+          >
+            <Icon name="IdCard" className="w-5 h-5 text-ink-400 shrink-0" strokeWidth={1.6} />
+            <input
               value={account}
               onChange={(event) => {
                 setAccount(event.target.value)
                 clearFeedback()
               }}
-              placeholder="账号 / 工号"
-              aria-label="账号或工号"
+              placeholder="登录名"
+              aria-label="登录名"
               autoComplete="username"
               className="flex-1 bg-transparent text-base text-ink-800 placeholder:text-ink-400 outline-none"
             />
@@ -163,6 +188,12 @@ export default function Login() {
           </button>
         </div>
         {note && <p className={cx('mt-3 text-center text-micro', status === 'error' || status === 'locked' ? 'text-danger-600' : 'text-ink-500')}>{note}</p>}
+        <Link
+          to="/student/register"
+          className="mt-5 block text-center text-sm font-semibold text-[#3E9E8F] hover:text-[#2F7D71] transition"
+        >
+          凭据注册
+        </Link>
 
         <div
           className="console-enter mt-11 flex w-full items-center justify-center gap-5 rounded-full border border-white/65 bg-white/50 px-6 py-3.5 backdrop-blur-md"

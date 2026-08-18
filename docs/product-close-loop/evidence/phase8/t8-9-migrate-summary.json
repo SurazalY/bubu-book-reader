@@ -1,0 +1,142 @@
+{
+  "task": "T8.9-migrate",
+  "verdict": "A-D pass; E.1/E.2/E.4 pass; E.3 blocked-no-http-create-draft; rollback no longer valid",
+  "stamp": "20260818T134900Z",
+  "collectedAt": "2026-08-18T13:55:00.070Z",
+  "git": {
+    "branch": "feat/product-close-loop",
+    "head": "b3cd4b532cd4e7e44398bd465112e9ff84a9684e"
+  },
+  "pids": {
+    "old5191": 66104,
+    "firstNew5191": 71740,
+    "finalNew5191": 10340,
+    "finalNpmParent": 66332,
+    "vite5190Untouched": true
+  },
+  "listen": {
+    "host": "127.0.0.1",
+    "port": 5191,
+    "finalHealth": {
+      "httpStatus": 200,
+      "status": "ok",
+      "database": "sqlite",
+      "migrations": 34
+    }
+  },
+  "backup": {
+    "dir": "C:\\Users\\Yak\\AppData\\Local\\Temp\\t8-9-gate3-20260818T134900Z",
+    "path": "C:\\Users\\Yak\\AppData\\Local\\Temp\\t8-9-gate3-20260818T134900Z\\readmate-046-official.sqlite",
+    "reusedT88OrPreflight": false,
+    "bytes": 107028480,
+    "sha256": "44d55384ba2b49c4468fd8d42693a3b97cd9ec67bd3d8cb1c48b38bfb050167b",
+    "quick_check": "ok",
+    "source": {
+      "sqlite": {
+        "bytes": 108261376,
+        "sha256": "6e3e163d5f2d437c892b2cbfeb44906b6a78dad5a56f9577d0277e6819cff14b"
+      },
+      "wal": {
+        "bytes": 9723232,
+        "sha256": "a7a4e12c33e01d710203ae3ae93d9b38341573111864c67ba554bf78d4be07be"
+      },
+      "shm": {
+        "bytes": 32768,
+        "sha256": "e0bcfc25d83fe60a7ee4e9d8b49bf2490d440c63d5f3d76c0ad3a341a07a6a23"
+      }
+    }
+  },
+  "baseline11_1AfterStop": {
+    "allPass": true,
+    "published": 49,
+    "versions": 49,
+    "grants": 0,
+    "activeClass": "internal-demo-class",
+    "grade_id": "internal-demo-grade",
+    "schema_migrations_max": "046_reader_mode_preferences.sql"
+  },
+  "migrations": {
+    "firstStart": {
+      "pid": 71740,
+      "inferredApplied": [
+        "047_login_and_class_identity.sql",
+        "048_registration_credentials.sql",
+        "049_enrollment_and_password_reset.sql",
+        "050_book_access_grant_backfill.sql"
+      ],
+      "appliedAt": "2026-08-18T13:49:23.231Z",
+      "healthMigrations": 34
+    },
+    "restart": {
+      "pid": 10340,
+      "alreadyApplied": [
+        "047_login_and_class_identity.sql",
+        "048_registration_credentials.sql",
+        "049_enrollment_and_password_reset.sql",
+        "050_book_access_grant_backfill.sql"
+      ],
+      "appliedAtUnchanged": true,
+      "checksumUnchanged": true,
+      "healthMigrations": 34
+    },
+    "checksums": {
+      "047_login_and_class_identity.sql": "de7d7fcad2926427b7b8ed75e9a4bc3691de8fa3a88f8452c30ab9cf99285f48",
+      "048_registration_credentials.sql": "97dcadc912e5c9593b60ccd84ade4987c7208acdd10f75fe42f2b140cf7fccea",
+      "049_enrollment_and_password_reset.sql": "190cfb10e9fef84991724aeb2fe579c3a77dc6a669a61f637a8b70de7eb5cfff",
+      "050_book_access_grant_backfill.sql": "bbb1a4bd103495acfc5e1ffed1e74cc960aae2fa3c2b0ad3ee31982af5eef763"
+    }
+  },
+  "checkpointBeforeExtraWrites": {
+    "grants": 49,
+    "published": 49,
+    "activeClasses": 1,
+    "grade_manager": 0,
+    "quick_check": "ok",
+    "triplesComplete": true,
+    "currentVersionsUnique": true,
+    "rollbackStillValid": true,
+    "setDiffEmpty": true
+  },
+  "visibility": {
+    "added": [],
+    "removed": [],
+    "allEmpty": true,
+    "postPath": "docs/product-close-loop/evidence/phase8/t8-9-post-visibility-sets.json",
+    "diffPath": "docs/product-close-loop/evidence/phase8/t8-9-visibility-set-diff.json"
+  },
+  "httpD": {
+    "oldBodyStudent": 400,
+    "newBodyStudent": 200,
+    "studentBooks": { "status": 200, "count": 49 },
+    "teacherPublish": 403,
+    "teacherUnpublish": 403,
+    "grantsUnchanged": true
+  },
+  "httpE": {
+    "executed": true,
+    "e1": true,
+    "e2": true,
+    "e3": false,
+    "e3Reason": "blocked-no-http-create-draft",
+    "e4": true,
+    "newClassId": "34b41110-8286-4a5d-84a3-ae72c90dd734",
+    "newStudentUserId": "bdb84ff0-fedf-4ffe-bebf-c158875e00be",
+    "newStudentBooks": 0,
+    "acquireLeaseNoGrant": {
+      "status": 404,
+      "code": "RESOURCE_NOT_FOUND",
+      "wroteLease": false
+    },
+    "shelfOwn": 200,
+    "shelfForeign": 403,
+    "grantsAfterE": 49
+  },
+  "rollbackStillValid": false,
+  "warning": "已发生新业务写入，agent 不得自行用旧备份覆盖真库。",
+  "stop": {
+    "hit": false,
+    "reasons": []
+  },
+  "passwordWrittenToEvidence": false,
+  "businessSourceTouched": false
+}

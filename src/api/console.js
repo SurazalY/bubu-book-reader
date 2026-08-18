@@ -1,5 +1,12 @@
 import { createApiClient } from './client.js'
 
+function writeIdempotencyKey(prefix) {
+  if (typeof globalThis.crypto?.randomUUID !== 'function') {
+    throw new Error('当前浏览器无法生成安全请求标识')
+  }
+  return `${prefix}:${globalThis.crypto.randomUUID()}`
+}
+
 export function createConsoleApi(client = createApiClient()) {
   return {
     getSession: (options = {}) => client.get('/session', options),
@@ -12,10 +19,19 @@ export function createConsoleApi(client = createApiClient()) {
       client.post(`/books/${encodeURIComponent(bookId)}/publish`, options),
     unpublishBook: (bookId, options = {}) =>
       client.post(`/books/${encodeURIComponent(bookId)}/unpublish`, options),
-    getBookVisibility: (bookId, options = {}) =>
-      client.get(`/books/${encodeURIComponent(bookId)}/visibility`, options),
-    setBookVisibility: (bookId, body, options = {}) =>
-      client.put(`/books/${encodeURIComponent(bookId)}/visibility`, { ...options, body }),
+    getClassShelf: (classId, options = {}) =>
+      client.get(`/classes/${encodeURIComponent(classId)}/shelf`, options),
+    putClassShelfBook: (classId, bookId, options = {}) =>
+      client.put(`/classes/${encodeURIComponent(classId)}/shelf/${encodeURIComponent(bookId)}`, {
+        ...options,
+        idempotencyKey: options.idempotencyKey || writeIdempotencyKey('class-shelf-put'),
+        body: options.body ?? {},
+      }),
+    deleteClassShelfBook: (classId, bookId, options = {}) =>
+      client.delete(`/classes/${encodeURIComponent(classId)}/shelf/${encodeURIComponent(bookId)}`, {
+        ...options,
+        idempotencyKey: options.idempotencyKey || writeIdempotencyKey('class-shelf-delete'),
+      }),
     listAssignments: (options = {}) => client.get('/assignments', { ...options, query: { limit: 20, ...(options.query || {}) } }),
     createAssignment: (body, options = {}) => client.post('/assignments', { ...options, body }),
     getBookPage: (bookId, pageNo, options = {}) =>

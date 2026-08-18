@@ -71,8 +71,8 @@ test('书目已存在但公开封面丢失时幂等导入会恢复素材', async
   await importPublicDomainCatalog({
     databasePath,
     manifestPath,
-    actorId: 'internal-principal',
-    workspaceId: 'internal-demo-school-workspace',
+    actorId: 'internal-ops-admin',
+    workspaceId: 'internal-demo-platform-workspace',
     publicRoot,
   })
 
@@ -83,8 +83,8 @@ test('书目已存在但公开封面丢失时幂等导入会恢复素材', async
   const replay = await importPublicDomainCatalog({
     databasePath,
     manifestPath,
-    actorId: 'internal-principal',
-    workspaceId: 'internal-demo-school-workspace',
+    actorId: 'internal-ops-admin',
+    workspaceId: 'internal-demo-platform-workspace',
     publicRoot,
   })
 

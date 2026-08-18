@@ -65,7 +65,7 @@ export default function TeacherReader() {
         <EmptyState
           icon="FileWarning"
           title="读不到这本书的书页"
-          desc="如果它刚被下架，请重新发布后再打开。"
+          desc="这本书当前不可读取。请回到书库确认它仍已发布，以及是否已投放到本班。"
           action={
             <Btn tone="primary" icon="ArrowLeft" onClick={() => navigate('/console/teaching/books')}>
               回到书库

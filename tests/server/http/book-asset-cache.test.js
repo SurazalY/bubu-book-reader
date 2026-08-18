@@ -7,6 +7,7 @@ import test from 'node:test'
 
 import { hashPassword } from '../../../server/auth/password.js'
 import { createReadmateApplication } from '../../../server/app.js'
+import { grantBookToClass, loginBody } from '../helpers/phase8-old-fixture.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
 
 function identityFixture() {
@@ -25,6 +26,7 @@ function identityFixture() {
   ]
   return {
     organizationId,
+    schoolCode: organizationId,
     classId,
     gradeId,
     workspaceId,
@@ -99,7 +101,7 @@ async function login(baseUrl, fixture, user) {
   const response = await requestJson(baseUrl, jar, '/auth/login', {
     method: 'POST',
     idempotencyKey: `login-${user.id}`,
-    body: { username: user.username, password: fixture.password },
+    body: loginBody(fixture, user),
   })
   assert.equal(response.status, 200, JSON.stringify(response.payload))
   return jar
@@ -187,6 +189,13 @@ async function startHarness(t) {
     }],
   })
   await reading.publishBook(created.bookId)
+  grantBookToClass(application.database, {
+    bookId: created.bookId,
+    classId: fixture.classId,
+    organizationId: fixture.organizationId,
+    actorId: fixture.adminId,
+    bookVersionId: created.versionId,
+  })
   const server = await new Promise((resolve) => {
     const listener = application.app.listen(0, '127.0.0.1', () => resolve(listener))
   })

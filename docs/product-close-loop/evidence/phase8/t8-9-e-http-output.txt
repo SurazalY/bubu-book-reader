@@ -1,0 +1,15 @@
+PRINCIPAL_LOGIN 200 userId=internal-principal workspace=internal-demo-school-workspace
+CREATE_CLASS 201 {"data":{"id":"34b41110-8286-4a5d-84a3-ae72c90dd734","name":"T89验收二班","stage":"primary","entryYear":2023,"classNumber":2,"gradeId":"primary:2023","currentGrade":3,"lifecycle":"active","status":"active","version":1}}
+ISSUE_CRED 201 credentialId=26660d06-9bba-4d3e-a9cf-793f57650a0b expectedRole=student rawToken=[redacted]
+REGISTER 201 {"data":{"user":{"id":"bdb84ff0-fedf-4ffe-bebf-c158875e00be","organizationId":"internal-demo-organization","username":"bdb84ff0-fedf-4ffe-bebf-c158875e00be","displayName":"T89新班学生","status":"active","version":1}}}
+LIST_PENDING 200 enrollmentId=0159ac68-0c94-4e49-9c96-de461442954f version=1
+APPROVE 200 {"data":{"id":"0159ac68-0c94-4e49-9c96-de461442954f","status":"approved"}}
+NEW_STUDENT_LOGIN 200 userId=bdb84ff0-fedf-4ffe-bebf-c158875e00be workspaceId=0e31e8b4-a4b9-4c67-a670-afe195a9754a
+NEW_STUDENT_BOOKS 200 count=0 ids=[]
+LEASE_NO_GRANT 404 version=book-001-trusted-v1 {"error":{"code":"RESOURCE_NOT_FOUND","message":"书籍不存在或当前不可读取","retryable":false,"details":{},"requestId":"4f0e41fa-2855-4e97-ab94-14b715fe1b95"}}
+OPS_LOGIN 200 userId=internal-ops-admin workspace=internal-demo-platform-workspace
+OPS_DRAFT_LIST 200 count=0
+TEACHER_LOGIN 200 userId=internal-teacher-li workspace=internal-demo-workspace
+SHELF_OWN 200 {"data":{"bookId":"book-001","classId":"internal-demo-class","bookVersionId":"book-001-trusted-v1"}}
+SHELF_OWN_IDEMPOTENT 200 {"data":{"bookId":"book-001","classId":"internal-demo-class","bookVersionId":"book-001-trusted-v1"}}
+SHELF_FOREIGN 403 {"error":{"code":"PERMISSION_DENIED","message":"当前工作空间无权执行此操作","retryable":false,"details":{},"requestId":"41c2f583-9cfd-4249-9045-3401caf257d7"}}

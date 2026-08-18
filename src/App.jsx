@@ -14,6 +14,11 @@ function LegacyReaderRedirect() {
   return <Navigate to={`/student/books/${bookId}`} replace />
 }
 
+function JoinRedirect() {
+  const { token } = useParams()
+  return <Navigate to={`/student/register/${token}`} replace />
+}
+
 function RouteFallback() {
   return <div className="min-h-screen" aria-busy="true" />
 }
@@ -34,6 +39,7 @@ export default function App() {
         <Route path="/reader" element={<Navigate to="/student/home" replace />} />
         <Route path="/reader/:bookId" element={<LegacyReaderRedirect />} />
         {/* 学生端与权限端共用一体化入口，均保持独立外壳 */}
+        <Route path="/join/:token" element={<JoinRedirect />} />
         <Route path="/student/*" element={<StudentApp />} />
         <Route path="/console/*" element={<ConsoleApp />} />
       </Routes>

@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { createAuthApi } from '../../api/auth.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 import { cx } from '../../shared/cx.js'
 import { GlassPanel } from '../components/Glass.jsx'
 import { BrandMark, DiamondRule } from '../components/BrandMark.jsx'
+import { resolveLoginDestination } from '../../console/pages/accounts/identityUi.js'
 
 const FIELD =
   'student-field h-16 w-full rounded-[24px] border border-white/70 bg-white/55 px-14 text-title text-ink-800 placeholder:text-ink-400 outline-none transition focus:border-white/90 focus:bg-white/70'
@@ -19,6 +20,7 @@ const authApi = createAuthApi()
 
 export default function Login() {
   const nav = useNavigate()
+  const [school, setSchool] = useState('')
   const [account, setAccount] = useState('')
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd] = useState(false)
@@ -33,19 +35,19 @@ export default function Login() {
 
   async function submit(event) {
     event.preventDefault()
-    const username = account.trim()
-    if (!username || !password) {
+    const schoolCode = school.trim()
+    const loginName = account.trim()
+    if (!schoolCode || !loginName || !password) {
       setStatus('error')
-      setFeedback('请输入账号和密码')
+      setFeedback('请输入学校码、登录名和密码')
       return
     }
     setSubmitting(true)
     try {
-      const response = await authApi.login(username, password)
-      const destination = response.data?.navigation?.defaultPath
-      if (!destination) throw new Error('当前账号没有可用的读伴入口，请联系学校管理员')
+      const response = await authApi.login({ schoolCode, loginName, password })
+      const destination = resolveLoginDestination(response.data?.navigation)
       clearFeedback()
-      nav(destination, { replace: true })
+      if (destination) nav(destination, { replace: true })
     } catch (cause) {
       setStatus(cause?.code === 'ACCOUNT_RESTRICTED' ? 'locked' : 'error')
       setFeedback(cause?.message || '登录服务暂不可用，请稍后重试')
@@ -74,11 +76,25 @@ export default function Login() {
 
         <form className="mt-9 space-y-4" onSubmit={submit}>
           <div className="relative">
+            <Icon name="School" className="pointer-events-none absolute left-6 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-400" />
+            <input
+              className={FIELD}
+              placeholder="学校码"
+              aria-label="学校码"
+              value={school}
+              onChange={(event) => {
+                setSchool(event.target.value)
+                clearFeedback()
+              }}
+              autoComplete="organization"
+            />
+          </div>
+          <div className="relative">
             <Icon name="User" className="pointer-events-none absolute left-6 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-400" />
             <input
               className={FIELD}
-              placeholder="账号 / 学号"
-              aria-label="账号或学号"
+              placeholder="登录名"
+              aria-label="登录名"
               value={account}
               onChange={(event) => {
                 setAccount(event.target.value)
@@ -150,6 +166,12 @@ export default function Login() {
             老师帮我登录
           </button>
         </div>
+        <Link
+          to="/student/register"
+          className="mt-5 block text-center text-caption font-semibold text-[#3E9E8F] transition hover:text-[#2F8375]"
+        >
+          凭据注册
+        </Link>
 
         <div className="mt-8 flex items-stretch overflow-hidden rounded-[18px] border border-white/60 bg-white/50 text-caption text-ink-500" role="status">
           <span className={cx('flex flex-1 items-center justify-center gap-2 px-4 py-3', state.textTone)}>

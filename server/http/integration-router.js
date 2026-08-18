@@ -335,6 +335,51 @@ function requireCommunityReview(identityService) {
   }
 }
 
+const CLASS_SHELF_NOT_FOUND = '班级不存在或当前不可读取'
+
+function requireClassInCurrentOrganization(database, organizationId, classId) {
+  const classroom = database.prepare(`
+    SELECT id FROM classes
+    WHERE id = ? AND organization_id = ?
+  `).get(classId, organizationId)
+  if (!classroom) {
+    throw new HttpError(404, 'RESOURCE_NOT_FOUND', CLASS_SHELF_NOT_FOUND)
+  }
+  return classroom
+}
+
+function requireShelfClassWorkspace(req, classId) {
+  if (req.workspace.scopeType !== 'class' || req.workspace.scopeId !== classId) {
+    throw new HttpError(403, 'PERMISSION_DENIED', '当前工作空间无权执行此操作')
+  }
+}
+
+function listClassLocalShelfItems(database, { organizationId, classId }) {
+  return database.prepare(`
+    SELECT book.id AS bookId, book.id AS id, book.title AS title, book.status AS status,
+      (
+        SELECT latest.id FROM book_versions AS latest
+        WHERE latest.book_id = book.id AND latest.organization_id_at_creation = ?
+        ORDER BY latest.created_at DESC, latest.id DESC
+        LIMIT 1
+      ) AS versionId
+    FROM books AS book
+    WHERE book.organization_id_at_creation = ?
+      AND book.status = 'published'
+      AND EXISTS (
+        SELECT 1
+        FROM book_access_grants AS grant_row
+        JOIN book_versions AS version ON version.id = grant_row.book_version_id
+        WHERE version.book_id = book.id
+          AND version.organization_id_at_creation = ?
+          AND grant_row.organization_id_at_creation = ?
+          AND grant_row.grantee_type = 'class'
+          AND grant_row.grantee_id = ?
+      )
+    ORDER BY book.title, book.id
+  `).all(organizationId, organizationId, organizationId, organizationId, classId)
+}
+
 function signDeviceId(deviceId, secret) {
   const signature = createHmac('sha256', secret).update(deviceId).digest('base64url')
   return `${deviceId}.${signature}`
@@ -672,23 +717,46 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
     await pipeline(createReadStream(filename), res)
   }))
 
-  // 注册在 /books/assets/:assetId 之后，避免影响已冻结的资产路由解析顺序。
-  router.get('/books/:bookId/visibility', route(async (req, res) => {
-    const { reading } = domainForRequest(req, database, identityService)
-    return sendData(res, await reading.getBookVisibility(req.params.bookId), { requestId: req.requestId })
+  router.get('/classes/:classId/shelf', requirePermission(identityService, 'book.shelf.read'), route((req, res) => {
+    requireClassInCurrentOrganization(database, req.workspace.organizationId, req.params.classId)
+    requireShelfClassWorkspace(req, req.params.classId)
+    return sendData(res, {
+      items: listClassLocalShelfItems(database, {
+        organizationId: req.workspace.organizationId,
+        classId: req.params.classId,
+      }),
+    }, { requestId: req.requestId })
   }))
 
-  router.put('/books/:bookId/visibility', route(async (req, res) => {
+  router.put('/classes/:classId/shelf/:bookId', requirePermission(identityService, 'book.shelf.grant'), route(async (req, res) => {
+    requireClassInCurrentOrganization(database, req.workspace.organizationId, req.params.classId)
+    requireShelfClassWorkspace(req, req.params.classId)
     const key = writeKey(req)
     const { reading } = domainForRequest(req, database, identityService)
     const outcome = await executeIdempotentAsync(database, {
       key,
-      scope: `book.visibility:${req.workspace.organizationId}:${req.workspace.id}:${req.params.bookId}`,
-      request: { scope: req.body?.scope, classIds: req.body?.classIds },
-      operation: () => domainWriteOutcome(200, () => reading.setBookVisibility({
+      scope: `book.shelf.grant:${req.workspace.organizationId}:${req.workspace.id}:${req.params.classId}:${req.params.bookId}`,
+      request: { classId: req.params.classId, bookId: req.params.bookId },
+      operation: () => domainWriteOutcome(200, () => reading.grantClassLocalShelf({
         bookId: req.params.bookId,
-        scope: req.body?.scope,
-        classIds: req.body?.classIds,
+        classId: req.params.classId,
+      })),
+    })
+    return sendOutcome(res, req, outcome)
+  }))
+
+  router.delete('/classes/:classId/shelf/:bookId', requirePermission(identityService, 'book.shelf.revoke'), route(async (req, res) => {
+    requireClassInCurrentOrganization(database, req.workspace.organizationId, req.params.classId)
+    requireShelfClassWorkspace(req, req.params.classId)
+    const key = writeKey(req)
+    const { reading } = domainForRequest(req, database, identityService)
+    const outcome = await executeIdempotentAsync(database, {
+      key,
+      scope: `book.shelf.revoke:${req.workspace.organizationId}:${req.workspace.id}:${req.params.classId}:${req.params.bookId}`,
+      request: { classId: req.params.classId, bookId: req.params.bookId },
+      operation: () => domainWriteOutcome(200, () => reading.revokeClassLocalShelf({
+        bookId: req.params.bookId,
+        classId: req.params.classId,
       })),
     })
     return sendOutcome(res, req, outcome)
@@ -1268,7 +1336,7 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
   )))
 
   router.get('/assignments', requirePermission(identityService, 'assignment.read'), route((req, res) => sendData(res,
-    { items: projectAssignments(database, req.workspace.organizationId, req.workspace.id) },
+    { items: projectAssignments(database, req.workspace.organizationId, req.workspace.id, req.identitySession.user.id) },
     { requestId: req.requestId },
   )))
 

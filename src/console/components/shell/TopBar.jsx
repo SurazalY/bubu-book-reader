@@ -8,9 +8,8 @@ import { useConsole } from '../../state/ConsoleContext.jsx'
 const authApi = createAuthApi()
 
 // 顶栏（母版 02/03）：右上角只有铃铛与工作空间胶囊，不做占满整行的大导航。
-// 个人菜单与工作空间选择器是「同一个组合浮层系统」：
-// 点开第二层时父菜单保持展开并整体左移，两层共享同一个头像锚点，
-// 子层顶部与「切换工作空间」那一行对齐（母版 03 的关系），不做互不相关的两个模态。
+// 个人菜单锁在胶囊下方右侧；第二层挂在父菜单内侧左侧，向页面中央展开。
+// 打开子层时父菜单保持展开且不位移，两层共享同一个头像锚点。
 export default function TopBar({ pendingTotal }) {
   const { workspace, workspaces, switchWorkspace, prefs, togglePref, setPref } = useConsole()
   const navigate = useNavigate()
@@ -107,9 +106,9 @@ export default function TopBar({ pendingTotal }) {
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-2 flex items-start justify-end gap-2.5 z-40">
-          {/* 第一层：个人菜单 */}
-          <div ref={menuRef} className="console-float console-pop w-[212px] rounded-2xl py-2" role="menu">
+        <div className="absolute top-full right-0 mt-2 z-40">
+          {/* 第一层：个人菜单，锁在胶囊下方右侧，不因第二层开合位移 */}
+          <div ref={menuRef} className="relative console-float console-pop w-[212px] rounded-2xl py-2" role="menu">
             <div className="flex items-center gap-3 px-3.5 py-2.5">
               <Avatar size={38} />
               <div className="min-w-0">
@@ -135,6 +134,15 @@ export default function TopBar({ pendingTotal }) {
               active={subOpen}
               onClick={() => setSubOpen(true)}
               onMouseEnter={() => setSubOpen(true)}
+            />
+            <MenuRow
+              icon="Users"
+              label="管理任教班级"
+              onClick={() => {
+                close()
+                navigate('/console/select-class')
+              }}
+              onMouseEnter={() => setSubOpen(false)}
             />
             <MenuRow
               icon="CircleHelp"
@@ -191,41 +199,41 @@ export default function TopBar({ pendingTotal }) {
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* 第二层：工作空间选择器，与上面那一行顶部对齐 */}
-          {subOpen && (
-            <div
-              className="console-float console-pop w-[204px] rounded-2xl py-2"
-              style={{ marginTop: subTop }}
-              role="menu"
-              aria-label="选择工作空间"
-            >
-              <div className="px-3.5 pb-1.5 pt-1 text-[11px] text-ink-400">选择工作空间</div>
-              <ul>
-                {workspaces.map((w) => {
-                  const on = w.id === workspace.id
-                  return (
-                    <li key={w.id}>
-                      <button
-                        type="button"
-                        onClick={() => pickWorkspace(w.id)}
-                        className="w-full text-left px-3.5 py-2 flex items-start gap-2 hover:bg-white/70 transition"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div className={cx('text-[13px] truncate', on ? 'font-semibold text-ink-900' : 'text-ink-700')}>
-                            {w.name}
+            {/* 第二层：挂在父菜单左侧，向页面中央展开，不把父层顶开 */}
+            {subOpen && (
+              <div
+                className="absolute top-0 right-full mr-2.5 console-float console-pop w-[204px] rounded-2xl py-2"
+                style={{ marginTop: subTop }}
+                role="menu"
+                aria-label="选择工作空间"
+              >
+                <div className="px-3.5 pb-1.5 pt-1 text-[11px] text-ink-400">选择工作空间</div>
+                <ul>
+                  {workspaces.map((w) => {
+                    const on = w.id === workspace.id
+                    return (
+                      <li key={w.id}>
+                        <button
+                          type="button"
+                          onClick={() => pickWorkspace(w.id)}
+                          className="w-full text-left px-3.5 py-2 flex items-start gap-2 hover:bg-white/70 transition"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className={cx('text-[13px] truncate', on ? 'font-semibold text-ink-900' : 'text-ink-700')}>
+                              {w.name}
+                            </div>
+                            <div className="text-[11px] text-ink-400 truncate mt-0.5">{w.scopeNote}</div>
                           </div>
-                          <div className="text-[11px] text-ink-400 truncate mt-0.5">{w.scopeNote}</div>
-                        </div>
-                        {on && <Icon name="Check" className="w-4 h-4 text-[#3E9E8F] shrink-0 mt-0.5" strokeWidth={2.4} />}
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          )}
+                          {on && <Icon name="Check" className="w-4 h-4 text-[#3E9E8F] shrink-0 mt-0.5" strokeWidth={2.4} />}
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

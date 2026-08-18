@@ -1,0 +1,1778 @@
+﻿
+> book-reader-app@0.1.0 test:frontend
+> node --test tests/frontend/*.mjs
+
+TAP version 13
+# Subtest: 缁熶竴鎴愬姛淇″皝淇濈暀 data 涓?meta
+ok 1 - 缁熶竴鎴愬姛淇″皝淇濈暀 data 涓?meta
+  ---
+  duration_ms: 1.2965
+  type: 'test'
+  ...
+# Subtest: 缁熶竴澶辫触淇″皝鏆撮湶鏈嶅姟绔敊璇爜涓庤姹傛爣璇?ok 2 - 缁熶竴澶辫触淇″皝鏆撮湶鏈嶅姟绔敊璇爜涓庤姹傛爣璇?  ---
+  duration_ms: 0.3673
+  type: 'test'
+  ...
+# Subtest: 瀹㈡埛绔彂閫佺湡瀹炲伐浣滅┖闂翠笂涓嬫枃涓斾繚鐣?Cookie 浼氳瘽
+ok 3 - 瀹㈡埛绔彂閫佺湡瀹炲伐浣滅┖闂翠笂涓嬫枃涓斾繚鐣?Cookie 浼氳瘽
+  ---
+  duration_ms: 0.612
+  type: 'test'
+  ...
+# Subtest: 鍐欒姹傛嫆缁濈己灏?Idempotency-Key 鐨勬湰鍦颁吉鎻愪氦
+ok 4 - 鍐欒姹傛嫆缁濈己灏?Idempotency-Key 鐨勬湰鍦颁吉鎻愪氦
+  ---
+  duration_ms: 0.2688
+  type: 'test'
+  ...
+# Subtest: 瀹夊叏浜嬩欢鍏抽棴閫傞厤鍣ㄤ繚鐣欏伐浣滅┖闂淬€佸箓绛夐敭鍜屼汉宸ヨ鏄?ok 5 - 瀹夊叏浜嬩欢鍏抽棴閫傞厤鍣ㄤ繚鐣欏伐浣滅┖闂淬€佸箓绛夐敭鍜屼汉宸ヨ鏄?  ---
+  duration_ms: 1.3044
+  type: 'test'
+  ...
+# Subtest: 鐧诲綍閫傞厤鍣ㄥ彧鎻愪氦 schoolCode+loginName+password 骞朵娇鐢ㄧ湡瀹炲箓绛夊啓璇锋眰
+ok 6 - 鐧诲綍閫傞厤鍣ㄥ彧鎻愪氦 schoolCode+loginName+password 骞朵娇鐢ㄧ湡瀹炲箓绛夊啓璇锋眰
+  ---
+  duration_ms: 0.4245
+  type: 'test'
+  ...
+# Subtest: 瀹夊叏璇︽儏鍙槧灏勬湇鍔＄闃堝€笺€佺鍚堟潯鏁颁笌澶嶆牳缁撹
+ok 7 - 瀹夊叏璇︽儏鍙槧灏勬湇鍔＄闃堝€笺€佺鍚堟潯鏁颁笌澶嶆牳缁撹
+  ---
+  duration_ms: 0.4324
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓绔繍琛屾椂 DTO 鍙繚鐣欑湡瀹?API 鏁版嵁锛屼笉鎼哄甫杩囨浮澹虫爣璁?ok 8 - 瀛︾敓绔繍琛屾椂 DTO 鍙繚鐣欑湡瀹?API 鏁版嵁锛屼笉鎼哄甫杩囨浮澹虫爣璁?  ---
+  duration_ms: 0.2939
+  type: 'test'
+  ...
+# Subtest: 鍥涙潯鐪熷疄璺敱淇濈暀 Claude 椤甸潰缁勪欢鏍戯紝骞跺叿澶囨垚鍔熶笌澶辫触鍒嗘敮
+ok 9 - 鍥涙潯鐪熷疄璺敱淇濈暀 Claude 椤甸潰缁勪欢鏍戯紝骞跺叿澶囨垚鍔熶笌澶辫触鍒嗘敮
+  ---
+  duration_ms: 8.4708
+  type: 'test'
+  ...
+# Subtest: 鐢熶骇鏋勫缓鐨勯潤鎬佽祫婧愪娇鐢ㄧ珯鐐规牴璺緞锛屾繁閾炬帴涓嶄細璇锋眰宓屽璺敱涓嬬殑 assets
+ok 10 - 鐢熶骇鏋勫缓鐨勯潤鎬佽祫婧愪娇鐢ㄧ珯鐐规牴璺緞锛屾繁閾炬帴涓嶄細璇锋眰宓屽璺敱涓嬬殑 assets
+  ---
+  duration_ms: 2.5492
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓杩愯鏃朵笂涓嬫枃涓嶅垵濮嬪寲杩囨浮涓氬姟鏁版嵁鎴?localStorage
+ok 11 - 瀛︾敓杩愯鏃朵笂涓嬫枃涓嶅垵濮嬪寲杩囨浮涓氬姟鏁版嵁鎴?localStorage
+  ---
+  duration_ms: 0.7756
+  type: 'test'
+  ...
+# Subtest: 鏈€缁堝鐢熶笌鏉冮檺鍏ュ彛妯″潡鍥句笉甯?fixture銆佹紨绀烘暟鎹垨涓氬姟瀛樺偍
+ok 12 - 鏈€缁堝鐢熶笌鏉冮檺鍏ュ彛妯″潡鍥句笉甯?fixture銆佹紨绀烘暟鎹垨涓氬姟瀛樺偍
+  ---
+  duration_ms: 46.1797
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓闃呰鍣ㄥ彧鎶?API 鍒嗛〉姝ｆ枃鏄犲皠涓哄彲娓叉煋鍧?ok 13 - 瀛︾敓闃呰鍣ㄥ彧鎶?API 鍒嗛〉姝ｆ枃鏄犲皠涓哄彲娓叉煋鍧?  ---
+  duration_ms: 0.5961
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓 AI 闈㈡澘鍙秷璐规湇鍔＄浼氳瘽銆侀搴﹀苟鐢ㄧ湡瀹炲啓璇锋眰鍙戦€?ok 14 - 瀛︾敓 AI 闈㈡澘鍙秷璐规湇鍔＄浼氳瘽銆侀搴﹀苟鐢ㄧ湡瀹炲啓璇锋眰鍙戦€?  ---
+  duration_ms: 2.145
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺棣栭〉浠呬粠濂戠害 API DTO 缁勮鎸囨爣銆佸畨鎺掑拰瀹夊叏鎻愰啋
+ok 15 - 鏉冮檺棣栭〉浠呬粠濂戠害 API DTO 缁勮鎸囨爣銆佸畨鎺掑拰瀹夊叏鎻愰啋
+  ---
+  duration_ms: 0.7697
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺棣栭〉鍦ㄥ畨鍏ㄤ簨浠惰鎷掔粷鏃朵繚鐣欏彲璇荤殑缁熻鍜屽畨鎺掞紝骞舵槑纭樉绀烘潈闄愯竟鐣?ok 16 - 鏉冮檺棣栭〉鍦ㄥ畨鍏ㄤ簨浠惰鎷掔粷鏃朵繚鐣欏彲璇荤殑缁熻鍜屽畨鎺掞紝骞舵槑纭樉绀烘潈闄愯竟鐣?  ---
+  duration_ms: 0.4491
+  type: 'test'
+  ...
+# Subtest: 涔︽灦 DTO 鍙繚鐣欏悗绔?title銆乧over 涓庡彲鐢?assets
+ok 17 - 涔︽灦 DTO 鍙繚鐣欏悗绔?title銆乧over 涓庡彲鐢?assets
+  ---
+  duration_ms: 0.5811
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔繍琛屾椂 DTO 涓嶄粠闈欐€佸伐浣滅┖闂存帹瀵兼巿鏉?ok 18 - 鏉冮檺绔繍琛屾椂 DTO 涓嶄粠闈欐€佸伐浣滅┖闂存帹瀵兼巿鏉?  ---
+  duration_ms: 0.3197
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓棣栭〉涓庝功鏋跺皝闈㈣蛋鍙椾繚鎶よ祫浜ф帴鍙ｏ紝涓嶅洖閫€鍏紑 /covers/
+ok 19 - 瀛︾敓棣栭〉涓庝功鏋跺皝闈㈣蛋鍙椾繚鎶よ祫浜ф帴鍙ｏ紝涓嶅洖閫€鍏紑 /covers/
+  ---
+  duration_ms: 4.0474
+  type: 'test'
+  ...
+# Subtest: 鍏变韩 ui BookCover 璧板甫澶?fetch锛屼笖涓嶅啀鍑虹幇鍏紑 /covers/ 鍥為€€
+ok 20 - 鍏变韩 ui BookCover 璧板甫澶?fetch锛屼笖涓嶅啀鍑虹幇鍏紑 /covers/ 鍥為€€
+  ---
+  duration_ms: 0.8294
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀绔功搴撳皝闈㈣蛋甯﹀ご fetch锛屼笉鎶婂彈淇濇姢 URL 鍐欏叆 CSS url()
+ok 21 - 鏁欏笀绔功搴撳皝闈㈣蛋甯﹀ご fetch锛屼笉鎶婂彈淇濇姢 URL 鍐欏叆 CSS url()
+  ---
+  duration_ms: 1.6817
+  type: 'test'
+  ...
+# Subtest: 绀惧尯甯栧崱涓嶅啀浣跨敤鍏紑 /covers/ 瀛楅潰閲?ok 22 - 绀惧尯甯栧崱涓嶅啀浣跨敤鍏紑 /covers/ 瀛楅潰閲?  ---
+  duration_ms: 0.9243
+  type: 'test'
+  ...
+# Subtest: 婧愮爜閲屼笉瀛樺湪鎶婂彈淇濇姢灏侀潰 URL 鐩存帴濉炶繘瑁?img src 鎴?CSS url() 鐨勫睍绀轰綅
+ok 23 - 婧愮爜閲屼笉瀛樺湪鎶婂彈淇濇姢灏侀潰 URL 鐩存帴濉炶繘瑁?img src 鎴?CSS url() 鐨勫睍绀轰綅
+  ---
+  duration_ms: 109.0296
+  type: 'test'
+  ...
+# Subtest: 璧勪骇鎺ュ彛杩斿洖 404 鏃?loadProtectedAsset 闄嶇骇涓哄け璐ヤ笖涓嶆姏寮傚父
+ok 24 - 璧勪骇鎺ュ彛杩斿洖 404 鏃?loadProtectedAsset 闄嶇骇涓哄け璐ヤ笖涓嶆姏寮傚父
+  ---
+  duration_ms: 0.3601
+  type: 'test'
+  ...
+# Subtest: 璧勪骇鎺ュ彛 403/400 涓庣綉缁滈敊璇悓鏍烽檷绾э紝涓嶆妸寮傚父鎶涚粰璋冪敤鏂?ok 25 - 璧勪骇鎺ュ彛 403/400 涓庣綉缁滈敊璇悓鏍烽檷绾э紝涓嶆妸寮傚父鎶涚粰璋冪敤鏂?  ---
+  duration_ms: 0.9875
+  type: 'test'
+  ...
+# Subtest: ui BookCover 涓庢暀甯堜功搴撳湪澶辫触鏃惰蛋鍗犱綅鑰屼笉鏄姏寮傚父
+ok 26 - ui BookCover 涓庢暀甯堜功搴撳湪澶辫触鏃惰蛋鍗犱綅鑰屼笉鏄姏寮傚父
+  ---
+  duration_ms: 1.124
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓棣栭〉涓庝功鏋跺皝闈㈣蛋鍙椾繚鎶よ祫浜ф帴鍙ｏ紝涓嶅洖閫€鍏紑 /covers/
+ok 27 - 瀛︾敓棣栭〉涓庝功鏋跺皝闈㈣蛋鍙椾繚鎶よ祫浜ф帴鍙ｏ紝涓嶅洖閫€鍏紑 /covers/
+  ---
+  duration_ms: 6.9981
+  type: 'test'
+  ...
+# Subtest: 鍏变韩 ui BookCover 璧板甫澶?fetch锛屼笖涓嶅啀鍑虹幇鍏紑 /covers/ 鍥為€€
+ok 28 - 鍏变韩 ui BookCover 璧板甫澶?fetch锛屼笖涓嶅啀鍑虹幇鍏紑 /covers/ 鍥為€€
+  ---
+  duration_ms: 0.8826
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀绔功搴撳皝闈㈣蛋甯﹀ご fetch锛屼笉鎶婂彈淇濇姢 URL 鍐欏叆 CSS url()
+ok 29 - 鏁欏笀绔功搴撳皝闈㈣蛋甯﹀ご fetch锛屼笉鎶婂彈淇濇姢 URL 鍐欏叆 CSS url()
+  ---
+  duration_ms: 1.1223
+  type: 'test'
+  ...
+# Subtest: 绀惧尯甯栧崱涓嶅啀浣跨敤鍏紑 /covers/ 瀛楅潰閲?ok 30 - 绀惧尯甯栧崱涓嶅啀浣跨敤鍏紑 /covers/ 瀛楅潰閲?  ---
+  duration_ms: 0.9
+  type: 'test'
+  ...
+# Subtest: 婧愮爜閲屼笉瀛樺湪鎶婂彈淇濇姢灏侀潰 URL 鐩存帴濉炶繘瑁?img src 鎴?CSS url() 鐨勫睍绀轰綅
+ok 31 - 婧愮爜閲屼笉瀛樺湪鎶婂彈淇濇姢灏侀潰 URL 鐩存帴濉炶繘瑁?img src 鎴?CSS url() 鐨勫睍绀轰綅
+  ---
+  duration_ms: 111.3821
+  type: 'test'
+  ...
+# Subtest: 璧勪骇鎺ュ彛杩斿洖 404 鏃?loadProtectedAsset 闄嶇骇涓哄け璐ヤ笖涓嶆姏寮傚父
+ok 32 - 璧勪骇鎺ュ彛杩斿洖 404 鏃?loadProtectedAsset 闄嶇骇涓哄け璐ヤ笖涓嶆姏寮傚父
+  ---
+  duration_ms: 0.3002
+  type: 'test'
+  ...
+# Subtest: 璧勪骇鎺ュ彛 403/400 涓庣綉缁滈敊璇悓鏍烽檷绾э紝涓嶆妸寮傚父鎶涚粰璋冪敤鏂?ok 33 - 璧勪骇鎺ュ彛 403/400 涓庣綉缁滈敊璇悓鏍烽檷绾э紝涓嶆妸寮傚父鎶涚粰璋冪敤鏂?  ---
+  duration_ms: 1.0604
+  type: 'test'
+  ...
+# Subtest: ui BookCover 涓庢暀甯堜功搴撳湪澶辫触鏃惰蛋鍗犱綅鑰屼笉鏄姏寮傚父
+ok 34 - ui BookCover 涓庢暀甯堜功搴撳湪澶辫触鏃惰蛋鍗犱綅鑰屼笉鏄姏寮傚父
+  ---
+  duration_ms: 1.741
+  type: 'test'
+  ...
+# Subtest: 鍙戝竷銆佷笅鏋朵粛甯?Idempotency-Key锛涘彲瑙佽寖鍥存敼涓烘湰鐝功鏋?PUT/DELETE
+ok 35 - 鍙戝竷銆佷笅鏋朵粛甯?Idempotency-Key锛涘彲瑙佽寖鍥存敼涓烘湰鐝功鏋?PUT/DELETE
+  ---
+  duration_ms: 0.7438
+  type: 'test'
+  ...
+# Subtest: 鐝骇涔︽灦璧?GET /classes/:id/shelf锛屼笉璧版棫 visibility / listClasses
+ok 36 - 鐝骇涔︽灦璧?GET /classes/:id/shelf锛屼笉璧版棫 visibility / listClasses
+  ---
+  duration_ms: 1.6109
+  type: 'test'
+  ...
+# Subtest: 鏀剁獎鍙鑼冨洿浼氬熀浜?references 缁欏嚭鎻愮ず锛岃€屼笉鏄棤澹颁繚瀛?ok 37 - 鏀剁獎鍙鑼冨洿浼氬熀浜?references 缁欏嚭鎻愮ず锛岃€屼笉鏄棤澹颁繚瀛?  ---
+  duration_ms: 0.4468
+  type: 'test'
+  ...
+# Subtest: 鏈彮涔︽灦鎾や笅鍓嶅脊鍑虹‘璁わ紝鎶曟斁/鎾や笅鍙敼鏈彮
+ok 38 - 鏈彮涔︽灦鎾や笅鍓嶅脊鍑虹‘璁わ紝鎶曟斁/鎾や笅鍙敼鏈彮
+  ---
+  duration_ms: 1.0071
+  type: 'test'
+  ...
+# Subtest: 鏂板灏侀潰灞曠ず浣嶆病鏈夎８ img 鍙栧彈淇濇姢璧勪骇
+ok 39 - 鏂板灏侀潰灞曠ず浣嶆病鏈夎８ img 鍙栧彈淇濇姢璧勪骇
+  ---
+  duration_ms: 1.9071
+  type: 'test'
+  ...
+# Subtest: 鍚屼竴娆″啓鎿嶄綔閲嶈瘯澶嶇敤鍚屼竴涓?Idempotency-Key锛屾柊鎿嶄綔鎹㈡柊閿?ok 40 - 鍚屼竴娆″啓鎿嶄綔閲嶈瘯澶嶇敤鍚屼竴涓?Idempotency-Key锛屾柊鎿嶄綔鎹㈡柊閿?  ---
+  duration_ms: 0.2783
+  type: 'test'
+  ...
+# Subtest: 422 HUMAN_REVIEW_REQUIRED 涓?403 details.classIds 缁欏嚭鍙鎻愮ず
+ok 41 - 422 HUMAN_REVIEW_REQUIRED 涓?403 details.classIds 缁欏嚭鍙鎻愮ず
+  ---
+  duration_ms: 0.3139
+  type: 'test'
+  ...
+# Subtest: organization 鍐欎綋涓嶅甫 classIds锛宑lasses 鍐欎綋甯?classIds
+ok 42 - organization 鍐欎綋涓嶅甫 classIds锛宑lasses 鍐欎綋甯?classIds
+  ---
+  duration_ms: 0.1327
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀绔功搴撴寜鎶曞奖瀛楁 grade 绛涢€夛紝缂哄勾绾у彧杩涘叏閮ㄤ笌鏈爣娉?ok 43 - 鏁欏笀绔功搴撴寜鎶曞奖瀛楁 grade 绛涢€夛紝缂哄勾绾у彧杩涘叏閮ㄤ笌鏈爣娉?  ---
+  duration_ms: 0.4958
+  type: 'test'
+  ...
+# Subtest: 涔﹀簱绠＄悊鍒楄〃鍒嗗埆璇锋眰 published 涓?draft锛岀彮绾ч€夋嫨鍣ㄤ笉鍦ㄨ繖鏉￠摼涓?ok 44 - 涔﹀簱绠＄悊鍒楄〃鍒嗗埆璇锋眰 published 涓?draft锛岀彮绾ч€夋嫨鍣ㄤ笉鍦ㄨ繖鏉￠摼涓?  ---
+  duration_ms: 0.4962
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀绔鐞嗕功鐩悎骞?published 涓?draft锛岄噸澶?id 浠?published 涓哄噯
+ok 45 - 鏁欏笀绔鐞嗕功鐩悎骞?published 涓?draft锛岄噸澶?id 浠?published 涓哄噯
+  ---
+  duration_ms: 0.1329
+  type: 'test'
+  ...
+# Subtest: 涔︾洰璇︽儏浼氬洖閫€鍒?draft 鍒楄〃锛岄伩鍏嶄笅鏋跺悗璇︽儏绌虹櫧
+ok 46 - 涔︾洰璇︽儏浼氬洖閫€鍒?draft 鍒楄〃锛岄伩鍏嶄笅鏋跺悗璇︽儏绌虹櫧
+  ---
+  duration_ms: 0.2441
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀绔彂甯冪鐞嗛〉闈笉寮曠敤瀛︾敓绔瓫閫夛紝涔熶笉璧版棫 listClasses
+ok 47 - 鏁欏笀绔彂甯冪鐞嗛〉闈笉寮曠敤瀛︾敓绔瓫閫夛紝涔熶笉璧版棫 listClasses
+  ---
+  duration_ms: 4.4514
+  type: 'test'
+  ...
+# Subtest: 鍏宠仈闃呰瀹夋帓琛屼繚鐣欏弬涓庡畬鎴愮巼锛岀┖鍊兼樉绀虹牬鎶樺彿
+ok 48 - 鍏宠仈闃呰瀹夋帓琛屼繚鐣欏弬涓庡畬鎴愮巼锛岀┖鍊兼樉绀虹牬鎶樺彿
+  ---
+  duration_ms: 0.9408
+  type: 'test'
+  ...
+# Subtest: 鑽夌涔︿笉鑳芥姇鏀惧埌鐝骇涔︽灦锛岃鎯呴〉绂佺敤鏁欏笀闃呰鍣?ok 49 - 鑽夌涔︿笉鑳芥姇鏀惧埌鐝骇涔︽灦锛岃鎯呴〉绂佺敤鏁欏笀闃呰鍣?  ---
+  duration_ms: 1.1484
+  type: 'test'
+  ...
+# Subtest: 缂?classId 鏃?loadClassShelf 杩斿洖绌烘灦锛沢etClassShelf 澶辫触鍒欐暣娆″姞杞藉け璐?ok 50 - 缂?classId 鏃?loadClassShelf 杩斿洖绌烘灦锛沢etClassShelf 澶辫触鍒欐暣娆″姞杞藉け璐?  ---
+  duration_ms: 0.6153
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀闃呰鍣ㄤ繚鐣欏師澹冲苟閫氳繃鐪熷疄璇惧爞 hook 鎺ョ嚎
+ok 51 - 鏁欏笀闃呰鍣ㄤ繚鐣欏師澹冲苟閫氳繃鐪熷疄璇惧爞 hook 鎺ョ嚎
+  ---
+  duration_ms: 3.9236
+  type: 'test'
+  ...
+# Subtest: 璇惧爞 API 瑕嗙洊鏁欏笀鎺у埗涓庡鐢熸帴鏀跺洖鎵?ok 52 - 璇惧爞 API 瑕嗙洊鏁欏笀鎺у埗涓庡鐢熸帴鏀跺洖鎵?  ---
+  duration_ms: 1.1521
+  type: 'test'
+  ...
+# Subtest: 绀惧尯 API 閫傞厤鍣ㄥ彧璋冪敤鐪熷疄璺敱骞堕€忎紶宸ヤ綔绌洪棿涓庡箓绛夐敭
+ok 53 - 绀惧尯 API 閫傞厤鍣ㄥ彧璋冪敤鐪熷疄璺敱骞堕€忎紶宸ヤ綔绌洪棿涓庡箓绛夐敭
+  ---
+  duration_ms: 1.9995
+  type: 'test'
+  ...
+# Subtest: 绀惧尯 hook 涓嶅啀鎶?fixture 鎴?localStorage 褰撲綔涓氬姟鐪熺浉
+ok 54 - 绀惧尯 hook 涓嶅啀鎶?fixture 鎴?localStorage 褰撲綔涓氬姟鐪熺浉
+  ---
+  duration_ms: 4.3326
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓绀惧尯鐪熷疄璺敱鍙揪涓旀帶鍒跺彴鍗＄墖涓嶅啀瀵煎叆 fixture
+ok 55 - 瀛︾敓绀惧尯鐪熷疄璺敱鍙揪涓旀帶鍒跺彴鍗＄墖涓嶅啀瀵煎叆 fixture
+  ---
+  duration_ms: 1.847
+  type: 'test'
+  ...
+# Subtest: 鏈€闀垮瓙璺敱鍐冲畾鏉冮檺绔竴绾ф爮涓庝簩绾ф爮楂樹寒
+ok 56 - 鏈€闀垮瓙璺敱鍐冲畾鏉冮檺绔竴绾ф爮涓庝簩绾ф爮楂樹寒
+  ---
+  duration_ms: 1.2513
+  type: 'test'
+  ...
+# Subtest: 骞冲彴瀹¤鍙悜骞冲彴宸ヤ綔绌洪棿寮€鏀撅紝鏅€氬伐浣滅┖闂村湪鍓嶇鍗宠鎷掔粷
+ok 57 - 骞冲彴瀹¤鍙悜骞冲彴宸ヤ綔绌洪棿寮€鏀撅紝鏅€氬伐浣滅┖闂村湪鍓嶇鍗宠鎷掔粷
+  ---
+  duration_ms: 0.1897
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔墍鏈変笟鍔′竴绾ч」閮芥湁鐪熷疄浜岀骇鍏ュ彛
+ok 58 - 鏉冮檺绔墍鏈変笟鍔′竴绾ч」閮芥湁鐪熷疄浜岀骇鍏ュ彛
+  ---
+  duration_ms: 0.2936
+  type: 'test'
+  ...
+# Subtest: 鍗曢〉闈笟鍔℃ā鍧楀拰骞冲彴瀹¤涔熻兘瑙ｆ瀽鍑轰簩绾ч€変腑鎬?ok 59 - 鍗曢〉闈笟鍔℃ā鍧楀拰骞冲彴瀹¤涔熻兘瑙ｆ瀽鍑轰簩绾ч€変腑鎬?  ---
+  duration_ms: 0.1026
+  type: 'test'
+  ...
+# Subtest: 闃呰瀹夋帓椤甸潰淇濈暀鍘熷３缁撴瀯涓旂敓浜у叆鍙ｄ笉鍐嶅鍏?fixture
+ok 60 - 闃呰瀹夋帓椤甸潰淇濈暀鍘熷３缁撴瀯涓旂敓浜у叆鍙ｄ笉鍐嶅鍏?fixture
+  ---
+  duration_ms: 4.3171
+  type: 'test'
+  ...
+# Subtest: 闃呰瀹夋帓閫傞厤鍣ㄤ娇鐢ㄧ湡瀹炰功绫嶇増鏈笌褰撳墠 class 宸ヤ綔绌洪棿
+ok 61 - 闃呰瀹夋帓閫傞厤鍣ㄤ娇鐢ㄧ湡瀹炰功绫嶇増鏈笌褰撳墠 class 宸ヤ綔绌洪棿
+  ---
+  duration_ms: 3.0097
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔?API 鐢ㄧ湡瀹炲箓绛夊啓璇锋眰鍒涘缓瀹夋帓
+ok 62 - 鏉冮檺绔?API 鐢ㄧ湡瀹炲箓绛夊啓璇锋眰鍒涘缓瀹夋帓
+  ---
+  duration_ms: 0.5341
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔ぞ鍖?DTO 淇濈暀鐪熷疄浣滆€呫€佷功鐩拰涓ょ骇瀹℃牳鐘舵€?ok 63 - 鏉冮檺绔ぞ鍖?DTO 淇濈暀鐪熷疄浣滆€呫€佷功鐩拰涓ょ骇瀹℃牳鐘舵€?  ---
+  duration_ms: 2.0358
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔ぞ鍖哄鏍稿姩浣滃彧鏄犲皠鍒扮湡瀹炲悗绔喅绛?ok 64 - 鏉冮檺绔ぞ鍖哄鏍稿姩浣滃彧鏄犲皠鍒扮湡瀹炲悗绔喅绛?  ---
+  duration_ms: 0.8213
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔ぞ鍖?hook 璋冪敤鐪熷疄鍒楄〃鍜屽鏍告帴鍙?ok 65 - 鏉冮檺绔ぞ鍖?hook 璋冪敤鐪熷疄鍒楄〃鍜屽鏍告帴鍙?  ---
+  duration_ms: 5.8366
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄浼氳瘽 DTO 淇濈暀鐝骇瀛︾敓绱㈠紩骞堕殣钘忕瀵嗘爣棰?ok 66 - 鐪熷疄浼氳瘽 DTO 淇濈暀鐝骇瀛︾敓绱㈠紩骞堕殣钘忕瀵嗘爣棰?  ---
+  duration_ms: 18.4749
+  type: 'test'
+  ...
+# Subtest: 瀹夊叏鏈€灏忎笂涓嬫枃浼樺厛浜庣瀵嗛攣骞舵槧灏勭湡瀹炴秷鎭?ok 67 - 瀹夊叏鏈€灏忎笂涓嬫枃浼樺厛浜庣瀵嗛攣骞舵槧灏勭湡瀹炴秷鎭?  ---
+  duration_ms: 0.3795
+  type: 'test'
+  ...
+# Subtest: 鎶ょ溂椤典繚鐣欑湡瀹炴帴绾匡紝鐝骇闃呰缁熻浣跨敤鐙珛鐪熷疄 scope state
+ok 68 - 鎶ょ溂椤典繚鐣欑湡瀹炴帴绾匡紝鐝骇闃呰缁熻浣跨敤鐙珛鐪熷疄 scope state
+  ---
+  duration_ms: 4.3582
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔敓浜у叆鍙ｆā鍧楀浘涓嶅姞杞?fixture銆乵ock 鎴栨湰鍦颁笟鍔″瓨鍌?ok 69 - 鏉冮檺绔敓浜у叆鍙ｆā鍧楀浘涓嶅姞杞?fixture銆乵ock 鎴栨湰鍦颁笟鍔″瓨鍌?  ---
+  duration_ms: 28.1431
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓绔敓浜у叆鍙ｆā鍧楀浘涓嶅姞杞?fixture銆乵ock 鎴栨湰鍦颁笟鍔″瓨鍌?ok 70 - 瀛︾敓绔敓浜у叆鍙ｆā鍧楀浘涓嶅姞杞?fixture銆乵ock 鎴栨湰鍦颁笟鍔″瓨鍌?  ---
+  duration_ms: 24.2264
+  type: 'test'
+  ...
+# Subtest: 鍘嗗彶 fixture 椤甸潰鍜屾棫瀵艰埅涓嶅湪涓変釜鐢熶骇鍏ュ彛鐨勫彲杈炬ā鍧楀浘鍐?ok 71 - 鍘嗗彶 fixture 椤甸潰鍜屾棫瀵艰埅涓嶅湪涓変釜鐢熶骇鍏ュ彛鐨勫彲杈炬ā鍧楀浘鍐?  ---
+  duration_ms: 83.2877
+  type: 'test'
+  ...
+# Subtest: 瀹堕暱鍙戦€侀〉涓嶄繚鐣欏彧鏀规湰鍦扮姸鎬佺殑妯℃嫙寮€鍏?ok 72 - 瀹堕暱鍙戦€侀〉涓嶄繚鐣欏彧鏀规湰鍦扮姸鎬佺殑妯℃嫙寮€鍏?  ---
+  duration_ms: 0.4915
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄鐧诲綍椤典笉瀵煎叆鏃ф壘鍥炲３锛屼篃涓嶅睍绀哄浐瀹氶偖绠?ok 73 - 鐪熷疄鐧诲綍椤典笉瀵煎叆鏃ф壘鍥炲３锛屼篃涓嶅睍绀哄浐瀹氶偖绠?  ---
+  duration_ms: 0.6698
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔洰鏍囬〉闈㈢殑 fixture 缂哄彛娓呭崟瀹屾暣涓旀病鏈夎鍙揪璺敱闈欓粯鍔犺浇
+ok 74 - 鏉冮檺绔洰鏍囬〉闈㈢殑 fixture 缂哄彛娓呭崟瀹屾暣涓旀病鏈夎鍙揪璺敱闈欓粯鍔犺浇
+  ---
+  duration_ms: 2.8778
+  type: 'test'
+  ...
+# Subtest: 鏈帴鍏ョ殑鍐荤粨椤甸潰缁х画璧拌瘹瀹炵殑 unavailable 椤甸潰鑰屼笉鏄垹闄ゅ鑸?ok 75 - 鏈帴鍏ョ殑鍐荤粨椤甸潰缁х画璧拌瘹瀹炵殑 unavailable 椤甸潰鑰屼笉鏄垹闄ゅ鑸?  ---
+  duration_ms: 0.3325
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓浼氳瘽閫傞厤鍣ㄤ粎璋冪敤鐪熷疄 API锛屾墍鏈夊啓鎿嶄綔甯﹀伐浣滅┖闂翠笌骞傜瓑閿?ok 76 - 瀛︾敓浼氳瘽閫傞厤鍣ㄤ粎璋冪敤鐪熷疄 API锛屾墍鏈夊啓鎿嶄綔甯﹀伐浣滅┖闂翠笌骞傜瓑閿?  ---
+  duration_ms: 4.8365
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓蹇収淇濈暀鏍囬銆佺瀵嗐€佸垹闄ゅ尯銆佷功椤甸€夋枃寮曠敤銆侀搴﹀強鎭㈠鏃堕棿
+ok 77 - 瀛︾敓蹇収淇濈暀鏍囬銆佺瀵嗐€佸垹闄ゅ尯銆佷功椤甸€夋枃寮曠敤銆侀搴﹀強鎭㈠鏃堕棿
+  ---
+  duration_ms: 0.2511
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔瀯閫犵彮绾у鐢熶功绫嶆爣棰樻煡璇紝骞惰鑼冨寲涓夌骇绱㈠紩
+ok 78 - 鏉冮檺绔瀯閫犵彮绾у鐢熶功绫嶆爣棰樻煡璇紝骞惰鑼冨寲涓夌骇绱㈠紩
+  ---
+  duration_ms: 0.3454
+  type: 'test'
+  ...
+# Subtest: 鐢熶骇閫傞厤鍣ㄤ笉瀵煎叆 fixture銆乵ock銆乴ocalStorage 鎴栨棫绉嶅瓙浼氳瘽
+ok 79 - 鐢熶骇閫傞厤鍣ㄤ笉瀵煎叆 fixture銆乵ock銆乴ocalStorage 鎴栨棫绉嶅瓙浼氳瘽
+  ---
+  duration_ms: 5.3656
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓鍥涗釜搴曟爮鍏ュ彛杩炴帴鍐荤粨椤甸潰涓斾功鏋朵釜浜轰富椤典笉瀵煎叆婕旂ず鏁版嵁
+ok 80 - 瀛︾敓鍥涗釜搴曟爮鍏ュ彛杩炴帴鍐荤粨椤甸潰涓斾功鏋朵釜浜轰富椤典笉瀵煎叆婕旂ず鏁版嵁
+  ---
+  duration_ms: 5.9624
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔爮鐩牴璺緞杩涘叆鐪熷疄椤甸潰涓斿畨鍏ㄥ叆鍙ｄ笉鍔犺浇 fixture 鍒楄〃
+ok 81 - 鏉冮檺绔爮鐩牴璺緞杩涘叆鐪熷疄椤甸潰涓斿畨鍏ㄥ叆鍙ｄ笉鍔犺浇 fixture 鍒楄〃
+  ---
+  duration_ms: 3.7215
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓閫傞厤鍣ㄥ彧璋冪敤鐪熷疄鎶ょ溂涓庨殣绉?API锛屽苟涓哄喅瀹氬啓鍏ユ彁渚涘箓绛夐敭
+ok 82 - 瀛︾敓閫傞厤鍣ㄥ彧璋冪敤鐪熷疄鎶ょ溂涓庨殣绉?API锛屽苟涓哄喅瀹氬啓鍏ユ彁渚涘箓绛夐敭
+  ---
+  duration_ms: 2.0645
+  type: 'test'
+  ...
+# Subtest: 鏂綉鍚庢部鐢ㄦ渶鍚庝竴娆″己鍒朵紤鎭埅姝㈡椂闂达紝鍒版椂鑷姩鎭㈠浣嗕笉浼€犳柊鏈嶅姟绔暟鎹?ok 83 - 鏂綉鍚庢部鐢ㄦ渶鍚庝竴娆″己鍒朵紤鎭埅姝㈡椂闂达紝鍒版椂鑷姩鎭㈠浣嗕笉浼€犳柊鏈嶅姟绔暟鎹?  ---
+  duration_ms: 0.3968
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔€傞厤鍣ㄤ繚鐣欒寖鍥淬€佺敤閫斻€佽鍒よ涔夊拰骞傜瓑鍐欏叆
+ok 84 - 鏉冮檺绔€傞厤鍣ㄤ繚鐣欒寖鍥淬€佺敤閫斻€佽鍒よ涔夊拰骞傜瓑鍐欏叆
+  ---
+  duration_ms: 0.3633
+  type: 'test'
+  ...
+# Subtest: B 绾跨敓浜х姸鎬佹ā鍧椾笉瀵煎叆 fixture銆乵ock 鎴?localStorage 涓氬姟鐪熺浉
+ok 85 - B 绾跨敓浜х姸鎬佹ā鍧椾笉瀵煎叆 fixture銆乵ock 鎴?localStorage 涓氬姟鐪熺浉
+  ---
+  duration_ms: 3.6488
+  type: 'test'
+  ...
+# Subtest: 鍥涢〉浠呯 1 椤佃秴澶ф椂璁捐灏哄绛変簬姝ｆ枃涓綅鏁帮紝涓嶇瓑浜庡皝闈?ok 86 - 鍥涢〉浠呯 1 椤佃秴澶ф椂璁捐灏哄绛変簬姝ｆ枃涓綅鏁帮紝涓嶇瓑浜庡皝闈?  ---
+  duration_ms: 1.5566
+  type: 'test'
+  ...
+# Subtest: 鍥涢〉瀹藉害鎺ヨ繎 460鈥?80 鏃惰璁″昂瀵镐粛鏄鏂囬噺绾?ok 87 - 鍥涢〉瀹藉害鎺ヨ繎 460鈥?80 鏃惰璁″昂瀵镐粛鏄鏂囬噺绾?  ---
+  duration_ms: 0.1733
+  type: 'test'
+  ...
+# Subtest: 鍗曢〉涔︾洿鎺ヤ娇鐢ㄨ椤靛昂瀵?ok 88 - 鍗曢〉涔︾洿鎺ヤ娇鐢ㄨ椤靛昂瀵?  ---
+  duration_ms: 0.0958
+  type: 'test'
+  ...
+# Subtest: 绌烘暟缁勪笌闈炴硶杈撳叆鎷掔粷鍥為€€鍒板皝闈?ok 89 - 绌烘暟缁勪笌闈炴硶杈撳叆鎷掔粷鍥為€€鍒板皝闈?  ---
+  duration_ms: 0.584
+  type: 'test'
+  ...
+# Subtest: 鎶芥牱椤靛彿涓虹 1銆?銆佷腑闂淬€佹湯椤典笖鍘婚噸
+ok 90 - 鎶芥牱椤靛彿涓虹 1銆?銆佷腑闂淬€佹湯椤典笖鍘婚噸
+  ---
+  duration_ms: 0.2859
+  type: 'test'
+  ...
+# Subtest: PDF_ZOOM_SCALE 钀藉湪銆屾眽瀛楀 12鈥?4 璁惧鍍忕礌銆嶄笖涓嶈秴鍑烘壂鎻忎欢瑙ｆ瀽搴︾殑鍖洪棿
+ok 91 - PDF_ZOOM_SCALE 钀藉湪銆屾眽瀛楀 12鈥?4 璁惧鍍忕礌銆嶄笖涓嶈秴鍑烘壂鎻忎欢瑙ｆ瀽搴︾殑鍖洪棿
+  ---
+  duration_ms: 0.1445
+  type: 'test'
+  ...
+# Subtest: applyPdfZoom 鏀惧ぇ涓嶅皬浜庨摵婊°€佷笉瓒呭嚭鑸炲彴瀹藉害
+ok 92 - applyPdfZoom 鏀惧ぇ涓嶅皬浜庨摵婊°€佷笉瓒呭嚭鑸炲彴瀹藉害
+  ---
+  duration_ms: 0.3039
+  type: 'test'
+  ...
+# Subtest: applyPdfZoom 鎷掔粷闈炴硶鍊嶇巼鑰屼笉鏄潤榛樿繑鍥?NaN
+ok 93 - applyPdfZoom 鎷掔粷闈炴硶鍊嶇巼鑰屼笉鏄潤榛樿繑鍥?NaN
+  ---
+  duration_ms: 0.2709
+  type: 'test'
+  ...
+# Subtest: pdfCanvasOutputScale 鑷冲皯涓?2 涓旇嚦灏戞槸 dpr 鐨勪袱鍊?ok 94 - pdfCanvasOutputScale 鑷冲皯涓?2 涓旇嚦灏戞槸 dpr 鐨勪袱鍊?  ---
+  duration_ms: 0.4907
+  type: 'test'
+  ...
+# Subtest: T8.5B login envelope 鍙彁浜?schoolCode+loginName+password
+ok 95 - T8.5B login envelope 鍙彁浜?schoolCode+loginName+password
+  ---
+  duration_ms: 1.7522
+  type: 'test'
+  ...
+# Subtest: T8.5B console shelf envelope 鎵?class-local 璺緞涓旀棤 visibility
+ok 96 - T8.5B console shelf envelope 鎵?class-local 璺緞涓旀棤 visibility
+  ---
+  duration_ms: 0.925
+  type: 'test'
+  ...
+# Subtest: T8.5B student registration/onboarding envelope
+ok 97 - T8.5B student registration/onboarding envelope
+  ---
+  duration_ms: 0.6579
+  type: 'test'
+  ...
+# Subtest: T8.6A 鐧诲綍鍙帴鍙楁湇鍔＄璺緞锛岀┖ defaultPath 涓嶆槸澶辫触
+ok 98 - T8.6A 鐧诲綍鍙帴鍙楁湇鍔＄璺緞锛岀┖ defaultPath 涓嶆槸澶辫触
+  ---
+  duration_ms: 0.9743
+  type: 'test'
+  ...
+# Subtest: T8.6A 鏁欏笀閫夌彮锛歵eacherCount>0 鎵嶇‘璁わ紝鍙栨秷涓嶅彂 PUT
+ok 99 - T8.6A 鏁欏笀閫夌彮锛歵eacherCount>0 鎵嶇‘璁わ紝鍙栨秷涓嶅彂 PUT
+  ---
+  duration_ms: 0.8165
+  type: 'test'
+  ...
+# Subtest: T8.6A 寤虹彮 body 鍙湁 name/stage/entryYear/classNumber
+ok 100 - T8.6A 寤虹彮 body 鍙湁 name/stage/entryYear/classNumber
+  ---
+  duration_ms: 0.2049
+  type: 'test'
+  ...
+# Subtest: T8.6A 骞寸骇涓讳换鍙仛鏁欏笀璐﹀彿鏀寔锛屾枃妗堢姝㈡殫绀鸿法灞婃垨涔︽灦
+ok 101 - T8.6A 骞寸骇涓讳换鍙仛鏁欏笀璐﹀彿鏀寔锛屾枃妗堢姝㈡殫绀鸿法灞婃垨涔︽灦
+  ---
+  duration_ms: 0.2205
+  type: 'test'
+  ...
+# Subtest: T8.6A 瀹℃壒杈ㄨ鐢ㄥ熬 4 浣嶏紝rawToken 鍙嫾涓€娆″姞鍏ヨ矾寰?ok 102 - T8.6A 瀹℃壒杈ㄨ鐢ㄥ熬 4 浣嶏紝rawToken 鍙嫾涓€娆″姞鍏ヨ矾寰?  ---
+  duration_ms: 0.2638
+  type: 'test'
+  ...
+# Subtest: T8.6A identityApi 鎵撳绾﹁矾寰勪笖鍐欒姹傚甫骞傜瓑閿?ok 103 - T8.6A identityApi 鎵撳绾﹁矾寰勪笖鍐欒姹傚甫骞傜瓑閿?  ---
+  duration_ms: 0.8129
+  type: 'test'
+  ...
+# Subtest: T8.6A 椤甸潰宸插幓鎺夋紨绀轰笉鍐欏叆鏂囨锛屽苟鎸備笂鐪熻矾鐢?ok 104 - T8.6A 椤甸潰宸插幓鎺夋紨绀轰笉鍐欏叆鏂囨锛屽苟鎸備笂鐪熻矾鐢?  ---
+  duration_ms: 7.7932
+  type: 'test'
+  ...
+# Subtest: T8.6B console.js 宸叉湁 class-local shelf 涓夋柟娉曪紝缂烘柟娉曞垯鍋滄墜
+ok 105 - T8.6B console.js 宸叉湁 class-local shelf 涓夋柟娉曪紝缂烘柟娉曞垯鍋滄墜
+  ---
+  duration_ms: 1.8666
+  type: 'test'
+  ...
+# Subtest: T8.6B 鍙湁 class workspace 鑳界鐞嗘湰鐝功鏋?ok 106 - T8.6B 鍙湁 class workspace 鑳界鐞嗘湰鐝功鏋?  ---
+  duration_ms: 0.2552
+  type: 'test'
+  ...
+# Subtest: T8.6B 绌轰功鏋舵枃妗堜笌 teacherCount 甯搁┗鎻愮ず
+ok 107 - T8.6B 绌轰功鏋舵枃妗堜笌 teacherCount 甯搁┗鎻愮ず
+  ---
+  duration_ms: 0.2299
+  type: 'test'
+  ...
+# Subtest: T8.6B loadClassShelf 鍙墦 GET /classes/:id/shelf锛屼笉鎵?visibility / GET /classes
+ok 108 - T8.6B loadClassShelf 鍙墦 GET /classes/:id/shelf锛屼笉鎵?visibility / GET /classes
+  ---
+  duration_ms: 0.9667
+  type: 'test'
+  ...
+# Subtest: T8.6B 鎶曟斁 PUT / 鎾や笅 DELETE 鍙墦鏈彮璺緞锛屽啓鍚庤鍙?teacherCount
+ok 109 - T8.6B 鎶曟斁 PUT / 鎾や笅 DELETE 鍙墦鏈彮璺緞锛屽啓鍚庤鍙?teacherCount
+  ---
+  duration_ms: 0.5901
+  type: 'test'
+  ...
+# Subtest: T8.6B 鍚屼竴娆℃姇鏀?鎾や笅閲嶈瘯澶嶇敤鍚屼竴涓?Idempotency-Key
+ok 110 - T8.6B 鍚屼竴娆℃姇鏀?鎾や笅閲嶈瘯澶嶇敤鍚屼竴涓?Idempotency-Key
+  ---
+  duration_ms: 0.3018
+  type: 'test'
+  ...
+# Subtest: T8.6B 涔︽灦鍐欓敊璇彲璇伙紝涓嶆彁鍏ㄥ眬鍙戝竷
+ok 111 - T8.6B 涔︽灦鍐欓敊璇彲璇伙紝涓嶆彁鍏ㄥ眬鍙戝竷
+  ---
+  duration_ms: 0.4056
+  type: 'test'
+  ...
+# Subtest: T8.6B 涔︽灦 items 瑙ｆ瀽涓庢湰鐝垽瀹?ok 112 - T8.6B 涔︽灦 items 瑙ｆ瀽涓庢湰鐝垽瀹?  ---
+  duration_ms: 0.2388
+  type: 'test'
+  ...
+# Subtest: T8.6B 鏁欏椤靛垹闄ゅ叏灞€鍙戝竷/鏃?visibility锛屾敼鏈彮鎶曟斁涓旀牎闀垮勾绾ф棤鍏ュ彛
+ok 113 - T8.6B 鏁欏椤靛垹闄ゅ叏灞€鍙戝竷/鏃?visibility锛屾敼鏈彮鎶曟斁涓旀牎闀垮勾绾ф棤鍏ュ彛
+  ---
+  duration_ms: 11.2181
+  type: 'test'
+  ...
+# Subtest: T8.6B 鏍￠暱/骞寸骇涓讳换婧愮爜璺緞娌℃湁鏈彮鎶曟斁鎸夐挳鐨勬棤鏉′欢娓叉煋
+ok 114 - T8.6B 鏍￠暱/骞寸骇涓讳换婧愮爜璺緞娌℃湁鏈彮鎶曟斁鎸夐挳鐨勬棤鏉′欢娓叉煋
+  ---
+  duration_ms: 2.1266
+  type: 'test'
+  ...
+# Subtest: 鍙屾ā寮忓叡鐢ㄧ墿鐞嗛〉锛屽師鐗?PDF 鍙覆鏌撹繎椤典笖绂佺敤鏂囧瓧閫夋嫨
+ok 115 - 鍙屾ā寮忓叡鐢ㄧ墿鐞嗛〉锛屽師鐗?PDF 鍙覆鏌撹繎椤典笖绂佺敤鏂囧瓧閫夋嫨
+  ---
+  duration_ms: 4.7037
+  type: 'test'
+  ...
+# Subtest: 鍘熺増妯″紡浠庡彈淇濇姢璧勪骇鐢?PDF.js 鍔犺浇锛岄〉鏁颁笉涓€鑷存樉寮忓け璐?ok 116 - 鍘熺増妯″紡浠庡彈淇濇姢璧勪骇鐢?PDF.js 鍔犺浇锛岄〉鏁颁笉涓€鑷存樉寮忓け璐?  ---
+  duration_ms: 2.0773
+  type: 'test'
+  ...
+# Subtest: 娴忚鍣ㄤ晶 pdfjs 鍙厑璁?legacy 鏋勫缓锛岄槻姝㈢幇浠ｆ瀯寤哄湪鏃?getOrInsertComputed 鐨勬祻瑙堝櫒閲岀偢鎺?ok 117 - 娴忚鍣ㄤ晶 pdfjs 鍙厑璁?legacy 鏋勫缓锛岄槻姝㈢幇浠ｆ瀯寤哄湪鏃?getOrInsertComputed 鐨勬祻瑙堝櫒閲岀偢鎺?  ---
+  duration_ms: 1.0273
+  type: 'test'
+  ...
+# Subtest: useProtectedPdfDocument 鎶芥牱澶氶〉缁?pickPdfPageDesign 瀹氬昂锛屼笉寰楀彧闈?getPage(1)
+ok 118 - useProtectedPdfDocument 鎶芥牱澶氶〉缁?pickPdfPageDesign 瀹氬昂锛屼笉寰楀彧闈?getPage(1)
+  ---
+  duration_ms: 0.934
+  type: 'test'
+  ...
+# Subtest: PdfBookPage 鐢?pdfCanvasOutputScale 鎻愰珮 backing锛屼笉鍐嶅彧涔?1脳dpr
+ok 119 - PdfBookPage 鐢?pdfCanvasOutputScale 鎻愰珮 backing锛屼笉鍐嶅彧涔?1脳dpr
+  ---
+  duration_ms: 1.1126
+  type: 'test'
+  ...
+# Subtest: D-19锛歝anvas 鐨?CSS 灏哄蹇呴』鍙栨暣锛屼笖楂樺害鎸夋湰椤佃嚜韬楂樻瘮鎺紝涓嶅緱鐢?designHeight
+ok 120 - D-19锛歝anvas 鐨?CSS 灏哄蹇呴』鍙栨暣锛屼笖楂樺害鎸夋湰椤佃嚜韬楂樻瘮鎺紝涓嶅緱鐢?designHeight
+  ---
+  duration_ms: 2.2851
+  type: 'test'
+  ...
+# Subtest: D-19锛氬師鐗?PDF 鏀惧ぇ妗ｅ彧鍦ㄥ師鐗堟ā寮忕敓鏁堬紝涓斿繀椤昏蛋 applyPdfZoom
+ok 121 - D-19锛氬師鐗?PDF 鏀惧ぇ妗ｅ彧鍦ㄥ師鐗堟ā寮忕敓鏁堬紝涓斿繀椤昏蛋 applyPdfZoom
+  ---
+  duration_ms: 1.6625
+  type: 'test'
+  ...
+# Subtest: D-19锛氶《鏍忓簳鏍忔敹璧锋椂蹇呴』鐪熺殑閫€鍑?flex 娴侊紝鍚﹀垯鑸炲彴涓嶄細鍙橀珮
+ok 122 - D-19锛氶《鏍忓簳鏍忔敹璧锋椂蹇呴』鐪熺殑閫€鍑?flex 娴侊紝鍚﹀垯鑸炲彴涓嶄細鍙橀珮
+  ---
+  duration_ms: 1.5388
+  type: 'test'
+  ...
+# Subtest: D-05 / D-11 / D-17 鐨勪笁澶勭粨鏋勪笉寰楄鍚庣画鏀瑰姩甯﹁蛋
+ok 123 - D-05 / D-11 / D-17 鐨勪笁澶勭粨鏋勪笉寰楄鍚庣画鏀瑰姩甯﹁蛋
+  ---
+  duration_ms: 1.3526
+  type: 'test'
+  ...
+# Subtest: OCR 鏂囧瓧妯″紡鍙緭鍑哄彲閫夋嫨 DOM锛屼笉鍐嶅湪椤靛浘涓婂彔 OCR 灞?ok 124 - OCR 鏂囧瓧妯″紡鍙緭鍑哄彲閫夋嫨 DOM锛屼笉鍐嶅湪椤靛浘涓婂彔 OCR 灞?  ---
+  duration_ms: 1.3041
+  type: 'test'
+  ...
+# Subtest: 鎽樺綍椤典袱澶勮烦闃呰鍣ㄧ敤 pageNo锛屼笉鍐嶅啓 ?page=
+ok 125 - 鎽樺綍椤典袱澶勮烦闃呰鍣ㄧ敤 pageNo锛屼笉鍐嶅啓 ?page=
+  ---
+  duration_ms: 4.5198
+  type: 'test'
+  ...
+# Subtest: 绀惧尯甯栬鎯呰烦闃呰鍣ㄧ敤 pageNo锛屼笉鍐嶅啓 ?page=
+ok 126 - 绀惧尯甯栬鎯呰烦闃呰鍣ㄧ敤 pageNo锛屼笉鍐嶅啓 ?page=
+  ---
+  duration_ms: 1.6381
+  type: 'test'
+  ...
+# Subtest: src 閲岃烦杩涘鐢熼槄璇诲櫒鐨勬煡璇㈠弬鏁颁笉寰楀啀鐢??page=
+ok 127 - src 閲岃烦杩涘鐢熼槄璇诲櫒鐨勬煡璇㈠弬鏁颁笉寰楀啀鐢??page=
+  ---
+  duration_ms: 105.2507
+  type: 'test'
+  ...
+# Subtest: 闃呰鍣ㄤ綅缃В鏋愬彧璁?pageNo锛屼笌璺宠浆鍙傛暟瀵归綈
+ok 128 - 闃呰鍣ㄤ綅缃В鏋愬彧璁?pageNo锛屼笌璺宠浆鍙傛暟瀵归綈
+  ---
+  duration_ms: 0.9795
+  type: 'test'
+  ...
+# Subtest: toBook 鏄犲皠 preferredReaderMode锛岄潪娉曞€煎洖钀?null锛屼笖涓嶅啓杩?progress
+ok 129 - toBook 鏄犲皠 preferredReaderMode锛岄潪娉曞€煎洖钀?null锛屼笖涓嶅啓杩?progress
+  ---
+  duration_ms: 1.9142
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓 API PUT /reading/reader-preference 甯﹀箓绛夐敭锛屼笖涓嶈浆鍙戜粬浜?userId
+ok 130 - 瀛︾敓 API PUT /reading/reader-preference 甯﹀箓绛夐敭锛屼笖涓嶈浆鍙戜粬浜?userId
+  ---
+  duration_ms: 1.0338
+  type: 'test'
+  ...
+# Subtest: Reader 鎵撳紑鏃舵湇鍔＄鍋忓ソ瑕嗙洊榛樿锛屽垏鎹㈡椂 fire-and-forget锛屼笖涓嶈惤鏈湴瀛樺偍
+ok 131 - Reader 鎵撳紑鏃舵湇鍔＄鍋忓ソ瑕嗙洊榛樿锛屽垏鎹㈡椂 fire-and-forget锛屼笖涓嶈惤鏈湴瀛樺偍
+  ---
+  duration_ms: 6.2766
+  type: 'test'
+  ...
+# Subtest: reader quote text and offsets share the same raw DOM source
+ok 132 - reader quote text and offsets share the same raw DOM source
+  ---
+  duration_ms: 1.2672
+  type: 'test'
+  ...
+# Subtest: reading footprint renders the strict streak day unit instead of an undefined DTO field
+ok 133 - reading footprint renders the strict streak day unit instead of an undefined DTO field
+  ---
+  duration_ms: 0.1944
+  type: 'test'
+  ...
+# Subtest: 绌虹櫧椤靛垽瀹氳蛋 kind / blank / normalizedText / blocks 瀛楁閾?ok 134 - 绌虹櫧椤靛垽瀹氳蛋 kind / blank / normalizedText / blocks 瀛楁閾?  ---
+  duration_ms: 1.0393
+  type: 'test'
+  ...
+# Subtest: API 绌虹櫧椤?DTO 淇濈暀绌虹殑 normalizedText锛屽悎鎴?loading/error 椤典笉浼氳鍒ゆ垚绌虹櫧
+ok 135 - API 绌虹櫧椤?DTO 淇濈暀绌虹殑 normalizedText锛屽悎鎴?loading/error 椤典笉浼氳鍒ゆ垚绌虹櫧
+  ---
+  duration_ms: 1.1284
+  type: 'test'
+  ...
+# Subtest: 鏂囧瓧妯″紡绌虹櫧椤垫槸鐙珛娓叉煋鍒嗘敮锛屾枃妗堜笌 loading/error/鎺ュ彛绌哄彲鍖哄垎
+ok 136 - 鏂囧瓧妯″紡绌虹櫧椤垫槸鐙珛娓叉煋鍒嗘敮锛屾枃妗堜笌 loading/error/鎺ュ彛绌哄彲鍖哄垎
+  ---
+  duration_ms: 5.3634
+  type: 'test'
+  ...
+# Subtest: 鏂囧瓧椤垫鏂囧鍣ㄥ彲绾靛悜婊氬姩锛屼笖涓嶅洖閫€ D-19 瑙嗗彛濂戠害
+ok 137 - 鏂囧瓧椤垫鏂囧鍣ㄥ彲绾靛悜婊氬姩锛屼笖涓嶅洖閫€ D-19 瑙嗗彛濂戠害
+  ---
+  duration_ms: 1.4445
+  type: 'test'
+  ...
+# Subtest: 缈婚〉鎵嬪娍娌℃湁 wheel 鐩戝惉锛涚炕椤靛彧璁ゆí鍚戜富瀵间綅绉?ok 138 - 缈婚〉鎵嬪娍娌℃湁 wheel 鐩戝惉锛涚炕椤靛彧璁ゆí鍚戜富瀵间綅绉?  ---
+  duration_ms: 0.8349
+  type: 'test'
+  ...
+# Subtest: FINGERPRINT_FIELDS 浠嶆槸鍐荤粨鐨?15 涓瓧娈典笖椤哄簭涓嶅彉
+ok 139 - FINGERPRINT_FIELDS 浠嶆槸鍐荤粨鐨?15 涓瓧娈典笖椤哄簭涓嶅彉
+  ---
+  duration_ms: 4.3831
+  type: 'test'
+  ...
+# Subtest: 闃呰鐩戞祴绉熺害 API 鍙妸鍗忚瀛楁鏀惧叆 body锛岃寖鍥村彧杩涘叆宸ヤ綔绌洪棿 header 涓婁笅鏂?ok 140 - 闃呰鐩戞祴绉熺害 API 鍙妸鍗忚瀛楁鏀惧叆 body锛岃寖鍥村彧杩涘叆宸ヤ綔绌洪棿 header 涓婁笅鏂?  ---
+  duration_ms: 1.3019
+  type: 'test'
+  ...
+# Subtest: 闃呰鎽樿 API 鍙洿鎺ラ€傞厤 C 绔彛杈撳叆涓斾笉娉勬紡 scope/device/鏈煡瀛楁
+ok 141 - 闃呰鎽樿 API 鍙洿鎺ラ€傞厤 C 绔彛杈撳叆涓斾笉娉勬紡 scope/device/鏈煡瀛楁
+  ---
+  duration_ms: 0.3725
+  type: 'test'
+  ...
+# Subtest: self/scope API 鍙彂閫佸喕缁撴煡璇紝scope 鎼滅储绛涢€夊拰韬唤瀛楁涓嶄細杩涘叆 query
+ok 142 - self/scope API 鍙彂閫佸喕缁撴煡璇紝scope 鎼滅储绛涢€夊拰韬唤瀛楁涓嶄細杩涘叆 query
+  ---
+  duration_ms: 0.3586
+  type: 'test'
+  ...
+# Subtest: 鏈夋晥鍋滅暀4:59銆?:00涓?:00鐨勫崟娈典笂闄愭纭?ok 143 - 鏈夋晥鍋滅暀4:59銆?:00涓?:00鐨勫崟娈典笂闄愭纭?  ---
+  duration_ms: 2.8739
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄纭浜や簰鍒囨鍚庡彲閲嶆柊鑾峰緱5鍒嗛挓锛屼粎鍚庡彴鏃堕棿涓?
+ok 144 - 鐪熷疄纭浜や簰鍒囨鍚庡彲閲嶆柊鑾峰緱5鍒嗛挓锛屼粎鍚庡彴鏃堕棿涓?
+  ---
+  duration_ms: 0.6294
+  type: 'test'
+  ...
+# Subtest: 閫愰〉鏈夋晥瑕嗙洊鎸夐槄璇绘ā寮忓垎璐︿笖纭浜や簰璁板埌鏄惧紡閿氱偣椤?ok 145 - 閫愰〉鏈夋晥瑕嗙洊鎸夐槄璇绘ā寮忓垎璐︿笖纭浜や簰璁板埌鏄惧紡閿氱偣椤?  ---
+  duration_ms: 1.1074
+  type: 'test'
+  ...
+# Subtest: 绉熺害澶辨晥鎴栧緟纭鍖烘弧杞藉悗鍋滄鏂板绱
+ok 146 - 绉熺害澶辨晥鎴栧緟纭鍖烘弧杞藉悗鍋滄鏂板绱
+  ---
+  duration_ms: 0.3277
+  type: 'test'
+  ...
+# Subtest: 璺宠闇€瑕佽繛缁袱涓浉閭昏鍥惧潎澶т簬0涓斿皬浜?绉?ok 147 - 璺宠闇€瑕佽繛缁袱涓浉閭昏鍥惧潎澶т簬0涓斿皬浜?绉?  ---
+  duration_ms: 0.39
+  type: 'test'
+  ...
+# Subtest: 瀹氫綅銆佹仮澶嶃€佹暀甯堝悓姝ュ拰甯冨眬鍙樺寲涓嶆瀯鎴愯烦璇?ok 148 - 瀹氫綅銆佹仮澶嶃€佹暀甯堝悓姝ュ拰甯冨眬鍙樺寲涓嶆瀯鎴愯烦璇?  ---
+  duration_ms: 1.3972
+  type: 'test'
+  ...
+# Subtest: 鍥為€€姝ｅソ3椤典笖鐩爣瑙嗗浘鏈夋晥鍋滅暀瓒呰繃30绉掓墠璁板綍鍥炶
+ok 149 - 鍥為€€姝ｅソ3椤典笖鐩爣瑙嗗浘鏈夋晥鍋滅暀瓒呰繃30绉掓墠璁板綍鍥炶
+  ---
+  duration_ms: 0.2347
+  type: 'test'
+  ...
+# Subtest: 鍥為€€2椤点€佹暀甯堝悓姝ユ垨鎭㈠浣嶇疆閮戒笉寤虹珛鍥炶鍊欓€?ok 150 - 鍥為€€2椤点€佹暀甯堝悓姝ユ垨鎭㈠浣嶇疆閮戒笉寤虹珛鍥炶鍊欓€?  ---
+  duration_ms: 0.3387
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄鐩戞祴绔彛鎸塈绛惧悕璋冪敤涓斾笉鎶妔cope/device閫佸叆API杈撳叆
+ok 151 - 鐪熷疄鐩戞祴绔彛鎸塈绛惧悕璋冪敤涓斾笉鎶妔cope/device閫佸叆API杈撳叆
+  ---
+  duration_ms: 1.7916
+  type: 'test'
+  ...
+# Subtest: 鐩戞祴鑼冨洿浠庢湇鍔＄浼氳瘽瑙ｆ瀽缁勭粐/瀛︾敓/宸ヤ綔绌洪棿涓旀嫆缁濊法韬唤
+ok 152 - 鐩戞祴鑼冨洿浠庢湇鍔＄浼氳瘽瑙ｆ瀽缁勭粐/瀛︾敓/宸ヤ綔绌洪棿涓旀嫆缁濊法韬唤
+  ---
+  duration_ms: 0.6866
+  type: 'test'
+  ...
+# Subtest: Reader绋冲畾memoized monitor閰嶇疆骞剁敱鍚屼竴鏂扮绾﹀惎鍔ㄦ棫鎶ょ溂搴忓彿
+ok 153 - Reader绋冲畾memoized monitor閰嶇疆骞剁敱鍚屼竴鏂扮绾﹀惎鍔ㄦ棫鎶ょ溂搴忓彿
+  ---
+  duration_ms: 4.7496
+  type: 'test'
+  ...
+# Subtest: 鍖椾含鏃堕棿04:00绮剧‘鍒囨崲缁熻鏃ワ紝鏃堕挓鍙敞鍏?ok 154 - 鍖椾含鏃堕棿04:00绮剧‘鍒囨崲缁熻鏃ワ紝鏃堕挓鍙敞鍏?  ---
+  duration_ms: 2.5595
+  type: 'test'
+  ...
+# Subtest: 绋冲畾鍗曞弻椤佃鍥剧粺涓€浣跨敤鏈€灏忓彲瑙侀〉浣滀富椤?ok 155 - 绋冲畾鍗曞弻椤佃鍥剧粺涓€浣跨敤鏈€灏忓彲瑙侀〉浣滀富椤?  ---
+  duration_ms: 0.3888
+  type: 'test'
+  ...
+# Subtest: 缁х画闃呰query涓ユ牸鎵撳紑鎸囧畾鐗堟湰鍜岄〉鐮?ok 156 - 缁х画闃呰query涓ユ牸鎵撳紑鎸囧畾鐗堟湰鍜岄〉鐮?  ---
+  duration_ms: 0.4136
+  type: 'test'
+  ...
+# Subtest: 閿欒鐗堟湰銆佽法涔︾増鏈€佷笉鍙闂笌闈炴暣鏁?瓒婄晫椤电爜閮芥槑纭け璐?ok 157 - 閿欒鐗堟湰銆佽法涔︾増鏈€佷笉鍙闂笌闈炴暣鏁?瓒婄晫椤电爜閮芥槑纭け璐?  ---
+  duration_ms: 0.332
+  type: 'test'
+  ...
+# Subtest: 姝ｆ枃鍝嶅簲涓嶅緱闈欓粯鎹㈢増鏈€佽法涔︽垨鎹㈤〉
+ok 158 - 姝ｆ枃鍝嶅簲涓嶅緱闈欓粯鎹㈢増鏈€佽法涔︽垨鎹㈤〉
+  ---
+  duration_ms: 0.2191
+  type: 'test'
+  ...
+# Subtest: 寰呯‘璁ゅ尯璁惧闅旂閿彧浣跨敤acquire杩斿洖鐨勫彲淇¤澶?ok 159 - 寰呯‘璁ゅ尯璁惧闅旂閿彧浣跨敤acquire杩斿洖鐨勫彲淇¤澶?  ---
+  duration_ms: 9.7641
+  type: 'test'
+  ...
+# Subtest: 缁熻鏃ヨ竟鐣屽厛浠tat_date_change缁撴潫鏃т細璇濓紝鍐嶅缓鏂颁細璇?ok 160 - 缁熻鏃ヨ竟鐣屽厛浠tat_date_change缁撴潫鏃т細璇濓紝鍐嶅缓鏂颁細璇?  ---
+  duration_ms: 1.7821
+  type: 'test'
+  ...
+# Subtest: 绉熺害缁撴潫鍘熷洜鐢辨湇鍔＄鏉冨▉鍏抽棴锛屽鎴风鍙彁浜ゆ埅姝㈠墠鐨勫紑鏀炬憳瑕?ok 161 - 绉熺害缁撴潫鍘熷洜鐢辨湇鍔＄鏉冨▉鍏抽棴锛屽鎴风鍙彁浜ゆ埅姝㈠墠鐨勫紑鏀炬憳瑕?  ---
+  duration_ms: 1.5312
+  type: 'test'
+  ...
+# Subtest: 绉熺害杩囨湡鍥炶皟杩熷埌30绉掍篃涓嶄細璁″叆expiresAt涔嬪悗鐨勬椂闀?ok 162 - 绉熺害杩囨湡鍥炶皟杩熷埌30绉掍篃涓嶄細璁″叆expiresAt涔嬪悗鐨勬椂闀?  ---
+  duration_ms: 1.7668
+  type: 'test'
+  ...
+# Subtest: 绗?12鏉″垰杈捐褰曠‖涓婇檺鏃剁珛鍗冲仠姝㈡柊澧炴湁鏁堢疮璁?ok 163 - 绗?12鏉″垰杈捐褰曠‖涓婇檺鏃剁珛鍗冲仠姝㈡柊澧炴湁鏁堢疮璁?  ---
+  duration_ms: 4.4209
+  type: 'test'
+  ...
+# Subtest: 瀛楄妭鏁板垰杈?MiB纭笂闄愭椂绔嬪嵆鍋滄鏂板鏈夋晥绱
+ok 164 - 瀛楄妭鏁板垰杈?MiB纭笂闄愭椂绔嬪嵆鍋滄鏂板鏈夋晥绱
+  ---
+  duration_ms: 1.928
+  type: 'test'
+  ...
+# Subtest: 婊¤浇鍚巇rain蹇呴』浣庝簬80%鍘嬪姏绾挎墠鎭㈠璁℃椂
+ok 165 - 婊¤浇鍚巇rain蹇呴』浣庝簬80%鍘嬪姏绾挎墠鎭㈠璁℃椂
+  ---
+  duration_ms: 4.6492
+  type: 'test'
+  ...
+# Subtest: tickDirect鎶涢敊鍚庡畾鏃堕摼浠嶄細杩涜涓嬩竴娆″皾璇?ok 166 - tickDirect鎶涢敊鍚庡畾鏃堕摼浠嶄細杩涜涓嬩竴娆″皾璇?  ---
+  duration_ms: 4.548
+  type: 'test'
+  ...
+# Subtest: 鎽樿鎻愪氦LEASE_CONFLICT鍚庡畾鏃堕摼涓嶆案涔呭仠鎽?ok 167 - 鎽樿鎻愪氦LEASE_CONFLICT鍚庡畾鏃堕摼涓嶆案涔呭仠鎽?  ---
+  duration_ms: 3.3646
+  type: 'test'
+  ...
+# Subtest: 绾?鍒嗛挓銆佸悗鍙般€佺綉缁滄仮澶嶅拰鍏抽棴鍧囪Е鍙戠疮璁℃憳瑕?ok 168 - 绾?鍒嗛挓銆佸悗鍙般€佺綉缁滄仮澶嶅拰鍏抽棴鍧囪Е鍙戠疮璁℃憳瑕?  ---
+  duration_ms: 3.1624
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄鐢熷懡鍛ㄦ湡浜嬩欢鍦ㄥ悗鍙般€乫reeze鍜岀綉缁滄仮澶嶆椂棰濆鎻愪氦
+ok 169 - 鐪熷疄鐢熷懡鍛ㄦ湡浜嬩欢鍦ㄥ悗鍙般€乫reeze鍜岀綉缁滄仮澶嶆椂棰濆鎻愪氦
+  ---
+  duration_ms: 2.8688
+  type: 'test'
+  ...
+# Subtest: 鎻愪氦闃熷垪鍫靛鏃跺叧闂瓑寰呭湪鏈夌晫瓒呮椂鍚庝粛鑳藉畬鎴?ok 170 - 鎻愪氦闃熷垪鍫靛鏃跺叧闂瓑寰呭湪鏈夌晫瓒呮椂鍚庝粛鑳藉畬鎴?  ---
+  duration_ms: 2.3337
+  type: 'test'
+  ...
+# Subtest: closeAndWait 鐢熶骇璺緞鎶婃湁鐣岃秴鏃朵紶缁欏叧闂瓑寰?ok 171 - closeAndWait 鐢熶骇璺緞鎶婃湁鐣岃秴鏃朵紶缁欏叧闂瓑寰?  ---
+  duration_ms: 1.3283
+  type: 'test'
+  ...
+# Subtest: 棣栭〉鍒锋柊鍗忚皟鍦╝ccepted缁堟€佸墠涓嶈В閿?ok 172 - 棣栭〉鍒锋柊鍗忚皟鍦╝ccepted缁堟€佸墠涓嶈В閿?  ---
+  duration_ms: 0.7597
+  type: 'test'
+  ...
+# Subtest: Reader鎵€鏈夌Щ鍔ㄨ皟鐢ㄩ兘鏄惧紡鎼哄甫鏉ユ簮锛屽簳鏍忎笉鍐嶆帹瀵肩櫨鍒嗘瘮鎴杅inished
+ok 173 - Reader鎵€鏈夌Щ鍔ㄨ皟鐢ㄩ兘鏄惧紡鎼哄甫鏉ユ簮锛屽簳鏍忎笉鍐嶆帹瀵肩櫨鍒嗘瘮鎴杅inished
+  ---
+  duration_ms: 1.0217
+  type: 'test'
+  ...
+# Subtest: 鏂版憳瑕佷笉鍙憇creenOn锛屾棫鎶ょ溂浜嬩欢浠呬互document visibility浣滀负浠ｇ悊
+ok 174 - 鏂版憳瑕佷笉鍙憇creenOn锛屾棫鎶ょ溂浜嬩欢浠呬互document visibility浣滀负浠ｇ悊
+  ---
+  duration_ms: 0.6607
+  type: 'test'
+  ...
+# Subtest: 绉熺害鎸夋潈濞乪xpiresAt鍦ㄥ墿30/15/5绉掔獥鍙ｇ画绉熼噸璇?ok 175 - 绉熺害鎸夋潈濞乪xpiresAt鍦ㄥ墿30/15/5绉掔獥鍙ｇ画绉熼噸璇?  ---
+  duration_ms: 5.8208
+  type: 'test'
+  ...
+# Subtest: 缁鎺ョ鍐茬獊绔嬪嵆鍋滄锛岃繃鏈熶笉浼氭湰鍦板娲?ok 176 - 缁鎺ョ鍐茬獊绔嬪嵆鍋滄锛岃繃鏈熶笉浼氭湰鍦板娲?  ---
+  duration_ms: 1.1396
+  type: 'test'
+  ...
+# Subtest: 杩囨湡timer杩熷埌鏃朵粛浠ユ湇鍔＄expiresAt浣滀负鏉冨▉澶辨晥鎴
+ok 177 - 杩囨湡timer杩熷埌鏃朵粛浠ユ湇鍔＄expiresAt浣滀负鏉冨▉澶辨晥鎴
+  ---
+  duration_ms: 1.0984
+  type: 'test'
+  ...
+# Subtest: 瀹㈡埛绔鑼冩寚绾逛笌鍐荤粨JSON瀛楁椤哄簭瀹屽叏涓€鑷?ok 178 - 瀹㈡埛绔鑼冩寚绾逛笌鍐荤粨JSON瀛楁椤哄簭瀹屽叏涓€鑷?  ---
+  duration_ms: 1.933
+  type: 'test'
+  ...
+# Subtest: revision浠?涓ユ牸杩炵画锛?涓粨鏉熷師鍥犲潎鍙楁帶
+ok 179 - revision浠?涓ユ牸杩炵画锛?涓粨鏉熷師鍥犲潎鍙楁帶
+  ---
+  duration_ms: 0.6904
+  type: 'test'
+  ...
+# Subtest: IndexedDB寰呯‘璁ゅ尯鎸夌粍缁?瀛︾敓/宸ヤ綔绌洪棿/璁惧闅旂骞跺湪璇锋眰鍓嶅畬鎴愪簨鍔?ok 180 - IndexedDB寰呯‘璁ゅ尯鎸夌粍缁?瀛︾敓/宸ヤ綔绌洪棿/璁惧闅旂骞跺湪璇锋眰鍓嶅畬鎴愪簨鍔?  ---
+  duration_ms: 29.0704
+  type: 'test'
+  ...
+# Subtest: 鍚宺evision鐩稿悓鍐呭绋冲畾閲嶆斁锛屽紓鍐呭鏈湴鍐茬獊
+ok 181 - 鍚宺evision鐩稿悓鍐呭绋冲畾閲嶆斁锛屽紓鍐呭鏈湴鍐茬獊
+  ---
+  duration_ms: 31.0424
+  type: 'test'
+  ...
+# Subtest: IndexedDB瀵瑰簭鍒楀寲鍚庤秴杩?MiB鐨勫崟鏉℃憳瑕佺洿鎺ユ樉寮忔嫆缁?ok 182 - IndexedDB瀵瑰簭鍒楀寲鍚庤秴杩?MiB鐨勫崟鏉℃憳瑕佺洿鎺ユ樉寮忔嫆缁?  ---
+  duration_ms: 19.8337
+  type: 'test'
+  ...
+# Subtest: 鎽樿蹇呴』鍏堝師瀛愭寔涔呭寲鍐嶄覆琛岃姹傦紝涓夌缁堟€佸潎鍒犻櫎
+ok 183 - 鎽樿蹇呴』鍏堝師瀛愭寔涔呭寲鍐嶄覆琛岃姹傦紝涓夌缁堟€佸潎鍒犻櫎
+  ---
+  duration_ms: 1.7235
+  type: 'test'
+  ...
+# Subtest: 缃戠粶鍜宺evision/鏉冮檺鍐茬獊淇濈暀璁板綍骞跺仠姝㈠悗缁覆琛屼慨璁?ok 184 - 缃戠粶鍜宺evision/鏉冮檺鍐茬獊淇濈暀璁板綍骞跺仠姝㈠悗缁覆琛屼慨璁?  ---
+  duration_ms: 0.605
+  type: 'test'
+  ...
+# Subtest: LEASE_CONFLICT绉诲嚭闃熷ご浠ュ厤姣掓鍚庣画鎽樿
+ok 185 - LEASE_CONFLICT绉诲嚭闃熷ご浠ュ厤姣掓鍚庣画鎽樿
+  ---
+  duration_ms: 0.2698
+  type: 'test'
+  ...
+# Subtest: 512鏉℃垨2MiB鏄‖涓婇檺锛?0%鍘嬪姏闃堝€煎彲瑙傛祴
+ok 186 - 512鏉℃垨2MiB鏄‖涓婇檺锛?0%鍘嬪姏闃堝€煎彲瑙傛祴
+  ---
+  duration_ms: 0.243
+  type: 'test'
+  ...
+# Subtest: 婊¤浇鏃跺厛灏濊瘯drain锛屼粛鏃犳硶鎺掔┖鍒欐樉寮忓け璐ヨ€屼笉瑕嗙洊
+ok 187 - 婊¤浇鏃跺厛灏濊瘯drain锛屼粛鏃犳硶鎺掔┖鍒欐樉寮忓け璐ヨ€屼笉瑕嗙洊
+  ---
+  duration_ms: 1.2088
+  type: 'test'
+  ...
+# Subtest: runtime鏅氬埌鏃舵樉寮弍ageNo=4鍚屾瑕嗙洊鏃х殑鍒濆1锛屽悗缁悓URL淇濈暀褰撳墠涓婚〉
+ok 188 - runtime鏅氬埌鏃舵樉寮弍ageNo=4鍚屾瑕嗙洊鏃х殑鍒濆1锛屽悗缁悓URL淇濈暀褰撳墠涓婚〉
+  ---
+  duration_ms: 0.7627
+  type: 'test'
+  ...
+# Subtest: 涓夌淮缁勪欢棣栨閿欒onFlip=0涓嶈兘瑕嗙洊鏄惧紡鏈〉leaf=2
+ok 189 - 涓夌淮缁勪欢棣栨閿欒onFlip=0涓嶈兘瑕嗙洊鏄惧紡鏈〉leaf=2
+  ---
+  duration_ms: 0.6238
+  type: 'test'
+  ...
+# Subtest: Reader鏈〉鍙岄〉鍒濆鍖栦笉鍒堕€犲菇鐏甸〉锛屼笖浠嶄笉鏄剧ず瀹屾垚搴﹁涔?ok 190 - Reader鏈〉鍙岄〉鍒濆鍖栦笉鍒堕€犲菇鐏甸〉锛屼笖浠嶄笉鏄剧ず瀹屾垚搴﹁涔?  ---
+  duration_ms: 4.4485
+  type: 'test'
+  ...
+# Subtest: 鍚屼竴鏈功鎹㈤〉涓嶆妸pageNo鎴栨煡璇覆鍐欒繘ReaderView鐨刱ey
+ok 191 - 鍚屼竴鏈功鎹㈤〉涓嶆妸pageNo鎴栨煡璇覆鍐欒繘ReaderView鐨刱ey
+  ---
+  duration_ms: 1.0806
+  type: 'test'
+  ...
+# Subtest: 鐩存帴鎵撳紑鏈〉鍙繚鐣欎綅缃紝涓嶄骇鐢熷畬鎴愬害鎴栬瀹岃涔?ok 192 - 鐩存帴鎵撳紑鏈〉鍙繚鐣欎綅缃紝涓嶄骇鐢熷畬鎴愬害鎴栬瀹岃涔?  ---
+  duration_ms: 1.2545
+  type: 'test'
+  ...
+# Subtest: 鍙揪鏃ф秷璐硅€呬笉鍐嶈闂〉鐮佸畬鎴愬害銆佽瀹屾垨鏃т簨浠堕槄璇荤鏁板瓧娈?ok 193 - 鍙揪鏃ф秷璐硅€呬笉鍐嶈闂〉鐮佸畬鎴愬害銆佽瀹屾垨鏃т簨浠堕槄璇荤鏁板瓧娈?  ---
+  duration_ms: 6.2981
+  type: 'test'
+  ...
+# Subtest: 鎶ュ憡鎸囨爣绉婚櫎椤垫暟銆佸畬鎴愬害涓庡紑濮嬩功鐩紝浠呬繚鐣欓潪鏃ч槄璇绘寚鏍?ok 194 - 鎶ュ憡鎸囨爣绉婚櫎椤垫暟銆佸畬鎴愬害涓庡紑濮嬩功鐩紝浠呬繚鐣欓潪鏃ч槄璇绘寚鏍?  ---
+  duration_ms: 0.7992
+  type: 'test'
+  ...
+# Subtest: Foundation 浠嶄笉鍙揪锛屼笖涓嶅啀淇濈暀琚墿鐞嗙Щ闄ょ殑 BookProgress 绀轰緥
+ok 195 - Foundation 浠嶄笉鍙揪锛屼笖涓嶅啀淇濈暀琚墿鐞嗙Щ闄ょ殑 BookProgress 绀轰緥
+  ---
+  duration_ms: 22.8258
+  type: 'test'
+  ...
+# Subtest: self DTO is strict and final page only builds an exact position URL
+ok 196 - self DTO is strict and final page only builds an exact position URL
+  ---
+  duration_ms: 1.4669
+  type: 'test'
+  ...
+# Subtest: self controller keeps the last good fact stale and never advances dataUpdatedAt on failure
+ok 197 - self controller keeps the last good fact stale and never advances dataUpdatedAt on failure
+  ---
+  duration_ms: 3.4543
+  type: 'test'
+  ...
+# Subtest: scope DTO requires exact seven-day series and honest empty-class null metrics
+ok 198 - scope DTO requires exact seven-day series and honest empty-class null metrics
+  ---
+  duration_ms: 1.1917
+  type: 'test'
+  ...
+# Subtest: scope controller composes classes, polls only while visible, refreshes immediately on return, and retains stale data
+ok 199 - scope controller composes classes, polls only while visible, refreshes immediately on return, and retains stale data
+  ---
+  duration_ms: 11.4599
+  type: 'test'
+  ...
+# Subtest: class option and Beijing 04:00 helpers are deterministic
+ok 200 - class option and Beijing 04:00 helpers are deterministic
+  ---
+  duration_ms: 0.2969
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓绠€鎶ュ浐瀹氫娇鐢ㄥ洓绉嶄腑鎬ч紦鍔辨枃妗?ok 201 - 瀛︾敓绠€鎶ュ浐瀹氫娇鐢ㄥ洓绉嶄腑鎬ч紦鍔辨枃妗?  ---
+  duration_ms: 1.7673
+  type: 'test'
+  ...
+# Subtest: 浜斿垎閽熻竟鐣屼俊浠绘湇鍔＄ checked 涓?remaining锛?99/300 涓嶈椤甸潰閲嶇畻
+ok 202 - 浜斿垎閽熻竟鐣屼俊浠绘湇鍔＄ checked 涓?remaining锛?99/300 涓嶈椤甸潰閲嶇畻
+  ---
+  duration_ms: 0.3131
+  type: 'test'
+  ...
+# Subtest: 0 绉掋€? streak銆乶ull 鏇存柊鏃堕棿涓?null 鏈€杩戦槄璇婚兘鏄樉寮忕┖鍊?ok 203 - 0 绉掋€? streak銆乶ull 鏇存柊鏃堕棿涓?null 鏈€杩戦槄璇婚兘鏄樉寮忕┖鍊?  ---
+  duration_ms: 0.1654
+  type: 'test'
+  ...
+# Subtest: 缂哄け DTO 瀛楁鏃舵嫆缁濊ˉ 0
+ok 204 - 缂哄け DTO 瀛楁鏃舵嫆缁濊ˉ 0
+  ---
+  duration_ms: 0.144
+  type: 'test'
+  ...
+# Subtest: Home 鎺ュ叆鐪熷疄 self resource锛岀户缁槄璇诲彧浣跨敤 hook 鐨勭簿纭?URL
+ok 205 - Home 鎺ュ叆鐪熷疄 self resource锛岀户缁槄璇诲彧浣跨敤 hook 鐨勭簿纭?URL
+  ---
+  duration_ms: 5.616
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀鎬昏浣跨敤鏈嶅姟绔彛寰勬樉绀?37/50=74%锛屼笉鍦ㄨ鍥炬ā鍨嬮噸绠?ok 206 - 鏁欏笀鎬昏浣跨敤鏈嶅姟绔彛寰勬樉绀?37/50=74%锛屼笉鍦ㄨ鍥炬ā鍨嬮噸绠?  ---
+  duration_ms: 1.8095
+  type: 'test'
+  ...
+# Subtest: 绌虹彮绾?rate/perCapita 淇濇寔 null 绌烘€侊紝涓冩棩鏁扮粍浠嶇劧鎭板ソ 7 椤?ok 207 - 绌虹彮绾?rate/perCapita 淇濇寔 null 绌烘€侊紝涓冩棩鏁扮粍浠嶇劧鎭板ソ 7 椤?  ---
+  duration_ms: 0.4129
+  type: 'test'
+  ...
+# Subtest: 鏈墦鍗＄瓫閫夊寘鍚?0锝?99 绉掞紝鍙俊浠?checkedIn 甯冨皵鍊?ok 208 - 鏈墦鍗＄瓫閫夊寘鍚?0锝?99 绉掞紝鍙俊浠?checkedIn 甯冨皵鍊?  ---
+  duration_ms: 0.8747
+  type: 'test'
+  ...
+# Subtest: 鎼滅储瑙勮寖鍖栧叏瑙掍笌绌虹櫧锛屾帓搴忎娇鐢ㄨ鑼冨寲濮撳悕 + studentId 绋冲畾鎵撶牬鍚屽悕
+ok 209 - 鎼滅储瑙勮寖鍖栧叏瑙掍笌绌虹櫧锛屾帓搴忎娇鐢ㄨ鑼冨寲濮撳悕 + studentId 绋冲畾鎵撶牬鍚屽悕
+  ---
+  duration_ms: 0.3079
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀瀵规瘮鍙睍绀轰腑鎬т簨瀹烇紝no_baseline 涓嶄吉瑁呮垚鎸佸钩
+ok 210 - 鏁欏笀瀵规瘮鍙睍绀轰腑鎬т簨瀹烇紝no_baseline 涓嶄吉瑁呮垚鎸佸钩
+  ---
+  duration_ms: 0.325
+  type: 'test'
+  ...
+# Subtest: ClassOverview 鎺ュ叆鐪熷疄 scope state锛屽睍绀烘墍鏈夌姸鎬併€佸弻瓒嬪娍涓庢娊灞夌劍鐐硅竟鐣?ok 211 - ClassOverview 鎺ュ叆鐪熷疄 scope state锛屽睍绀烘墍鏈夌姸鎬併€佸弻瓒嬪娍涓庢娊灞夌劍鐐硅竟鐣?  ---
+  duration_ms: 6.9398
+  type: 'test'
+  ...
+# Subtest: 鏈€杩戦槄璇婚〉鐮佽秴鍑烘€婚〉鏁版椂鎷掔粷灞曠ず
+ok 212 - 鏈€杩戦槄璇婚〉鐮佽秴鍑烘€婚〉鏁版椂鎷掔粷灞曠ず
+  ---
+  duration_ms: 0.3586
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓闃呰缁熻閫傞厤鍣ㄥ彧璇诲彇涓ユ牸 self锛屼笉鍏煎鏃х瓑绾с€佹寜涔︽帓琛屼笌瀹屾垚搴﹀瓧娈?ok 213 - 瀛︾敓闃呰缁熻閫傞厤鍣ㄥ彧璇诲彇涓ユ牸 self锛屼笉鍏煎鏃х瓑绾с€佹寜涔︽帓琛屼笌瀹屾垚搴﹀瓧娈?  ---
+  duration_ms: 3.3266
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔粺璁￠€傞厤鍣ㄥ彧浼?classId/statDate锛屽苟涓ユ牸鎷掔粷鏃ц寖鍥村拰绔炰簤鎺掑悕瀛楁
+ok 214 - 鏉冮檺绔粺璁￠€傞厤鍣ㄥ彧浼?classId/statDate锛屽苟涓ユ牸鎷掔粷鏃ц寖鍥村拰绔炰簤鎺掑悕瀛楁
+  ---
+  duration_ms: 1.2273
+  type: 'test'
+  ...
+# Subtest: 鐢熶骇缁熻鐘舵€佹ā鍧椾笉瀵煎叆 fixture銆乵ock銆丮OOC 鎴?localStorage 涓氬姟鐪熺浉
+ok 215 - 鐢熶骇缁熻鐘舵€佹ā鍧椾笉瀵煎叆 fixture銆乵ock銆丮OOC 鎴?localStorage 涓氬姟鐪熺浉
+  ---
+  duration_ms: 4.6265
+  type: 'test'
+  ...
+# Subtest: 闃呰鍣ㄥ埛鏂板悗浠庢湇鍔＄绉熺害杩斿洖鐨勪笅涓€绂荤嚎搴忓彿缁х画鍐欏叆
+ok 216 - 闃呰鍣ㄥ埛鏂板悗浠庢湇鍔＄绉熺害杩斿洖鐨勪笅涓€绂荤嚎搴忓彿缁х画鍐欏叆
+  ---
+  duration_ms: 0.8336
+  type: 'test'
+  ...
+# Subtest: 鏂癿onitor鐨刴ovement source涓嶅緱娉勬紡鍒版棫page_turn payload
+ok 217 - 鏂癿onitor鐨刴ovement source涓嶅緱娉勬紡鍒版棫page_turn payload
+  ---
+  duration_ms: 2.926
+  type: 'test'
+  ...
+# Subtest: 鎶ュ憡椤甸潰涓嶅緱浠?fixture 鎴栨祻瑙堝櫒瀛樺偍璇诲彇涓氬姟鏁版嵁
+ok 218 - 鎶ュ憡椤甸潰涓嶅緱浠?fixture 鎴栨祻瑙堝櫒瀛樺偍璇诲彇涓氬姟鏁版嵁
+  ---
+  duration_ms: 4.9934
+  type: 'test'
+  ...
+# Subtest: 鎶ュ憡 API 瑕嗙洊瀛︾敓銆佹姤鍛娿€佸鏍搞€佽仈绯讳汉涓庡彂閫佸鐞嗗绾?ok 219 - 鎶ュ憡 API 瑕嗙洊瀛︾敓銆佹姤鍛娿€佸鏍搞€佽仈绯讳汉涓庡彂閫佸鐞嗗绾?  ---
+  duration_ms: 0.9754
+  type: 'test'
+  ...
+# Subtest: 鎶ュ憡 API 鎶婅鍐欒姹備氦缁欑湡瀹炵鐐瑰苟淇濈暀璋冪敤鏂圭殑鍐欏叆閫夐」
+ok 220 - 鎶ュ憡 API 鎶婅鍐欒姹備氦缁欑湡瀹炵鐐瑰苟淇濈暀璋冪敤鏂圭殑鍐欏叆閫夐」
+  ---
+  duration_ms: 0.9379
+  type: 'test'
+  ...
+# Subtest: 鎶ュ憡鐘舵€?hook 鍙粠 API 缁勭粐鍔犺浇銆佺敓鎴愩€佸鏍镐笌鍙戦€佺姸鎬?ok 221 - 鎶ュ憡鐘舵€?hook 鍙粠 API 缁勭粐鍔犺浇銆佺敓鎴愩€佸鏍镐笌鍙戦€佺姸鎬?  ---
+  duration_ms: 1.1436
+  type: 'test'
+  ...
+# {
+#   "routes": [
+#     {
+#       "route": "/student/home",
+#       "app": "src/student/StudentApp.jsx",
+#       "page": "src/student/pages/Home.jsx",
+#       "routePresent": true,
+#       "successPathPresent": true,
+#       "failurePathPresent": true,
+#       "runtimeGatePresent": false
+#     },
+#     {
+#       "route": "/student/reader/:bookId",
+#       "app": "src/student/StudentApp.jsx",
+#       "page": "src/student/pages/Reader.jsx",
+#       "routePresent": true,
+#       "successPathPresent": true,
+#       "failurePathPresent": true,
+#       "runtimeGatePresent": false
+#     },
+#     {
+#       "route": "/console/home",
+#       "app": "src/console/ConsoleApp.jsx",
+#       "page": "src/console/pages/Home.jsx",
+#       "routePresent": true,
+#       "successPathPresent": true,
+#       "failurePathPresent": true,
+#       "runtimeGatePresent": false
+#     },
+#     {
+#       "route": "/console/safety/:eventId",
+#       "app": "src/console/ConsoleApp.jsx",
+#       "page": "src/console/pages/safety/SafetyDetail.jsx",
+#       "routePresent": true,
+#       "successPathPresent": true,
+#       "failurePathPresent": true,
+#       "runtimeGatePresent": false
+#     }
+#   ],
+#   "graphs": [
+#     {
+#       "entry": "src/student/StudentApp.jsx",
+#       "modules": [
+#         "src/adapters/student.js",
+#         "src/api/auth.js",
+#         "src/api/client.js",
+#         "src/api/envelope.js",
+#         "src/api/student.js",
+#         "src/api/useApiResource.js",
+#         "src/components/ui.jsx",
+#         "src/console/pages/accounts/identityUi.js",
+#         "src/shared/RuntimeIcon.jsx",
+#         "src/shared/cx.js",
+#         "src/shared/format.js",
+#         "src/shared/useProtectedAssetUrl.js",
+#         "src/student/StudentApp.jsx",
+#         "src/student/community/CommunityRuntimeContext.jsx",
+#         "src/student/community/presentation.js",
+#         "src/student/components/AiHistory.jsx",
+#         "src/student/components/AiMessages.jsx",
+#         "src/student/components/AiPanel.jsx",
+#         "src/student/components/Avatar.jsx",
+#         "src/student/components/Backdrop.jsx",
+#         "src/student/components/BookCard.jsx",
+#         "src/student/components/BookCover.jsx",
+#         "src/student/components/BookPage.jsx",
+#         "src/student/components/BottomNav.jsx",
+#         "src/student/components/BrandMark.jsx",
+#         "src/student/components/ClassroomLayer.jsx",
+#         "src/student/components/Clock.jsx",
+#         "src/student/components/Glass.jsx",
+#         "src/student/components/MascotDock.jsx",
+#         "src/student/components/MascotFrame.jsx",
+#         "src/student/components/MyPostsPanel.jsx",
+#         "src/student/components/PageArt.jsx",
+#         "src/student/components/PageHead.jsx",
+#         "src/student/components/PdfBookPage.jsx",
+#         "src/student/components/PostCard.jsx",
+#         "src/student/components/Progress.jsx",
+#         "src/student/components/Reactions.jsx",
+#         "src/student/components/ReaderOverlays.jsx",
+#         "src/student/components/StudentShell.jsx",
+#         "src/student/components/book-page-blank.js",
+#         "src/student/components/mascotPresentation.js",
+#         "src/student/components/reading-monitor/DailyReadingBrief.jsx",
+#         "src/student/components/reading-monitor/dailyReadingBriefModel.js",
+#         "src/student/hooks/useReaderGesture.js",
+#         "src/student/pages/BookDetail.jsx",
+#         "src/student/pages/Community.jsx",
+#         "src/student/pages/Compose.jsx",
+#         "src/student/pages/Footprint.jsx",
+#         "src/student/pages/Highlights.jsx",
+#         "src/student/pages/Home.jsx",
+#         "src/student/pages/Level.jsx",
+#         "src/student/pages/ListDetail.jsx",
+#         "src/student/pages/Lists.jsx",
+#         "src/student/pages/Login.jsx",
+#         "src/student/pages/Me.jsx",
+#         "src/student/pages/MyPosts.jsx",
+#         "src/student/pages/Notes.jsx",
+#         "src/student/pages/Onboarding.jsx",
+#         "src/student/pages/PostDetail.jsx",
+#         "src/student/pages/Ranking.jsx",
+#         "src/student/pages/Reader.jsx",
+#         "src/student/pages/Register.jsx",
+#         "src/student/pages/Shelf.jsx",
+#         "src/student/pages/TeacherHub.jsx",
+#         "src/student/pages/Usage.jsx",
+#         "src/student/pages/shelfFilters.js",
+#         "src/student/pdf-page-design.js",
+#         "src/student/reading-monitor/activity.js",
+#         "src/student/reading-monitor/apiPorts.js",
+#         "src/student/reading-monitor/clock.js",
+#         "src/student/reading-monitor/constants.js",
+#         "src/student/reading-monitor/coordinator.js",
+#         "src/student/reading-monitor/index.js",
+#         "src/student/reading-monitor/leaseController.js",
+#         "src/student/reading-monitor/pendingQueue.js",
+#         "src/student/reading-monitor/pendingStore.js",
+#         "src/student/reading-monitor/summary.js",
+#         "src/student/reading-monitor/view.js",
+#         "src/student/reading-monitor/viewModel.js",
+#         "src/student/state/StudentContext.jsx",
+#         "src/student/state/useClassroomRuntime.js",
+#         "src/student/state/useCommunity.js",
+#         "src/student/state/useConversationManager.js",
+#         "src/student/state/useEyeCarePrivacy.js",
+#         "src/student/state/usePersonalReadingAdapter.js",
+#         "src/student/state/useReadingLibrary.js",
+#         "src/student/state/useReadingStatistics.js",
+#         "src/student/state/useReadingTelemetry.js",
+#         "src/student/state/useRefreshStudentRuntimeOnMount.js",
+#         "src/student/state/useStudentAiRuntime.js",
+#         "src/student/state/useStudentReaderPages.js",
+#         "src/student/state/useStudentRuntime.js"
+#       ],
+#       "forbiddenImports": [],
+#       "storageReferences": [],
+#       "allowedStorageReferences": [
+#         "src/student/reading-monitor/pendingStore.js"
+#       ]
+#     },
+#     {
+#       "entry": "src/console/ConsoleApp.jsx",
+#       "modules": [
+#         "src/adapters/console.js",
+#         "src/adapters/consoleAssignments.js",
+#         "src/adapters/consoleHome.js",
+#         "src/adapters/safety.js",
+#         "src/adapters/student.js",
+#         "src/api/auth.js",
+#         "src/api/client.js",
+#         "src/api/console.js",
+#         "src/api/envelope.js",
+#         "src/api/reports.js",
+#         "src/api/stage4.js",
+#         "src/api/student.js",
+#         "src/api/useApiResource.js",
+#         "src/components/ui.jsx",
+#         "src/console/ConsoleApp.jsx",
+#         "src/console/components/Backdrop.jsx",
+#         "src/console/components/BookFlip.jsx",
+#         "src/console/components/BrandMark.jsx",
+#         "src/console/components/CommunityPostCard.jsx",
+#         "src/console/components/Controls.jsx",
+#         "src/console/components/Glass.jsx",
+#         "src/console/components/MiniChart.jsx",
+#         "src/console/components/Overlay.jsx",
+#         "src/console/components/PagePanel.jsx",
+#         "src/console/components/Progress.jsx",
+#         "src/console/components/reading-monitor/ReadingStatisticsView.jsx",
+#         "src/console/components/reading-monitor/readingStatisticsViewModel.js",
+#         "src/console/components/shell/ConsoleShell.jsx",
+#         "src/console/components/shell/PrimaryRail.jsx",
+#         "src/console/components/shell/SecondaryRail.jsx",
+#         "src/console/components/shell/TopBar.jsx",
+#         "src/console/components/shell/activeNavigation.js",
+#         "src/console/pages/ClassOverview.jsx",
+#         "src/console/pages/Community.jsx",
+#         "src/console/pages/Home.jsx",
+#         "src/console/pages/Login.jsx",
+#         "src/console/pages/PlatformAudit.jsx",
+#         "src/console/pages/SelectClass.jsx",
+#         "src/console/pages/accounts/ClassDetail.jsx",
+#         "src/console/pages/accounts/ClassList.jsx",
+#         "src/console/pages/accounts/OrgAccounts.jsx",
+#         "src/console/pages/accounts/StudentDetail.jsx",
+#         "src/console/pages/accounts/StudentDirectory.jsx",
+#         "src/console/pages/accounts/identityApi.js",
+#         "src/console/pages/accounts/identityUi.js",
+#         "src/console/pages/classes/EyeCare.jsx",
+#         "src/console/pages/reports/ParentSend.jsx",
+#         "src/console/pages/reports/ReportCenter.jsx",
+#         "src/console/pages/reports/ReportDetail.jsx",
+#         "src/console/pages/reports/Templates.jsx",
+#         "src/console/pages/safety/SafetyDetail.jsx",
+#         "src/console/pages/teaching/ArrangeDetail.jsx",
+#         "src/console/pages/teaching/ArrangeList.jsx",
+#         "src/console/pages/teaching/BookDetail.jsx",
+#         "src/console/pages/teaching/BookLibrary.jsx",
+#         "src/console/pages/teaching/BookVisibilityPanel.jsx",
+#         "src/console/pages/teaching/TeacherReader.jsx",
+#         "src/console/pages/teaching/bookLibraryFilters.js",
+#         "src/console/pages/teaching/bookManagement.js",
+#         "src/console/pages/usage/Privacy.jsx",
+#         "src/console/pages/usage/Sessions.jsx",
+#         "src/console/pages/usage/UsageOverview.jsx",
+#         "src/console/state/ConsoleContext.jsx",
+#         "src/console/state/communityRuntime.js",
+#         "src/console/state/consoleAccess.js",
+#         "src/console/state/conversationViewModel.js",
+#         "src/console/state/navigation.js",
+#         "src/console/state/useAssignmentsData.js",
+#         "src/console/state/useBookVisibility.js",
+#         "src/console/state/useBookWriteActions.js",
+#         "src/console/state/useConsoleCommunityRuntime.js",
+#         "src/console/state/useConsoleHomeData.js",
+#         "src/console/state/useConsoleRuntime.js",
+#         "src/console/state/useConversationData.js",
+#         "src/console/state/usePrivacyEyeCareData.js",
+#         "src/console/state/useReadingStatistics.js",
+#         "src/console/state/useReportsData.js",
+#         "src/console/state/useSafetyEvent.js",
+#         "src/console/state/useStage4ConsoleData.js",
+#         "src/console/state/useTeacherReaderRuntime.js",
+#         "src/console/state/useUsageSummary.js",
+#         "src/shared/RuntimeIcon.jsx",
+#         "src/shared/cx.js",
+#         "src/shared/useProtectedAssetUrl.js",
+#         "src/student/state/StudentContext.jsx",
+#         "src/student/state/useConversationManager.js",
+#         "src/student/state/useStudentAiRuntime.js",
+#         "src/student/state/useStudentRuntime.js"
+#       ],
+#       "forbiddenImports": [],
+#       "storageReferences": [],
+#       "allowedStorageReferences": []
+#     }
+#   ]
+# }
+# Subtest: tests\\frontend\\runtime-import-scan.mjs
+ok 40 - tests\\frontend\\runtime-import-scan.mjs
+  ---
+  duration_ms: 136.8083
+  type: 'test'
+  ...
+# Subtest: 涔︽灦娓叉煋闆嗗悎绛変簬鏁版嵁婧愯繑鍥為泦鍚堬紝骞寸骇绛涢€夊彧鍋氬瓙闆嗕笉杩囧叆鏂颁功
+ok 223 - 涔︽灦娓叉煋闆嗗悎绛変簬鏁版嵁婧愯繑鍥為泦鍚堬紝骞寸骇绛涢€夊彧鍋氬瓙闆嗕笉杩囧叆鏂颁功
+  ---
+  duration_ms: 1.5996
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓涔︾洰閫傞厤鍣ㄦ妸鎶曞奖瀛楁 grade 甯﹀埌鍓嶇涔﹀璞★紝缂哄け鍒欎负 null
+ok 224 - 瀛︾敓涔︾洰閫傞厤鍣ㄦ妸鎶曞奖瀛楁 grade 甯﹀埌鍓嶇涔﹀璞★紝缂哄け鍒欎负 null
+  ---
+  duration_ms: 0.572
+  type: 'test'
+  ...
+# Subtest: 涔︾睄璇︽儏骞寸骇鑳跺泭鍦ㄤ袱绾ч兘缂哄け鏃朵笉娓叉煋锛岀姝㈠綋鍓嶅勾绾?骞寸骇鍗婃埅鏂囨
+ok 225 - 涔︾睄璇︽儏骞寸骇鑳跺泭鍦ㄤ袱绾ч兘缂哄け鏃朵笉娓叉煋锛岀姝㈠綋鍓嶅勾绾?骞寸骇鍗婃埅鏂囨
+  ---
+  duration_ms: 3.5984
+  type: 'test'
+  ...
+# Subtest: 涔︽灦椤靛彧娓叉煋 runtime.books锛岀瓫閫夌偣鍑讳笉璇锋眰涔︾洰銆佷笉瀵煎叆婕旂ず涔﹀簱
+ok 226 - 涔︽灦椤靛彧娓叉煋 runtime.books锛岀瓫閫夌偣鍑讳笉璇锋眰涔︾洰銆佷笉瀵煎叆婕旂ず涔﹀簱
+  ---
+  duration_ms: 1.8191
+  type: 'test'
+  ...
+# Subtest: 瀹夊叏浜嬩欢鍒楄〃鍙姹傜湡瀹炲伐浣滅┖闂?API
+ok 227 - 瀹夊叏浜嬩欢鍒楄〃鍙姹傜湡瀹炲伐浣滅┖闂?API
+  ---
+  duration_ms: 1.7078
+  type: 'test'
+  ...
+# Subtest: 鐝骇鍒楄〃鐢辩湡瀹炲鐢熷悕鍗曡仛鍚堜笖璇︽儏淇濇寔鍚屼竴璧勬簮鑼冨洿
+ok 228 - 鐝骇鍒楄〃鐢辩湡瀹炲鐢熷悕鍗曡仛鍚堜笖璇︽儏淇濇寔鍚屼竴璧勬簮鑼冨洿
+  ---
+  duration_ms: 8.8705
+  type: 'test'
+  ...
+# Subtest: 涔︾洰璇︽儏浠庣湡瀹炰功鐩垪琛ㄩ€夋嫨锛屼笉鐢熸垚婕旂ず鍏滃簳
+ok 229 - 涔︾洰璇︽儏浠庣湡瀹炰功鐩垪琛ㄩ€夋嫨锛屼笉鐢熸垚婕旂ず鍏滃簳
+  ---
+  duration_ms: 0.6857
+  type: 'test'
+  ...
+# Subtest: 缂哄皯鏁欏笀鎶ょ溂涓庨殣绉?HTTP 濂戠害鏃惰繑鍥?unavailable 涓斾笉鍙戜吉璇锋眰
+ok 230 - 缂哄皯鏁欏笀鎶ょ溂涓庨殣绉?HTTP 濂戠害鏃惰繑鍥?unavailable 涓斾笉鍙戜吉璇锋眰
+  ---
+  duration_ms: 0.4633
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄鎺ュ彛閿欒淇濇寔 error锛屼笉闄嶇骇涓虹┖鏁版嵁鎴?fixture
+ok 231 - 鐪熷疄鎺ュ彛閿欒淇濇寔 error锛屼笉闄嶇骇涓虹┖鏁版嵁鎴?fixture
+  ---
+  duration_ms: 0.8208
+  type: 'test'
+  ...
+# Subtest: Stage 4 鐢熶骇閫傞厤灞備笉寮曠敤 fixture銆乵ock銆乨emo 鎴栨湰鍦颁笟鍔″瓨鍌?ok 232 - Stage 4 鐢熶骇閫傞厤灞備笉寮曠敤 fixture銆乵ock銆乨emo 鎴栨湰鍦颁笟鍔″瓨鍌?  ---
+  duration_ms: 6.0812
+  type: 'test'
+  ...
+# Subtest: 闃呰鍣ㄨ繑鍥炵殑涔︾睄璇︽儏璺敱鎸傝浇鐪熷疄 BookDetail锛屼笉鍥炶惤缁熶竴 unavailable 椤?ok 233 - 闃呰鍣ㄨ繑鍥炵殑涔︾睄璇︽儏璺敱鎸傝浇鐪熷疄 BookDetail锛屼笉鍥炶惤缁熶竴 unavailable 椤?  ---
+  duration_ms: 4.9332
+  type: 'test'
+  ...
+# Subtest: 瀹夋帓璇︽儏璺敱鎸傝浇鐪熷疄鏁版嵁椤碉紝鏈疄鐜板啓鎿嶄綔涓嶅緱淇濈暀婕旂ず纭鏂囨
+ok 234 - 瀹夋帓璇︽儏璺敱鎸傝浇鐪熷疄鏁版嵁椤碉紝鏈疄鐜板啓鎿嶄綔涓嶅緱淇濈暀婕旂ず纭鏂囨
+  ---
+  duration_ms: 1.4924
+  type: 'test'
+  ...
+# Subtest: ConsoleShell 灏嗘繁璺敱璁＄畻缁撴灉浼犵粰浜岀骇瀵艰埅楂樹寒
+ok 235 - ConsoleShell 灏嗘繁璺敱璁＄畻缁撴灉浼犵粰浜岀骇瀵艰埅楂樹寒
+  ---
+  duration_ms: 0.6881
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓涓汉鍏ュ彛鎸傝浇鐪熷疄椤甸潰锛岄〉闈笉鍐嶅鍏ラ潤鎬佹紨绀烘暟鎹?ok 236 - 瀛︾敓涓汉鍏ュ彛鎸傝浇鐪熷疄椤甸潰锛岄〉闈笉鍐嶅鍏ラ潤鎬佹紨绀烘暟鎹?  ---
+  duration_ms: 3.228
+  type: 'test'
+  ...
+# Subtest: 娌℃湁鏈嶅姟绔缃绾︽椂锛屼釜浜轰富椤典繚鐣欏師鍗＄墖鍐呯殑璇氬疄鐘舵€佽€屼笉璺宠浆闈欐€佽缃〉
+ok 237 - 娌℃湁鏈嶅姟绔缃绾︽椂锛屼釜浜轰富椤典繚鐣欏師鍗＄墖鍐呯殑璇氬疄鐘舵€佽€屼笉璺宠浆闈欐€佽缃〉
+  ---
+  duration_ms: 1.8976
+  type: 'test'
+  ...
+# Subtest: 闃呰鍣ㄥ拰涓汉鍐呭鍐欏叆璧版寮忛槄璇诲璞℃帴鍙ｏ紝涓嶅啀澹版槑鏀惰棌鎴栨壒娉ㄤ笉鍙敤
+ok 238 - 闃呰鍣ㄥ拰涓汉鍐呭鍐欏叆璧版寮忛槄璇诲璞℃帴鍙ｏ紝涓嶅啀澹版槑鏀惰棌鎴栨壒娉ㄤ笉鍙敤
+  ---
+  duration_ms: 1.7028
+  type: 'test'
+  ...
+# Subtest: 涓荤珯鍙涔︾睄鍏ュ彛鍏堣繘鍏ョ湡瀹炶鎯咃紝AI 鍚戝涓嶅啀鎺ㄨ崘鏃у３闈欐€佷功鐩?ok 239 - 涓荤珯鍙涔︾睄鍏ュ彛鍏堣繘鍏ョ湡瀹炶鎯咃紝AI 鍚戝涓嶅啀鎺ㄨ崘鏃у３闈欐€佷功鐩?  ---
+  duration_ms: 1.1127
+  type: 'test'
+  ...
+# Subtest: 鍙揪鐨勬棤鍚庣鎺т欢蹇呴』鏄庣‘绂佺敤锛屼笉鑳界暀涓嬬湅浼煎彲鐐瑰嚮鐨勫亣鍔ㄤ綔
+ok 240 - 鍙揪鐨勬棤鍚庣鎺т欢蹇呴』鏄庣‘绂佺敤锛屼笉鑳界暀涓嬬湅浼煎彲鐐瑰嚮鐨勫亣鍔ㄤ綔
+  ---
+  duration_ms: 1.1651
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓鍜屼功鐩鎯呮寕鍒扮湡瀹炴潈闄愮璺敱锛岀彮绾ф€昏鎺ュ叆鏂伴槄璇荤粺璁＄姸鎬?ok 241 - 瀛︾敓鍜屼功鐩鎯呮寕鍒扮湡瀹炴潈闄愮璺敱锛岀彮绾ф€昏鎺ュ叆鏂伴槄璇荤粺璁＄姸鎬?  ---
+  duration_ms: 2.2459
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔彧璇绘垨缂哄绾︾殑鍔ㄤ綔蹇呴』灞€閮ㄧ鐢紝涓嶈兘寮瑰嚭鍋囨垚鍔熺‘璁ゆ
+ok 242 - 鏉冮檺绔彧璇绘垨缂哄绾︾殑鍔ㄤ綔蹇呴』灞€閮ㄧ鐢紝涓嶈兘寮瑰嚭鍋囨垚鍔熺‘璁ゆ
+  ---
+  duration_ms: 1.8771
+  type: 'test'
+  ...
+# Subtest: 琚秹浜嬪洖閬跨殑鏁欏笀鎵撳紑瀹夊叏鍏ュ彛鏃舵樉绀虹湡瀹炴潈闄愯竟鐣岋紝涓嶅洖娴佸畨鍏ㄥ垪琛?fixture
+ok 243 - 琚秹浜嬪洖閬跨殑鏁欏笀鎵撳紑瀹夊叏鍏ュ彛鏃舵樉绀虹湡瀹炴潈闄愯竟鐣岋紝涓嶅洖娴佸畨鍏ㄥ垪琛?fixture
+  ---
+  duration_ms: 1.3868
+  type: 'test'
+  ...
+# Subtest: 鏅€氬伐浣滅┖闂寸洿杈惧钩鍙板璁℃椂鏄剧ず鍓嶇鏉冮檺绌烘€侊紝涓嶄緷璧栧悗绔?403
+ok 244 - 鏅€氬伐浣滅┖闂寸洿杈惧钩鍙板璁℃椂鏄剧ず鍓嶇鏉冮檺绌烘€侊紝涓嶄緷璧栧悗绔?403
+  ---
+  duration_ms: 1.3185
+  type: 'test'
+  ...
+# Subtest: 绀惧尯涓庢姤鍛婂彧鏆撮湶宸叉湁鐪熷疄鍐欐帴鍙ｏ紝鍏朵綑鍔ㄤ綔鏄庣‘鐣欏湪瀵瑰簲鐪熷疄椤甸潰
+ok 245 - 绀惧尯涓庢姤鍛婂彧鏆撮湶宸叉湁鐪熷疄鍐欐帴鍙ｏ紝鍏朵綑鍔ㄤ綔鏄庣‘鐣欏湪瀵瑰簲鐪熷疄椤甸潰
+  ---
+  duration_ms: 1.4098
+  type: 'test'
+  ...
+# Subtest: 鍏ㄦ柊 AI 浼氳瘽棣栨鍙戦€佷笉鎼哄甫鏃т細璇濆苟淇濈暀鏂伴€夋嫨鐨勪功椤典笂涓嬫枃
+ok 246 - 鍏ㄦ柊 AI 浼氳瘽棣栨鍙戦€佷笉鎼哄甫鏃т細璇濆苟淇濈暀鏂伴€夋嫨鐨勪功椤典笂涓嬫枃
+  ---
+  duration_ms: 28.5538
+  type: 'test'
+  ...
+# Subtest: 鏂板璇濈姸鎬侀樆姝㈡棫浼氳瘽鍥為€夊苟鍦ㄦ湇鍔＄鍒涘缓鍚庡埛鏂板畬鏁村巻鍙?ok 247 - 鏂板璇濈姸鎬侀樆姝㈡棫浼氳瘽鍥為€夊苟鍦ㄦ湇鍔＄鍒涘缓鍚庡埛鏂板畬鏁村巻鍙?  ---
+  duration_ms: 3.7196
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄瀛︾敓 AI 杩愯鏃舵妸璇惧爞骞挎挱鏄犲皠涓哄悓涓€鏁欏笀鎻愰棶涓庡悓涓€鍥炲
+ok 248 - 鐪熷疄瀛︾敓 AI 杩愯鏃舵妸璇惧爞骞挎挱鏄犲皠涓哄悓涓€鏁欏笀鎻愰棶涓庡悓涓€鍥炲
+  ---
+  duration_ms: 0.4315
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓绔粯璁ょ炕椤垫晥鏋滀笉鏄?curl锛屼笖 curl 鍒嗘敮杩愯鏃朵笉鍙揪
+ok 249 - 瀛︾敓绔粯璁ょ炕椤垫晥鏋滀笉鏄?curl锛屼笖 curl 鍒嗘敮杩愯鏃朵笉鍙揪
+  ---
+  duration_ms: 5.1726
+  type: 'test'
+  ...
+# Subtest: Reader ready 鎬佷繚鐣欏喕缁撶炕椤点€丄I銆佽鍫傘€佸悏绁ョ墿涓庢娊灞夌粨鏋?ok 250 - Reader ready 鎬佷繚鐣欏喕缁撶炕椤点€丄I銆佽鍫傘€佸悏绁ョ墿涓庢娊灞夌粨鏋?  ---
+  duration_ms: 5.3205
+  type: 'test'
+  ...
+# Subtest: Home ready 鎬佷繚鐣欏喕缁撲簲鍒椾功鏋躲€佹诞鍔ㄤ功鍗曚笌鍗＄墖缁撴瀯
+ok 251 - Home ready 鎬佷繚鐣欏喕缁撲簲鍒椾功鏋躲€佹诞鍔ㄤ功鍗曚笌鍗＄墖缁撴瀯
+  ---
+  duration_ms: 2.8877
+  type: 'test'
+  ...
+# Subtest: 涓汉涓績鎸傝浇 Me.jsx锛屽苟鏈夎皟鐢?createAuthApi.logout 鐨勯€€鍑虹櫥褰曞叆鍙?ok 252 - 涓汉涓績鎸傝浇 Me.jsx锛屽苟鏈夎皟鐢?createAuthApi.logout 鐨勯€€鍑虹櫥褰曞叆鍙?  ---
+  duration_ms: 4.3231
+  type: 'test'
+  ...
+# Subtest: Me.jsx 閫€鍑鸿矾寰勪笉鍖呭惈浠讳綍闃呰璁℃椂澶勭悊
+ok 253 - Me.jsx 閫€鍑鸿矾寰勪笉鍖呭惈浠讳綍闃呰璁℃椂澶勭悊
+  ---
+  duration_ms: 1.2538
+  type: 'test'
+  ...
+# Subtest: Settings.jsx 浼€€鍑哄叆鍙ｄ繚鎸佸彧 Link 鍒扮櫥褰曢〉锛屼笉璋?logout
+ok 254 - Settings.jsx 浼€€鍑哄叆鍙ｄ繚鎸佸彧 Link 鍒扮櫥褰曢〉锛屼笉璋?logout
+  ---
+  duration_ms: 1.6048
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓闃呰瀵硅薄 API 鍙皟鐢ㄧ湡瀹炶矾鐢卞苟閫忎紶宸ヤ綔绌洪棿涓庡箓绛夐敭
+ok 255 - 瀛︾敓闃呰瀵硅薄 API 鍙皟鐢ㄧ湡瀹炶矾鐢卞苟閫忎紶宸ヤ綔绌洪棿涓庡箓绛夐敭
+  ---
+  duration_ms: 18.8783
+  type: 'test'
+  ...
+# Subtest: 闃呰瀵硅薄绌烘€佹潵鑷湡瀹炴帴鍙ｇ粨鏋滐紝涓嶅鍏?fixture 鎴?localStorage 涓氬姟鐪熺浉
+ok 256 - 闃呰瀵硅薄绌烘€佹潵鑷湡瀹炴帴鍙ｇ粨鏋滐紝涓嶅鍏?fixture 鎴?localStorage 涓氬姟鐪熺浉
+  ---
+  duration_ms: 1.2678
+  type: 'test'
+  ...
+# Subtest: 鏈嶅姟绔┖鍝嶅簲瑙勮寖鍖栦负鍏釜鐪熷疄绌洪泦鍚堬紝鏃ц冻杩逛笉鑳芥妸绌鸿祫婧愬彉涓?ready
+ok 257 - 鏈嶅姟绔┖鍝嶅簲瑙勮寖鍖栦负鍏釜鐪熷疄绌洪泦鍚堬紝鏃ц冻杩逛笉鑳芥妸绌鸿祫婧愬彉涓?ready
+  ---
+  duration_ms: 1.0399
+  type: 'test'
+  ...
+# Subtest: 鍚庡彴鍒锋柊鎴愬姛鏃朵笉杩涘叆 loading锛屼笖鐢ㄦ湇鍔＄鏂拌繘搴﹁鐩栨棫 books
+ok 258 - 鍚庡彴鍒锋柊鎴愬姛鏃朵笉杩涘叆 loading锛屼笖鐢ㄦ湇鍔＄鏂拌繘搴﹁鐩栨棫 books
+  ---
+  duration_ms: 0.6533
+  type: 'test'
+  ...
+# Subtest: 浠庨槄璇诲櫒杩斿洖璇︽儏椤碉細Provider 浠嶆寔鏃?runtime锛岃鎯呴〉鎸傝浇鍚庡彴鍒锋柊鍚庨〉鐮佷笌鏈夋晥闃呰鏃堕暱鏇存柊
+ok 259 - 浠庨槄璇诲櫒杩斿洖璇︽儏椤碉細Provider 浠嶆寔鏃?runtime锛岃鎯呴〉鎸傝浇鍚庡彴鍒锋柊鍚庨〉鐮佷笌鏈夋晥闃呰鏃堕暱鏇存柊
+  ---
+  duration_ms: 0.5423
+  type: 'test'
+  ...
+# Subtest: 涔︽灦/涔﹀崟椤典笌璇︽儏椤靛叡鐢?runtime.books锛屽悗鍙板埛鏂板悗 buildPersonalBookCollection 鍚屾鏂拌繘搴?ok 260 - 涔︽灦/涔﹀崟椤典笌璇︽儏椤靛叡鐢?runtime.books锛屽悗鍙板埛鏂板悗 buildPersonalBookCollection 鍚屾鏂拌繘搴?  ---
+  duration_ms: 0.3058
+  type: 'test'
+  ...
+# Subtest: 鍚庡彴鍒锋柊澶辫触涓斿凡鏈夋棫鏁版嵁鏃朵繚鎸?ready锛屼笉鎶婇〉闈㈡墦鍥炵┖鎬?ok 261 - 鍚庡彴鍒锋柊澶辫触涓斿凡鏈夋棫鏁版嵁鏃朵繚鎸?ready锛屼笉鎶婇〉闈㈡墦鍥炵┖鎬?  ---
+  duration_ms: 0.1676
+  type: 'test'
+  ...
+# Subtest: 灞曠ず闃呰杩涘害鐨勫鐢熼〉鍦ㄦ寕杞芥椂璋冪敤 useRefreshStudentRuntimeOnMount
+ok 262 - 灞曠ず闃呰杩涘害鐨勫鐢熼〉鍦ㄦ寕杞芥椂璋冪敤 useRefreshStudentRuntimeOnMount
+  ---
+  duration_ms: 4.0903
+  type: 'test'
+  ...
+# Subtest: useRefreshStudentRuntimeOnMount 鍙湪鎸傝浇鏃惰Е鍙?refreshInBackground锛屼笉鍥?runtime 鏇存柊寰幆璇锋眰
+ok 263 - useRefreshStudentRuntimeOnMount 鍙湪鎸傝浇鏃惰Е鍙?refreshInBackground锛屼笉鍥?runtime 鏇存柊寰幆璇锋眰
+  ---
+  duration_ms: 0.8187
+  type: 'test'
+  ...
+# Subtest: Vite dev 鍙嫤鎴?/books/*锛屼笉鎷?logo 涓庡叾瀹冨叕寮€闈欐€佽祫婧?ok 264 - Vite dev 鍙嫤鎴?/books/*锛屼笉鎷?logo 涓庡叾瀹冨叕寮€闈欐€佽祫婧?  ---
+  duration_ms: 3.0251
+  type: 'test'
+  ...
+1..264
+# tests 264
+# suites 0
+# pass 264
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 559.2494
+
+EXIT:0
+
+
+===== spot:phase8-t8-6a-ui =====
+
+TAP version 13
+# Subtest: T8.6A 登录只接受服务端路径，空 defaultPath 不是失败
+ok 1 - T8.6A 登录只接受服务端路径，空 defaultPath 不是失败
+  ---
+  duration_ms: 0.6078
+  type: 'test'
+  ...
+# Subtest: T8.6A 教师选班：teacherCount>0 才确认，取消不发 PUT
+ok 2 - T8.6A 教师选班：teacherCount>0 才确认，取消不发 PUT
+  ---
+  duration_ms: 0.6166
+  type: 'test'
+  ...
+# Subtest: T8.6A 建班 body 只有 name/stage/entryYear/classNumber
+ok 3 - T8.6A 建班 body 只有 name/stage/entryYear/classNumber
+  ---
+  duration_ms: 0.1378
+  type: 'test'
+  ...
+# Subtest: T8.6A 年级主任可做教师账号支持，文案禁止暗示跨届或书架
+ok 4 - T8.6A 年级主任可做教师账号支持，文案禁止暗示跨届或书架
+  ---
+  duration_ms: 0.1644
+  type: 'test'
+  ...
+# Subtest: T8.6A 审批辨认用尾 4 位，rawToken 只拼一次加入路径
+ok 5 - T8.6A 审批辨认用尾 4 位，rawToken 只拼一次加入路径
+  ---
+  duration_ms: 0.1756
+  type: 'test'
+  ...
+# Subtest: T8.6A identityApi 打契约路径且写请求带幂等键
+ok 6 - T8.6A identityApi 打契约路径且写请求带幂等键
+  ---
+  duration_ms: 0.5011
+  type: 'test'
+  ...
+# Subtest: T8.6A 页面已去掉演示不写入文案，并挂上真路由
+ok 7 - T8.6A 页面已去掉演示不写入文案，并挂上真路由
+  ---
+  duration_ms: 6.0175
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 77.9169
+
+EXIT:0
+
+
+===== spot:phase8-t8-6b-shelf =====
+
+TAP version 13
+# Subtest: T8.6B console.js 已有 class-local shelf 三方法，缺方法则停手
+ok 1 - T8.6B console.js 已有 class-local shelf 三方法，缺方法则停手
+  ---
+  duration_ms: 1.3468
+  type: 'test'
+  ...
+# Subtest: T8.6B 只有 class workspace 能管理本班书架
+ok 2 - T8.6B 只有 class workspace 能管理本班书架
+  ---
+  duration_ms: 0.3537
+  type: 'test'
+  ...
+# Subtest: T8.6B 空书架文案与 teacherCount 常驻提示
+ok 3 - T8.6B 空书架文案与 teacherCount 常驻提示
+  ---
+  duration_ms: 0.1611
+  type: 'test'
+  ...
+# Subtest: T8.6B loadClassShelf 只打 GET /classes/:id/shelf，不打 visibility / GET /classes
+ok 4 - T8.6B loadClassShelf 只打 GET /classes/:id/shelf，不打 visibility / GET /classes
+  ---
+  duration_ms: 0.6948
+  type: 'test'
+  ...
+# Subtest: T8.6B 投放 PUT / 撤下 DELETE 只打本班路径，写后读取 teacherCount
+ok 5 - T8.6B 投放 PUT / 撤下 DELETE 只打本班路径，写后读取 teacherCount
+  ---
+  duration_ms: 0.3546
+  type: 'test'
+  ...
+# Subtest: T8.6B 同一次投放/撤下重试复用同一个 Idempotency-Key
+ok 6 - T8.6B 同一次投放/撤下重试复用同一个 Idempotency-Key
+  ---
+  duration_ms: 0.1357
+  type: 'test'
+  ...
+# Subtest: T8.6B 书架写错误可读，不提全局发布
+ok 7 - T8.6B 书架写错误可读，不提全局发布
+  ---
+  duration_ms: 0.2544
+  type: 'test'
+  ...
+# Subtest: T8.6B 书架 items 解析与本班判定
+ok 8 - T8.6B 书架 items 解析与本班判定
+  ---
+  duration_ms: 0.1406
+  type: 'test'
+  ...
+# Subtest: T8.6B 教学页删除全局发布/旧 visibility，改本班投放且校长年级无入口
+ok 9 - T8.6B 教学页删除全局发布/旧 visibility，改本班投放且校长年级无入口
+  ---
+  duration_ms: 7.614
+  type: 'test'
+  ...
+# Subtest: T8.6B 校长/年级主任源码路径没有本班投放按钮的无条件渲染
+ok 10 - T8.6B 校长/年级主任源码路径没有本班投放按钮的无条件渲染
+  ---
+  duration_ms: 1.9637
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 94.9099
+
+EXIT:0

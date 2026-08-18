@@ -1,0 +1,1339 @@
+TAP version 13
+# (node:66272) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. console.js 必须有 class-local shelf API，并删除 visibility 写
+not ok 1 - F. console.js 必须有 class-local shelf API，并删除 visibility 写
+  ---
+  duration_ms: 1.6876
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\api-client.guard.test.js:14:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    createConsoleApi 必须导出 getClassShelf(classId)
+    + actual - expected
+    
+    + 'undefined'
+    - 'function'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'function'
+  actual: 'undefined'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/api-client.guard.test.js:17:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only
+not ok 2 - F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only
+  ---
+  duration_ms: 0.3795
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\api-client.guard.test.js:26:1'
+  failureType: 'testCodeFailure'
+  error: 'login body 必须含 schoolCode'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    import { createApiClient } from './client.js'
+    
+    function idempotencyKey(prefix) {
+      if (typeof globalThis.crypto?.randomUUID !== 'function') {
+        throw new Error('当前浏览器无法生成安全请求标识')
+      }
+      return `${prefix}:${globalThis.crypto.randomUUID()}`
+    }
+    
+    export function createAuthApi(client = createApiClient()) {
+      return {
+        login: (username, password, options = {}) =>
+          client.post('/auth/login', {
+            ...options,
+            idempotencyKey: options.idempotencyKey || idempotencyKey('auth-login'),
+            body: { username, password },
+          }),
+        logout: (options = {}) =>
+          client.post('/auth/logout', {
+            ...options,
+            idempotencyKey: options.idempotencyKey || idempotencyKey('auth-logout'),
+          }),
+      }
+    }
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/api-client.guard.test.js:30:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: F. student.js 必须有 registration / onboarding / enrollment 读方法
+not ok 3 - F. student.js 必须有 registration / onboarding / enrollment 读方法
+  ---
+  duration_ms: 0.4929
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\api-client.guard.test.js:45:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    必须导出 getRegistration(token) → GET /registration/:token
+    + actual - expected
+    
+    + 'undefined'
+    - 'function'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'function'
+  actual: 'undefined'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/api-client.guard.test.js:48:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:12264) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. integration-router 必须注册 class-local 书架路由，且不得调用 listAuthorizedClasses
+not ok 4 - B. integration-router 必须注册 class-local 书架路由，且不得调用 listAuthorizedClasses
+  ---
+  duration_ms: 1.5136
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\class-shelf-http.guard.test.js:29:1'
+  failureType: 'testCodeFailure'
+  error: '必须有 GET /classes/:classId/shelf'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ''
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/class-shelf-http.guard.test.js:31:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: B. 教师对本班 PUT/GET/DELETE 书架 200 幂等，只改本班一行
+not ok 5 - B. 教师对本班 PUT/GET/DELETE 书架 200 幂等，只改本班一行
+  ---
+  duration_ms: 381.9714
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\class-shelf-http.guard.test.js:46:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    createReadmateApplication 必须打到 integration-router：登录后 GET /books 须 200。若是 identity 兜底 404「资源不存在」，说明 catch-all 吞掉了整条集成链，visibility/书架/D-21/D-22 HTTP 不能当已接线 期望 200，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"4bf3589a-2536-4505-9237-ef6d9f15eeab"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    requireIntegrationReachable (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:213:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/class-shelf-http.guard.test.js:50:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B. 他班或无 C workspace 操作书架必须 403 或 404
+not ok 6 - B. 他班或无 C workspace 操作书架必须 403 或 404
+  ---
+  duration_ms: 296.2432
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\class-shelf-http.guard.test.js:109:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    createReadmateApplication 必须打到 integration-router：登录后 GET /books 须 200。若是 identity 兜底 404「资源不存在」，说明 catch-all 吞掉了整条集成链，visibility/书架/D-21/D-22 HTTP 不能当已接线 期望 200，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"b27b220c-cc2e-451b-ade8-2b79952e4122"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    requireIntegrationReachable (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:213:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/class-shelf-http.guard.test.js:113:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B. 跨组织 classId 与不存在 classId 书架写必须同码同文案 404
+not ok 7 - B. 跨组织 classId 与不存在 classId 书架写必须同码同文案 404
+  ---
+  duration_ms: 272.4122
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\class-shelf-http.guard.test.js:133:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    createReadmateApplication 必须打到 integration-router：登录后 GET /books 须 200。若是 identity 兜底 404「资源不存在」，说明 catch-all 吞掉了整条集成链，visibility/书架/D-21/D-22 HTTP 不能当已接线 期望 200，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"a20a069a-18d5-495f-98f4-68d4c2cb6501"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    requireIntegrationReachable (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:213:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/class-shelf-http.guard.test.js:137:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B. 两名教师并发 PUT 同班同书最终只有一行 grant
+not ok 8 - B. 两名教师并发 PUT 同班同书最终只有一行 grant
+  ---
+  duration_ms: 312.0656
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\class-shelf-http.guard.test.js:156:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    createReadmateApplication 必须打到 integration-router：登录后 GET /books 须 200。若是 identity 兜底 404「资源不存在」，说明 catch-all 吞掉了整条集成链，visibility/书架/D-21/D-22 HTTP 不能当已接线 期望 200，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"14934dd4-57e7-4ada-9ed1-0097b11a1ae9"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    requireIntegrationReachable (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:213:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/class-shelf-http.guard.test.js:161:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B. 一班撤下不得删除他班 grant
+not ok 9 - B. 一班撤下不得删除他班 grant
+  ---
+  duration_ms: 257.0927
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\class-shelf-http.guard.test.js:191:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    createReadmateApplication 必须打到 integration-router：登录后 GET /books 须 200。若是 identity 兜底 404「资源不存在」，说明 catch-all 吞掉了整条集成链，visibility/书架/D-21/D-22 HTTP 不能当已接线 期望 200，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"db2f9281-6baa-4abf-a7ad-c2ad9de8e635"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    requireIntegrationReachable (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:213:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/class-shelf-http.guard.test.js:201:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:61664) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. projectCommunityPosts 必须接到与 T8.4 同一 isBookVisibleToAudience
+not ok 10 - D. projectCommunityPosts 必须接到与 T8.4 同一 isBookVisibleToAudience
+  ---
+  duration_ms: 1.3664
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d21-community-list.guard.test.js:47:1'
+  failureType: 'testCodeFailure'
+  error: 'projectCommunityPosts 必须调用 isBookVisibleToAudience；只改 getPost 不算修完 D-21'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    function parseJson(value, fallback) {
+      if (typeof value !== 'string' || !value) return fallback
+      try {
+        return JSON.parse(value)
+      } catch {
+        return fallback
+      }
+    }
+    
+    function publicAsset(row) {
+      if (!row) return null
+      return {
+        id: row.id ?? null,
+        kind: row.asset_type,
+        url: `/api/v1/books/assets/${encodeURIComponent(row.id)}`,
+        mimeType: row.mime_type,
+        sizeBytes: row.size_bytes,
+        sha256: row.sha256,
+      }
+    }
+    
+    const PREFERRED_BOOK_MODE_FIELD = 'preferredReaderMode'
+    
+    function preferredBookModeByVersion(database, actorId) {
+      return new Map(database.prepare(`
+        SELECT book_version_id, mode
+        FROM reader_mode_preferences
+        WHERE user_id = ?
+      `).all(actorId).map((row) => [row.book_version_id, row.mode]))
+    }
+    
+    function preferredBookModeValue(preferences, bookVersionId) {
+      const mode = preferences.get(bookVersionId)
+      return mode === 'original' || mode === 'text' ? mode : null
+    }
+    
+    export function projectBooks(database, actorId, workspaceId, rows) {
+      const progressStatement = database.prepare(`
+        SELECT progress.last_page_no, progress.updated_from_event_at, version.page_count,
+          daily.effective_reading_ms
+        FROM reading_progress AS progress
+        JOIN book_versions AS version ON version.id = progress.book_version_id
+        LEFT JOIN (
+          SELECT actor_id_at_creation, workspace_id_at_creation, book_version_id,
+            SUM(effective_reading_ms) AS effective_reading_ms
+          FROM reading_daily_book_summaries
+          WHERE actor_id_at_creation = ? AND workspace_id_at_creation = ? AND book_version_id = ?
+          GROUP BY actor_id_at_creation, workspace_id_at_creation, book_version_id
+        ) AS daily
+          ON daily.actor_id_at_creation = progress.actor_id
+         AND daily.workspace_id_at_creation = progress.workspace_id
+         AND daily.book_version_id = progress.book_version_id
+        WHERE progress.actor_id = ? AND progress.workspace_id = ? AND progress.book_version_id = ?
+      `)
+      const classroomStatement = database.prepare(`
+        SELECT session.*, participant.last_seen_at, participant.last_broadcast_id
+        FROM class_sessions AS session
+        JOIN assignment_classes AS assignment_class ON assignment_class.assignment_id = session.assignment_id
+        JOIN class_memberships AS membership
+          ON membership.class_id = assignment_class.class_id
+          AND membership.user_id = ?
+          AND membership.status = 'active'
+        JOIN classes AS class
+          ON class.id = membership.class_id
+          AND class.status = 'active'
+        JOIN workspaces AS workspace
+          ON workspace.id = ?
+          AND workspace.organization_id = class.organization_id
+          AND workspace.scope_type = 'class'
+          AND workspace.scope_id = class.id
+          AND workspace.status = 'active'
+        LEFT JOIN class_session_participants AS participant
+          ON participant.class_session_id = session.id AND participant.actor_id = ?
+        WHERE session.workspace_id_at_creation = ?
+          AND session.locked_book_version_id = ?
+          AND session.status = 'active'
+        ORDER BY session.created_at DESC, session.id DESC
+        LIMIT 1
+      `)
+      const broadcastStatement = database.prepare(`
+        SELECT * FROM class_broadcasts
+        WHERE class_session_id = ?
+        ORDER BY created_at DESC, id DESC
+        LIMIT 1
+      `)
+      const bookModePreferences = preferredBookModeByVersion(database, actorId)
+      return rows.map((row) => {
+        const progress = progressStatement.get(
+          actorId, workspaceId, row.book_version_id,
+          actorId, workspaceId, row.book_version_id,
+        )
+        const classroom = classroomStatement.get(actorId, workspaceId, actorId, workspaceId, row.book_version_id)
+        const latestBroadcast = classroom ? broadcastStatement.get(classroom.id) : null
+        const classroomMessage = parseJson(latestBroadcast?.message_json, {})
+        const totalPages = row.page_count
+        const currentPage = progress?.last_page_no ?? null
+        const projectedProgress = {
+          currentPage,
+          totalPages,
+          bookmarks: [],
+          ...(progress?.effective_reading_ms === null || progress?.effective_reading_ms === undefined
+            ? {}
+            : { effectiveMinutes: Math.floor(Number(progress.effective_reading_ms) / 60_000) }),
+        }
+        return {
+          id: row.id,
+          versionId: row.book_version_id,
+          title: row.title,
+          grade: row.grade ?? null,
+          author: row.author ?? null,
+          illustrator: row.illustrator ?? null,
+          sourcePage: row.source_page ?? null,
+          usageLabel: row.catalog_usage_label ?? row.cover?.usage_label ?? null,
+          cover: publicAsset(row.cover),
+          assets: (row.assets || []).map(publicAsset),
+          progress: projectedProgress,
+          access: { readable: true },
+          lists: [],
+          [PREFERRED_BOOK_MODE_FIELD]: preferredBookModeValue(bookModePreferences, row.book_version_id),
+          classReading: classroom ? {
+            id: classroom.id,
+            mode: classroom.mode,
+            tone: classroom.mode === 'sync' ? 'violet' : 'blue',
+            connected: classroom.last_seen_at ? Date.parse(classroom.last_seen_at) >= Date.now() - 45_000 : null,
+            teacher: classroom.teacher_display_name || classroom.actor_id_at_creation,
+            page: classroom.synced_page_no,
+            label: classroom.mode === 'sync' ? '课堂同步页面' : '课堂锁定书籍',
+            desc: classroom.mode === 'sync' ? '当前跟随教师页面，仍可查看老师的选文与课堂提问。' : '必须留在这本书中，页码仍可自由控制。',
+            broadcast: latestBroadcast ? {
+              id: latestBroadcast.id,
+              sourceRequestId: latestBroadcast.source_request_id,
+              teacher: classroom.teacher_display_name || classroom.actor_id_at_creation,
+              message: classroomMessage,
+              createdAt: latestBroadcast.created_at,
+              received: classroom.last_broadcast_id === latestBroadcast.id,
+            } : null,
+            teacherMarks: Array.isArray(classroomMessage.teacherMarks) ? classroomMessage.teacherMarks : [],
+          } : null,
+        }
+      })
+    }
+    
+    export function projectBookPage(database, page, { readRangeVersion } = {}) {
+      const illustration = database.prepare(`
+        SELECT id, asset_type, storage_key, mime_type, size_bytes, sha256
+        FROM book_assets
+        WHERE page_id = ? AND asset_type = 'page_image'
+        ORDER BY created_at, id
+        LIMIT 1
+      `).get(page.id)
+      return {
+        id: page.id,
+        pageNo: page.page_no,
+        printedPageLabel: page.printed_page_label,
+        bookVersionId: page.book_version_id,
+        text: page.normalized_text,
+        rawText: page.raw_text,
+        width: page.width,
+        height: page.height,
+        readRangeVersion,
+        pageImage: publicAsset(illustration),
+        blocks: page.blocks.map((block) => ({
+          id: block.id,
+          blockId: block.id,
+          kind: 'paragraph',
+          text: block.normalized_text,
+          rawText: block.raw_text,
+          charStart: block.char_start,
+          charEnd: block.char_end,
+          coordinates: { x: block.x, y: block.y, width: block.width, height: block.height },
+        })),
+      }
+    }
+    
+    export function projectReadingProgress(database, actorId, workspaceId, organizationId) {
+      const items = database.prepare(`
+        WITH daily AS (
+          SELECT book_version_id, SUM(effective_reading_ms) AS effective_reading_ms,
+            MAX(updated_at) AS daily_updated_at
+          FROM reading_daily_book_summaries
+          WHERE organization_id_at_creation = ? AND actor_id_at_creation = ?
+            AND workspace_id_at_creation = ?
+          GROUP BY book_version_id
+        )
+        SELECT version.id AS book_version_id, version.book_id, version.page_count, book.title,
+          progress.last_page_no, progress.updated_at AS progress_updated_at,
+          daily.effective_reading_ms, daily.daily_updated_at
+        FROM book_versions AS version
+        JOIN books AS book ON book.id = version.book_id
+        LEFT JOIN reading_progress AS progress
+          ON progress.book_version_id = version.id
+         AND progress.actor_id = ? AND progress.workspace_id = ?
+        LEFT JOIN daily ON daily.book_version_id = version.id
+        WHERE version.organization_id_at_creation = ? AND book.organization_id_at_creation = ?
+          AND (progress.id IS NOT NULL OR daily.book_version_id IS NOT NULL)
+        ORDER BY COALESCE(daily.daily_updated_at, progress.updated_at) DESC, version.id
+      `).all(
+        organizationId, actorId, workspaceId,
+        actorId, workspaceId,
+        organizationId, organizationId,
+      ).map((row) => ({
+        bookId: row.book_id,
+        bookVersionId: row.book_version_id,
+        title: row.title,
+        currentPage: row.last_page_no ?? null,
+        totalPages: row.page_count,
+        ...(row.effective_reading_ms === null
+          ? {}
+          : { effectiveMinutes: Math.floor(Number(row.effective_reading_ms) / 60_000) }),
+        updatedAt: row.daily_updated_at ?? row.progress_updated_at,
+      }))
+      const measuredItems = items.filter((item) => Object.hasOwn(item, 'effectiveMinutes'))
+      return {
+        items,
+        ...(measuredItems.length
+          ? { totalEffectiveMinutes: measuredItems.reduce((total, item) => total + item.effectiveMinutes, 0) }
+          : {}),
+      }
+    }
+    
+    export function projectConversations(database, organizationId, ownerUserId) {
+      const conversations = database.prepare(`
+        SELECT * FROM ai_conversations
+        WHERE organization_id = ? AND owner_user_id = ?
+        ORDER BY updated_at DESC, id DESC
+      `).all(organizationId, ownerUserId)
+      const messageStatement = database.prepare(`
+        SELECT * FROM ai_messages
+        WHERE organization_id = ? AND actor_id_at_creation = ? AND conversation_id = ?
+        ORDER BY created_at, id
+      `)
+      const evidenceStatement = database.prepare(`
+        SELECT evidence.*, COALESCE(evidence.page_number, page.page_no) AS page_no,
+          block.text_content AS evidence_text
+        FROM ai_message_evidence AS evidence
+        LEFT JOIN book_pages AS page ON page.id = evidence.page_id
+        LEFT JOIN book_blocks AS block
+          ON block.id = evidence.evidence_id
+         AND block.page_id = evidence.page_id
+        WHERE evidence.ai_message_id = ? AND evidence.citation_verified = 1
+        ORDER BY evidence.created_at, evidence.id
+      `)
+      const items = conversations.map((conversation) => ({
+        id: conversation.id,
+        conversationId: conversation.id,
+        title: conversation.title,
+        private: conversation.privacy_mode === 'private',
+        bookVersionId: conversation.book_version_id,
+        messages: messageStatement.all(organizationId, ownerUserId, conversation.id).map((message) => ({
+          id: message.id,
+          role: message.role,
+          content: message.content,
+          createdAt: message.created_at,
+          refs: evidenceStatement.all(message.id).map((evidence) => ({
+            id: evidence.evidence_id,
+            pageNo: evidence.page_no,
+            text: evidence.evidence_text,
+            coordinates: parseJson(evidence.coordinates_json, null),
+          })),
+        })),
+      }))
+      const usage = database.prepare(`
+        SELECT COALESCE(SUM(CASE WHEN reservation_state = 'settled' THEN 1 ELSE 0 END), 0) AS used
+        FROM ai_usage_ledger
+        WHERE organization_id = ? AND user_id = ?
+      `).get(organizationId, ownerUserId)
+      const dailyLimit = 20
+      return {
+        items,
+        activeConversationId: items[0]?.id ?? null,
+        quota: {
+          remaining: Math.max(0, dailyLimit - Number(usage.used || 0)),
+          usagePercent: Math.min(100, Math.round((Number(usage.used || 0) / dailyLimit) * 100)),
+          resetAt: null,
+        },
+      }
+    }
+    
+    export function projectCommunityPosts(database, { organizationId, workspace, actorId, scope = 'all', canReviewClass = false, canReviewSchool = false }) {
+      const classId = workspace.scopeType === 'class' ? workspace.scopeId : null
+      const includeOwn = scope === 'all'
+      const classReviewClause = canReviewClass && classId
+        ? " OR (post.status = 'submitted' AND post.class_id_at_creation = ?)"
+        : ''
+      const schoolReviewClause = canReviewSchool
+        ? " OR (post.scope = 'school' AND post.status = 'class_approved')"
+        : ''
+      const parameters = [organizationId, classId, classId]
+      if (includeOwn) parameters.push(actorId, workspace.id)
+      if (canReviewClass && classId) parameters.push(classId)
+      const rows = database.prepare(`
+        SELECT post.*, user.display_name AS author_name
+        FROM community_posts AS post
+        JOIN users AS user ON user.id = post.author_id AND user.organization_id = post.organization_id_at_creation
+        WHERE post.organization_id_at_creation = ?
+          AND (
+            (post.status = 'approved' AND (post.scope = 'school' OR (? IS NOT NULL AND post.scope = 'class' AND post.class_id_at_creation = ?)))
+            ${includeOwn ? 'OR (post.author_id = ? AND post.workspace_id_at_creation = ?)' : ''}
+            ${classReviewClause}
+            ${schoolReviewClause}
+          )
+        ORDER BY post.created_at DESC, post.id DESC
+      `).all(...parameters)
+      const reactions = database.prepare(`
+        SELECT reaction_type, COUNT(*) AS count
+        FROM post_reactions WHERE post_id = ? GROUP BY reaction_type
+      `)
+      const viewerReactions = database.prepare('SELECT reaction_type FROM post_reactions WHERE post_id = ? AND actor_id = ?')
+      const reviews = database.prepare(`
+        SELECT review_stage AS stage, decision, reason, reviewer_id AS reviewerId,
+          workspace_id_at_review AS workspaceId, class_id_at_review AS classId, created_at AS createdAt
+        FROM post_reviews WHERE post_id = ? ORDER BY created_at, id
+      `)
+      return rows
+        .filter((row) => scope === 'all' || (scope === 'pending'
+          ? (canReviewClass && row.status === 'submitted' && row.class_id_at_creation === classId) || (canReviewSchool && row.scope === 'school' && row.status === 'class_approved')
+          : row.scope === scope))
+        .map((row) => ({
+          id: row.id,
+          title: row.title,
+          body: row.body,
+          status: row.status,
+          scope: row.scope,
+          classId: row.class_id_at_creation,
+          workspaceId: row.workspace_id_at_creation,
+          quote: row.quote_book_id ? { bookId: row.quote_book_id, page: row.quote_page, text: row.quote_text } : null,
+          aiAssisted: Boolean(row.ai_assisted),
+          author: { id: row.author_id, displayName: row.author_name },
+          reactions: reactions.all(row.id).map((reaction) => ({ type: reaction.reaction_type, count: reaction.count })),
+          viewerReactionTypes: viewerReactions.all(row.id, actorId).map((reaction) => reaction.reaction_type),
+          reviews: reviews.all(row.id),
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+        }))
+    }
+    
+    export function projectAssignments(database, organizationId, workspaceId) {
+      const rows = database.prepare(`
+        SELECT assignment.*, book.title AS book_title,
+          GROUP_CONCAT(class.id) AS class_ids, GROUP_CONCAT(class.name) AS class_names
+        FROM reading_assignments AS assignment
+        JOIN book_versions AS version ON version.id = assignment.book_version_id
+        JOIN books AS book ON book.id = version.book_id
+        LEFT JOIN assignment_classes AS link ON link.assignment_id = assignment.id
+        LEFT JOIN classes AS class ON class.id = link.class_id AND class.organization_id = assignment.organization_id_at_creation
+        WHERE assignment.organization_id_at_creation = ? AND assignment.workspace_id_at_creation = ?
+        GROUP BY assignment.id
+        ORDER BY assignment.created_at DESC
+      `).all(organizationId, workspaceId)
+      return rows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        book: { id: row.book_version_id, title: row.book_title },
+        class: { id: row.class_ids?.split(',')[0] ?? null, name: row.class_names?.split(',')[0] ?? null },
+        startsAt: row.starts_at,
+        endsAt: row.ends_at,
+        status: row.ends_at && Date.parse(row.ends_at) < Date.now() ? 'ended' : 'scheduled',
+      }))
+    }
+    
+    export function projectUsageSummary(database, organizationId, workspaceId) {
+      const classCount = database.prepare(`
+        SELECT COUNT(DISTINCT class_id) AS count FROM assignment_classes
+        JOIN reading_assignments ON reading_assignments.id = assignment_classes.assignment_id
+        WHERE reading_assignments.organization_id_at_creation = ? AND reading_assignments.workspace_id_at_creation = ?
+      `).get(organizationId, workspaceId).count
+      const reading = database.prepare(`
+        SELECT COUNT(*) AS reading_count, COUNT(DISTINCT actor_id_at_creation) AS active_readers
+        FROM reading_daily_book_summaries
+        WHERE organization_id_at_creation = ? AND workspace_id_at_creation = ?
+          AND effective_reading_ms > 0
+      `).get(organizationId, workspaceId)
+      const pendingSafetyCount = database.prepare(`
+        SELECT COUNT(*) AS count
+        FROM safety_events
+        WHERE organization_id = ? AND status NOT IN ('closed', 'false_positive_closed')
+      `).get(organizationId).count
+      return {
+        metrics: {
+          classCount,
+          effectiveReadingCount: reading.reading_count,
+          activeReaders: reading.active_readers,
+          pendingSafetyCount,
+        },
+        series: {},
+      }
+    }
+    
+    export function projectSafetyEvents(database, organizationId) {
+      return database.prepare(`
+        SELECT COALESCE(event.id, task.id) AS id, task.id AS review_task_id,
+          COALESCE(event.status, task.status) AS status, event.risk_level,
+          event.summary_for_staff, task.created_at, task.updated_at
+        FROM safety_review_tasks AS task
+        LEFT JOIN safety_events AS event ON event.review_task_id = task.id
+        WHERE task.organization_id = ?
+        ORDER BY task.created_at DESC, task.id DESC
+      `).all(organizationId).map((row) => ({
+        id: row.id,
+        reviewTaskId: row.review_task_id,
+        status: row.status,
+        riskLevel: row.risk_level,
+        summaryForStaff: row.summary_for_staff,
+        pendingCount: 1,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      }))
+    }
+    
+    export function projectSafetyDetail(database, organizationId, eventOrTaskId) {
+      const row = database.prepare(`
+        SELECT task.*, event.id AS event_id, event.status AS event_status, event.reason_code AS event_reason_code,
+          event.risk_level, event.summary_for_staff, event.notification_chain_json,
+          event.accepted_by_user_id, event.accepted_at, event.closure_outcome,
+          event.resolution_note, event.closed_by_user_id, event.closed_at,
+          owner.display_name AS student_name, closer.display_name AS closed_by_name,
+          (
+            SELECT class.id
+            FROM class_memberships AS membership
+            JOIN classes AS class ON class.id = membership.class_id AND class.organization_id = task.organization_id
+            WHERE membership.user_id = task.actor_id_at_creation AND membership.status = 'active'
+            ORDER BY membership.created_at, membership.id
+            LIMIT 1
+          ) AS class_id,
+          (
+            SELECT class.name
+            FROM class_memberships AS membership
+            JOIN classes AS class ON class.id = membership.class_id AND class.organization_id = task.organization_id
+            WHERE membership.user_id = task.actor_id_at_creation AND membership.status = 'active'
+            ORDER BY membership.created_at, membership.id
+            LIMIT 1
+          ) AS class_name,
+          book.id AS book_id, book.title AS book_title
+        FROM safety_review_tasks AS task
+        JOIN users AS owner ON owner.id = task.actor_id_at_creation AND owner.organization_id = task.organization_id
+        JOIN ai_conversations AS conversation
+          ON conversation.id = task.conversation_id
+         AND conversation.organization_id = task.organization_id
+         AND conversation.owner_user_id = task.actor_id_at_creation
+        LEFT JOIN book_versions AS version ON version.id = conversation.book_version_id
+        LEFT JOIN books AS book
+          ON book.id = version.book_id
+         AND book.organization_id_at_creation = task.organization_id
+        LEFT JOIN safety_events AS event ON event.review_task_id = task.id
+        LEFT JOIN users AS closer ON closer.id = event.closed_by_user_id AND closer.organization_id = task.organization_id
+        WHERE task.organization_id = ? AND (task.id = ? OR event.id = ?)
+      `).get(organizationId, eventOrTaskId, eventOrTaskId)
+      if (!row) return null
+      const triggerReasons = parseJson(row.trigger_reasons_json, [])
+      const source = triggerReasons.some((reason) => reason?.source === 'manual_demo_test') ? 'manual_demo_test' : null
+      const policy = parseJson(row.policy_snapshot_json, {})
+      const threshold = Number(policy.confidenceThreshold ?? 0.8)
+      const evidence = database.prepare(`
+        SELECT evidence.ai_message_id AS id, evidence.confidence, evidence.trigger,
+          message.role, message.content, message.created_at
+        FROM safety_review_evidence AS evidence
+        JOIN ai_messages AS message ON message.id = evidence.ai_message_id
+          AND message.organization_id = evidence.organization_id
+          AND message.actor_id_at_creation = evidence.owner_user_id
+          AND message.conversation_id = evidence.conversation_id
+        WHERE evidence.review_task_id = ? AND evidence.organization_id = ?
+          AND evidence.owner_user_id = ? AND evidence.conversation_id = ?
+        ORDER BY evidence.created_at, evidence.ai_message_id
+      `).all(row.id, organizationId, row.actor_id_at_creation, row.conversation_id)
+      const implicated = database.prepare(`
+        SELECT candidate.candidate_user_id AS id, user.display_name, candidate.reason
+        FROM safety_implicated_candidates AS candidate
+        LEFT JOIN users AS user ON user.id = candidate.candidate_user_id AND user.organization_id = ?
+        WHERE candidate.review_task_id = ?
+        ORDER BY candidate.created_at, candidate.id
+      `).all(organizationId, row.id)
+      const notificationRecipients = row.event_id ? database.prepare(`
+        SELECT recipient.user_id, user.display_name, recipient.role_code, recipient.scope_type,
+          recipient.scope_id, recipient.status, recipient.planned_at, recipient.dispatched_at,
+          recipient.delivered_at, recipient.read_at
+        FROM safety_notification_recipients AS recipient
+        JOIN users AS user
+          ON user.id = recipient.user_id
+         AND user.organization_id = recipient.organization_id
+        WHERE recipient.organization_id = ? AND recipient.safety_event_id = ?
+        ORDER BY recipient.planned_at, recipient.id
+      `).all(organizationId, row.event_id).map((recipient) => ({
+        userId: recipient.user_id,
+        displayName: recipient.display_name,
+        role: recipient.role_code,
+        scopeType: recipient.scope_type,
+        scopeId: recipient.scope_id,
+        deliveryStatus: recipient.status,
+        state: recipient.status,
+        plannedAt: recipient.planned_at,
+        dispatchedAt: recipient.dispatched_at,
+        deliveredAt: recipient.delivered_at,
+        readAt: recipient.read_at,
+        at: recipient.read_at ?? recipient.delivered_at ?? recipient.dispatched_at ?? recipient.planned_at,
+      })) : []
+      const dispatchedNotifications = notificationRecipients.filter((recipient) =>
+        ['dispatched', 'delivered', 'read'].includes(recipient.deliveryStatus))
+      const deliveredNotifications = notificationRecipients.filter((recipient) =>
+        ['delivered', 'read'].includes(recipient.deliveryStatus))
+      const timeline = row.event_id ? database.prepare(`
+        SELECT audit.event_type, audit.actor_user_id, actor.display_name AS actor_name,
+          audit.outcome, audit.reason_code, audit.created_at
+        FROM audit_events AS audit
+        LEFT JOIN users AS actor ON actor.id = audit.actor_user_id AND actor.organization_id = ?
+        WHERE audit.resource_type = 'safety_event' AND audit.resource_id = ?
+        ORDER BY audit.created_at, audit.id
+      `).all(organizationId, row.event_id).map((item) => ({
+        eventType: item.event_type,
+        actorName: item.actor_name ?? item.actor_user_id,
+        reason: item.reason_code,
+        outcome: item.outcome,
+        createdAt: item.created_at,
+      })) : []
+      return {
+        id: row.event_id ?? row.id,
+        eventId: row.event_id,
+        reviewTaskId: row.id,
+        conversationId: row.conversation_id,
+        status: row.event_status ?? row.status,
+        reviewStatus: row.status,
+        riskLevel: row.risk_level,
+        summaryForStaff: row.summary_for_staff,
+        reviewResult: row.event_reason_code ?? row.reason_code,
+        source,
+        displayLabel: source === 'manual_demo_test' ? '演示测试事件' : null,
+        threshold,
+        qualifyingMessageCount: evidence.filter((item) => Number(item.confidence) >= threshold).length,
+        requiredQualifiedMessages: Number(policy.requiredQualifiedMessages ?? 3),
+        policy,
+        student: { id: row.actor_id_at_creation, displayName: row.student_name },
+        class: row.class_id ? { id: row.class_id, displayName: row.class_name } : null,
+        book: row.book_id ? { id: row.book_id, title: row.book_title } : null,
+        hiddenBefore: 0,
+        hiddenAfter: 0,
+        evidenceMessages: evidence.map((item) => ({
+          id: item.id,
+          role: item.role,
+          content: item.content,
+          createdAt: item.created_at,
+          confidence: item.confidence,
+          trigger: item.trigger,
+        })),
+        implicatedCandidates: implicated,
+        notificationTargets: notificationRecipients,
+        dispatchedNotifications,
+        deliveredNotifications,
+        notified: dispatchedNotifications,
+        chain: notificationRecipients,
+        acceptedByUserId: row.accepted_by_user_id,
+        acceptedAt: row.accepted_at,
+        closedByUserId: row.closed_by_user_id,
+        closedAt: row.closed_at,
+        result: row.closed_at ? {
+          tone: row.closure_outcome === 'false_positive_closed' ? 'muted' : 'success',
+          label: row.closure_outcome === 'false_positive_closed' ? '误报已关闭' : '事件已关闭',
+          summary: row.resolution_note,
+          actor: { id: row.closed_by_user_id, displayName: row.closed_by_name },
+        } : null,
+        timeline,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      }
+    }
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d21-community-list.guard.test.js:51:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 无 grant 时保留帖子但 quote.text=null
+not ok 11 - D-21 HTTP：GET /community/posts 无 grant 时保留帖子但 quote.text=null
+  ---
+  duration_ms: 382.8163
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d21-community-list.guard.test.js:63:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    GET /community/posts 必须 200，实际 404 {"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"c56c74cc-07d8-4cc5-bfdc-e335c4cb9349"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d21-community-list.guard.test.js:74:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 仅他班 grant 时隐藏原文
+not ok 12 - D-21 HTTP：GET /community/posts 仅他班 grant 时隐藏原文
+  ---
+  duration_ms: 312.2461
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d21-community-list.guard.test.js:78:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"4fdf8933-19c5-4873-b6a2-5361395ca173"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d21-community-list.guard.test.js:95:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 对 draft 书隐藏原文
+not ok 13 - D-21 HTTP：GET /community/posts 对 draft 书隐藏原文
+  ---
+  duration_ms: 276.3667
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d21-community-list.guard.test.js:99:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"b2264d71-3e39-493c-9c2c-7684d68ad9be"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d21-community-list.guard.test.js:116:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 有本班 grant 仍返原文
+not ok 14 - D-21 HTTP：GET /community/posts 有本班 grant 仍返原文
+  ---
+  duration_ms: 268.3688
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d21-community-list.guard.test.js:120:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"a0ca40c0-849d-4ef7-8113-0a6ca5a16085"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d21-community-list.guard.test.js:137:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:22576) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. projectAssignments 必须接到与 T8.4 同一 isBookVisibleToAudience
+not ok 15 - E. projectAssignments 必须接到与 T8.4 同一 isBookVisibleToAudience
+  ---
+  duration_ms: 1.314
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d22-assignments-list.guard.test.js:40:1'
+  failureType: 'testCodeFailure'
+  error: 'projectAssignments 必须调用 isBookVisibleToAudience（book.id 实际是 bookVersionId）'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    export function projectAssignments(database, organizationId, workspaceId) {
+      const rows = database.prepare(`
+        SELECT assignment.*, book.title AS book_title,
+          GROUP_CONCAT(class.id) AS class_ids, GROUP_CONCAT(class.name) AS class_names
+        FROM reading_assignments AS assignment
+        JOIN book_versions AS version ON version.id = assignment.book_version_id
+        JOIN books AS book ON book.id = version.book_id
+        LEFT JOIN assignment_classes AS link ON link.assignment_id = assignment.id
+        LEFT JOIN classes AS class ON class.id = link.class_id AND class.organization_id = assignment.organization_id_at_creation
+        WHERE assignment.organization_id_at_creation = ? AND assignment.workspace_id_at_creation = ?
+        GROUP BY assignment.id
+        ORDER BY assignment.created_at DESC
+      `).all(organizationId, workspaceId)
+      return rows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        book: { id: row.book_version_id, title: row.book_title },
+        class: { id: row.class_ids?.split(',')[0] ?? null, name: row.class_names?.split(',')[0] ?? null },
+        startsAt: row.starts_at,
+        endsAt: row.ends_at,
+        status: row.ends_at && Date.parse(row.ends_at) < Date.now() ? 'ended' : 'scheduled',
+      }))
+    }
+    
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d22-assignments-list.guard.test.js:48:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: D-22 HTTP：GET /assignments 对学生省略无 grant 的书整项
+not ok 16 - D-22 HTTP：GET /assignments 对学生省略无 grant 的书整项
+  ---
+  duration_ms: 379.8685
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d22-assignments-list.guard.test.js:51:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"ce7bc3d1-5aa7-4ec7-8c56-d33883e3370c"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d22-assignments-list.guard.test.js:62:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: D-22 HTTP：GET /assignments 仅他班 grant 或 draft 也整项省略
+not ok 17 - D-22 HTTP：GET /assignments 仅他班 grant 或 draft 也整项省略
+  ---
+  duration_ms: 293.9905
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d22-assignments-list.guard.test.js:71:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"fbc46882-dc66-4a65-b54f-3d35b6463de0"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d22-assignments-list.guard.test.js:99:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: D-22 HTTP：有本班 grant 返回安排；撤下后消失
+not ok 18 - D-22 HTTP：有本班 grant 返回安排；撤下后消失
+  ---
+  duration_ms: 278.8931
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\d22-assignments-list.guard.test.js:113:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"611339df-d7c3-4bef-a71b-31d06b508320"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/d22-assignments-list.guard.test.js:130:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:46824) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 临时库路径不得指向真库，独立端口不得为 5191
+ok 19 - G. 临时库路径不得指向真库，独立端口不得为 5191
+  ---
+  duration_ms: 265.9389
+  type: 'test'
+  ...
+# Subtest: G. 登录后 GET /books 必须打到 integration-router，不得被 identity 兜底吞掉
+not ok 20 - G. 登录后 GET /books 必须打到 integration-router，不得被 identity 兜底吞掉
+  ---
+  duration_ms: 330.3162
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\invariants.guard.test.js:22:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    GET /books 必须 200 才证明 integration-router 挂上了。实际 404 {"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"5fc769f3-803f-405f-8137-050a0eaa06f0"}}。identity catch-all 若对未匹配路径直接 404，T8.5B 无法在允许文件内修好 HTTP 契约。
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/invariants.guard.test.js:31:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: G. 书架路由块不得调用 listAuthorizedClasses
+not ok 21 - G. 书架路由块不得调用 listAuthorizedClasses
+  ---
+  duration_ms: 0.8044
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\invariants.guard.test.js:38:1'
+  failureType: 'testCodeFailure'
+  error: 'integration-router 必须注册 /classes/:classId/shelf'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: -1
+  actual: -1
+  operator: 'notStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/invariants.guard.test.js:41:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:67848) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. 教师全局 publish/unpublish 必须 403，且不得改 grants
+not ok 22 - C. 教师全局 publish/unpublish 必须 403，且不得改 grants
+  ---
+  duration_ms: 389.3845
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\publish-school-forbidden.guard.test.js:20:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    教师 unpublish 期望 403，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"22704acb-cda8-4e15-97bf-8e1beb549e7f"}}
+    
+    404 !== 403
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 403
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/publish-school-forbidden.guard.test.js:38:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: C. 校长与年级主任全局 publish 必须 403
+not ok 23 - C. 校长与年级主任全局 publish 必须 403
+  ---
+  duration_ms: 352.2737
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\publish-school-forbidden.guard.test.js:69:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    校长 publish 期望 403，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"b0db9aee-8c6d-4b3c-9ca2-e38e813bbcb6"}}
+    
+    404 !== 403
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 403
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/publish-school-forbidden.guard.test.js:81:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C. platform publish/unpublish 仍 200，且不得创建或清空 grants
+not ok 24 - C. platform publish/unpublish 仍 200，且不得创建或清空 grants
+  ---
+  duration_ms: 269.8017
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\publish-school-forbidden.guard.test.js:98:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    platform publish 期望 200，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"21035398-7a2b-4c70-9cea-1ab9fd9359f3"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/publish-school-forbidden.guard.test.js:126:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:67384) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. integration-router 必须删除 GET/PUT /books/:bookId/visibility，无兼容 handler
+not ok 25 - A. integration-router 必须删除 GET/PUT /books/:bookId/visibility，无兼容 handler
+  ---
+  duration_ms: 2.4941
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\visibility-deleted.guard.test.js:19:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    必须删除 GET /books/:bookId/visibility
+    + actual - expected
+    
+    + "router.get('/books/:bookId/visibility', route(async (req, res) => {\n" +
+    +   '    const { reading } = domainForRequest(req, database, identityService)\n' +
+    +   '    return sendData(res, await reading.getBookVisibility(req.params.bookId), { requestId: req.requestId })\n' +
+    +   '  }))\n' +
+    +   '\n' +
+    +   "  router.put('/books/:bookId/visibility', route(async (req, res) => {\n" +
+    +   '    const key = writeKey(req)\n' +
+    +   '    const { reading } = domainForRequest(req, database, identityService)\n' +
+    +   '    const outcome = await executeIdempotentAsync(database, {\n' +
+    +   '      key,\n' +
+    +   '      scope: `book.visibility:${req.workspace.organizationId}:${req.workspace.id}:${req.params.bookId}`,\n' +
+    +   '      request: { scope: req.body?.scope, classIds: req.body?.classIds },\n' +
+    +   '      operation: () => domainWriteOutcome(200, () => reading.setBookVisibility({\n' +
+    +   '        bookId: req.params.bookId,\n' +
+    +   '        scope: req.body?.scope,\n' +
+    +   '        classIds: req.body?.classIds,\n' +
+    +   '      })),\n' +
+    +   '    })\n' +
+    +   '    return sendOutcome(res, req, outcome)\n' +
+    +   '  }))\n' +
+    +   '\n' +
+    +   "  router.get('/books/:bookId/pages/:pageNo', route(async (req, res) => {\n" +
+    +   '    const { reading } = domainForRequest(req, database, identityService)\n' +
+    +   '    const page = await reading.getPage(req.params.bookId, Number(req.params.pageNo), req.query.versionId || null)\n' +
+    +   '    const scope = deriveAiRequestScope(database, {\n' +
+    +   '      organizationId: req.workspace.organizationId,\n' +
+    +   '      ownerUserId: req.identitySession.user.id,\n' +
+    +   '      workspaceId: req.workspace.id,\n' +
+    +   '      bookId: req.params.bookId,\n' +
+    +   '      bookVersionId: page.book_version_id,\n' +
+    +   '      currentPageNo: page.page_no,\n' +
+    +   '    })\n' +
+    +   "    if (!scope) throw new HttpError(404, 'RESOURCE_NOT_FOUND', '当前书页不存在或不在可读范围')\n" +
+    +   '    return sendData(res, projectBookPage(database, page, { readRangeVersion: scope.readRangeVersion }), { requestId: req.requestId })\n' +
+    +   '  }))\n' +
+    +   '\n' +
+    +   "  router.get('/reading/progress', route((req, res) => sendData(res,\n" +
+    +   '    projectReadingProgress(database, req.identitySession.user.id, req.workspace.id, req.workspace.organizationId),\n' +
+    +   '    { requestId: req.requestId },\n' +
+    +   '  )'
+    - ''
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ''
+  actual: |-
+    router.get('/books/:bookId/visibility', route(async (req, res) => {
+        const { reading } = domainForRequest(req, database, identityService)
+        return sendData(res, await reading.getBookVisibility(req.params.bookId), { requestId: req.requestId })
+      }))
+    
+      router.put('/books/:bookId/visibility', route(async (req, res) => {
+        const key = writeKey(req)
+        const { reading } = domainForRequest(req, database, identityService)
+        const outcome = await executeIdempotentAsync(database, {
+          key,
+          scope: `book.visibility:${req.workspace.organizationId}:${req.workspace.id}:${req.params.bookId}`,
+          request: { scope: req.body?.scope, classIds: req.body?.classIds },
+          operation: () => domainWriteOutcome(200, () => reading.setBookVisibility({
+            bookId: req.params.bookId,
+            scope: req.body?.scope,
+            classIds: req.body?.classIds,
+          })),
+        })
+        return sendOutcome(res, req, outcome)
+      }))
+    
+      router.get('/books/:bookId/pages/:pageNo', route(async (req, res) => {
+        const { reading } = domainForRequest(req, database, identityService)
+        const page = await reading.getPage(req.params.bookId, Number(req.params.pageNo), req.query.versionId || null)
+        const scope = deriveAiRequestScope(database, {
+          organizationId: req.workspace.organizationId,
+          ownerUserId: req.identitySession.user.id,
+          workspaceId: req.workspace.id,
+          bookId: req.params.bookId,
+          bookVersionId: page.book_version_id,
+          currentPageNo: page.page_no,
+        })
+        if (!scope) throw new HttpError(404, 'RESOURCE_NOT_FOUND', '当前书页不存在或不在可读范围')
+        return sendData(res, projectBookPage(database, page, { readRangeVersion: scope.readRangeVersion }), { requestId: req.requestId })
+      }))
+    
+      router.get('/reading/progress', route((req, res) => sendData(res,
+        projectReadingProgress(database, req.identitySession.user.id, req.workspace.id, req.workspace.organizationId),
+        { requestId: req.requestId },
+      )
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/visibility-deleted.guard.test.js:21:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: A. GET /books/:bookId/visibility 必须是标准 JSON 404，且 integration 链可到达
+not ok 26 - A. GET /books/:bookId/visibility 必须是标准 JSON 404，且 integration 链可到达
+  ---
+  duration_ms: 379.9276
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\visibility-deleted.guard.test.js:35:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    createReadmateApplication 必须打到 integration-router：登录后 GET /books 须 200。若是 identity 兜底 404「资源不存在」，说明 catch-all 吞掉了整条集成链，visibility/书架/D-21/D-22 HTTP 不能当已接线 期望 200，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"3c457a5b-c570-4224-8219-9bca9e2cdbcb"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    requireIntegrationReachable (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:213:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/visibility-deleted.guard.test.js:39:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A. PUT /books/:bookId/visibility 含 scope=organization 也必须标准 JSON 404，且不得清空他班 grant
+not ok 27 - A. PUT /books/:bookId/visibility 含 scope=organization 也必须标准 JSON 404，且不得清空他班 grant
+  ---
+  duration_ms: 292.9472
+  type: 'test'
+  location: 'D:\\Project\\整书8.15\\tests\\server\\http\\phase8-http-guards\\visibility-deleted.guard.test.js:49:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    createReadmateApplication 必须打到 integration-router：登录后 GET /books 须 200。若是 identity 兜底 404「资源不存在」，说明 catch-all 吞掉了整条集成链，visibility/书架/D-21/D-22 HTTP 不能当已接线 期望 200，实际 404 body={"error":{"code":"RESOURCE_NOT_FOUND","message":"资源不存在","retryable":false,"details":{},"requestId":"1f6cad2f-09a8-49bf-8a7d-5efdb24c932d"}}
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    assertHttpStatus (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:72:10)
+    requireIntegrationReachable (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/shared-harness.guard.test.js:213:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async TestContext.<anonymous> (file:///D:/Project/%E6%95%B4%E4%B9%A68.15/tests/server/http/phase8-http-guards/visibility-deleted.guard.test.js:59:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 1
+# fail 26
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1757.378

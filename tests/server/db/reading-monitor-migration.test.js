@@ -25,14 +25,14 @@ function temporaryDatabase(prefix) {
 }
 
 function insertScope(db) {
-  db.prepare(`INSERT INTO organizations (id, name, status, created_at, updated_at, version)
-    VALUES ('org-a', 'A', 'active', ?, ?, 1), ('org-b', 'B', 'active', ?, ?, 1)`)
+  db.prepare(`INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version)
+    VALUES ('org-a', 'A', 'org-a', 'active', ?, ?, 1), ('org-b', 'B', 'org-b', 'active', ?, ?, 1)`)
     .run(NOW, NOW, NOW, NOW)
   db.prepare(`INSERT INTO users
-      (id, organization_id, username, display_name, status, created_at, updated_at, version)
-    VALUES ('student-a', 'org-a', 'student-a', 'A Student', 'active', ?, ?, 1),
-      ('student-b', 'org-b', 'student-b', 'B Student', 'active', ?, ?, 1),
-      ('admin-a', 'org-a', 'admin-a', 'A Admin', 'active', ?, ?, 1)`)
+      (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code)
+    VALUES ('student-a', 'org-a', 'student-a', 'A Student', 'active', ?, ?, 1, 'student-a', 'A-student-a'),
+      ('student-b', 'org-b', 'student-b', 'B Student', 'active', ?, ?, 1, 'student-b', 'A-student-b'),
+      ('admin-a', 'org-a', 'admin-a', 'A Admin', 'active', ?, ?, 1, 'admin-a', 'A-admin-a')`)
     .run(NOW, NOW, NOW, NOW, NOW, NOW)
   db.prepare(`INSERT INTO classes
       (id, organization_id, grade_id, name, status, created_at, updated_at, version)
@@ -105,7 +105,7 @@ test('044 在全新数据库顺序执行并由迁移账本重复启动校验和�
   t.after(() => fixture.close())
   const first = runMigrations(fixture.db, migrationDirectory, NOW)
   const second = runMigrations(fixture.db, migrationDirectory, NOW)
-  assert.equal(first.applied.at(-1), '046_reader_mode_preferences.sql')
+  assert.equal(first.applied.at(-1), '050_book_access_grant_backfill.sql')
   assert.equal(first.applied.length, listMigrationFiles(migrationDirectory).length)
   assert.equal(second.applied.length, 0)
   assert.equal(second.alreadyApplied.length, first.applied.length)

@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 
 import { withTransaction } from '../../db/database.js'
 import { DomainError, emit, json, makeId, nowIso, requirePermission, requireText, resolveContext } from '../delivery/primitives.js'
+import { isBookVisibleToAudience, resolveBookAudience } from '../reading/visibility.js'
 
 const imageTypes = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const reactionTypes = new Set(['appreciate', 'insight', 'bookmark', 'clap', 'same', 'learn', 'warm'])
@@ -118,6 +119,51 @@ function assertOrganization(post, workspace) {
   return post
 }
 
+function quoteIsReadable(db, current, bookId) {
+  if (!bookId) return false
+  const audience = resolveBookAudience(db, {
+    organizationId: current.workspace.organizationId,
+    userId: current.actor.id,
+    workspaceId: current.workspace.id,
+  })
+  const book = db.prepare(`
+    SELECT id, status FROM books
+    WHERE id = ? AND organization_id_at_creation = ?
+  `).get(bookId, current.workspace.organizationId)
+  if (!book) return false
+  if (book.status !== 'published' && !audience.allowUnpublished) return false
+  return isBookVisibleToAudience(db, {
+    bookId: book.id,
+    organizationId: current.workspace.organizationId,
+    audience,
+  })
+}
+
+function projectPostQuote(db, current, post) {
+  if (!post.quote_book_id) return { quote: null, quoteText: post.quote_text ?? null }
+  const readable = quoteIsReadable(db, current, post.quote_book_id)
+  if (!readable) {
+    return {
+      quote: {
+        bookId: post.quote_book_id,
+        page: post.quote_page,
+        text: null,
+        availability: 'unavailable',
+      },
+      quoteText: null,
+    }
+  }
+  return {
+    quote: {
+      bookId: post.quote_book_id,
+      page: post.quote_page,
+      text: post.quote_text,
+      availability: 'available',
+    },
+    quoteText: post.quote_text,
+  }
+}
+
 function assertReadablePost(post, current) {
   assertOrganization(post, current.workspace)
   if (post.workspace_id_at_creation === current.workspace.id) return post
@@ -199,10 +245,12 @@ export function createCommunityDomain({ db, actor, workspace, outbox, clock, idG
       const assets = db.prepare('SELECT id, mime_type AS mimeType, size_bytes AS sizeBytes, sha256, original_name AS originalName FROM post_assets WHERE post_id = ? ORDER BY created_at').all(postId)
       const reactions = db.prepare('SELECT reaction_type AS reactionType, COUNT(*) AS count FROM post_reactions WHERE post_id = ? GROUP BY reaction_type').all(postId)
       const reviews = db.prepare('SELECT reviewer_id AS reviewerId, workspace_id_at_review AS workspaceId, class_id_at_review AS classId, review_stage AS stage, decision, reason, created_at AS createdAt FROM post_reviews WHERE post_id = ? ORDER BY created_at, id').all(postId)
+      const projected = projectPostQuote(db, current, post)
       return {
         ...post,
+        quote_text: projected.quoteText,
         ai_assisted: Boolean(post.ai_assisted),
-        quote: post.quote_book_id ? { bookId: post.quote_book_id, page: post.quote_page, text: post.quote_text } : null,
+        quote: projected.quote,
         assets,
         reactions,
         reviews,

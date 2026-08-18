@@ -1,0 +1,3627 @@
+﻿
+> book-reader-app@0.1.0 test:server
+> node --test tests/server/**/*.test.js
+
+TAP version 13
+# (node:70820) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鍙妸鏈夋晥宸茶椤电殑璇佹嵁浜ょ粰妯″瀷锛屽苟鍦ㄩ敊璇〉鐮佸紩鐢ㄥ悗浠呴噸璇曚竴娆?ok 1 - 鍙妸鏈夋晥宸茶椤电殑璇佹嵁浜ょ粰妯″瀷锛屽苟鍦ㄩ敊璇〉鐮佸紩鐢ㄥ悗浠呴噸璇曚竴娆?  ---
+  duration_ms: 9.5902
+  type: 'test'
+  ...
+# Subtest: 绗簩娆℃棤鏁堝紩鐢ㄥ悗鍙繚瀛樺畨鍏ㄩ€€鍖栧紩瀵硷紝涓嶇寽娴嬫湭璇诲墽鎯?ok 2 - 绗簩娆℃棤鏁堝紩鐢ㄥ悗鍙繚瀛樺畨鍏ㄩ€€鍖栧紩瀵硷紝涓嶇寽娴嬫湭璇诲墽鎯?  ---
+  duration_ms: 1.1418
+  type: 'test'
+  ...
+# Subtest: 鏃犳晥涓绘ā鍨嬬殑鐪熷疄鎴愭湰涓?fallback 鎴愭湰閮借繘鍏ヨ处鏈紝瀛︾敓鍙墸鎴愬姛鍥炵瓟涓€娆?ok 3 - 鏃犳晥涓绘ā鍨嬬殑鐪熷疄鎴愭湰涓?fallback 鎴愭湰閮借繘鍏ヨ处鏈紝瀛︾敓鍙墸鎴愬姛鍥炵瓟涓€娆?  ---
+  duration_ms: 0.9136
+  type: 'test'
+  ...
+# Subtest: 渚涘簲鍟嗘姏閿欎絾杩斿洖宸茶璐圭敤閲忔椂锛岃娆℃垚鏈篃涓嶄細浠?providerUsage 涓㈠け
+ok 4 - 渚涘簲鍟嗘姏閿欎絾杩斿洖宸茶璐圭敤閲忔椂锛岃娆℃垚鏈篃涓嶄細浠?providerUsage 涓㈠け
+  ---
+  duration_ms: 0.8404
+  type: 'test'
+  ...
+# Subtest: 澶辫触鏃?user銆乤ssistant銆佸紩鐢ㄣ€侀闄╁拰 usage 鏁寸瑪鍥炴粴锛屽悓閿噸璇曚笉閲嶅棰勭暀鎴栨秷鎭?ok 5 - 澶辫触鏃?user銆乤ssistant銆佸紩鐢ㄣ€侀闄╁拰 usage 鏁寸瑪鍥炴粴锛屽悓閿噸璇曚笉閲嶅棰勭暀鎴栨秷鎭?  ---
+  duration_ms: 2.0726
+  type: 'test'
+  ...
+# Subtest: 闅愮绱涓夋潯鍙妸浼氳瘽璁句负绉佸瘑骞惰繘鍏ヨ闂敵璇疯鍒欙紝鍗遍櫓浜嬩欢淇濇寔涓洪浂
+ok 6 - 闅愮绱涓夋潯鍙妸浼氳瘽璁句负绉佸瘑骞惰繘鍏ヨ闂敵璇疯鍒欙紝鍗遍櫓浜嬩欢淇濇寔涓洪浂
+  ---
+  duration_ms: 1.0376
+  type: 'test'
+  ...
+# Subtest: 鍗遍櫓绱浠诲姟鎼哄甫杈惧埌闃堝€肩殑鍏ㄩ儴娑堟伅锛岀鍥涚浜旀潯涓嶄负鏈畬鎴愰闄╅噸澶嶅缓浠诲姟
+ok 7 - 鍗遍櫓绱浠诲姟鎼哄甫杈惧埌闃堝€肩殑鍏ㄩ儴娑堟伅锛岀鍥涚浜旀潯涓嶄负鏈畬鎴愰闄╅噸澶嶅缓浠诲姟
+  ---
+  duration_ms: 1.4068
+  type: 'test'
+  ...
+# Subtest: 鍗曟潯鏄庣‘鑷激淇″彿鍙繘鍏ヤ簩娆″鏍革紝澶嶆牳涓婁笅鏂囪兘鍙栧緱鍘熷鐢ㄦ埛鎻愰棶
+ok 8 - 鍗曟潯鏄庣‘鑷激淇″彿鍙繘鍏ヤ簩娆″鏍革紝澶嶆牳涓婁笅鏂囪兘鍙栧緱鍘熷鐢ㄦ埛鎻愰棶
+  ---
+  duration_ms: 1.0485
+  type: 'test'
+  ...
+# Subtest: 浜屾澶嶆牳浠ュ師瀛?claim 闃插苟鍙戦噸澶嶈皟鐢紝浜嬩欢鍞竴涓旀秹浜嬪€欓€夊幓閲?ok 9 - 浜屾澶嶆牳浠ュ師瀛?claim 闃插苟鍙戦噸澶嶈皟鐢紝浜嬩欢鍞竴涓旀秹浜嬪€欓€夊幓閲?  ---
+  duration_ms: 2.0033
+  type: 'test'
+  ...
+# Subtest: 澶嶆牳杈撳嚭缂鸿瘉鎹垨缂?staff 鎽樿杞汉宸ョ‘璁わ紝閲嶅璋冪敤涓嶉噸澶嶅缓浜嬩欢
+ok 10 - 澶嶆牳杈撳嚭缂鸿瘉鎹垨缂?staff 鎽樿杞汉宸ョ‘璁わ紝閲嶅璋冪敤涓嶉噸澶嶅缓浜嬩欢
+  ---
+  duration_ms: 1.066
+  type: 'test'
+  ...
+# Subtest: 宸茬‘璁ゅ鏍哥己灏?staff 鎽樿鍚屾牱涓嶈兘鍙戝竷姝ｅ紡寰呮帴鍙椾簨浠?ok 11 - 宸茬‘璁ゅ鏍哥己灏?staff 鎽樿鍚屾牱涓嶈兘鍙戝竷姝ｅ紡寰呮帴鍙椾簨浠?  ---
+  duration_ms: 0.5859
+  type: 'test'
+  ...
+# Subtest: 娌℃湁鍚堟牸閫氱煡浜虹殑宸茬‘璁ら闄╄浆浜哄伐纭锛屼笉鐢熸垚鏃犱汉鍙鐨勫緟鎺ュ彈浜嬩欢
+ok 12 - 娌℃湁鍚堟牸閫氱煡浜虹殑宸茬‘璁ら闄╄浆浜哄伐纭锛屼笉鐢熸垚鏃犱汉鍙鐨勫緟鎺ュ彈浜嬩欢
+  ---
+  duration_ms: 0.5818
+  type: 'test'
+  ...
+# Subtest: 杩囨湡鐨勪簩娆″鏍哥绾﹀彲鐢卞悗缁皟鐢ㄦ帴鎵嬪苟鍙骇涓€鏉′簨浠?ok 13 - 杩囨湡鐨勪簩娆″鏍哥绾﹀彲鐢卞悗缁皟鐢ㄦ帴鎵嬪苟鍙骇涓€鏉′簨浠?  ---
+  duration_ms: 1.3683
+  type: 'test'
+  ...
+# Subtest: 閫氱煡閾捐绠楀け璐ヨ浆浜哄伐纭锛屽悗缁噸璇曚笉閲嶅璋冪敤妯″瀷鎴栧垱寤轰簨浠?ok 14 - 閫氱煡閾捐绠楀け璐ヨ浆浜哄伐纭锛屽悗缁噸璇曚笉閲嶅璋冪敤妯″瀷鎴栧垱寤轰簨浠?  ---
+  duration_ms: 0.7368
+  type: 'test'
+  ...
+# Subtest: 杩囨湡 claim 鐨勫け璐?worker 涓嶈兘瑕嗙洊骞跺彂閲嶈瘯瀹屾垚鐨勭粺涓€钀界洏缁撴灉
+ok 15 - 杩囨湡 claim 鐨勫け璐?worker 涓嶈兘瑕嗙洊骞跺彂閲嶈瘯瀹屾垚鐨勭粺涓€钀界洏缁撴灉
+  ---
+  duration_ms: 2.4336
+  type: 'test'
+  ...
+# Subtest: 璁よ瘉韬唤涓庢櫘閫氳姹傚垎绂伙紝鎸囩汗涓嶄繚瀛樺師闂紝瓒呴暱鎴栭潪娉曢€夋枃涓嶄細璋冪敤妯″瀷
+ok 16 - 璁よ瘉韬唤涓庢櫘閫氳姹傚垎绂伙紝鎸囩汗涓嶄繚瀛樺師闂紝瓒呴暱鎴栭潪娉曢€夋枃涓嶄細璋冪敤妯″瀷
+  ---
+  duration_ms: 1.8664
+  type: 'test'
+  ...
+# Subtest: 璺ㄩ〉 selections 淇濈暀姣忛〉閿氱偣骞剁敱鏈嶅姟绔寜 block 閲嶅缓寮曠敤鏂囨湰
+ok 17 - 璺ㄩ〉 selections 淇濈暀姣忛〉閿氱偣骞剁敱鏈嶅姟绔寜 block 閲嶅缓寮曠敤鏂囨湰
+  ---
+  duration_ms: 1.064
+  type: 'test'
+  ...
+# Subtest: 璁板繂鍗″彧瑕佹眰鍏ㄩ儴鏉ユ簮宸茶锛岄潪 lexical top 鐨勬潵婧愪粛闅忓崱鐗囧甫鍏ュ苟鍙紩鐢?ok 18 - 璁板繂鍗″彧瑕佹眰鍏ㄩ儴鏉ユ簮宸茶锛岄潪 lexical top 鐨勬潵婧愪粛闅忓崱鐗囧甫鍏ュ苟鍙紩鐢?  ---
+  duration_ms: 0.6982
+  type: 'test'
+  ...
+# (node:71240) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鏍囬鑷姩鐢熸垚骞朵繚鐣欐樉寮忔爣棰?ok 19 - 鏍囬鑷姩鐢熸垚骞朵繚鐣欐樉寮忔爣棰?  ---
+  duration_ms: 0.6862
+  type: 'test'
+  ...
+# Subtest: 浼氳瘽鏂板缓銆佷笂涓嬫枃銆侀噸鍛藉悕銆佺瀵嗗垏鎹€佽蒋鍒犻櫎涓庢仮澶嶅潎浣跨敤鐗堟湰淇濇姢
+ok 20 - 浼氳瘽鏂板缓銆佷笂涓嬫枃銆侀噸鍛藉悕銆佺瀵嗗垏鎹€佽蒋鍒犻櫎涓庢仮澶嶅潎浣跨敤鐗堟湰淇濇姢
+  ---
+  duration_ms: 431.2159
+  type: 'test'
+  ...
+# Subtest: 璺ㄧ鎴峰拰璺ㄤ富浣撲慨鏀圭粺涓€杩斿洖涓嶅瓨鍦紝涓嶈兘閫氳繃 conversationId 鐚滄祴璧勬簮
+ok 21 - 璺ㄧ鎴峰拰璺ㄤ富浣撲慨鏀圭粺涓€杩斿洖涓嶅瓨鍦紝涓嶈兘閫氳繃 conversationId 鐚滄祴璧勬簮
+  ---
+  duration_ms: 440.8205
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺绔寜鐝骇瀛︾敓褰㈡垚涓夌骇绱㈠紩锛屽苟鏀寔妯＄硦鎼滅储涓庝功绫?AND 鎴?OR 绾︽潫
+ok 22 - 鏉冮檺绔寜鐝骇瀛︾敓褰㈡垚涓夌骇绱㈠紩锛屽苟鏀寔妯＄硦鎼滅储涓庝功绫?AND 鎴?OR 绾︽潫
+  ---
+  duration_ms: 454.213
+  type: 'test'
+  ...
+# Subtest: 鏅€氫細璇濇寜鑼冨洿鍙锛岀瀵嗕細璇濋渶瑕佹巿鏉冿紝瀹夊叏浼氳瘽鍙繑鍥炶瘉鎹渶灏忎笂涓嬫枃
+ok 23 - 鏅€氫細璇濇寜鑼冨洿鍙锛岀瀵嗕細璇濋渶瑕佹巿鏉冿紝瀹夊叏浼氳瘽鍙繑鍥炶瘉鎹渶灏忎笂涓嬫枃
+  ---
+  duration_ms: 454.86
+  type: 'test'
+  ...
+# (node:68440) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: uses only passed runtime configuration and returns the complete structured contract
+ok 24 - uses only passed runtime configuration and returns the complete structured contract
+  ---
+  duration_ms: 2.8465
+  type: 'test'
+  ...
+# Subtest: normalizes only unambiguous response and citation aliases inside the backend evidence whitelist
+ok 25 - normalizes only unambiguous response and citation aliases inside the backend evidence whitelist
+  ---
+  duration_ms: 0.4532
+  type: 'test'
+  ...
+# Subtest: does not coerce ambiguous spoiler severity strings into the boolean contract
+ok 26 - does not coerce ambiguous spoiler severity strings into the boolean contract
+  ---
+  duration_ms: 0.6835
+  type: 'test'
+  ...
+# Subtest: uses the same explicit external runtime configuration for structured secondary review
+ok 27 - uses the same explicit external runtime configuration for structured secondary review
+  ---
+  duration_ms: 0.827
+  type: 'test'
+  ...
+# Subtest: 缂哄皯浠讳竴璇佹嵁 assistant 娑堟伅鏃跺湪鍙戝嚭璇锋眰鍓嶆嫆缁濆閮ㄥ鏍?ok 28 - 缂哄皯浠讳竴璇佹嵁 assistant 娑堟伅鏃跺湪鍙戝嚭璇锋眰鍓嶆嫆缁濆閮ㄥ鏍?  ---
+  duration_ms: 0.3828
+  type: 'test'
+  ...
+# Subtest: AI runtime keeps external question and review calls on the same OPENAI runtime configuration
+ok 29 - AI runtime keeps external question and review calls on the same OPENAI runtime configuration
+  ---
+  duration_ms: 0.9354
+  type: 'test'
+  ...
+# Subtest: rejects incomplete structured secondary review output before it reaches the safety domain
+    # Subtest: empty staff summary
+    ok 1 - empty staff summary
+      ---
+      duration_ms: 0.4397
+      type: 'test'
+      ...
+    # Subtest: incomplete evidence generation
+    ok 2 - incomplete evidence generation
+      ---
+      duration_ms: 0.37
+      type: 'test'
+      ...
+    # Subtest: candidate outside backend table
+    ok 3 - candidate outside backend table
+      ---
+      duration_ms: 0.3445
+      type: 'test'
+      ...
+    1..3
+ok 30 - rejects incomplete structured secondary review output before it reaches the safety domain
+  ---
+  duration_ms: 1.9223
+  type: 'test'
+  ...
+# Subtest: retries invalid structured JSON a finite number of times and accounts for every attempt
+ok 31 - retries invalid structured JSON a finite number of times and accounts for every attempt
+  ---
+  duration_ms: 0.7113
+  type: 'test'
+  ...
+# Subtest: rejects candidates outside the backend table after the configured parse retries
+ok 32 - rejects candidates outside the backend table after the configured parse retries
+  ---
+  duration_ms: 0.6274
+  type: 'test'
+  ...
+# Subtest: classifies provider refusal and rate limiting without exposing response details
+    # Subtest: content refusal
+    ok 1 - content refusal
+      ---
+      duration_ms: 0.5331
+      type: 'test'
+      ...
+    # Subtest: rate limiting
+    ok 2 - rate limiting
+      ---
+      duration_ms: 0.3672
+      type: 'test'
+      ...
+    1..2
+ok 33 - classifies provider refusal and rate limiting without exposing response details
+  ---
+  duration_ms: 1.2261
+  type: 'test'
+  ...
+# Subtest: classifies network failures without retaining sensitive error text
+ok 34 - classifies network failures without retaining sensitive error text
+  ---
+  duration_ms: 0.5134
+  type: 'test'
+  ...
+# Subtest: stays disabled when runtime configuration is not explicitly passed
+ok 35 - stays disabled when runtime configuration is not explicitly passed
+  ---
+  duration_ms: 0.2767
+  type: 'test'
+  ...
+# (node:15700) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鐪熷疄 node:sqlite 涓存椂搴撳彲閲嶅搴旂敤 020 鑷?025锛屼笖鍚屾浜嬪姟鎷掔粷 Promise 鍥炶皟
+ok 36 - 鐪熷疄 node:sqlite 涓存椂搴撳彲閲嶅搴旂敤 020 鑷?025锛屼笖鍚屾浜嬪姟鎷掔粷 Promise 鍥炶皟
+  ---
+  duration_ms: 247.1156
+  type: 'test'
+  ...
+# Subtest: 023 鍓嶅悜杩佺Щ鍙戠幇鏃㈡湁璺ㄧ鎴烽敊缁戣褰曟椂鏄庣‘澶辫触涓斾笉闈欓粯閲嶆寕
+ok 37 - 023 鍓嶅悜杩佺Щ鍙戠幇鏃㈡湁璺ㄧ鎴烽敊缁戣褰曟椂鏄庣‘澶辫触涓斾笉闈欓粯閲嶆寕
+  ---
+  duration_ms: 435.0191
+  type: 'test'
+  ...
+# Subtest: 024 鍓嶅悜杩佺Щ鍙戠幇鏃㈡湁 ai_message_evidence 瀛ゅ効鏃舵槑纭け璐ヤ笖涓嶉潤榛樺垹闄ゆ垨閲嶆寕
+ok 38 - 024 鍓嶅悜杩佺Щ鍙戠幇鏃㈡湁 ai_message_evidence 瀛ゅ効鏃舵槑纭け璐ヤ笖涓嶉潤榛樺垹闄ゆ垨閲嶆寕
+  ---
+  duration_ms: 500.006
+  type: 'test'
+  ...
+# Subtest: 024 杩佺Щ鍚庣殑 citation scope 瑙﹀彂鍣ㄥ湪鍏抽棴 FK 鏃朵粛鎷掔粷 missing-message
+ok 39 - 024 杩佺Щ鍚庣殑 citation scope 瑙﹀彂鍣ㄥ湪鍏抽棴 FK 鏃朵粛鎷掔粷 missing-message
+  ---
+  duration_ms: 526.4971
+  type: 'test'
+  ...
+# Subtest: 024 瀵规棤娉曚粠鍙俊璐︽湰纭畾 scope 鐨勬棫骞傜瓑璁板綍鏄庣‘澶辫触
+ok 40 - 024 瀵规棤娉曚粠鍙俊璐︽湰纭畾 scope 鐨勬棫骞傜瓑璁板綍鏄庣‘澶辫触
+  ---
+  duration_ms: 470.0229
+  type: 'test'
+  ...
+# Subtest: 024 鍙粠鍙俊 usage 涓?conversation 鍏崇郴鍥炲～鏃у箓绛?scope
+ok 41 - 024 鍙粠鍙俊 usage 涓?conversation 鍏崇郴鍥炲～鏃у箓绛?scope
+  ---
+  duration_ms: 481.7098
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 涓殣绉佺疮璁′笁鏉″彧杞瀵嗚闂鍒欙紝涓嶅垱寤哄嵄闄╁鏍镐换鍔?ok 42 - 鐪熷疄 SQLite 涓殣绉佺疮璁′笁鏉″彧杞瀵嗚闂鍒欙紝涓嶅垱寤哄嵄闄╁鏍镐换鍔?  ---
+  duration_ms: 635.0387
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 鍗遍櫓浠诲姟淇濆瓨鍏ㄩ儴闃堝€艰瘉鎹紝鍘熼棶棰樺彲瑙佷笖骞跺彂澶嶆牳鍙皟鐢ㄤ竴娆?provider
+ok 43 - 鐪熷疄 SQLite 鍗遍櫓浠诲姟淇濆瓨鍏ㄩ儴闃堝€艰瘉鎹紝鍘熼棶棰樺彲瑙佷笖骞跺彂澶嶆牳鍙皟鐢ㄤ竴娆?provider
+  ---
+  duration_ms: 723.5501
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 闅愯棌涓€鏉″鏍歌瘉鎹?assistant 娑堟伅鍚庤浆浜哄伐纭涓斾笉璋冪敤 provider
+ok 44 - 鐪熷疄 SQLite 闅愯棌涓€鏉″鏍歌瘉鎹?assistant 娑堟伅鍚庤浆浜哄伐纭涓斾笉璋冪敤 provider
+  ---
+  duration_ms: 1007.9972
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite claim 鍚庤拷鍔犲嵄闄╄瘉鎹細 supersede 鏃у鏍革紝骞朵互鏈€鏂扮ǔ瀹氬叏閲忚瘉鎹噸鏂板鏍?ok 45 - 鐪熷疄 SQLite claim 鍚庤拷鍔犲嵄闄╄瘉鎹細 supersede 鏃у鏍革紝骞朵互鏈€鏂扮ǔ瀹氬叏閲忚瘉鎹噸鏂板鏍?  ---
+  duration_ms: 950.2108
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 杩佺Щ璇佹嵁缂哄皯璇锋眰閾炬帴鏃朵粛鍚戝鏍镐笂涓嬫枃淇濈暀 assistant 鍘熸枃
+ok 46 - 鐪熷疄 SQLite 杩佺Щ璇佹嵁缂哄皯璇锋眰閾炬帴鏃朵粛鍚戝鏍镐笂涓嬫枃淇濈暀 assistant 鍘熸枃
+  ---
+  duration_ms: 424.0278
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 鍦ㄥ畨鍏ㄤ换鍔″悗缁撶畻澶辫触浼氭暣鍗曞洖婊氾紝鍚岄敭閲嶈瘯涓嶉噸澶嶉鐣欐垨娑堟伅
+ok 47 - 鐪熷疄 SQLite 鍦ㄥ畨鍏ㄤ换鍔″悗缁撶畻澶辫触浼氭暣鍗曞洖婊氾紝鍚岄敭閲嶈瘯涓嶉噸澶嶉鐣欐垨娑堟伅
+  ---
+  duration_ms: 444.7031
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 杩囨湡 lease 鐨勫苟鍙戦噸璇曚笉鑳借鐩栧凡瀹屾垚璇锋眰锛屽彧淇濈暀涓€缁勬秷鎭笌鐢ㄩ噺
+ok 48 - 鐪熷疄 SQLite 杩囨湡 lease 鐨勫苟鍙戦噸璇曚笉鑳借鐩栧凡瀹屾垚璇锋眰锛屽彧淇濈暀涓€缁勬秷鎭笌鐢ㄩ噺
+  ---
+  duration_ms: 341.2154
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 骞傜瓑閿寜缁勭粐銆佷富浣撳拰浼氳瘽闅旂锛屽け璐ラ噸璇曚笌瀹屾垚鐘舵€佷簰涓嶈鐩?ok 49 - 鐪熷疄 SQLite 骞傜瓑閿寜缁勭粐銆佷富浣撳拰浼氳瘽闅旂锛屽け璐ラ噸璇曚笌瀹屾垚鐘舵€佷簰涓嶈鐩?  ---
+  duration_ms: 594.074
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 璐︽湰淇濈暀鏃犳晥涓绘ā鍨嬩笌 fallback 鐨勪緵搴斿晢鎬绘垚鏈紝瀛︾敓浠呮墸鎴愬姛鍥炵瓟
+ok 50 - 鐪熷疄 SQLite 璐︽湰淇濈暀鏃犳晥涓绘ā鍨嬩笌 fallback 鐨勪緵搴斿晢鎬绘垚鏈紝瀛︾敓浠呮墸鎴愬姛鍥炵瓟
+  ---
+  duration_ms: 353.1591
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 鎷掔粷璺ㄧ鎴锋垨璺ㄤ富浣撳鐢?conversationId锛屼笖妯″瀷鐪嬩笉鍒颁粬浜哄巻鍙?ok 51 - 鐪熷疄 SQLite 鎷掔粷璺ㄧ鎴锋垨璺ㄤ富浣撳鐢?conversationId锛屼笖妯″瀷鐪嬩笉鍒颁粬浜哄巻鍙?  ---
+  duration_ms: 310.6919
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 鐨勮法绉熸埛闅愮鐢宠涓庡鏍镐笂涓嬫枃缁熶竴杩斿洖 RESOURCE_NOT_FOUND
+ok 52 - 鐪熷疄 SQLite 鐨勮法绉熸埛闅愮鐢宠涓庡鏍镐笂涓嬫枃缁熶竴杩斿洖 RESOURCE_NOT_FOUND
+  ---
+  duration_ms: 345.5258
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite open review 骞跺彂杩藉姞绗?绗?鏉″強鍚庣画璇佹嵁锛屼笉涓㈠け涔熶笉閲嶅寤轰换鍔?ok 53 - 鐪熷疄 SQLite open review 骞跺彂杩藉姞绗?绗?鏉″強鍚庣画璇佹嵁锛屼笉涓㈠け涔熶笉閲嶅寤轰换鍔?  ---
+  duration_ms: 369.0563
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 鏈湴瀹夊叏闄嶇骇涓嶆墸瀛︾敓棰濆害锛屼絾淇濈暀涓ゆ provider 鎴愭湰涓庢嫤鎴師鍥?ok 54 - 鐪熷疄 SQLite 鏈湴瀹夊叏闄嶇骇涓嶆墸瀛︾敓棰濆害锛屼絾淇濈暀涓ゆ provider 鎴愭湰涓庢嫤鎴師鍥?  ---
+  duration_ms: 316.7269
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 SQLite 灏嗙函鍓ч€忛闄╀笌寮曠敤澶辫触鍒嗗紑璁拌处
+ok 55 - 鐪熷疄 SQLite 灏嗙函鍓ч€忛闄╀笌寮曠敤澶辫触鍒嗗紑璁拌处
+  ---
+  duration_ms: 367.2143
+  type: 'test'
+  ...
+# (node:71488) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 涓氬姟鍐欏叆涓?outbox 鍚屼簨鍔★紝浜嬩欢鍏ラ槦澶辫触鏃朵笉鐣欎笅鍗婃垚鍝?ok 56 - 涓氬姟鍐欏叆涓?outbox 鍚屼簨鍔★紝浜嬩欢鍏ラ槦澶辫触鏃朵笉鐣欎笅鍗婃垚鍝?  ---
+  duration_ms: 160.7359
+  type: 'test'
+  ...
+# Subtest: 瀹夊叏閾炬帴鎺ュ彈闅旂杩愯鍩熶紶鍏ョ殑鏍囧噯浜岃繘鍒剁鍚嶅瘑閽?ok 57 - 瀹夊叏閾炬帴鎺ュ彈闅旂杩愯鍩熶紶鍏ョ殑鏍囧噯浜岃繘鍒剁鍚嶅瘑閽?  ---
+  duration_ms: 75.0462
+  type: 'test'
+  ...
+# Subtest: 032 鍓嶅悜杩佺Щ淇濈暀鏃ф姇閫掓暟鎹苟灏嗘棫鑱旂郴浜洪殧绂讳负鏈綊灞?ok 58 - 032 鍓嶅悜杩佺Щ淇濈暀鏃ф姇閫掓暟鎹苟灏嗘棫鑱旂郴浜洪殧绂讳负鏈綊灞?  ---
+  duration_ms: 340.6193
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓鎶曠缁忚繃鍩虹鍥剧墖鏍￠獙銆佷汉宸ュ鏍稿悗鎵嶈兘杞讳簰鍔ㄦ垨鏀惰棌
+ok 59 - 瀛︾敓鎶曠缁忚繃鍩虹鍥剧墖鏍￠獙銆佷汉宸ュ鏍稿悗鎵嶈兘杞讳簰鍔ㄦ垨鏀惰棌
+  ---
+  duration_ms: 135.7303
+  type: 'test'
+  ...
+# Subtest: 鏉冮檺榛樿鎷掔粷涓旇法宸ヤ綔绌洪棿鎿嶄綔琚嫆缁?ok 60 - 鏉冮檺榛樿鎷掔粷涓旇法宸ヤ綔绌洪棿鎿嶄綔琚嫆缁?  ---
+  duration_ms: 113.1216
+  type: 'test'
+  ...
+# Subtest: 鍐呴儴鎶ュ憡閫掑綊鎷掔粷闃呰瀹屾垚搴﹀悓涔夐敭锛屽苟淇濈暀鍚堟硶鎶ょ溂姣斾緥鍜屾櫘閫氬瓧娈?ok 61 - 鍐呴儴鎶ュ憡閫掑綊鎷掔粷闃呰瀹屾垚搴﹀悓涔夐敭锛屽苟淇濈暀鍚堟硶鎶ょ溂姣斾緥鍜屾櫘閫氬瓧娈?  ---
+  duration_ms: 109.1716
+  type: 'test'
+  ...
+# Subtest: 鎶ュ憡鐗堟湰蹇呴』浜哄伐瀹℃牳锛屽け璐ラ噸璇曠湡瀹炶惤搴擄紝鐭俊涓嶄骇鐢熸墦寮€鎴栧凡璇?ok 62 - 鎶ュ憡鐗堟湰蹇呴』浜哄伐瀹℃牳锛屽け璐ラ噸璇曠湡瀹炶惤搴擄紝鐭俊涓嶄骇鐢熸墦寮€鎴栧凡璇?  ---
+  duration_ms: 206.6437
+  type: 'test'
+  ...
+# Subtest: 鎶曢€掑鏍哥粦瀹氱洰鏍囨姤鍛婄増鏈紝宸插鏍告棫鐗堟湰鍙彂閫佽€屾湭瀹℃牳鏂扮増鏈鎷掔粷
+ok 63 - 鎶曢€掑鏍哥粦瀹氱洰鏍囨姤鍛婄増鏈紝宸插鏍告棫鐗堟湰鍙彂閫佽€屾湭瀹℃牳鏂扮増鏈鎷掔粷
+  ---
+  duration_ms: 171.8175
+  type: 'test'
+  ...
+# Subtest: 鎶ュ憡銆佸鐢熴€佽仈绯讳汉鍜屽伐浣滅┖闂村湪鍚屼竴浜嬪姟鎺堟潈鍏崇郴涓粦瀹?ok 64 - 鎶ュ憡銆佸鐢熴€佽仈绯讳汉鍜屽伐浣滅┖闂村湪鍚屼竴浜嬪姟鎺堟潈鍏崇郴涓粦瀹?  ---
+  duration_ms: 97.6834
+  type: 'test'
+  ...
+# Subtest: 瀹夊叏閾炬帴闄愬埗 TTL 骞舵牎楠岀鍚嶏紝鎾ら攢銆佽繃鏈熷拰閲嶅鎵撳紑鍧囧け璐?ok 65 - 瀹夊叏閾炬帴闄愬埗 TTL 骞舵牎楠岀鍚嶏紝鎾ら攢銆佽繃鏈熷拰閲嶅鎵撳紑鍧囧け璐?  ---
+  duration_ms: 321.5817
+  type: 'test'
+  ...
+# Subtest: 灏忕▼搴忓洖鎵ф棤楠岃瘉鎴栭獙璇佸け璐ユ椂鎷掔粷锛屼粎鎺ュ彈杩愯鏃?verifier 閫氳繃鐨勫洖鎵?ok 66 - 灏忕▼搴忓洖鎵ф棤楠岃瘉鎴栭獙璇佸け璐ユ椂鎷掔粷锛屼粎鎺ュ彈杩愯鏃?verifier 閫氳繃鐨勫洖鎵?  ---
+  duration_ms: 194.696
+  type: 'test'
+  ...
+# Subtest: 鐭俊鍙戦€佷换鍔′娇鐢ㄧ姸鎬佸拰鐗堟湰鍘熷瓙棰嗗彇锛岀浜屼釜骞跺彂鎵ц鍣ㄤ笉鑳介噸澶嶅鍙?ok 67 - 鐭俊鍙戦€佷换鍔′娇鐢ㄧ姸鎬佸拰鐗堟湰鍘熷瓙棰嗗彇锛岀浜屼釜骞跺彂鎵ц鍣ㄤ笉鑳介噸澶嶅鍙?  ---
+  duration_ms: 131.0019
+  type: 'test'
+  ...
+# Subtest: 鍙戦€佺绾﹁繃鏈熻浆寰呭璐︼紝杩熷埌缁撴灉涓嶈兘瑕嗙洊涓斿璐︾‘璁ゅ彂閫佸悗涓嶅啀澶栧彂
+ok 68 - 鍙戦€佺绾﹁繃鏈熻浆寰呭璐︼紝杩熷埌缁撴灉涓嶈兘瑕嗙洊涓斿璐︾‘璁ゅ彂閫佸悗涓嶅啀澶栧彂
+  ---
+  duration_ms: 138.7136
+  type: 'test'
+  ...
+# Subtest: 閫傞厤鍣ㄧ‘瀹氬け璐ュ紓甯歌惤澶辫触灏濊瘯锛岄噸璇曚娇鐢ㄦ柊鐨勭ǔ瀹氫緵搴斿晢骞傜瓑閿?ok 69 - 閫傞厤鍣ㄧ‘瀹氬け璐ュ紓甯歌惤澶辫触灏濊瘯锛岄噸璇曚娇鐢ㄦ柊鐨勭ǔ瀹氫緵搴斿晢骞傜瓑閿?  ---
+  duration_ms: 191.6786
+  type: 'test'
+  ...
+# Subtest: 閫傞厤鍣ㄦ彁浜ゅ悗寮傚父杩涘叆鏈煡瀵硅处锛岀‘璁ゆ湭鍙戦€佸悗鎵嶅厑璁镐笅涓€骞傜瓑灏濊瘯
+ok 70 - 閫傞厤鍣ㄦ彁浜ゅ悗寮傚父杩涘叆鏈煡瀵硅处锛岀‘璁ゆ湭鍙戦€佸悗鎵嶅厑璁镐笅涓€骞傜瓑灏濊瘯
+  ---
+  duration_ms: 170.9025
+  type: 'test'
+  ...
+# (node:71176) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 005 quarantines invalid role assignments and makes legacy processing reconciliation-only
+ok 71 - 005 quarantines invalid role assignments and makes legacy processing reconciliation-only
+  ---
+  duration_ms: 149.7561
+  type: 'test'
+  ...
+# Subtest: fencing epochs reject stale and expired workers while allowing pre-effect renewal
+ok 72 - fencing epochs reject stale and expired workers while allowing pre-effect renewal
+  ---
+  duration_ms: 554.3206
+  type: 'test'
+  ...
+# (node:71052) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: migrations apply once and replay without mutation against a temporary SQLite file
+ok 73 - migrations apply once and replay without mutation against a temporary SQLite file
+  ---
+  duration_ms: 397.7979
+  type: 'test'
+  ...
+# Subtest: 004 migrates 003 idempotency records to pending and succeeded without rewriting history
+ok 74 - 004 migrates 003 idempotency records to pending and succeeded without rewriting history
+  ---
+  duration_ms: 95.9257
+  type: 'test'
+  ...
+# Subtest: HTTP login persists sessions, protects the login idempotency hash, and enforces input bounds
+ok 75 - HTTP login persists sessions, protects the login idempotency hash, and enforces input bounds
+  ---
+  duration_ms: 1005.0026
+  type: 'test'
+  ...
+# Subtest: disabled organizations block fresh login, replayed login, existing sessions, and school workspaces
+ok 76 - disabled organizations block fresh login, replayed login, existing sessions, and school workspaces
+  ---
+  duration_ms: 766.0063
+  type: 'test'
+  ...
+# Subtest: a legacy forged cross-organization class membership cannot expand class scope or authorize HTTP access
+ok 77 - a legacy forged cross-organization class membership cannot expand class scope or authorize HTTP access
+  ---
+  duration_ms: 854.1445
+  type: 'test'
+  ...
+# Subtest: class, grade, own, school, and platform scopes use persisted memberships without widening student actions
+ok 78 - class, grade, own, school, and platform scopes use persisted memberships without widening student actions
+  ---
+  duration_ms: 1225.4225
+  type: 'test'
+  ...
+# Subtest: session TTL rejects invalid values before opening the database
+ok 79 - session TTL rejects invalid values before opening the database
+  ---
+  duration_ms: 3.8331
+  type: 'test'
+  ...
+# Subtest: seed import is strict on drift and the JSON CLI reports nonzero failure without raw credentials
+ok 80 - seed import is strict on drift and the JSON CLI reports nonzero failure without raw credentials
+  ---
+  duration_ms: 1135.6877
+  type: 'test'
+  ...
+# Subtest: async idempotency reserves outside external work, replays successes, and recovers expired leases
+ok 81 - async idempotency reserves outside external work, replays successes, and recovers expired leases
+  ---
+  duration_ms: 325.0409
+  type: 'test'
+  ...
+# Subtest: async idempotency persists classified failures and blocks blind replay after unknown external results
+ok 82 - async idempotency persists classified failures and blocks blind replay after unknown external results
+  ---
+  duration_ms: 304.4981
+  type: 'test'
+  ...
+# (node:64072) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: role assignments stay inside their organization for SQLite writes and HTTP target access
+ok 83 - role assignments stay inside their organization for SQLite writes and HTTP target access
+  ---
+  duration_ms: 963.5824
+  type: 'test'
+  ...
+# (node:65992) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: H. POST /classes 蹇呴』鐢?class.create锛宺esourceScope 蹇呴』甯︽湇鍔＄璁＄畻鐨?gradeId
+ok 84 - H. POST /classes 蹇呴』鐢?class.create锛宺esourceScope 蹇呴』甯︽湇鍔＄璁＄畻鐨?gradeId
+  ---
+  duration_ms: 2.2044
+  type: 'test'
+  ...
+# Subtest: H. POST /classes body 涓?{name,stage,entryYear,classNumber}锛屾湇鍔＄鐢熸垚 gradeId
+ok 85 - H. POST /classes body 涓?{name,stage,entryYear,classNumber}锛屾湇鍔＄鐢熸垚 gradeId
+  ---
+  duration_ms: 699.2767
+  type: 'test'
+  ...
+# Subtest: H. PATCH 鏀瑰眾鍒』甯?version锛屽苟瀵瑰彉鏇村墠/鍚?scope 閮芥牎楠?ok 86 - H. PATCH 鏀瑰眾鍒』甯?version锛屽苟瀵瑰彉鏇村墠/鍚?scope 閮芥牎楠?  ---
+  duration_ms: 521.9768
+  type: 'test'
+  ...
+# Subtest: H. DELETE/restore 杞仠鐢?class+workspace锛屾垚鍛樹笌 grants 淇濈暀
+ok 87 - H. DELETE/restore 杞仠鐢?class+workspace锛屾垚鍛樹笌 grants 淇濈暀
+  ---
+  duration_ms: 548.9535
+  type: 'test'
+  ...
+# Subtest: H. 瀛﹀勾璁＄畻锛氬浐瀹?now 娴?9 鏈?1 鏃ヨ竟鐣屻€佸皬瀛?6 / 鍒濋珮涓?3銆乽pcoming/graduated
+ok 88 - H. 瀛﹀勾璁＄畻锛氬浐瀹?now 娴?9 鏈?1 鏃ヨ竟鐣屻€佸皬瀛?6 / 鍒濋珮涓?3銆乽pcoming/graduated
+  ---
+  duration_ms: 2.18
+  type: 'test'
+  ...
+# Subtest: H. grade_group 鈫?grade_manager 鍒悕涓嶅緱鍐嶆槧灏?ok 89 - H. grade_group 鈫?grade_manager 鍒悕涓嶅緱鍐嶆槧灏?  ---
+  duration_ms: 0.6204
+  type: 'test'
+  ...
+# Subtest: H. 鏁欏笀涓嶅緱 POST /classes锛涜法缁勭粐 classId 涓庝笉瀛樺湪鍚岀爜鍚屾枃妗?ok 90 - H. 鏁欏笀涓嶅緱 POST /classes锛涜法缁勭粐 classId 涓庝笉瀛樺湪鍚岀爜鍚屾枃妗?  ---
+  duration_ms: 496.1168
+  type: 'test'
+  ...
+# (node:56724) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. 娉ㄥ唽鍚庨浂鎴愬憳鍏崇郴銆佷竴鏉?pending
+ok 91 - F. 娉ㄥ唽鍚庨浂鎴愬憳鍏崇郴銆佷竴鏉?pending
+  ---
+  duration_ms: 783.8725
+  type: 'test'
+  ...
+# Subtest: F. 鎵瑰噯涓€娆℃€у缓瀛︾敓涓夊叧绯?ok 92 - F. 鎵瑰噯涓€娆℃€у缓瀛︾敓涓夊叧绯?  ---
+  duration_ms: 564.3161
+  type: 'test'
+  ...
+# Subtest: F. 鎷掔粷鍚庡彲鏂扮敵璇凤紱缁堟€佷笉鍙敼 鈫?409 VERSION_CONFLICT
+ok 93 - F. 鎷掔粷鍚庡彲鏂扮敵璇凤紱缁堟€佷笉鍙敼 鈫?409 VERSION_CONFLICT
+  ---
+  duration_ms: 530.7922
+  type: 'test'
+  ...
+# Subtest: F. 閲嶅 pending / 宸叉湁 active 鐝?/ 鏁欏笀瀹″埆鐝?/ grade_manager 璺ㄥ眾 鍏ㄩ儴鎷掔粷
+ok 94 - F. 閲嶅 pending / 宸叉湁 active 鐝?/ 鏁欏笀瀹″埆鐝?/ grade_manager 璺ㄥ眾 鍏ㄩ儴鎷掔粷
+  ---
+  duration_ms: 554.871
+  type: 'test'
+  ...
+# Subtest: F. If-Match 浼樺厛浜?body version锛欼f-Match 褰撳墠 + body 杩囨湡 鈫?200
+ok 95 - F. If-Match 浼樺厛浜?body version锛欼f-Match 褰撳墠 + body 杩囨湡 鈫?200
+  ---
+  duration_ms: 549.6597
+  type: 'test'
+  ...
+# Subtest: F. 骞跺彂涓や釜鎵瑰噯锛氬彧鏈変竴娆＄墿鍖栧鐢熶笁鍏崇郴锛屽彟涓€娆?409
+ok 96 - F. 骞跺彂涓や釜鎵瑰噯锛氬彧鏈変竴娆＄墿鍖栧鐢熶笁鍏崇郴锛屽彟涓€娆?409
+  ---
+  duration_ms: 682.9813
+  type: 'test'
+  ...
+# Subtest: F. If-Match 浼樺厛浜?body version锛欼f-Match 杩囨湡 + body 褰撳墠 鈫?409 VERSION_CONFLICT
+ok 97 - F. If-Match 浼樺厛浜?body version锛欼f-Match 杩囨湡 + body 褰撳墠 鈫?409 VERSION_CONFLICT
+  ---
+  duration_ms: 669.61
+  type: 'test'
+  ...
+# (node:69036) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\core\\phase8-identity-guards\\harness.guard.test.js
+ok 11 - tests\\server\\core\\phase8-identity-guards\\harness.guard.test.js
+  ---
+  duration_ms: 308.0805
+  type: 'test'
+  ...
+# (node:69812) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. POST /auth/login 鍙帴鍙?{schoolCode, loginName, password} 涓旂櫥褰曟垚鍔?ok 99 - A. POST /auth/login 鍙帴鍙?{schoolCode, loginName, password} 涓旂櫥褰曟垚鍔?  ---
+  duration_ms: 760.4276
+  type: 'test'
+  ...
+# Subtest: A. username-only 鐧诲綍涓嶅緱鍐嶆垚鍔?ok 100 - A. username-only 鐧诲綍涓嶅緱鍐嶆垚鍔?  ---
+  duration_ms: 548.2663
+  type: 'test'
+  ...
+# Subtest: A. 鐧诲綍澶辫触缁熶竴 401銆屽鏍°€佽处鍙锋垨瀵嗙爜閿欒銆?ok 101 - A. 鐧诲綍澶辫触缁熶竴 401銆屽鏍°€佽处鍙锋垨瀵嗙爜閿欒銆?  ---
+  duration_ms: 615.2388
+  type: 'test'
+  ...
+# Subtest: A. pending 瀛︾敓鐧诲綍 200锛宒efaultPath=/student/onboarding锛宎ctiveWorkspaceId=null
+ok 102 - A. pending 瀛︾敓鐧诲綍 200锛宒efaultPath=/student/onboarding锛宎ctiveWorkspaceId=null
+  ---
+  duration_ms: 569.158
+  type: 'test'
+  ...
+# Subtest: A. V 鎴愮珛涓旈浂 active 鏁欏笀鐝細defaultPath=/console/select-class
+ok 103 - A. V 鎴愮珛涓旈浂 active 鏁欏笀鐝細defaultPath=/console/select-class
+  ---
+  duration_ms: 652.0428
+  type: 'test'
+  ...
+# Subtest: A. 涓嶅緱鎶婄┖ defaultPath 褰撴垚鐧诲綍澶辫触
+ok 104 - A. 涓嶅緱鎶婄┖ defaultPath 褰撴垚鐧诲綍澶辫触
+  ---
+  duration_ms: 727.149
+  type: 'test'
+  ...
+# (node:72020) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 瀵嗙爜閲嶇疆鐭╅樀锛氭暀甯堝鏈彮瀛︾敓鍏佽锛屽浠栫彮瀛︾敓/鏈牎鏁欏笀鎷掔粷
+ok 105 - G. 瀵嗙爜閲嶇疆鐭╅樀锛氭暀甯堝鏈彮瀛︾敓鍏佽锛屽浠栫彮瀛︾敓/鏈牎鏁欏笀鎷掔粷
+  ---
+  duration_ms: 764.044
+  type: 'test'
+  ...
+# Subtest: G. 瀵嗙爜閲嶇疆鐭╅樀锛氬勾绾т富浠诲鏈眾瀛︾敓+鏈牎鏁欏笀鍏佽锛岃法灞婂鐢熸嫆缁?ok 106 - G. 瀵嗙爜閲嶇疆鐭╅樀锛氬勾绾т富浠诲鏈眾瀛︾敓+鏈牎鏁欏笀鍏佽锛岃法灞婂鐢熸嫆缁?  ---
+  duration_ms: 599.3429
+  type: 'test'
+  ...
+# Subtest: G. 瀵嗙爜閲嶇疆鐭╅樀锛氭牎闀垮叏鏍″厑璁革紱platform 瀵规牎闀垮厑璁革紱璺ㄧ粍缁?404
+ok 107 - G. 瀵嗙爜閲嶇疆鐭╅樀锛氭牎闀垮叏鏍″厑璁革紱platform 瀵规牎闀垮厑璁革紱璺ㄧ粍缁?404
+  ---
+  duration_ms: 631.0657
+  type: 'test'
+  ...
+# Subtest: G. 閲嶇疆鐮?30 鍒嗛挓銆佹挙閿€銆佸崟娆★紱澶辫触瀵嗙爜涓嶆秷璐癸紱鏃?session 鍏ㄥけ鏁?ok 108 - G. 閲嶇疆鐮?30 鍒嗛挓銆佹挙閿€銆佸崟娆★紱澶辫触瀵嗙爜涓嶆秷璐癸紱鏃?session 鍏ㄥけ鏁?  ---
+  duration_ms: 585.828
+  type: 'test'
+  ...
+# Subtest: G. 瀹¤涓嶅惈 token/password/hash
+ok 109 - G. 瀹¤涓嶅惈 token/password/hash
+  ---
+  duration_ms: 719.5952
+  type: 'test'
+  ...
+# (node:68232) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: I. roleActions锛歵eacher 鏈?shelf 鏃?catalog锛涜鏀挎棤 shelf/catalog锛沺latform 鏈?catalog 鏃?shelf
+ok 110 - I. roleActions锛歵eacher 鏈?shelf 鏃?catalog锛涜鏀挎棤 shelf/catalog锛沺latform 鏈?catalog 鏃?shelf
+  ---
+  duration_ms: 2.1583
+  type: 'test'
+  ...
+# Subtest: I. 搴熸 teacher.affiliation.approve锛氭棤 action
+ok 111 - I. 搴熸 teacher.affiliation.approve锛氭棤 action
+  ---
+  duration_ms: 0.4206
+  type: 'test'
+  ...
+# Subtest: I. teacher.affiliation.join_self / leave_self锛氬厑璁?+ 鍚岀粍缁囪秺 scope 鎷掔粷 + 璺ㄧ粍缁?404
+ok 112 - I. teacher.affiliation.join_self / leave_self锛氬厑璁?+ 鍚岀粍缁囪秺 scope 鎷掔粷 + 璺ㄧ粍缁?404
+  ---
+  duration_ms: 772.3943
+  type: 'test'
+  ...
+# Subtest: I. teacher.affiliation.force_assign / force_remove锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+ok 113 - I. teacher.affiliation.force_assign / force_remove锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+  ---
+  duration_ms: 562.3773
+  type: 'test'
+  ...
+# Subtest: I. student.enrollment.review锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+ok 114 - I. student.enrollment.review锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+  ---
+  duration_ms: 558.7901
+  type: 'test'
+  ...
+# Subtest: I. 10.2 鍐欏姩浣滃湪 roleActions 涓殑鍏佽/鎷掔粷鎶芥牱
+ok 115 - I. 10.2 鍐欏姩浣滃湪 roleActions 涓殑鍏佽/鎷掔粷鎶芥牱
+  ---
+  duration_ms: 0.7893
+  type: 'test'
+  ...
+# Subtest: I. registration.student.issue / teacher.issue锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+ok 116 - I. registration.student.issue / teacher.issue锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+  ---
+  duration_ms: 553.4768
+  type: 'test'
+  ...
+# Subtest: I. password_reset.student.issue / teacher.issue锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+ok 117 - I. password_reset.student.issue / teacher.issue锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+  ---
+  duration_ms: 611.481
+  type: 'test'
+  ...
+# Subtest: I. class.create锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+ok 118 - I. class.create锛氬厑璁?+ 瓒?scope 403 + 璺ㄧ粍缁?404
+  ---
+  duration_ms: 664.2608
+  type: 'test'
+  ...
+# Subtest: I. 琛屾斂瑙掕壊鎸囨淳锛歱latform 鎸囨淳鏍￠暱 / 鏍￠暱鎸囨淳骞寸骇涓讳换锛涜秺鏉?403锛涜法缁勭粐 404
+ok 119 - I. 琛屾斂瑙掕壊鎸囨淳锛歱latform 鎸囨淳鏍￠暱 / 鏍￠暱鎸囨淳骞寸骇涓讳换锛涜秺鏉?403锛涜法缁勭粐 404
+  ---
+  duration_ms: 685.0484
+  type: 'test'
+  ...
+# (node:63332) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. teacher/student 鍑嵁鍒嗗紑锛沚ody 鍑虹幇 role/organizationId/scopeId 鈫?400
+ok 120 - E. teacher/student 鍑嵁鍒嗗紑锛沚ody 鍑虹幇 role/organizationId/scopeId 鈫?400
+  ---
+  duration_ms: 765.2335
+  type: 'test'
+  ...
+# Subtest: E. 缁勭粐鍙粠 token 鍙嶆煡锛涘叕寮€娑堣垂鍘熸枃涓嶈惤搴撱€佷笉杩涘璁?ok 121 - E. 缁勭粐鍙粠 token 鍙嶆煡锛涘叕寮€娑堣垂鍘熸枃涓嶈惤搴撱€佷笉杩涘璁?  ---
+  duration_ms: 610.9641
+  type: 'test'
+  ...
+# Subtest: E. 鎾ら攢/鍒版湡/鐢ㄥ敖鍏紑绔粺涓€ 404
+ok 122 - E. 鎾ら攢/鍒版湡/鐢ㄥ敖鍏紑绔粺涓€ 404
+  ---
+  duration_ms: 550.8501
+  type: 'test'
+  ...
+# Subtest: E. 浜烘暟涓婇檺鏈€鍚庝竴鍚嶉骞跺彂鍙湁涓€涓垚鍔燂紱澶辫触涓嶈 use
+ok 123 - E. 浜烘暟涓婇檺鏈€鍚庝竴鍚嶉骞跺彂鍙湁涓€涓垚鍔燂紱澶辫触涓嶈 use
+  ---
+  duration_ms: 601.443
+  type: 'test'
+  ...
+# Subtest: E. 鍚?loginName 璺ㄦ牎鍙敞鍐岋紱鍚屾牎鍐茬獊 409 + details.suggestions 3 涓?ok 124 - E. 鍚?loginName 璺ㄦ牎鍙敞鍐岋紱鍚屾牎鍐茬獊 409 + details.suggestions 3 涓?  ---
+  duration_ms: 686.2416
+  type: 'test'
+  ...
+# Subtest: E. 鏁欏笀/瀛︾敓榛樿 TTL 涓?max_uses 鍙鏄惧紡瑕嗙洊
+ok 125 - E. 鏁欏笀/瀛︾敓榛樿 TTL 涓?max_uses 鍙鏄惧紡瑕嗙洊
+  ---
+  duration_ms: 776.4964
+  type: 'test'
+  ...
+# Subtest: E. 鏁欏笀榛樿 7 澶?max_uses=1锛涘鐢熼粯璁?180 澶?max_uses=NULL
+ok 126 - E. 鏁欏笀榛樿 7 澶?max_uses=1锛涘鐢熼粯璁?180 澶?max_uses=NULL
+  ---
+  duration_ms: 608.6921
+  type: 'test'
+  ...
+# Subtest: E. grade_manager 绛惧彂瀛︾敓鍑嵁蹇呴』鏄嚜宸辩殑 grade scope锛宐ody 鏀?scopeId 鈫?400
+ok 127 - E. grade_manager 绛惧彂瀛︾敓鍑嵁蹇呴』鏄嚜宸辩殑 grade scope锛宐ody 鏀?scopeId 鈫?400
+  ---
+  duration_ms: 578.4716
+  type: 'test'
+  ...
+# Subtest: E. grade_manager 鍙鍙戞暀甯堝嚟鎹紙school 渚嬪锛夛紝浣嗕笉鑳借法灞婂缓鐝?鏀瑰鐢?ok 128 - E. grade_manager 鍙鍙戞暀甯堝嚟鎹紙school 渚嬪锛夛紝浣嗕笉鑳借法灞婂缓鐝?鏀瑰鐢?  ---
+  duration_ms: 468.5561
+  type: 'test'
+  ...
+# (node:69348) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: J. 涓存椂搴撹矾寰勪笉寰楁槸 server/data/readmate.sqlite
+ok 129 - J. 涓存椂搴撹矾寰勪笉寰楁槸 server/data/readmate.sqlite
+  ---
+  duration_ms: 627.5036
+  type: 'test'
+  ...
+# Subtest: J. session-only 涓庡叕寮€娉ㄥ唽蹇呴』鎵?identity router锛岀姝?integration-router
+ok 130 - J. session-only 涓庡叕寮€娉ㄥ唽蹇呴』鎵?identity router锛岀姝?integration-router
+  ---
+  duration_ms: 1.7893
+  type: 'test'
+  ...
+# Subtest: J. 璺ㄧ粍缁?id 涓庝笉瀛樺湪 id 鍚岀爜鍚屾枃妗?404
+ok 131 - J. 璺ㄧ粍缁?id 涓庝笉瀛樺湪 id 鍚岀爜鍚屾枃妗?404
+  ---
+  duration_ms: 650.3692
+  type: 'test'
+  ...
+# Subtest: J. 缂哄け璺敱涓嶅緱 fallback 鎴?200锛汸OST /students 涔熶笉寰楀啀 200
+ok 132 - J. 缂哄け璺敱涓嶅緱 fallback 鎴?200锛汸OST /students 涔熶笉寰楀啀 200
+  ---
+  duration_ms: 590.3427
+  type: 'test'
+  ...
+# Subtest: J. 鏈瀹堝崼鍙０鏄庣湡搴撹矾寰勶紝缁濅笉鎶?createIdentityTestApp 鎸囧悜瀹?ok 133 - J. 鏈瀹堝崼鍙０鏄庣湡搴撹矾寰勶紝缁濅笉鎶?createIdentityTestApp 鎸囧悜瀹?  ---
+  duration_ms: 487.5013
+  type: 'test'
+  ...
+# (node:27116) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. session-only 璺敱鍙寕 identity router锛屼笖涓嶇粡杩?requireWorkspace
+ok 134 - C. session-only 璺敱鍙寕 identity router锛屼笖涓嶇粡杩?requireWorkspace
+  ---
+  duration_ms: 4.5363
+  type: 'test'
+  ...
+# Subtest: C. 闆?workspace pending 瀛︾敓鍙?GET /onboarding/me锛堟棤 X-Workspace-Id锛?ok 135 - C. 闆?workspace pending 瀛︾敓鍙?GET /onboarding/me锛堟棤 X-Workspace-Id锛?  ---
+  duration_ms: 665.7552
+  type: 'test'
+  ...
+# Subtest: C. 闆?workspace 鐨?V 鏁欏笀鍙?GET /teacher/class-directory锛堟棤 X-Workspace-Id锛?ok 136 - C. 闆?workspace 鐨?V 鏁欏笀鍙?GET /teacher/class-directory锛堟棤 X-Workspace-Id锛?  ---
+  duration_ms: 577.3566
+  type: 'test'
+  ...
+# Subtest: C. 闆?workspace 鐨?V 鏁欏笀鍙?PUT join锛屼笖涓嶅緱涓?V 鍒涘缓 school 鑼冨洿 teacher role
+ok 137 - C. 闆?workspace 鐨?V 鏁欏笀鍙?PUT join锛屼笖涓嶅緱涓?V 鍒涘缓 school 鑼冨洿 teacher role
+  ---
+  duration_ms: 562.7901
+  type: 'test'
+  ...
+# Subtest: C. 鏁欏笀璋冪敤 GET /classes 鈫?403
+ok 138 - C. 鏁欏笀璋冪敤 GET /classes 鈫?403
+  ---
+  duration_ms: 514.5967
+  type: 'test'
+  ...
+# Subtest: C. GET /classes 浠?S/G 鍙闂?ok 139 - C. GET /classes 浠?S/G 鍙闂?  ---
+  duration_ms: 584.1699
+  type: 'test'
+  ...
+# Subtest: C. 宸插叆鐝暀甯堢湅鏈彮璧?GET /classes/:classId + C
+ok 140 - C. 宸插叆鐝暀甯堢湅鏈彮璧?GET /classes/:classId + C
+  ---
+  duration_ms: 744.8186
+  type: 'test'
+  ...
+# (node:64548) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. identity router 涓嶅緱鍐嶆敞鍐?POST /students锛堟棤鍏煎 handler / 鍋?404 鍒嗘敮锛?ok 141 - B. identity router 涓嶅緱鍐嶆敞鍐?POST /students锛堟棤鍏煎 handler / 鍋?404 鍒嗘敮锛?  ---
+  duration_ms: 1.5314
+  type: 'test'
+  ...
+# Subtest: B. POST /students 蹇呴』鐢辨爣鍑嗕笉瀛樺湪璺敱杩斿洖 404锛屼笖涓嶈兘鍐嶇墿鍖栧凡鍏ョ彮瀛︾敓
+ok 142 - B. POST /students 蹇呴』鐢辨爣鍑嗕笉瀛樺湪璺敱杩斿洖 404锛屼笖涓嶈兘鍐嶇墿鍖栧凡鍏ョ彮瀛︾敓
+  ---
+  duration_ms: 739.8292
+  type: 'test'
+  ...
+# (node:72324) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. join_self锛歴ession-only + V锛岀珛鍗崇敓鏁堬紝宸?active 鍒?200 骞傜瓑涓斾笉寰椾骇鐢熺浜岀粍
+ok 143 - D. join_self锛歴ession-only + V锛岀珛鍗崇敓鏁堬紝宸?active 鍒?200 骞傜瓑涓斾笉寰椾骇鐢熺浜岀粍
+  ---
+  duration_ms: 743.2333
+  type: 'test'
+  ...
+# Subtest: D. leave_self锛氫笉瑕佹眰 X-Workspace-Id锛涘畬鏁?active 鈫?鍚屼簨鍔″仠鐢ㄤ笁鑰?200
+ok 144 - D. leave_self锛氫笉瑕佹眰 X-Workspace-Id锛涘畬鏁?active 鈫?鍚屼簨鍔″仠鐢ㄤ笁鑰?200
+  ---
+  duration_ms: 566.317
+  type: 'test'
+  ...
+# Subtest: D. leave_self锛氬畬鏁?disabled 鎴栦笁鑰呯殕鏃?鈫?200 no-op锛涗笉寰楀洜 disabled/absent 鍏?403
+ok 145 - D. leave_self锛氬畬鏁?disabled 鎴栦笁鑰呯殕鏃?鈫?200 no-op锛涗笉寰楀洜 disabled/absent 鍏?403
+  ---
+  duration_ms: 585.7678
+  type: 'test'
+  ...
+# Subtest: D. leave_self锛氭畫缂轰笁鍏冪粍 鈫?500 IDENTITY_INVARIANT_VIOLATION锛屼笖涓嶈嚜鍔ㄤ慨
+ok 146 - D. leave_self锛氭畫缂轰笁鍏冪粍 鈫?500 IDENTITY_INVARIANT_VIOLATION锛屼笖涓嶈嚜鍔ㄤ慨
+  ---
+  duration_ms: 486.2473
+  type: 'test'
+  ...
+# Subtest: D. leave_self / join_self锛歝lass 涓嶅瓨鍦ㄤ笌璺ㄧ粍缁囧悓鐮佸悓鏂囨 404
+ok 147 - D. leave_self / join_self锛歝lass 涓嶅瓨鍦ㄤ笌璺ㄧ粍缁囧悓鐮佸悓鏂囨 404
+  ---
+  duration_ms: 590.4574
+  type: 'test'
+  ...
+# Subtest: D. 澶栨牎 / disabled / graduated 鎷掔粷鍔犲叆
+ok 148 - D. 澶栨牎 / disabled / graduated 鎷掔粷鍔犲叆
+  ---
+  duration_ms: 755.129
+  type: 'test'
+  ...
+# Subtest: D. 骞跺彂涓や釜 join 鏈€缁堝彧鏈変竴缁勪笁鍏冪粍
+ok 149 - D. 骞跺彂涓や釜 join 鏈€缁堝彧鏈変竴缁勪笁鍏冪粍
+  ---
+  duration_ms: 656.7687
+  type: 'test'
+  ...
+# Subtest: D. 浠讳竴琛ㄦ晠鎰忕己澶辨椂涓嶈嚜鍔ㄤ慨锛屾姤涓嶅彉閲忛敊璇?ok 150 - D. 浠讳竴琛ㄦ晠鎰忕己澶辨椂涓嶈嚜鍔ㄤ慨锛屾姤涓嶅彉閲忛敊璇?  ---
+  duration_ms: 507.8361
+  type: 'test'
+  ...
+# Subtest: D. teacher.affiliation.approve 涓嶅緱瀛樺湪锛堟棤 action銆佹棤璺敱銆佹棤 pending 鏁欏笀瀹℃壒妯″瀷锛?ok 151 - D. teacher.affiliation.approve 涓嶅緱瀛樺湪锛堟棤 action銆佹棤璺敱銆佹棤 pending 鏁欏笀瀹℃壒妯″瀷锛?  ---
+  duration_ms: 1.6526
+  type: 'test'
+  ...
+# Subtest: D. teacherCount 璁″畬鏁?active 涓夊厓缁勶紱涓夎〃浜烘暟涓嶄竴鑷?鈫?IDENTITY_INVARIANT_VIOLATION
+ok 152 - D. teacherCount 璁″畬鏁?active 涓夊厓缁勶紱涓夎〃浜烘暟涓嶄竴鑷?鈫?IDENTITY_INVARIANT_VIOLATION
+  ---
+  duration_ms: 570.4134
+  type: 'test'
+  ...
+# Subtest: D. 寮哄埗鎸囨淳/绉婚櫎锛歋/G锛涚洰鏍囬』鍚屾牎宸查獙璇佹暀甯堬紱200 骞傜瓑锛涙暀甯堣皟鐢?403
+ok 153 - D. 寮哄埗鎸囨淳/绉婚櫎锛歋/G锛涚洰鏍囬』鍚屾牎宸查獙璇佹暀甯堬紱200 骞傜瓑锛涙暀甯堣皟鐢?403
+  ---
+  duration_ms: 434.6744
+  type: 'test'
+  ...
+# Subtest: D. 琛屾斂绾犻敊 PATCH /students/:userId/class锛氭暀甯?403锛涙簮+鐩爣瀵圭О鏍￠獙锛涚洰鏍囧嵆褰撳墠鐝?200 涓斾笉鎺╃洊娈嬬己
+ok 154 - D. 琛屾斂绾犻敊 PATCH /students/:userId/class锛氭暀甯?403锛涙簮+鐩爣瀵圭О鏍￠獙锛涚洰鏍囧嵆褰撳墠鐝?200 涓斾笉鎺╃洊娈嬬己
+  ---
+  duration_ms: 381.0868
+  type: 'test'
+  ...
+# (node:72564) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: GET /classes/:classId/enrollment-requests锛氭湰鐝厑璁搞€佽秺 scope 403銆佽法缁勭粐 404
+ok 155 - GET /classes/:classId/enrollment-requests锛氭湰鐝厑璁搞€佽秺 scope 403銆佽法缁勭粐 404
+  ---
+  duration_ms: 754.8851
+  type: 'test'
+  ...
+# Subtest: GET /registration-credentials锛氭牎闀垮厑璁搞€佹暀甯堣秺 scope 403銆佷笉鍥炴樉 hash/rawToken
+ok 156 - GET /registration-credentials锛氭牎闀垮厑璁搞€佹暀甯堣秺 scope 403銆佷笉鍥炴樉 hash/rawToken
+  ---
+  duration_ms: 559.5069
+  type: 'test'
+  ...
+# Subtest: GET /users/:userId/password-reset-credentials锛氭湰鐝厑璁搞€佽秺 scope 403銆佽法缁勭粐 404
+ok 157 - GET /users/:userId/password-reset-credentials锛氭湰鐝厑璁搞€佽秺 scope 403銆佽法缁勭粐 404
+  ---
+  duration_ms: 554.4783
+  type: 'test'
+  ...
+# (node:42780) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鍒犻櫎鍏ㄩ噺 visibility 鍐欐ā鍨嬶細setBookVisibility(scope,classIds) 蹇呴』涓嶅啀鍙敤
+ok 158 - 鍒犻櫎鍏ㄩ噺 visibility 鍐欐ā鍨嬶細setBookVisibility(scope,classIds) 蹇呴』涓嶅啀鍙敤
+  ---
+  duration_ms: 387.5313
+  type: 'test'
+  ...
+# Subtest: class-local grant锛氬彧澧炴湰 class + 褰撳墠鐗堟湰涓€琛岋紝200 骞傜瓑锛屼笉鏇挎崲鍏朵粬鐝?ok 159 - class-local grant锛氬彧澧炴湰 class + 褰撳墠鐗堟湰涓€琛岋紝200 骞傜瓑锛屼笉鏇挎崲鍏朵粬鐝?  ---
+  duration_ms: 430.8335
+  type: 'test'
+  ...
+# Subtest: class-local revoke锛氬彧鍒犳湰 class grant锛屼笉鍔ㄥ叾浠栫彮銆佷笉鍔ㄦ湭鐭?grantee_type
+ok 160 - class-local revoke锛氬彧鍒犳湰 class grant锛屼笉鍔ㄥ叾浠栫彮銆佷笉鍔ㄦ湭鐭?grantee_type
+  ---
+  duration_ms: 416.3835
+  type: 'test'
+  ...
+# Subtest: shelf 棰嗗煙鍑芥暟绂佹鍐嶈皟鐢?book.publish / setBookVisibility
+ok 161 - shelf 棰嗗煙鍑芥暟绂佹鍐嶈皟鐢?book.publish / setBookVisibility
+  ---
+  duration_ms: 429.6552
+  type: 'test'
+  ...
+# Subtest: 涓や釜骞跺彂 PUT 鍚岀彮鍚屼功鏈€缁堜竴琛?ok 162 - 涓や釜骞跺彂 PUT 鍚岀彮鍚屼功鏈€缁堜竴琛?  ---
+  duration_ms: 378.2719
+  type: 'test'
+  ...
+# Subtest: 涓€涓彮鎾や笅涓嶅奖鍝嶄粬鐝?ok 163 - 涓€涓彮鎾や笅涓嶅奖鍝嶄粬鐝?  ---
+  duration_ms: 386.6368
+  type: 'test'
+  ...
+# (node:71020) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-21 getPost锛氭湁鏈彮 grant 鏃?quote.text 浠嶈繑鍥?ok 164 - D-21 getPost锛氭湁鏈彮 grant 鏃?quote.text 浠嶈繑鍥?  ---
+  duration_ms: 430.7021
+  type: 'test'
+  ...
+# Subtest: D-21 getPost锛氭棤 grant 鏃朵繚鐣欏笘瀛愶紝quote.text=null 涓?availability=unavailable
+ok 165 - D-21 getPost锛氭棤 grant 鏃朵繚鐣欏笘瀛愶紝quote.text=null 涓?availability=unavailable
+  ---
+  duration_ms: 486.995
+  type: 'test'
+  ...
+# Subtest: D-21 getPost锛氫粎浠栫彮 grant 鏃堕殣钘?quote.text
+ok 166 - D-21 getPost锛氫粎浠栫彮 grant 鏃堕殣钘?quote.text
+  ---
+  duration_ms: 382.9958
+  type: 'test'
+  ...
+# Subtest: D-21 getPost锛歞raft 鍗充娇宸茬粰鏈彮 grant 涔熼殣钘?quote.text锛堝け璐ュ彧褰掑洜鍙戝竷鐘舵€侊級
+ok 167 - D-21 getPost锛歞raft 鍗充娇宸茬粰鏈彮 grant 涔熼殣钘?quote.text锛堝け璐ュ彧褰掑洜鍙戝竷鐘舵€侊級
+  ---
+  duration_ms: 423.4525
+  type: 'test'
+  ...
+# Subtest: D-21 getPost锛氭棫甯栦笉鏀规暟鎹簱锛涙挙 grant 鍚庤闅愯棌锛屾仮澶?grant 鍚庤鎭㈠
+ok 168 - D-21 getPost锛氭棫甯栦笉鏀规暟鎹簱锛涙挙 grant 鍚庤闅愯棌锛屾仮澶?grant 鍚庤鎭㈠
+  ---
+  duration_ms: 395.0157
+  type: 'test'
+  ...
+# Subtest: D-21 getPost锛氭暀甯堝 published 鍙湅 quote.text锛堝嵆浣挎棤 class grant锛?ok 169 - D-21 getPost锛氭暀甯堝 published 鍙湅 quote.text锛堝嵆浣挎棤 class grant锛?  ---
+  duration_ms: 375.4051
+  type: 'test'
+  ...
+# Subtest: D-21 getPost锛氳法缁勭粐涓嶆硠闇插笘瀛愭垨 quote.text
+ok 170 - D-21 getPost锛氳法缁勭粐涓嶆硠闇插笘瀛愭垨 quote.text
+  ---
+  duration_ms: 353.3208
+  type: 'test'
+  ...
+# (node:72000) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-23 acquireLease锛歱ublished + 鏈彮 grant 鈫?鎴愬姛骞朵骇鐢?lease
+ok 171 - D-23 acquireLease锛歱ublished + 鏈彮 grant 鈫?鎴愬姛骞朵骇鐢?lease
+  ---
+  duration_ms: 378.4379
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease锛歱ublished + 鏃?grant 鈫?404銆屼功绫嶄笉瀛樺湪鎴栧綋鍓嶄笉鍙鍙栥€嶏紝涓斾笉寰楀啓 lease
+ok 172 - D-23 acquireLease锛歱ublished + 鏃?grant 鈫?404銆屼功绫嶄笉瀛樺湪鎴栧綋鍓嶄笉鍙鍙栥€嶏紝涓斾笉寰楀啓 lease
+  ---
+  duration_ms: 437.7501
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease锛歞raft + 鏈彮 grant 鈫?404锛屽け璐ュ彧褰掑洜鍙戝竷鐘舵€?ok 173 - D-23 acquireLease锛歞raft + 鏈彮 grant 鈫?404锛屽け璐ュ彧褰掑洜鍙戝竷鐘舵€?  ---
+  duration_ms: 417.8508
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease锛氬缁勭粐鐗堟湰 鈫?鍚岀爜鍚屾枃妗?404锛屼笉娉勯湶瀛樺湪鎬?ok 174 - D-23 acquireLease锛氬缁勭粐鐗堟湰 鈫?鍚岀爜鍚屾枃妗?404锛屼笉娉勯湶瀛樺湪鎬?  ---
+  duration_ms: 432.7037
+  type: 'test'
+  ...
+# Subtest: D-23锛氬凡鍙栧緱绉熺害鍚庢挙涓嬶紝鐜版湁 lease 鍙寜 90 绉掕鍒欑画鍒拌嚜鐒剁粨鏉燂紝缁撴潫鍚庢柊 acquire 404
+ok 175 - D-23锛氬凡鍙栧緱绉熺害鍚庢挙涓嬶紝鐜版湁 lease 鍙寜 90 绉掕鍒欑画鍒拌嚜鐒剁粨鏉燂紝缁撴潫鍚庢柊 acquire 404
+  ---
+  duration_ms: 374.6273
+  type: 'test'
+  ...
+# Subtest: D-23锛氬彲瑙佹€у墠缃繀椤诲湪浠讳綍 lease 鍐欎簨鍔′箣鍓?ok 176 - D-23锛氬彲瑙佹€у墠缃繀椤诲湪浠讳綍 lease 鍐欎簨鍔′箣鍓?  ---
+  duration_ms: 392.1191
+  type: 'test'
+  ...
+# Subtest: D-23锛歵akeOverLease 濮旀墭 acquire锛岃嚜鍔ㄥ彈鍚屼竴鍙鎬х害鏉?ok 177 - D-23锛歵akeOverLease 濮旀墭 acquire锛岃嚜鍔ㄥ彈鍚屼竴鍙鎬х害鏉?  ---
+  duration_ms: 368.0359
+  type: 'test'
+  ...
+# (node:65448) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-25锛歳esolveBookAudience 涓嶅啀杩斿洖 unrestricted锛屾敼涓?bypassClassGrants/allowUnpublished/classIds
+ok 178 - D-25锛歳esolveBookAudience 涓嶅啀杩斿洖 unrestricted锛屾敼涓?bypassClassGrants/allowUnpublished/classIds
+  ---
+  duration_ms: 451.5696
+  type: 'test'
+  ...
+# Subtest: D-25锛歱latform 鐨?audience 涓?bypassClassGrants=true 涓?allowUnpublished=true
+ok 179 - D-25锛歱latform 鐨?audience 涓?bypassClassGrants=true 涓?allowUnpublished=true
+  ---
+  duration_ms: 459.83
+  type: 'test'
+  ...
+# Subtest: D-25锛歵eacher 鐨?audience 涓?bypassClassGrants=true 涓?allowUnpublished=false
+ok 180 - D-25锛歵eacher 鐨?audience 涓?bypassClassGrants=true 涓?allowUnpublished=false
+  ---
+  duration_ms: 406.4654
+  type: 'test'
+  ...
+# Subtest: D-25锛歴tudent 鐨?audience 涓?bypassClassGrants=false 涓?allowUnpublished=false
+ok 181 - D-25锛歴tudent 鐨?audience 涓?bypassClassGrants=false 涓?allowUnpublished=false
+  ---
+  duration_ms: 418.6501
+  type: 'test'
+  ...
+# Subtest: D-25锛氭牎闀夸笉寰楀洜 BOOK_LIBRARY_MANAGEMENT_ROLES 杩涘叆涔﹀簱 audience
+ok 182 - D-25锛氭牎闀夸笉寰楀洜 BOOK_LIBRARY_MANAGEMENT_ROLES 杩涘叆涔﹀簱 audience
+  ---
+  duration_ms: 383.1028
+  type: 'test'
+  ...
+# Subtest: D-25锛氬勾绾т富浠讳笉寰楀洜 BOOK_LIBRARY_MANAGEMENT_ROLES 杩涘叆涔﹀簱 audience
+ok 183 - D-25锛氬勾绾т富浠讳笉寰楀洜 BOOK_LIBRARY_MANAGEMENT_ROLES 杩涘叆涔﹀簱 audience
+  ---
+  duration_ms: 362.285
+  type: 'test'
+  ...
+# Subtest: D-25锛歜ypassClassGrants=true 鍙粫杩?class grant锛屼笉鍙互鎶?draft 褰撴垚鍙涔?ok 184 - D-25锛歜ypassClassGrants=true 鍙粫杩?class grant锛屼笉鍙互鎶?draft 褰撴垚鍙涔?  ---
+  duration_ms: 344.3778
+  type: 'test'
+  ...
+# Subtest: D-25锛氭暀甯堜功搴撳彧鍒?published锛沝raft/archived 鍙 platform
+ok 185 - D-25锛氭暀甯堜功搴撳彧鍒?published锛沝raft/archived 鍙 platform
+  ---
+  duration_ms: 471.6896
+  type: 'test'
+  ...
+# Subtest: D-25锛氭暀甯堝彇 draft 璧勪骇蹇呴』 404锛屼笉寰楅潬鏃?unrestricted 鏀捐
+ok 186 - D-25锛氭暀甯堝彇 draft 璧勪骇蹇呴』 404锛屼笉寰楅潬鏃?unrestricted 鏀捐
+  ---
+  duration_ms: 506.0043
+  type: 'test'
+  ...
+# Subtest: D-25锛氭柊鍙戝竷鍥句功涓嶈嚜鍔ㄦ姇鏀撅紙publish 涓嶅緱鑷姩鍐?grant锛?ok 187 - D-25锛氭柊鍙戝竷鍥句功涓嶈嚜鍔ㄦ姇鏀撅紙publish 涓嶅緱鑷姩鍐?grant锛?  ---
+  duration_ms: 560.659
+  type: 'test'
+  ...
+# Subtest: D-25锛歜ypassClassGrants=true 鍦ㄤ粎鏈変粬鐝?grant 鏃朵粛鍙锛屼笖杩欏彧鏄?grant 鏃佽矾
+ok 188 - D-25锛歜ypassClassGrants=true 鍦ㄤ粎鏈変粬鐝?grant 鏃朵粛鍙锛屼笖杩欏彧鏄?grant 鏃佽矾
+  ---
+  duration_ms: 436.6805
+  type: 'test'
+  ...
+# (node:62020) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 榛樿鍏ㄩ棴锛氭棤 grants 鏃?isBookVisibleToAudience 蹇呴』涓?false锛堝垹闄ゃ€屾棤浠讳綍 grants 鍗?true銆嶏級
+ok 189 - 榛樿鍏ㄩ棴锛氭棤 grants 鏃?isBookVisibleToAudience 蹇呴』涓?false锛堝垹闄ゃ€屾棤浠讳綍 grants 鍗?true銆嶏級
+  ---
+  duration_ms: 436.0903
+  type: 'test'
+  ...
+# Subtest: 榛樿鍏ㄩ棴锛氫粎浠栫彮 class grant 鏃舵湰鐝鐢熶笉鍙
+ok 190 - 榛樿鍏ㄩ棴锛氫粎浠栫彮 class grant 鏃舵湰鐝鐢熶笉鍙
+  ---
+  duration_ms: 465.7393
+  type: 'test'
+  ...
+# Subtest: 榛樿鍏ㄩ棴锛氭湰鐝?class grant + published 鏃跺鐢熷彲瑙?ok 191 - 榛樿鍏ㄩ棴锛氭湰鐝?class grant + published 鏃跺鐢熷彲瑙?  ---
+  duration_ms: 406.2801
+  type: 'test'
+  ...
+# Subtest: 榛樿鍏ㄩ棴锛歛udience.classIds 涓虹┖蹇呴』涓嶅彲瑙?ok 192 - 榛樿鍏ㄩ棴锛歛udience.classIds 涓虹┖蹇呴』涓嶅彲瑙?  ---
+  duration_ms: 423.0016
+  type: 'test'
+  ...
+# Subtest: 榛樿鍏ㄩ棴锛氭湭鐭?grantee_type 涓嶅緱褰撳彲瑙侊紝涔熶笉寰楅潬鍏煎鍏滃簳鍙?true
+ok 193 - 榛樿鍏ㄩ棴锛氭湭鐭?grantee_type 涓嶅緱褰撳彲瑙侊紝涔熶笉寰楅潬鍏煎鍏滃簳鍙?true
+  ---
+  duration_ms: 375.5597
+  type: 'test'
+  ...
+# (node:61724) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 涓嶅彉閲忥細瀹堝崼娴嬭瘯涓嶆帴瑙︾湡瀹炰笟鍔″簱
+ok 194 - 涓嶅彉閲忥細瀹堝崼娴嬭瘯涓嶆帴瑙︾湡瀹炰笟鍔″簱
+  ---
+  duration_ms: 408.1094
+  type: 'test'
+  ...
+# Subtest: 涓嶅彉閲忥細鍐荤粨闃呰鎽樿琛?schema 涓嶅緱琚湰闃舵鏀瑰姩
+ok 195 - 涓嶅彉閲忥細鍐荤粨闃呰鎽樿琛?schema 涓嶅緱琚湰闃舵鏀瑰姩
+  ---
+  duration_ms: 452.3503
+  type: 'test'
+  ...
+# Subtest: 涓嶅彉閲忥細涓嶅緱淇敼 90s TTL 甯搁噺涓?renew / session-summaries 璺敱
+ok 196 - 涓嶅彉閲忥細涓嶅緱淇敼 90s TTL 甯搁噺涓?renew / session-summaries 璺敱
+  ---
+  duration_ms: 2.548
+  type: 'test'
+  ...
+# Subtest: 涓嶅彉閲忥細涓変唤 visibility 鏂囦欢鐢?T8.7 鎷ユ湁锛屼笉鍐嶈姹傚鍒濆 HEAD 骞插噣
+ok 197 - 涓嶅彉閲忥細涓変唤 visibility 鏂囦欢鐢?T8.7 鎷ユ湁锛屼笉鍐嶈姹傚鍒濆 HEAD 骞插噣
+  ---
+  duration_ms: 2.6538
+  type: 'test'
+  ...
+# (node:48024) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\core\\phase8-reading-guards\\shared-harness.guard.test.js
+ok 27 - tests\\server\\core\\phase8-reading-guards\\shared-harness.guard.test.js
+  ---
+  duration_ms: 137.0978
+  type: 'test'
+  ...
+# (node:71828) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: book-package/v2 鍙帴鍙楀凡杩囦汉宸ラ椄闂ㄤ笖鍙拷婧殑绮剧‘椤靛潡
+ok 199 - book-package/v2 鍙帴鍙楀凡杩囦汉宸ラ椄闂ㄤ笖鍙拷婧殑绮剧‘椤靛潡
+  ---
+  duration_ms: 84.4517
+  type: 'test'
+  ...
+# Subtest: book-package/v2 鍐呭琚敼鍐欏悗蹇呴』鍥?SHA-256 涓嶄竴鑷村け璐?ok 200 - book-package/v2 鍐呭琚敼鍐欏悗蹇呴』鍥?SHA-256 涓嶄竴鑷村け璐?  ---
+  duration_ms: 87.08
+  type: 'test'
+  ...
+# Subtest: book-package/v2 鍗充娇鍝堝笇閲嶇畻锛岀己灏戦€愬潡鏍¤鍙拌处浠嶄笉寰楀鍏?ok 201 - book-package/v2 鍗充娇鍝堝笇閲嶇畻锛岀己灏戦€愬潡鏍¤鍙拌处浠嶄笉寰楀鍏?  ---
+  duration_ms: 85.5492
+  type: 'test'
+  ...
+# Subtest: book-package/v2 閲嶇畻鍖呭搱甯屼篃涓嶈兘浼€犳牎璁㈠師鏂囧搱甯?ok 202 - book-package/v2 閲嶇畻鍖呭搱甯屼篃涓嶈兘浼€犳牎璁㈠師鏂囧搱甯?  ---
+  duration_ms: 57.7095
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖呭湪 --accept-trusted 涓嬭鎺ュ彈涓斾繚鐣欑湡瀹炶川閲忕姸鎬?ok 203 - trusted-baseline 鍖呭湪 --accept-trusted 涓嬭鎺ュ彈涓斾繚鐣欑湡瀹炶川閲忕姸鎬?  ---
+  duration_ms: 227.2149
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖呭湪娌℃湁 --accept-trusted 鏃跺繀椤昏浜哄伐闂搁棬鎷掔粷
+ok 204 - trusted-baseline 鍖呭湪娌℃湁 --accept-trusted 鏃跺繀椤昏浜哄伐闂搁棬鎷掔粷
+  ---
+  duration_ms: 53.371
+  type: 'test'
+  ...
+# Subtest: --accept-trusted 涓嶆斁瀹?passed 璺緞锛氭湭杩囦汉宸ラ椄闂ㄧ殑鍖呬粛琚嫆缁?ok 205 - --accept-trusted 涓嶆斁瀹?passed 璺緞锛氭湭杩囦汉宸ラ椄闂ㄧ殑鍖呬粛琚嫆缁?  ---
+  duration_ms: 80.6817
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖呬笉寰椾吉閫犱汉宸ュ鏍歌褰?ok 206 - trusted-baseline 鍖呬笉寰椾吉閫犱汉宸ュ鏍歌褰?  ---
+  duration_ms: 81.8987
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖呯己灏?grade 蹇呴』琚嫆缁?ok 207 - trusted-baseline 鍖呯己灏?grade 蹇呴』琚嫆缁?  ---
+  duration_ms: 47.5996
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖呯墿鐞嗛〉缂哄彿蹇呴』琚嫆缁?ok 208 - trusted-baseline 鍖呯墿鐞嗛〉缂哄彿蹇呴』琚嫆缁?  ---
+  duration_ms: 91.0212
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖呮枃浠跺搱甯屼笉绗﹀繀椤昏鎷掔粷
+ok 209 - trusted-baseline 鍖呮枃浠跺搱甯屼笉绗﹀繀椤昏鎷掔粷
+  ---
+  duration_ms: 55.192
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖呭皝闈㈠搱甯屼笉绗﹀繀椤昏鎷掔粷
+ok 210 - trusted-baseline 鍖呭皝闈㈠搱甯屼笉绗﹀繀椤昏鎷掔粷
+  ---
+  duration_ms: 76.1993
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖?PDF 鐗╃悊椤垫暟涓?pageCount 涓嶇蹇呴』琚嫆缁?ok 211 - trusted-baseline 鍖?PDF 鐗╃悊椤垫暟涓?pageCount 涓嶇蹇呴』琚嫆缁?  ---
+  duration_ms: 61.5105
+  type: 'test'
+  ...
+# (node:71440) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: trusted-baseline 鍖呯敤 --accept-trusted 绔埌绔鍏ュ苟鐧昏灏侀潰涓庡勾绾?ok 212 - trusted-baseline 鍖呯敤 --accept-trusted 绔埌绔鍏ュ苟鐧昏灏侀潰涓庡勾绾?  ---
+  duration_ms: 1405.5807
+  type: 'test'
+  ...
+# Subtest: trusted-baseline 鍖呭湪娌℃湁 --accept-trusted 鏃跺鍏ヨ鎷掔粷涓斾笉钀藉簱涓嶈惤鐩?ok 213 - trusted-baseline 鍖呭湪娌℃湁 --accept-trusted 鏃跺鍏ヨ鎷掔粷涓斾笉钀藉簱涓嶈惤鐩?  ---
+  duration_ms: 993.002
+  type: 'test'
+  ...
+# Subtest: 鍚屼竴 trusted 鍖呴噸澶嶅鍏ヤ繚鎸佸箓绛?ok 214 - 鍚屼竴 trusted 鍖呴噸澶嶅鍏ヤ繚鎸佸箓绛?  ---
+  duration_ms: 1174.7097
+  type: 'test'
+  ...
+# Subtest: GET /books 鎶曞奖甯﹀嚭缂栫洰骞寸骇涓斾繚鐣欐棦鏈夊瓧娈?ok 215 - GET /books 鎶曞奖甯﹀嚭缂栫洰骞寸骇涓斾繚鐣欐棦鏈夊瓧娈?  ---
+  duration_ms: 1142.1606
+  type: 'test'
+  ...
+# Subtest: publishBook 鎺ュ彈 trusted-baseline 浣嗕粛鎷掔粷鏈€氳繃浜哄伐闂搁棬鐨?v2 鍖?ok 216 - publishBook 鎺ュ彈 trusted-baseline 浣嗕粛鎷掔粷鏈€氳繃浜哄伐闂搁棬鐨?v2 鍖?  ---
+  duration_ms: 776.575
+  type: 'test'
+  ...
+# (node:69448) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鍐呴儴婕旂ず鍒濆鍖栧崌绾хǔ瀹氬笀鐢熸牎闀胯韩浠藉苟淇濈暀杩愯惀杈圭晫
+ok 217 - 鍐呴儴婕旂ず鍒濆鍖栧崌绾хǔ瀹氬笀鐢熸牎闀胯韩浠藉苟淇濈暀杩愯惀杈圭晫
+  ---
+  duration_ms: 2164.1777
+  type: 'test'
+  ...
+# (node:62036) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: bootstrapInternalDemo 鎴愬姛杩斿洖鍚庣珛鍗抽噴鏀炬暟鎹簱鍙?WAL/SHM
+ok 218 - bootstrapInternalDemo 鎴愬姛杩斿洖鍚庣珛鍗抽噴鏀炬暟鎹簱鍙?WAL/SHM
+  ---
+  duration_ms: 1006.4562
+  type: 'test'
+  ...
+# Subtest: bootstrapInternalDemo 鍒濆鍖栧け璐ュ悗涔熼噴鏀惧凡鍙栧緱鎵€鏈夋潈鐨勬暟鎹簱杩炴帴
+ok 219 - bootstrapInternalDemo 鍒濆鍖栧け璐ュ悗涔熼噴鏀惧凡鍙栧緱鎵€鏈夋潈鐨勬暟鎹簱杩炴帴
+  ---
+  duration_ms: 84.1808
+  type: 'test'
+  ...
+# Subtest: identity close 鍙噸澶嶈皟鐢ㄤ笖閲婃斁鑷湁鏁版嵁搴撹繛鎺?ok 220 - identity close 鍙噸澶嶈皟鐢ㄤ笖閲婃斁鑷湁鏁版嵁搴撹繛鎺?  ---
+  duration_ms: 404.151
+  type: 'test'
+  ...
+# (node:72004) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 12. 瀹堝崼娴嬭瘯涓嶆帴瑙︾湡瀹炰笟鍔℃暟鎹簱
+ok 221 - 12. 瀹堝崼娴嬭瘯涓嶆帴瑙︾湡瀹炰笟鍔℃暟鎹簱
+  ---
+  duration_ms: 396.8345
+  type: 'test'
+  ...
+# Subtest: 1. 鍏ㄦ柊搴撴墽琛?047锝?50锛氭枃浠跺瓨鍦ㄣ€乤pplied 鍚洓 id銆佽〃鍜屽垪瀛樺湪
+ok 222 - 1. 鍏ㄦ柊搴撴墽琛?047锝?50锛氭枃浠跺瓨鍦ㄣ€乤pplied 鍚洓 id銆佽〃鍜屽垪瀛樺湪
+  ---
+  duration_ms: 414.3653
+  type: 'test'
+  ...
+# Subtest: 2. 046 鍓湰鍗囩骇鑷?050锛歴taged <047_ 鍏堣窇锛屾彃鍏?046 褰㈠熀绾匡紝鍐嶆寕 047锝?50
+ok 223 - 2. 046 鍓湰鍗囩骇鑷?050锛歴taged <047_ 鍏堣窇锛屾彃鍏?046 褰㈠熀绾匡紝鍐嶆寕 047锝?50
+  ---
+  duration_ms: 772.8283
+  type: 'test'
+  ...
+# Subtest: 3. 閲嶅鍚姩 alreadyApplied锛氱浜屾 applied=[]锛宎lreadyApplied 鍚?047锝?50
+ok 224 - 3. 閲嶅鍚姩 alreadyApplied锛氱浜屾 applied=[]锛宎lreadyApplied 鍚?047锝?50
+  ---
+  duration_ms: 377.79
+  type: 'test'
+  ...
+# Subtest: 4. checksum 绋冲畾锛氫袱娆?checksum 鐩哥瓑涓旈暱搴?64
+ok 225 - 4. checksum 绋冲畾锛氫袱娆?checksum 鐩哥瓑涓旈暱搴?64
+  ---
+  duration_ms: 375.8381
+  type: 'test'
+  ...
+# Subtest: 5. 047 鐧诲綍/鐝骇瀛楁鍥炲～涓庡敮涓€绱㈠紩
+ok 226 - 5. 047 鐧诲綍/鐝骇瀛楁鍥炲～涓庡敮涓€绱㈠紩
+  ---
+  duration_ms: 725.2981
+  type: 'test'
+  ...
+# Subtest: 6. 048 娉ㄥ唽鍑嵁琛ㄤ笌鍞竴/瑙掕壊绾︽潫锛屾棤榛樿 token
+ok 227 - 6. 048 娉ㄥ唽鍑嵁琛ㄤ笌鍞竴/瑙掕壊绾︽潫锛屾棤榛樿 token
+  ---
+  duration_ms: 1178.4161
+  type: 'test'
+  ...
+# Subtest: 7. 049 瀹℃壒涓庨噸缃〃 + pending 閮ㄥ垎鍞竴 + 瀛︾敓鍗?active 鐝?ok 228 - 7. 049 瀹℃壒涓庨噸缃〃 + pending 閮ㄥ垎鍞竴 + 瀛︾敓鍗?active 鐝?  ---
+  duration_ms: 954.7628
+  type: 'test'
+  ...
+# Subtest: 8. 050 grants 鍥炲～锛氬熀绾?49 琛屻€乨raft 涓嶅洖濉€乮d/actor 鏍煎紡涓庡綋鍓嶇増鏈彛寰?ok 229 - 8. 050 grants 鍥炲～锛氬熀绾?49 琛屻€乨raft 涓嶅洖濉€乮d/actor 鏍煎紡涓庡綋鍓嶇増鏈彛寰?  ---
+  duration_ms: 610.1912
+  type: 'test'
+  ...
+# Subtest: 9. 褰撳墠鍩虹嚎褰㈤鏈?49 琛?ok 230 - 9. 褰撳墠鍩虹嚎褰㈤鏈?49 琛?  ---
+  duration_ms: 543.6306
+  type: 'test'
+  ...
+# Subtest: 10. 050 涓嶉噸澶嶆彃鍏ワ細绗簩娆?alreadyApplied锛宑hecksum 涓嶅彉锛実rants 浠?49
+ok 231 - 10. 050 涓嶉噸澶嶆彃鍏ワ細绗簩娆?alreadyApplied锛宑hecksum 涓嶅彉锛実rants 浠?49
+  ---
+  duration_ms: 715.0739
+  type: 'test'
+  ...
+# Subtest: 11. 涓嶄慨鏀瑰喕缁撻槄璇昏〃 reading_summary_sessions / reading_daily_book_summaries
+ok 232 - 11. 涓嶄慨鏀瑰喕缁撻槄璇昏〃 reading_summary_sessions / reading_daily_book_summaries
+  ---
+  duration_ms: 519.9
+  type: 'test'
+  ...
+# Subtest: 050 绌哄簱锛? published 脳 0 鐝級鍏佽鎻掑叆 0 琛?ok 233 - 050 绌哄簱锛? published 脳 0 鐝級鍏佽鎻掑叆 0 琛?  ---
+  duration_ms: 250.0037
+  type: 'test'
+  ...
+# Subtest: bootstrap锛氬叏鏂板簱璺戝畬鍏ㄩ儴杩佺Щ鍚庢紨绀烘暟鎹繀椤诲惈绗簩鐝?ok 234 - bootstrap锛氬叏鏂板簱璺戝畬鍏ㄩ儴杩佺Щ鍚庢紨绀烘暟鎹繀椤诲惈绗簩鐝?  ---
+  duration_ms: 653.2674
+  type: 'test'
+  ...
+# Subtest: bootstrap锛氬繀椤绘湁 grade workspace锛坈ode=grade-admin, scope_type=grade锛?ok 235 - bootstrap锛氬繀椤绘湁 grade workspace锛坈ode=grade-admin, scope_type=grade锛?  ---
+  duration_ms: 625.6061
+  type: 'test'
+  ...
+# Subtest: bootstrap锛氬繀椤绘湁 grade_manager 璐﹀彿涓庡搴?role assignment
+ok 236 - bootstrap锛氬繀椤绘湁 grade_manager 璐﹀彿涓庡搴?role assignment
+  ---
+  duration_ms: 646.8163
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?46 鍓湰宸叉湁 2 涓棫鐝椂 047 蹇呴』澶辫触
+ok 237 - 璐熶緥锛?46 鍓湰宸叉湁 2 涓棫鐝椂 047 蹇呴』澶辫触
+  ---
+  duration_ms: 317.9277
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?46 鍓湰宸叉湁 1 鏉?grant 鏃?050 蹇呴』澶辫触
+ok 238 - 璐熶緥锛?46 鍓湰宸叉湁 1 鏉?grant 鏃?050 蹇呴』澶辫触
+  ---
+  duration_ms: 422.8057
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?46 鍓湰鏌?published 涔︽病鏈?version 鏃?050 蹇呴』澶辫触
+ok 239 - 璐熶緥锛?46 鍓湰鏌?published 涔︽病鏈?version 鏃?050 蹇呴』澶辫触
+  ---
+  duration_ms: 421.3453
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?46 鍓湰鏌愬鐢熷凡鏈?2 鏉?active class_memberships 鏃?049 蹇呴』澶辫触
+ok 240 - 璐熶緥锛?46 鍓湰鏌愬鐢熷凡鏈?2 鏉?active class_memberships 鏃?049 蹇呴』澶辫触
+  ---
+  duration_ms: 326.6161
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?47 涔嬪悗 INSERT 绌?school_code 蹇呴』琚Е鍙戝櫒鎷掔粷
+ok 241 - 璐熶緥锛?47 涔嬪悗 INSERT 绌?school_code 蹇呴』琚Е鍙戝櫒鎷掔粷
+  ---
+  duration_ms: 214.6445
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?47 涔嬪悗 INSERT 闈炴硶 stage 蹇呴』琚Е鍙戝櫒鎷掔粷
+ok 242 - 璐熶緥锛?47 涔嬪悗 INSERT 闈炴硶 stage 蹇呴』琚Е鍙戝櫒鎷掔粷
+  ---
+  duration_ms: 317.6003
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?47 涔嬪悗 INSERT 閿欒 grade_id 蹇呴』琚Е鍙戝櫒鎷掔粷
+ok 243 - 璐熶緥锛?47 涔嬪悗 INSERT 閿欒 grade_id 蹇呴』琚Е鍙戝櫒鎷掔粷
+  ---
+  duration_ms: 308.2583
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?49 涔嬪悗鍚屼竴瀛︾敓绗簩鏉?pending enrollment 蹇呴』澶辫触
+ok 244 - 璐熶緥锛?49 涔嬪悗鍚屼竴瀛︾敓绗簩鏉?pending enrollment 蹇呴』澶辫触
+  ---
+  duration_ms: 313.1642
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?49 涔嬪悗鍚屼竴瀛︾敓绗簩鏉?active student membership 蹇呴』澶辫触
+ok 245 - 璐熶緥锛?49 涔嬪悗鍚屼竴瀛︾敓绗簩鏉?active student membership 蹇呴』澶辫触
+  ---
+  duration_ms: 317.2026
+  type: 'test'
+  ...
+# Subtest: 璐熶緥锛?50 涓嶅緱缁?draft 涔︽垨 disabled 鐝彃 grant
+ok 246 - 璐熶緥锛?50 涓嶅緱缁?draft 涔︽垨 disabled 鐝彃 grant
+  ---
+  duration_ms: 445.0466
+  type: 'test'
+  ...
+# (node:27256) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 涔︾洰宸插瓨鍦ㄤ絾鍏紑灏侀潰涓㈠け鏃跺箓绛夊鍏ヤ細鎭㈠绱犳潗
+ok 247 - 涔︾洰宸插瓨鍦ㄤ絾鍏紑灏侀潰涓㈠け鏃跺箓绛夊鍏ヤ細鎭㈠绱犳潗
+  ---
+  duration_ms: 1287.1333
+  type: 'test'
+  ...
+# (node:71260) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 044 鍦ㄥ叏鏂版暟鎹簱椤哄簭鎵ц骞剁敱杩佺Щ璐︽湰閲嶅鍚姩鏍￠獙鍜屼繚鎶?ok 248 - 044 鍦ㄥ叏鏂版暟鎹簱椤哄簭鎵ц骞剁敱杩佺Щ璐︽湰閲嶅鍚姩鏍￠獙鍜屼繚鎶?  ---
+  duration_ms: 470.3693
+  type: 'test'
+  ...
+# Subtest: 043 涓?044 鍙粠宸叉墽琛?042 鐨勫共鍑€鏁版嵁搴撳墠鍚戝崌绾у苟淇濈暀 reading_progress
+ok 249 - 043 涓?044 鍙粠宸叉墽琛?042 鐨勫共鍑€鏁版嵁搴撳墠鍚戝崌绾у苟淇濈暀 reading_progress
+  ---
+  duration_ms: 537.7782
+  type: 'test'
+  ...
+# Subtest: 043 寮哄埗鑼冨洿銆佽繛缁寚绾广€乷pen 鍞竴銆侀〉鐮佸拰鍗曡皟鏇存柊绾︽潫
+ok 250 - 043 寮哄埗鑼冨洿銆佽繛缁寚绾广€乷pen 鍞竴銆侀〉鐮佸拰鍗曡皟鏇存柊绾︽潫
+  ---
+  duration_ms: 422.4816
+  type: 'test'
+  ...
+# Subtest: request context accepts only bounded safe caller request ids
+ok 251 - request context accepts only bounded safe caller request ids
+  ---
+  duration_ms: 1.1576
+  type: 'test'
+  ...
+# Subtest: success envelope contains request metadata and optional cursor
+ok 252 - success envelope contains request metadata and optional cursor
+  ---
+  duration_ms: 1.8415
+  type: 'test'
+  ...
+# Subtest: known API errors preserve safe details and status
+ok 253 - known API errors preserve safe details and status
+  ---
+  duration_ms: 0.2748
+  type: 'test'
+  ...
+# Subtest: unexpected errors never expose internal messages or secrets
+ok 254 - unexpected errors never expose internal messages or secrets
+  ---
+  duration_ms: 0.2657
+  type: 'test'
+  ...
+# (node:70996) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鍙椾繚鎶や功绫嶈祫浜ф寜绫诲瀷璁剧疆缂撳瓨澶达紝骞跺湪鐪熷疄 HTTP 閾捐矾涓婂鐞嗘潯浠惰姹?    # Subtest: 灏侀潰 Cache-Control 鍚?no-store 涓斾笉鍚?max-age=3600
+    ok 1 - 灏侀潰 Cache-Control 鍚?no-store 涓斾笉鍚?max-age=3600
+      ---
+      duration_ms: 17.8313
+      type: 'test'
+      ...
+    # Subtest: 婧?PDF Cache-Control 鍚?no-cache 涓斿甫闈炵┖ ETag
+    ok 2 - 婧?PDF Cache-Control 鍚?no-cache 涓斿甫闈炵┖ ETag
+      ---
+      duration_ms: 11.423
+      type: 'test'
+      ...
+    # Subtest: 婧?PDF 鍖归厤 If-None-Match 杩斿洖 304 涓旀棤鍝嶅簲浣?    ok 3 - 婧?PDF 鍖归厤 If-None-Match 杩斿洖 304 涓旀棤鍝嶅簲浣?      ---
+      duration_ms: 10.2655
+      type: 'test'
+      ...
+    # Subtest: 婧?PDF 涓嶅尮閰?If-None-Match 杩斿洖 200 瀹屾暣鍐呭
+    ok 4 - 婧?PDF 涓嶅尮閰?If-None-Match 杩斿洖 200 瀹屾暣鍐呭
+      ---
+      duration_ms: 9.2759
+      type: 'test'
+      ...
+    # Subtest: Range 璇锋眰浠嶈繑鍥?206 涓?Content-Range 姝ｇ‘
+    ok 5 - Range 璇锋眰浠嶈繑鍥?206 涓?Content-Range 姝ｇ‘
+      ---
+      duration_ms: 9.3252
+      type: 'test'
+      ...
+    # Subtest: Range 鍔犲尮閰?If-None-Match 杩斿洖 304 鑰屼笉鏄?206
+    ok 6 - Range 鍔犲尮閰?If-None-Match 杩斿洖 304 鑰屼笉鏄?206
+      ---
+      duration_ms: 7.5931
+      type: 'test'
+      ...
+    # Subtest: 缂?X-Workspace-Id 浠嶈繑鍥?400
+    ok 7 - 缂?X-Workspace-Id 浠嶈繑鍥?400
+      ---
+      duration_ms: 5.4497
+      type: 'test'
+      ...
+    # Subtest: 瀹屽叏鏈櫥褰曚粛杩斿洖 401
+    ok 8 - 瀹屽叏鏈櫥褰曚粛杩斿洖 401
+      ---
+      duration_ms: 4.671
+      type: 'test'
+      ...
+    # Subtest: 鏈灇涓剧被鍨嬮粯璁?no-cache+ETag锛岀姝㈡妸榛樿鍒嗘敮鏀瑰洖 max-age
+    ok 9 - 鏈灇涓剧被鍨嬮粯璁?no-cache+ETag锛岀姝㈡妸榛樿鍒嗘敮鏀瑰洖 max-age
+      ---
+      duration_ms: 18.0331
+      type: 'test'
+      ...
+    1..9
+ok 255 - 鍙椾繚鎶や功绫嶈祫浜ф寜绫诲瀷璁剧疆缂撳瓨澶达紝骞跺湪鐪熷疄 HTTP 閾捐矾涓婂鐞嗘潯浠惰姹?  ---
+  duration_ms: 988.9958
+  type: 'test'
+  ...
+# (node:61276) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: workspaceResourceScope 涓?class 宸ヤ綔绌洪棿甯︿笂 classId锛屼緵 scopeAllows 姣斿
+ok 256 - workspaceResourceScope 涓?class 宸ヤ綔绌洪棿甯︿笂 classId锛屼緵 scopeAllows 姣斿
+  ---
+  duration_ms: 1.6065
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓甯﹀悎娉曚細璇濆拰宸ヤ綔绌洪棿澶磋皟鐢ㄥ彂甯?涓嬫灦蹇呴』 403
+ok 257 - 瀛︾敓甯﹀悎娉曚細璇濆拰宸ヤ綔绌洪棿澶磋皟鐢ㄥ彂甯?涓嬫灦蹇呴』 403
+  ---
+  duration_ms: 1023.0176
+  type: 'test'
+  ...
+# Subtest: 骞冲彴杩愯惀缁忕湡瀹?HTTP 鍙戝竷鍜屼笅鏋讹紝骞跺啓鍏ュ璁?ok 258 - 骞冲彴杩愯惀缁忕湡瀹?HTTP 鍙戝竷鍜屼笅鏋讹紝骞跺啓鍏ュ璁?  ---
+  duration_ms: 664.1391
+  type: 'test'
+  ...
+# Subtest: 鍙戝竷鎺ュ彛瑕佹眰骞傜瓑閿紝閲嶆斁涓嶄簩娆″彉鏇翠篃涓嶄簩娆″璁?ok 259 - 鍙戝竷鎺ュ彛瑕佹眰骞傜瓑閿紝閲嶆斁涓嶄簩娆″彉鏇翠篃涓嶄簩娆″璁?  ---
+  duration_ms: 571.262
+  type: 'test'
+  ...
+# Subtest: trusted-baseline v2 鍖呯粡鐪熷疄 HTTP 涓嬫灦鍚庡啀鍙戝竷鑳介€氳繃璐ㄩ噺闂搁棬
+ok 260 - trusted-baseline v2 鍖呯粡鐪熷疄 HTTP 涓嬫灦鍚庡啀鍙戝竷鑳介€氳繃璐ㄩ噺闂搁棬
+  ---
+  duration_ms: 659.3923
+  type: 'test'
+  ...
+# Subtest: 璺ㄧ粍缁囧彂甯冭繑鍥?404锛屽鑽夌涓嬫灦涔熻繑鍥?404
+ok 261 - 璺ㄧ粍缁囧彂甯冭繑鍥?404锛屽鑽夌涓嬫灦涔熻繑鍥?404
+  ---
+  duration_ms: 723.3799
+  type: 'test'
+  ...
+# (node:58684) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 銆愭敾鍑婚潰 1.1/1.2銆戝鐢熶吉閫?X-Workspace-Id 涓嶈兘鏀瑰彉鐝骇鍙鑼冨洿锛屼笖鎹㈠ご澶辫触鏃朵笉娉勯湶涔︽槸鍚﹀瓨鍦?ok 262 - 銆愭敾鍑婚潰 1.1/1.2銆戝鐢熶吉閫?X-Workspace-Id 涓嶈兘鏀瑰彉鐝骇鍙鑼冨洿锛屼笖鎹㈠ご澶辫触鏃朵笉娉勯湶涔︽槸鍚﹀瓨鍦?  ---
+  duration_ms: 1250.9823
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 1.3銆戝鍎垮鐢燂紙鏃犱换浣?class_memberships锛夛細鏃?grant 涓嶅彲瑙侊紱鍙?grant 鏈彮浠嶄笉鍙锛堝師鍥狅細鏃?class_memberships锛?ok 263 - 銆愭敾鍑婚潰 1.3銆戝鍎垮鐢燂紙鏃犱换浣?class_memberships锛夛細鏃?grant 涓嶅彲瑙侊紱鍙?grant 鏈彮浠嶄笉鍙锛堝師鍥狅細鏃?class_memberships锛?  ---
+  duration_ms: 819.4525
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 1.4路鐜扮姸璁板綍銆戠彮绾ц鍋滅敤鍚庯紝璇ョ彮 grant 浠嶅湪浣嗗鐢熶笉鍙锛堝師鍥狅細鐝骇宸插仠鐢級
+ok 264 - 銆愭敾鍑婚潰 1.4路鐜扮姸璁板綍銆戠彮绾ц鍋滅敤鍚庯紝璇ョ彮 grant 浠嶅湪浣嗗鐢熶笉鍙锛堝師鍥狅細鐝骇宸插仠鐢級
+  ---
+  duration_ms: 1088.1462
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 1.4路鐜扮姸璁板綍銆戝鐢熸湰韬氨鍦ㄥ仠鐢ㄧ彮閲岋細鏃?grant 涓嶅彲瑙侊紱鍙?grant 浠栫彮涔熶笉鍙
+ok 265 - 銆愭敾鍑婚潰 1.4路鐜扮姸璁板綍銆戝鐢熸湰韬氨鍦ㄥ仠鐢ㄧ彮閲岋細鏃?grant 涓嶅彲瑙侊紱鍙?grant 浠栫彮涔熶笉鍙
+  ---
+  duration_ms: 670.5058
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 1.5/1.6銆戞暀甯堜笁鍏冪粍鍙粫杩?class grant 浣嗕笉鑳界湅 draft锛涙牎闀?骞寸骇涓讳换/grade_group 涓嶆槸涔﹀簱姝ｄ緥锛涘仠鏉冩暀甯?fail closed
+ok 266 - 銆愭敾鍑婚潰 1.5/1.6銆戞暀甯堜笁鍏冪粍鍙粫杩?class grant 浣嗕笉鑳界湅 draft锛涙牎闀?骞寸骇涓讳换/grade_group 涓嶆槸涔﹀簱姝ｄ緥锛涘仠鏉冩暀甯?fail closed
+  ---
+  duration_ms: 1058.2562
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 2.7/2.8/2.9銆戞敹绐勫悗鏂板鐗堟湰锛氭湭鎺堟潈鐝粛璇讳笉鍒版棫鐗堟湰椤?鏃ц祫浜э紝琚巿鏉冪彮涓嶈璇激
+ok 267 - 銆愭敾鍑婚潰 2.7/2.8/2.9銆戞敹绐勫悗鏂板鐗堟湰锛氭湭鎺堟潈鐝粛璇讳笉鍒版棫鐗堟湰椤?鏃ц祫浜э紝琚巿鏉冪彮涓嶈璇激
+  ---
+  duration_ms: 596.342
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 3.10/3.11銆戣法缁勭粐鏄惧紡涓ょ粍缁囦袱鐝悇鑷?grant 鍚庝粛浜掍笉鍙锛涘缁勭粐 classId 涓庝笉瀛樺湪 classId 鍚岀爜鍚屾枃妗?ok 268 - 銆愭敾鍑婚潰 3.10/3.11銆戣法缁勭粐鏄惧紡涓ょ粍缁囦袱鐝悇鑷?grant 鍚庝粛浜掍笉鍙锛涘缁勭粐 classId 涓庝笉瀛樺湪 classId 鍚岀爜鍚屾枃妗?  ---
+  duration_ms: 991.647
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 4.12/4.13/4.14銆戜功鏋跺彧璁ゅ綋鍓?class workspace锛氭暀甯堜笉鑳借法鐝紱骞寸骇涓讳换/鏍￠暱/骞冲彴鏃犱功鏋?ok 269 - 銆愭敾鍑婚潰 4.12/4.13/4.14銆戜功鏋跺彧璁ゅ綋鍓?class workspace锛氭暀甯堜笉鑳借法鐝紱骞寸骇涓讳换/鏍￠暱/骞冲彴鏃犱功鏋?  ---
+  duration_ms: 865.9098
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 4.15銆戝鐢熸墦绠＄悊鎺ュ彛鏃讹紝瀛樺湪鐨勪功涓庝笉瀛樺湪鐨勪功蹇呴』鍚岀爜鍚屾枃妗堬紙涓嶆硠闇插瓨鍦ㄦ€э級
+ok 270 - 銆愭敾鍑婚潰 4.15銆戝鐢熸墦绠＄悊鎺ュ彛鏃讹紝瀛樺湪鐨勪功涓庝笉瀛樺湪鐨勪功蹇呴』鍚岀爜鍚屾枃妗堬紙涓嶆硠闇插瓨鍦ㄦ€э級
+  ---
+  duration_ms: 498.3135
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 5.16銆戝鐢熺殑 ?status 鍙傛暟琚潤榛橀攣姝讳负 published锛涙暀甯堜笉寰楃湅 draft 璧勪骇锛沺latform 鎵嶆槸 draft 姝ｄ緥
+ok 271 - 銆愭敾鍑婚潰 5.16銆戝鐢熺殑 ?status 鍙傛暟琚潤榛橀攣姝讳负 published锛涙暀甯堜笉寰楃湅 draft 璧勪骇锛沺latform 鎵嶆槸 draft 姝ｄ緥
+  ---
+  duration_ms: 3614.5448
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 5.17/5.18銆戜功鏋跺箓绛夛細缂洪敭 400銆佸悓閿噸鏀句笉澧炶/瀹¤锛涙棫 visibility 鍚岄敭寮備綋 404 涓斾笉寰楁敼 grants
+ok 272 - 銆愭敾鍑婚潰 5.17/5.18銆戜功鏋跺箓绛夛細缂洪敭 400銆佸悓閿噸鏀句笉澧炶/瀹¤锛涙棫 visibility 鍚岄敭寮備綋 404 涓斾笉寰楁敼 grants
+  ---
+  duration_ms: 524.1626
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 5.19銆戞湰鐝姇鏀?鎾や笅鍙嶅鍒囨崲鍚庣姸鎬佸共鍑€锛涗笉寰楀啀鐢?organization 鍏ㄥ紑
+ok 273 - 銆愭敾鍑婚潰 5.19銆戞湰鐝姇鏀?鎾や笅鍙嶅鍒囨崲鍚庣姸鎬佸共鍑€锛涗笉寰楀啀鐢?organization 鍏ㄥ紑
+  ---
+  duration_ms: 821.2167
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 6.21銆戞棫 visibility 鍙傛暟杈圭晫涓€寰?404锛屼笉寰楀啀鍐?grants
+ok 274 - 銆愭敾鍑婚潰 6.21銆戞棫 visibility 鍙傛暟杈圭晫涓€寰?404锛屼笉寰楀啀鍐?grants
+  ---
+  duration_ms: 449.8603
+  type: 'test'
+  ...
+# Subtest: 銆愭敾鍑婚潰 6.20/6.22銆戞偓绌?grant 瀵瑰鐢熶笉鍙锛堝師鍥狅細瀛︾敓涓嶅湪璇ョ彮锛夛紱draft 闂ㄥ厛 grant 鍚庝粛涓嶅彲瑙?ok 275 - 銆愭敾鍑婚潰 6.20/6.22銆戞偓绌?grant 瀵瑰鐢熶笉鍙锛堝師鍥狅細瀛︾敓涓嶅湪璇ョ彮锛夛紱draft 闂ㄥ厛 grant 鍚庝粛涓嶅彲瑙?  ---
+  duration_ms: 662.1355
+  type: 'test'
+  ...
+# Subtest: 銆怐-22/D-23銆戝畨鎺掓暣椤圭渷鐣ワ紱绉熺害 published+鏈彮 grant 200锛屾棤 grant/draft/澶栫粍缁?404
+ok 276 - 銆怐-22/D-23銆戝畨鎺掓暣椤圭渷鐣ワ紱绉熺害 published+鏈彮 grant 200锛屾棤 grant/draft/澶栫粍缁?404
+  ---
+  duration_ms: 478.0416
+  type: 'test'
+  ...
+# Subtest: 銆怓-1 宸叉敹鍙ｃ€戞暀甯堜笉鑳界敤鏃?organization/visibility 娓呮帀浠栫彮 grant锛屼篃涓嶈兘鍏ㄥ眬 unpublish
+ok 277 - 銆怓-1 宸叉敹鍙ｃ€戞暀甯堜笉鑳界敤鏃?organization/visibility 娓呮帀浠栫彮 grant锛屼篃涓嶈兘鍏ㄥ眬 unpublish
+  ---
+  duration_ms: 448.6406
+  type: 'test'
+  ...
+# Subtest: GET /classes 鏉冮檺鐭╅樀锛氬绉嶅鐢熶汉鏍间竴寰?403锛沺latform_ops 缂?class.read 鐨勫疄闄呰〃鐜?ok 278 - GET /classes 鏉冮檺鐭╅樀锛氬绉嶅鐢熶汉鏍间竴寰?403锛沺latform_ops 缂?class.read 鐨勫疄闄呰〃鐜?  ---
+  duration_ms: 550.0816
+  type: 'test'
+  ...
+# Subtest: 銆怓-4 宸叉敹鍙ｃ€戦潪 class 绫诲瀷 grant 涓嶅緱褰撳彲瑙侊紱鏃?organization 涓嶅緱鍐嶆竻绌?ok 279 - 銆怓-4 宸叉敹鍙ｃ€戦潪 class 绫诲瀷 grant 涓嶅緱褰撳彲瑙侊紱鏃?organization 涓嶅緱鍐嶆竻绌?  ---
+  duration_ms: 434.6075
+  type: 'test'
+  ...
+# (node:71448) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鍙?grant 浠栫彮鍚庯紝鏈彮瀛︾敓鍥涗釜鍏ュ彛鍏ㄩ儴琛ㄧ幇涓轰功涓嶅瓨鍦紙404锛屼笉鏄?403锛夛紱鏃?grant 涔熶笉鍙
+ok 280 - 鍙?grant 浠栫彮鍚庯紝鏈彮瀛︾敓鍥涗釜鍏ュ彛鍏ㄩ儴琛ㄧ幇涓轰功涓嶅瓨鍦紙404锛屼笉鏄?403锛夛紱鏃?grant 涔熶笉鍙
+  ---
+  duration_ms: 957.2312
+  type: 'test'
+  ...
+# Subtest: grants 鍒版湰鐝悗锛屾湰鐝鐢熷洓涓叆鍙ｅ叏閮ㄥ彲璇伙紱鍒彮瀛︾敓浠嶇劧 404
+ok 281 - grants 鍒版湰鐝悗锛屾湰鐝鐢熷洓涓叆鍙ｅ叏閮ㄥ彲璇伙紱鍒彮瀛︾敓浠嶇劧 404
+  ---
+  duration_ms: 857.0322
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀鍙粫杩?class grant 鐪?published锛屼絾涓嶈兘鍒?draft锛沺latform 鎵嶆槸 draft 姝ｄ緥锛涘鐢熷彧鐪嬫湰鐝?grant
+ok 282 - 鏁欏笀鍙粫杩?class grant 鐪?published锛屼絾涓嶈兘鍒?draft锛沺latform 鎵嶆槸 draft 姝ｄ緥锛涘鐢熷彧鐪嬫湰鐝?grant
+  ---
+  duration_ms: 741.0965
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀 unpublish 403锛沺latform 涓嬫灦鍚庢暀甯?瀛︾敓閮戒笉寰楀彇鏈彂甯冭祫浜?ok 283 - 鏁欏笀 unpublish 403锛沺latform 涓嬫灦鍚庢暀甯?瀛︾敓閮戒笉寰楀彇鏈彂甯冭祫浜?  ---
+  duration_ms: 906.2033
+  type: 'test'
+  ...
+# Subtest: PUT 涔︽灦瑕佹眰骞傜瓑閿紝鍚岄敭閲嶆斁涓嶄骇鐢熺浜岃 grants锛涙棫 visibility 缂洪敭 404
+ok 284 - PUT 涔︽灦瑕佹眰骞傜瓑閿紝鍚岄敭閲嶆斁涓嶄骇鐢熺浜岃 grants锛涙棫 visibility 缂洪敭 404
+  ---
+  duration_ms: 722.053
+  type: 'test'
+  ...
+# Subtest: 鐝骇鏍￠獙锛氬鏍?浠栫彮涔︽灦琚嫆锛屽勾绾т富浠讳笌鏍￠暱鏃犱功鏋讹紝瀛︾敓鏃?visibility 404 鍚屾枃妗?ok 285 - 鐝骇鏍￠獙锛氬鏍?浠栫彮涔︽灦琚嫆锛屽勾绾т富浠讳笌鏍￠暱鏃犱功鏋讹紝瀛︾敓鏃?visibility 404 鍚屾枃妗?  ---
+  duration_ms: 677.443
+  type: 'test'
+  ...
+# Subtest: grants 鍐欏叆鐨?book_version_id 涓庤繃婊よ鍙栬В鏋愮殑褰撳墠鐗堟湰鍚屾簮锛屾棫鐗堟湰涓嶈兘缁曡繃
+ok 286 - grants 鍐欏叆鐨?book_version_id 涓庤繃婊よ鍙栬В鏋愮殑褰撳墠鐗堟湰鍚屾簮锛屾棫鐗堟湰涓嶈兘缁曡繃
+  ---
+  duration_ms: 569.3417
+  type: 'test'
+  ...
+# Subtest: GET /books/:bookId/visibility 宸插垹闄わ紝瀹夋帓鏈韩涓嶇骇鑱旀竻鐞?ok 287 - GET /books/:bookId/visibility 宸插垹闄わ紝瀹夋帓鏈韩涓嶇骇鑱旀竻鐞?  ---
+  duration_ms: 537.8342
+  type: 'test'
+  ...
+# Subtest: GET /classes 鎸夋搷浣滆€呮巿鏉冭寖鍥村垪鐝骇锛岀┖鐝篃鑳藉垪鍑猴紝瀛︾敓鏃犳潈璁块棶
+ok 288 - GET /classes 鎸夋搷浣滆€呮巿鏉冭寖鍥村垪鐝骇锛岀┖鐝篃鑳藉垪鍑猴紝瀛︾敓鏃犳潈璁块棶
+  ---
+  duration_ms: 596.3152
+  type: 'test'
+  ...
+# Subtest: PUT 鍙鑼冨洿鎷掔粷鏃犳晥 scope 涓庣┖鐝骇鍒楄〃锛岃法缁勭粐涔︾睄鎸変笉瀛樺湪澶勭悊
+ok 289 - PUT 鍙鑼冨洿鎷掔粷鏃犳晥 scope 涓庣┖鐝骇鍒楄〃锛岃法缁勭粐涔︾睄鎸変笉瀛樺湪澶勭悊
+  ---
+  duration_ms: 397.2948
+  type: 'test'
+  ...
+# (node:40600) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F-1 闇€姹?1/2/8锛欳 鐝?grant 鍚庯紝A 鐝暀甯堢殑鏃?organization/DELETE 浠栫彮閮借鎷掞紝C 鐝?grant 浠嶅湪
+ok 290 - F-1 闇€姹?1/2/8锛欳 鐝?grant 鍚庯紝A 鐝暀甯堢殑鏃?organization/DELETE 浠栫彮閮借鎷掞紝C 鐝?grant 浠嶅湪
+  ---
+  duration_ms: 1030.0036
+  type: 'test'
+  ...
+# Subtest: F-1 闇€姹?3/4锛氭暀甯堝彲鎶曟斁/鎾や笅鏈彮锛涙挙涓嬪悗榛樿鍏ㄩ棴锛屼笉寰?organization 鍏ㄥ紑
+ok 291 - F-1 闇€姹?3/4锛氭暀甯堝彲鎶曟斁/鎾や笅鏈彮锛涙挙涓嬪悗榛樿鍏ㄩ棴锛屼笉寰?organization 鍏ㄥ紑
+  ---
+  duration_ms: 865.502
+  type: 'test'
+  ...
+# Subtest: F-1 闇€姹?5锛氭偓绌?grants 瀵瑰鐢熶笉鍙锛堝師鍥狅細瀛︾敓涓嶅湪璇ョ彮锛夛紱鏃?organization 涓嶅緱鍐嶆竻绌?ok 292 - F-1 闇€姹?5锛氭偓绌?grants 瀵瑰鐢熶笉鍙锛堝師鍥狅細瀛︾敓涓嶅湪璇ョ彮锛夛紱鏃?organization 涓嶅緱鍐嶆竻绌?  ---
+  duration_ms: 831.3624
+  type: 'test'
+  ...
+# Subtest: F-1 闇€姹?6锛氭牎闀夸笉寰楁敼鐝骇涔︽灦锛涙棫 visibility 浠绘剰缁勫悎閮?404 涓斾笉寰楁敼 grants
+ok 293 - F-1 闇€姹?6锛氭牎闀夸笉寰楁敼鐝骇涔︽灦锛涙棫 visibility 浠绘剰缁勫悎閮?404 涓斾笉寰楁敼 grants
+  ---
+  duration_ms: 773.8884
+  type: 'test'
+  ...
+# Subtest: F-1 鏀剁揣鐨勮竟鐣岋細骞寸骇涓讳换瀵规湰灞?璺ㄥ眾涔︽灦閮藉繀椤?403锛屼笉寰楁敼鏃㈡湁浠栫彮 grant
+ok 294 - F-1 鏀剁揣鐨勮竟鐣岋細骞寸骇涓讳换瀵规湰灞?璺ㄥ眾涔︽灦閮藉繀椤?403锛屼笉寰楁敼鏃㈡湁浠栫彮 grant
+  ---
+  duration_ms: 696.5344
+  type: 'test'
+  ...
+# Subtest: F-4 闇€姹?7锛氶潪 class 绫诲瀷 grant 涓嶅緱褰撳彲瑙侊紱鏃?organization 涓嶅緱娓呴櫎
+ok 295 - F-4 闇€姹?7锛氶潪 class 绫诲瀷 grant 涓嶅緱褰撳彲瑙侊紱鏃?organization 涓嶅緱娓呴櫎
+  ---
+  duration_ms: 559.6819
+  type: 'test'
+  ...
+# Subtest: F-4 杈圭晫锛歴cope=classes 鍙敼鐝骇缁村害锛屼笉鐗佃繛闈?class 绫诲瀷鐨?grants 琛?ok 296 - F-4 杈圭晫锛歴cope=classes 鍙敼鐝骇缁村害锛屼笉鐗佃繛闈?class 绫诲瀷鐨?grants 琛?  ---
+  duration_ms: 3578.9239
+  type: 'test'
+  ...
+# (node:72684) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 瀛︾敓 GET /books 鎶曞奖蹇収锛氬喕缁?key 蹇呴』鍦紝鍏佽鏂板锛岀被鍨嬩笉寰楁敼绉?ok 297 - 瀛︾敓 GET /books 鎶曞奖蹇収锛氬喕缁?key 蹇呴』鍦紝鍏佽鏂板锛岀被鍨嬩笉寰楁敼绉?  ---
+  duration_ms: 737.2738
+  type: 'test'
+  ...
+# Subtest: 璁℃椂鎽樿涓夎〃鍒楀揩鐓т笉寰楀鍒犳敼鍚嶆敼绫诲瀷鏀?notnull
+ok 298 - 璁℃椂鎽樿涓夎〃鍒楀揩鐓т笉寰楀鍒犳敼鍚嶆敼绫诲瀷鏀?notnull
+  ---
+  duration_ms: 458.1865
+  type: 'test'
+  ...
+# Subtest: FINGERPRINT_FIELDS 椤哄簭鍐荤粨锛岃鏃跺啓璺緞涓嶅緱鍑虹幇 reader_mode
+ok 299 - FINGERPRINT_FIELDS 椤哄簭鍐荤粨锛岃鏃跺啓璺緞涓嶅緱鍑虹幇 reader_mode
+  ---
+  duration_ms: 1.8779
+  type: 'test'
+  ...
+# (node:54836) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鐪熷疄 HTTP 閾捐矾鎸佷箙鍖栭槄璇汇€佺ぞ鍖恒€佹姤鍛婂拰 outbox锛屽苟鍏佽鐩稿叧瑙掕壊鍒锋柊璇诲彇
+ok 300 - 鐪熷疄 HTTP 閾捐矾鎸佷箙鍖栭槄璇汇€佺ぞ鍖恒€佹姤鍛婂拰 outbox锛屽苟鍏佽鐩稿叧瑙掕壊鍒锋柊璇诲彇
+  ---
+  duration_ms: 1187.2508
+  type: 'test'
+  ...
+# Subtest: 鍙椾繚鎶?manual_demo_test 璧版寮忓畨鍏ㄥ鏍稿苟鎵ц娑変簨鏁欏笀鍥為伩
+ok 301 - 鍙椾繚鎶?manual_demo_test 璧版寮忓畨鍏ㄥ鏍稿苟鎵ц娑変簨鏁欏笀鍥為伩
+  ---
+  duration_ms: 2318.7735
+  type: 'test'
+  ...
+# Subtest: 瀛︽牎绀惧尯蹇呴』缁忚繃鐝骇鏁欏笀涓€瀹″拰瀛︽牎绠＄悊鍛樹簩瀹★紝涓旂湡瀹?SQLite 鐘舵€併€佸璁′笌 outbox 涓€鑷?ok 302 - 瀛︽牎绀惧尯蹇呴』缁忚繃鐝骇鏁欏笀涓€瀹″拰瀛︽牎绠＄悊鍛樹簩瀹★紝涓旂湡瀹?SQLite 鐘舵€併€佸璁′笌 outbox 涓€鑷?  ---
+  duration_ms: 635.9948
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 HTTP 绠＄悊鍛樺垱寤虹彮绾у拰瀛︾敓鍚庯紝瀛︾敓閲嶆柊鐧诲綍骞跺湪鏂板伐浣滅┖闂磋鍙栦功鐩?ok 303 - 鐪熷疄 HTTP 绠＄悊鍛樺垱寤虹彮绾у拰瀛︾敓鍚庯紝瀛︾敓閲嶆柊鐧诲綍骞跺湪鏂板伐浣滅┖闂磋鍙栦功鐩?  ---
+  duration_ms: 667.0779
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 HTTP 鏁欏閾惧垱寤哄畨鎺掋€佹帶鍒惰鍫傘€佸悓姝ラ〉闈㈠苟鍙箍鎾竴娆?ok 304 - 鐪熷疄 HTTP 鏁欏閾惧垱寤哄畨鎺掋€佹帶鍒惰鍫傘€佸悓姝ラ〉闈㈠苟鍙箍鎾竴娆?  ---
+  duration_ms: 684.4104
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 HTTP 瀹堕暱瑙﹁揪纭畾澶辫触鍚庨噸璇曟垚鍔熷苟淇濆瓨瀹夊叏閾炬帴鍥炴墽
+ok 305 - 鐪熷疄 HTTP 瀹堕暱瑙﹁揪纭畾澶辫触鍚庨噸璇曟垚鍔熷苟淇濆瓨瀹夊叏閾炬帴鍥炴墽
+  ---
+  duration_ms: 472.5119
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄 HTTP AI 涓庡畨鍏ㄩ摼杩斿洖寮曠敤銆侀槇鍊笺€佺疮璁℃暟鍜屽鏍哥姸鎬佸苟鎸佷箙鍖?ok 306 - 鐪熷疄 HTTP AI 涓庡畨鍏ㄩ摼杩斿洖寮曠敤銆侀槇鍊笺€佺疮璁℃暟鍜屽鏍哥姸鎬佸苟鎸佷箙鍖?  ---
+  duration_ms: 659.8231
+  type: 'test'
+  ...
+# Subtest: Stage 4 鐪熷疄 HTTP 澶氫細璇濄€佺瀵嗙敵璇枫€佹姢鐪间笌闃呰缁熻鍒锋柊鍚庝粛鐢?SQLite 椹卞姩
+ok 307 - Stage 4 鐪熷疄 HTTP 澶氫細璇濄€佺瀵嗙敵璇枫€佹姢鐪间笌闃呰缁熻鍒锋柊鍚庝粛鐢?SQLite 椹卞姩
+  ---
+  duration_ms: 1690.5345
+  type: 'test'
+  ...
+# Subtest: Stage 5 鐪熷疄 HTTP 瀛︾敓闃呰瀵硅薄璺敱鎸佷箙鍖栧枩娆€佷功鍗曘€佷功绛俱€佹憳褰曞拰鎵规敞
+ok 308 - Stage 5 鐪熷疄 HTTP 瀛︾敓闃呰瀵硅薄璺敱鎸佷箙鍖栧枩娆€佷功鍗曘€佷功绛俱€佹憳褰曞拰鎵规敞
+  ---
+  duration_ms: 565.2174
+  type: 'test'
+  ...
+# (node:69940) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 宸查攣鏀诲嚮鍙紩鐢?T8.3A/T8.5A锛屼笉鍦ㄦ湰鏂囦欢澶嶅埗寮卞寲鐗?ok 309 - 宸查攣鏀诲嚮鍙紩鐢?T8.3A/T8.5A锛屼笉鍦ㄦ湰鏂囦欢澶嶅埗寮卞寲鐗?  ---
+  duration_ms: 2.4855
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀鏈姞鍏ョ彮涓嶅緱鎿嶄綔鏈彮涔︽灦锛堥浂 workspace 鏁欏笀锛?ok 310 - 鏁欏笀鏈姞鍏ョ彮涓嶅緱鎿嶄綔鏈彮涔︽灦锛堥浂 workspace 鏁欏笀锛?  ---
+  duration_ms: 823.0293
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀鏈姞鍏ョ彮涓嶅緱瀹℃壒璇ョ彮鎴愬憳
+ok 311 - 鏁欏笀鏈姞鍏ョ彮涓嶅緱瀹℃壒璇ョ彮鎴愬憳
+  ---
+  duration_ms: 586.1829
+  type: 'test'
+  ...
+# Subtest: 骞寸骇涓讳换 school 渚嬪涓嶆墿鏁ｅ埌鏈眾/璺ㄥ眾涔︽灦
+ok 312 - 骞寸骇涓讳换 school 渚嬪涓嶆墿鏁ｅ埌鏈眾/璺ㄥ眾涔︽灦
+  ---
+  duration_ms: 664.8241
+  type: 'test'
+  ...
+# (node:48024) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. console.js 蹇呴』鏈?class-local shelf API锛屽苟鍒犻櫎 visibility 鍐?ok 313 - F. console.js 蹇呴』鏈?class-local shelf API锛屽苟鍒犻櫎 visibility 鍐?  ---
+  duration_ms: 1.9238
+  type: 'test'
+  ...
+# Subtest: F. auth.js 鐧诲綍浣撳繀椤绘槸 schoolCode+loginName锛屼笉寰楀啀鍙?username-only
+ok 314 - F. auth.js 鐧诲綍浣撳繀椤绘槸 schoolCode+loginName锛屼笉寰楀啀鍙?username-only
+  ---
+  duration_ms: 1.2967
+  type: 'test'
+  ...
+# Subtest: F. student.js 蹇呴』鏈?registration / onboarding / enrollment 璇绘柟娉?ok 315 - F. student.js 蹇呴』鏈?registration / onboarding / enrollment 璇绘柟娉?  ---
+  duration_ms: 0.7929
+  type: 'test'
+  ...
+# (node:47764) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. integration-router 蹇呴』娉ㄥ唽 class-local 涔︽灦璺敱锛屼笖涓嶅緱璋冪敤 listAuthorizedClasses
+ok 316 - B. integration-router 蹇呴』娉ㄥ唽 class-local 涔︽灦璺敱锛屼笖涓嶅緱璋冪敤 listAuthorizedClasses
+  ---
+  duration_ms: 2.107
+  type: 'test'
+  ...
+# Subtest: B. 鏁欏笀瀵规湰鐝?PUT/GET/DELETE 涔︽灦 200 骞傜瓑锛屽彧鏀规湰鐝竴琛?ok 317 - B. 鏁欏笀瀵规湰鐝?PUT/GET/DELETE 涔︽灦 200 骞傜瓑锛屽彧鏀规湰鐝竴琛?  ---
+  duration_ms: 897.6263
+  type: 'test'
+  ...
+# Subtest: B. 浠栫彮鎴栨棤 C workspace 鎿嶄綔涔︽灦蹇呴』 403 鎴?404
+ok 318 - B. 浠栫彮鎴栨棤 C workspace 鎿嶄綔涔︽灦蹇呴』 403 鎴?404
+  ---
+  duration_ms: 683.0614
+  type: 'test'
+  ...
+# Subtest: B. 璺ㄧ粍缁?classId 涓庝笉瀛樺湪 classId 涔︽灦鍐欏繀椤诲悓鐮佸悓鏂囨 404
+ok 319 - B. 璺ㄧ粍缁?classId 涓庝笉瀛樺湪 classId 涔︽灦鍐欏繀椤诲悓鐮佸悓鏂囨 404
+  ---
+  duration_ms: 671.2378
+  type: 'test'
+  ...
+# Subtest: B. 涓ゅ悕鏁欏笀骞跺彂 PUT 鍚岀彮鍚屼功鏈€缁堝彧鏈変竴琛?grant
+ok 320 - B. 涓ゅ悕鏁欏笀骞跺彂 PUT 鍚岀彮鍚屼功鏈€缁堝彧鏈変竴琛?grant
+  ---
+  duration_ms: 719.913
+  type: 'test'
+  ...
+# Subtest: B. 涓€鐝挙涓嬩笉寰楀垹闄や粬鐝?grant
+ok 321 - B. 涓€鐝挙涓嬩笉寰楀垹闄や粬鐝?grant
+  ---
+  duration_ms: 576.197
+  type: 'test'
+  ...
+# (node:64880) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. projectCommunityPosts 蹇呴』鎺ュ埌涓?T8.4 鍚屼竴 isBookVisibleToAudience
+ok 322 - D. projectCommunityPosts 蹇呴』鎺ュ埌涓?T8.4 鍚屼竴 isBookVisibleToAudience
+  ---
+  duration_ms: 1.7148
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP锛欸ET /community/posts 鏃?grant 鏃朵繚鐣欏笘瀛愪絾 quote.text=null
+ok 323 - D-21 HTTP锛欸ET /community/posts 鏃?grant 鏃朵繚鐣欏笘瀛愪絾 quote.text=null
+  ---
+  duration_ms: 786.5666
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP锛欸ET /community/posts 浠呬粬鐝?grant 鏃堕殣钘忓師鏂?ok 324 - D-21 HTTP锛欸ET /community/posts 浠呬粬鐝?grant 鏃堕殣钘忓師鏂?  ---
+  duration_ms: 555.7734
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP锛欸ET /community/posts 瀵?draft 涔﹂殣钘忓師鏂?ok 325 - D-21 HTTP锛欸ET /community/posts 瀵?draft 涔﹂殣钘忓師鏂?  ---
+  duration_ms: 621.9409
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP锛欸ET /community/posts 鏈夋湰鐝?grant 浠嶈繑鍘熸枃
+ok 326 - D-21 HTTP锛欸ET /community/posts 鏈夋湰鐝?grant 浠嶈繑鍘熸枃
+  ---
+  duration_ms: 566.8024
+  type: 'test'
+  ...
+# (node:63460) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. projectAssignments 蹇呴』鎺ュ埌涓?T8.4 鍚屼竴 isBookVisibleToAudience
+ok 327 - E. projectAssignments 蹇呴』鎺ュ埌涓?T8.4 鍚屼竴 isBookVisibleToAudience
+  ---
+  duration_ms: 2.2195
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP锛欸ET /assignments 瀵瑰鐢熺渷鐣ユ棤 grant 鐨勪功鏁撮」
+ok 328 - D-22 HTTP锛欸ET /assignments 瀵瑰鐢熺渷鐣ユ棤 grant 鐨勪功鏁撮」
+  ---
+  duration_ms: 765.6209
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP锛欸ET /assignments 浠呬粬鐝?grant 鎴?draft 涔熸暣椤圭渷鐣?ok 329 - D-22 HTTP锛欸ET /assignments 浠呬粬鐝?grant 鎴?draft 涔熸暣椤圭渷鐣?  ---
+  duration_ms: 638.9122
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP锛氭湁鏈彮 grant 杩斿洖瀹夋帓锛涙挙涓嬪悗娑堝け
+ok 330 - D-22 HTTP锛氭湁鏈彮 grant 杩斿洖瀹夋帓锛涙挙涓嬪悗娑堝け
+  ---
+  duration_ms: 639.0755
+  type: 'test'
+  ...
+# (node:64896) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 涓存椂搴撹矾寰勪笉寰楁寚鍚戠湡搴擄紝鐙珛绔彛涓嶅緱涓?5191
+ok 331 - G. 涓存椂搴撹矾寰勪笉寰楁寚鍚戠湡搴擄紝鐙珛绔彛涓嶅緱涓?5191
+  ---
+  duration_ms: 505.2657
+  type: 'test'
+  ...
+# Subtest: G. 鐧诲綍鍚?GET /books 蹇呴』鎵撳埌 integration-router锛屼笉寰楄 identity 鍏滃簳鍚炴帀
+ok 332 - G. 鐧诲綍鍚?GET /books 蹇呴』鎵撳埌 integration-router锛屼笉寰楄 identity 鍏滃簳鍚炴帀
+  ---
+  duration_ms: 622.8189
+  type: 'test'
+  ...
+# Subtest: G. 涔︽灦璺敱鍧椾笉寰楄皟鐢?listAuthorizedClasses
+ok 333 - G. 涔︽灦璺敱鍧椾笉寰楄皟鐢?listAuthorizedClasses
+  ---
+  duration_ms: 1.3982
+  type: 'test'
+  ...
+# (node:69488) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. 鏁欏笀鍏ㄥ眬 publish/unpublish 蹇呴』 403锛屼笖涓嶅緱鏀?grants
+ok 334 - C. 鏁欏笀鍏ㄥ眬 publish/unpublish 蹇呴』 403锛屼笖涓嶅緱鏀?grants
+  ---
+  duration_ms: 714.3464
+  type: 'test'
+  ...
+# Subtest: C. 鏍￠暱涓庡勾绾т富浠诲叏灞€ publish 蹇呴』 403
+ok 335 - C. 鏍￠暱涓庡勾绾т富浠诲叏灞€ publish 蹇呴』 403
+  ---
+  duration_ms: 694.6219
+  type: 'test'
+  ...
+# Subtest: C. platform publish/unpublish 浠?200锛屼笖涓嶅緱鍒涘缓鎴栨竻绌?grants
+ok 336 - C. platform publish/unpublish 浠?200锛屼笖涓嶅緱鍒涘缓鎴栨竻绌?grants
+  ---
+  duration_ms: 636.7057
+  type: 'test'
+  ...
+# (node:32784) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\http\\phase8-http-guards\\shared-harness.guard.test.js
+ok 50 - tests\\server\\http\\phase8-http-guards\\shared-harness.guard.test.js
+  ---
+  duration_ms: 429.2163
+  type: 'test'
+  ...
+# (node:69028) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. integration-router 蹇呴』鍒犻櫎 GET/PUT /books/:bookId/visibility锛屾棤鍏煎 handler
+ok 338 - A. integration-router 蹇呴』鍒犻櫎 GET/PUT /books/:bookId/visibility锛屾棤鍏煎 handler
+  ---
+  duration_ms: 10.3713
+  type: 'test'
+  ...
+# Subtest: A. GET /books/:bookId/visibility 蹇呴』鏄爣鍑?JSON 404锛屼笖 integration 閾惧彲鍒拌揪
+ok 339 - A. GET /books/:bookId/visibility 蹇呴』鏄爣鍑?JSON 404锛屼笖 integration 閾惧彲鍒拌揪
+  ---
+  duration_ms: 834.1537
+  type: 'test'
+  ...
+# Subtest: A. PUT /books/:bookId/visibility 鍚?scope=organization 涔熷繀椤绘爣鍑?JSON 404锛屼笖涓嶅緱娓呯┖浠栫彮 grant
+ok 340 - A. PUT /books/:bookId/visibility 鍚?scope=organization 涔熷繀椤绘爣鍑?JSON 404锛屼笖涓嶅緱娓呯┖浠栫彮 grant
+  ---
+  duration_ms: 701.3851
+  type: 'test'
+  ...
+# Subtest: 鍏紑鎶ュ憡椤典笉娓叉煋椤垫暟銆佸紑濮嬩功鐩€佽繘搴︽垨瀹屾垚搴︼紝浠呭睍绀哄悎娉曟寚鏍?ok 341 - 鍏紑鎶ュ憡椤典笉娓叉煋椤垫暟銆佸紑濮嬩功鐩€佽繘搴︽垨瀹屾垚搴︼紝浠呭睍绀哄悎娉曟寚鏍?  ---
+  duration_ms: 1.8735
+  type: 'test'
+  ...
+# Subtest: 鍏紑鎶ュ憡 JSON 鎶曞奖鍚屾牱鍒犻櫎寮€濮嬩功鐩€佹棫椤垫暟鍜屽畬鎴愬害瀛楁
+ok 342 - 鍏紑鎶ュ憡 JSON 鎶曞奖鍚屾牱鍒犻櫎寮€濮嬩功鐩€佹棫椤垫暟鍜屽畬鎴愬害瀛楁
+  ---
+  duration_ms: 1.2382
+  type: 'test'
+  ...
+# Subtest: 鍏紑鎶ュ憡椤跺眰鏁扮粍涓嶈兘缁曡繃 JSON 涓?HTML 閫掑綊鍑€鍖?ok 343 - 鍏紑鎶ュ憡椤跺眰鏁扮粍涓嶈兘缁曡繃 JSON 涓?HTML 閫掑綊鍑€鍖?  ---
+  duration_ms: 0.5981
+  type: 'test'
+  ...
+# (node:60476) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鏂拌〃 reader_mode_preferences 鍙湁濂戠害浜斿垪锛屼笖鏈崰鐢?030
+ok 344 - 鏂拌〃 reader_mode_preferences 鍙湁濂戠害浜斿垪锛屼笖鏈崰鐢?030
+  ---
+  duration_ms: 540.5496
+  type: 'test'
+  ...
+# Subtest: 鏃犲亸濂芥椂 GET /books 甯?preferredReaderMode=null锛屼笖涓嶅杩?progress
+ok 345 - 鏃犲亸濂芥椂 GET /books 甯?preferredReaderMode=null锛屼笖涓嶅杩?progress
+  ---
+  duration_ms: 683.1361
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓 PUT 鍋忓ソ鍚庡埛鏂?GET /books 浠嶅甫鏈汉鍋忓ソ锛屼笖涓嶈兘鍐欏埆浜虹殑琛?ok 346 - 瀛︾敓 PUT 鍋忓ソ鍚庡埛鏂?GET /books 浠嶅甫鏈汉鍋忓ソ锛屼笖涓嶈兘鍐欏埆浜虹殑琛?  ---
+  duration_ms: 734.0122
+  type: 'test'
+  ...
+# (node:71648) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G2-18 HTTP 缁瑕佹眰骞傜瓑閿拰鍙俊璁惧锛屽苟鏄犲皠 lease/validation 閿欒
+ok 347 - G2-18 HTTP 缁瑕佹眰骞傜瓑閿拰鍙俊璁惧锛屽苟鏄犲皠 lease/validation 閿欒
+  ---
+  duration_ms: 894.4768
+  type: 'test'
+  ...
+# Subtest: G2-18 HTTP 鎽樿杩斿洖 accepted/replayed/superseded锛屽苟鍐荤粨 revision 涓庢湭鐭ュ瓧娈甸敊璇?ok 348 - G2-18 HTTP 鎽樿杩斿洖 accepted/replayed/superseded锛屽苟鍐荤粨 revision 涓庢湭鐭ュ瓧娈甸敊璇?  ---
+  duration_ms: 742.4573
+  type: 'test'
+  ...
+# Subtest: G2-18 HTTP self/scope 涓ユ牸杩斿洖鏂?DTO锛屽苟鍖哄垎绌烘€併€佹潈闄愩€佽法缁勭粐鍜屾湭鐭?query
+ok 349 - G2-18 HTTP self/scope 涓ユ牸杩斿洖鏂?DTO锛屽苟鍖哄垎绌烘€併€佹潈闄愩€佽法缁勭粐鍜屾湭鐭?query
+  ---
+  duration_ms: 691.5967
+  type: 'test'
+  ...
+# Subtest: READING_LEASE_HELD 409 浠嶄笅鍙戞寔涔?readmate_device Cookie
+ok 350 - READING_LEASE_HELD 409 浠嶄笅鍙戞寔涔?readmate_device Cookie
+  ---
+  duration_ms: 482.4847
+  type: 'test'
+  ...
+# Subtest: HTTP 杩囨湡绉熺害娈嬬暀 open 浼氳瘽鏃舵柊璁惧 acquire 鎴愬姛
+ok 351 - HTTP 杩囨湡绉熺害娈嬬暀 open 浼氳瘽鏃舵柊璁惧 acquire 鎴愬姛
+  ---
+  duration_ms: 668.9821
+  type: 'test'
+  ...
+# Subtest: HTTP 鍏宠仈 open 浼氳瘽鍋滄粸瓒呴槇鍊兼椂缁湡杩斿洖 LEASE_REQUIRED
+ok 352 - HTTP 鍏宠仈 open 浼氳瘽鍋滄粸瓒呴槇鍊兼椂缁湡杩斿洖 LEASE_REQUIRED
+  ---
+  duration_ms: 437.1482
+  type: 'test'
+  ...
+# Subtest: HTTP re-acquire 鍏抽棴 open 浼氳瘽鍚?measured_through_at 鍋滄粸鏃剁画鏈熻繑鍥?LEASE_REQUIRED
+ok 353 - HTTP re-acquire 鍏抽棴 open 浼氳瘽鍚?measured_through_at 鍋滄粸鏃剁画鏈熻繑鍥?LEASE_REQUIRED
+  ---
+  duration_ms: 576.5238
+  type: 'test'
+  ...
+# Subtest: HTTP 鎷垮埌绉熺害浣嗕粠鏈垱寤轰細璇濓紝瓒呰繃鍋滄粸闃堝€煎悗缁湡杩斿洖 LEASE_REQUIRED
+ok 354 - HTTP 鎷垮埌绉熺害浣嗕粠鏈垱寤轰細璇濓紝瓒呰繃鍋滄粸闃堝€煎悗缁湡杩斿洖 LEASE_REQUIRED
+  ---
+  duration_ms: 421.1692
+  type: 'test'
+  ...
+# Subtest: HTTP 鍦ㄤ綅鑰呮椿璺冩彁浜ゆ椂鍙︿竴璁惧 takeover 杩斿洖 READING_LEASE_HELD
+ok 355 - HTTP 鍦ㄤ綅鑰呮椿璺冩彁浜ゆ椂鍙︿竴璁惧 takeover 杩斿洖 READING_LEASE_HELD
+  ---
+  duration_ms: 416.2951
+  type: 'test'
+  ...
+# Subtest: HTTP 鍦ㄤ綅鑰呬細璇濆仠婊炴椂鍙︿竴璁惧浠嶅彲鎺ョ
+ok 356 - HTTP 鍦ㄤ綅鑰呬細璇濆仠婊炴椂鍙︿竴璁惧浠嶅彲鎺ョ
+  ---
+  duration_ms: 433.9074
+  type: 'test'
+  ...
+# (node:46724) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 涔︾睄璧勪骇涓嶅啀鐢卞叕寮€闈欐€佽矾寰勬毚闇诧紝鍙椾繚鎶ょ鐐硅姹備細璇?ok 357 - 涔︾睄璧勪骇涓嶅啀鐢卞叕寮€闈欐€佽矾寰勬毚闇诧紝鍙椾繚鎶ょ鐐硅姹備細璇?  ---
+  duration_ms: 557.7377
+  type: 'test'
+  ...
+# (node:70596) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鎶ょ溂鐘舵€佹寜鐪熷疄鑱氬悎杩涘叆鎻愰啋銆佸己鍒朵紤鎭苟鍦ㄥ埌鏃跺悗鑷姩鎭㈠
+ok 358 - 鎶ょ溂鐘舵€佹寜鐪熷疄鑱氬悎杩涘叆鎻愰啋銆佸己鍒朵紤鎭苟鍦ㄥ埌鏃跺悗鑷姩鎭㈠
+  ---
+  duration_ms: 429.2677
+  type: 'test'
+  ...
+# Subtest: 鏁欏笀涓庡鏍＄鐞嗗憳鍙兘璇诲彇鐪熷疄鑼冨洿骞朵笖鍙兘鎸夎鍒よВ闄ゅ己鍒朵紤鎭?ok 359 - 鏁欏笀涓庡鏍＄鐞嗗憳鍙兘璇诲彇鐪熷疄鑼冨洿骞朵笖鍙兘鎸夎鍒よВ闄ゅ己鍒朵紤鎭?  ---
+  duration_ms: 420.6782
+  type: 'test'
+  ...
+# Subtest: 鏅€氱瀵嗕細璇濆繀椤荤粡瀛︾敓鎺堟潈锛岃秴鏃舵寜宸插憡鐭ヨ鍒欏悓鎰忓苟淇濈暀姘村嵃涓庤闂巻鍙?ok 360 - 鏅€氱瀵嗕細璇濆繀椤荤粡瀛︾敓鎺堟潈锛岃秴鏃舵寜宸插憡鐭ヨ鍒欏悓鎰忓苟淇濈暀姘村嵃涓庤闂巻鍙?  ---
+  duration_ms: 668.3511
+  type: 'test'
+  ...
+# Subtest: 瀹夊叏鏍囪浼氳瘽鍙繑鍥炶瘉鎹渶灏忎笂涓嬫枃锛屾秹浜嬫暀甯堣鍚庣鎷掔粷涓斿鐢熺涓嶆劅鐭ュ嵄闄╀簨浠?ok 361 - 瀹夊叏鏍囪浼氳瘽鍙繑鍥炶瘉鎹渶灏忎笂涓嬫枃锛屾秹浜嬫暀甯堣鍚庣鎷掔粷涓斿鐢熺涓嶆劅鐭ュ嵄闄╀簨浠?  ---
+  duration_ms: 433.0913
+  type: 'test'
+  ...
+# Subtest: 绉佸瘑浼氳瘽鏌ヨ濮嬬粓缁戝畾璁よ瘉缁勭粐鍜岀湡瀹炲伐浣滅┖闂磋寖鍥?ok 362 - 绉佸瘑浼氳瘽鏌ヨ濮嬬粓缁戝畾璁よ瘉缁勭粐鍜岀湡瀹炲伐浣滅┖闂磋寖鍥?  ---
+  duration_ms: 448.1075
+  type: 'test'
+  ...
+# (node:71684) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: P1: 鍚屼簨浠?ID 淇敼 annotation 涓氬姟 payload 蹇呴』鍐茬獊
+ok 363 - P1: 鍚屼簨浠?ID 淇敼 annotation 涓氬姟 payload 蹇呴』鍐茬獊
+  ---
+  duration_ms: 421.3529
+  type: 'test'
+  ...
+# Subtest: P1: 鏈煡 payload 瀛楁蹇呴』鎷掔粷鑰屼笉鏄拷鐣?ok 364 - P1: 鏈煡 payload 瀛楁蹇呴』鎷掔粷鑰屼笉鏄拷鐣?  ---
+  duration_ms: 462.9367
+  type: 'test'
+  ...
+# Subtest: P1: selection 涓?ai_question 瀹屾暣涓氬姟 payload 鍙備笌浜嬩欢鎸囩汗
+ok 365 - P1: selection 涓?ai_question 瀹屾暣涓氬姟 payload 鍙備笌浜嬩欢鎸囩汗
+  ---
+  duration_ms: 506.1923
+  type: 'test'
+  ...
+# Subtest: P1: 涓嶆敮鎸?eventType 涓庢湭鐭ラ《灞傚瓧娈靛繀椤绘槑纭嫆缁?ok 366 - P1: 涓嶆敮鎸?eventType 涓庢湭鐭ラ《灞傚瓧娈靛繀椤绘槑纭嫆缁?  ---
+  duration_ms: 396.3683
+  type: 'test'
+  ...
+# Subtest: P0: 鏃犵绾﹁澶囦簨浠朵笉寰楄繘鍏ョ粺璁?ok 367 - P0: 鏃犵绾﹁澶囦簨浠朵笉寰楄繘鍏ョ粺璁?  ---
+  duration_ms: 419.7818
+  type: 'test'
+  ...
+# Subtest: P0: 2035 鏈潵浜嬩欢涓嶅緱杩涘叆缁熻
+ok 368 - P0: 2035 鏈潵浜嬩欢涓嶅緱杩涘叆缁熻
+  ---
+  duration_ms: 330.1543
+  type: 'test'
+  ...
+# Subtest: P0: 浜嬩欢鎸夊彂鐢熸椂闂村尮閰嶅凡閲婃斁绉熺害鍘嗗彶骞舵嫆缁濈绾﹀墠鍚庤秺鐣?ok 369 - P0: 浜嬩欢鎸夊彂鐢熸椂闂村尮閰嶅凡閲婃斁绉熺害鍘嗗彶骞舵嫆缁濈绾﹀墠鍚庤秺鐣?  ---
+  duration_ms: 261.6815
+  type: 'test'
+  ...
+# Subtest: P0: 杩囨棫浜嬩欢鍜岃秺杩囬厤缃‖涓婇檺鍧囪鎷掔粷
+ok 370 - P0: 杩囨棫浜嬩欢鍜岃秺杩囬厤缃‖涓婇檺鍧囪鎷掔粷
+  ---
+  duration_ms: 314.3938
+  type: 'test'
+  ...
+# Subtest: P1: offline sequence 鍞竴閿拰鏌ヨ鍧囧寘鍚?organization
+ok 371 - P1: offline sequence 鍞竴閿拰鏌ヨ鍧囧寘鍚?organization
+  ---
+  duration_ms: 316.0343
+  type: 'test'
+  ...
+# Subtest: P0: schoolbag 璺?subject/workspace 鍐欏洖蹇呴』鎷掔粷
+ok 372 - P0: schoolbag 璺?subject/workspace 鍐欏洖蹇呴』鎷掔粷
+  ---
+  duration_ms: 288.1883
+  type: 'test'
+  ...
+# Subtest: P0: schoolbag 鍐欏洖閲嶆柊楠岃繃鏈熷苟鎷掔粷鍚?subject 鐨勯敊璇鍫備护鐗?ok 373 - P0: schoolbag 鍐欏洖閲嶆柊楠岃繃鏈熷苟鎷掔粷鍚?subject 鐨勯敊璇鍫備护鐗?  ---
+  duration_ms: 335.5834
+  type: 'test'
+  ...
+# Subtest: P1: 013 鍙粠 010-012 鍓嶅悜鍗囩骇涓旈噸澶嶆墽琛屼繚鎸佹暟鎹笌绾︽潫
+ok 374 - P1: 013 鍙粠 010-012 鍓嶅悜鍗囩骇涓旈噸澶嶆墽琛屼繚鎸佹暟鎹笌绾︽潫
+  ---
+  duration_ms: 361.8341
+  type: 'test'
+  ...
+# (node:66372) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: maintenance cleanup 鍛戒护鐪熷疄澶勭悊 cutoff銆佺瓑鍊间繚鐣欍€佸巻鍙?open銆佸紓甯告姤鍛婁笖骞傜瓑
+ok 375 - maintenance cleanup 鍛戒护鐪熷疄澶勭悊 cutoff銆佺瓑鍊间繚鐣欍€佸巻鍙?open銆佸紓甯告姤鍛婁笖骞傜瓑
+  ---
+  duration_ms: 1194.9456
+  type: 'test'
+  ...
+# Subtest: maintenance cleanup 鍛戒护鍙傛暟閿欒鏃堕潪闆堕€€鍑哄苟缁欏嚭绋冲畾閿欒鍓嶇紑
+ok 376 - maintenance cleanup 鍛戒护鍙傛暟閿欒鏃堕潪闆堕€€鍑哄苟缁欏嚭绋冲畾閿欒鍓嶇紑
+  ---
+  duration_ms: 738.0173
+  type: 'test'
+  ...
+# (node:66796) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鍖椾含鏃堕棿 04:00銆佹棩鏈熻寖鍥村拰鍏釜鏃ュ巻鏈?cutoff 浣跨敤鍐荤粨杈圭晫
+ok 377 - 鍖椾含鏃堕棿 04:00銆佹棩鏈熻寖鍥村拰鍏釜鏃ュ巻鏈?cutoff 浣跨敤鍐荤粨杈圭晫
+  ---
+  duration_ms: 3.6476
+  type: 'test'
+  ...
+# Subtest: acquire 涓嶅師鍦版崲 scope 鎴栫画鏈燂紝renew 浠呭欢闀垮師鑼冨洿涓?TTL 鍥哄畾 90 绉?ok 378 - acquire 涓嶅師鍦版崲 scope 鎴栫画鏈燂紝renew 浠呭欢闀垮師鑼冨洿涓?TTL 鍥哄畾 90 绉?  ---
+  duration_ms: 1329.7792
+  type: 'test'
+  ...
+# Subtest: 鎽樿 accepted/replayed/superseded銆佸巻鍙叉寚绾广€佽繛缁?revision 涓庝簨鍔?delta 涓嶉噸澶嶈鏃?ok 379 - 鎽樿 accepted/replayed/superseded銆佸巻鍙叉寚绾广€佽繛缁?revision 涓庝簨鍔?delta 涓嶉噸澶嶈鏃?  ---
+  duration_ms: 1082.4493
+  type: 'test'
+  ...
+# Subtest: 閫愰〉瑕嗙洊鎸?original/text 涓庣‘璁や氦浜掓寔涔呭寲锛岄噸鏀句笉閲嶅涓斾笉鑳界敱 lastPageNo 鎺ㄥ
+ok 380 - 閫愰〉瑕嗙洊鎸?original/text 涓庣‘璁や氦浜掓寔涔呭寲锛岄噸鏀句笉閲嶅涓斾笉鑳界敱 lastPageNo 鎺ㄥ
+  ---
+  duration_ms: 700.8511
+  type: 'test'
+  ...
+# Subtest: G5-01 鏃т簨浠跺彧璐＄尞鎶ょ溂锛屼笉鍐欓槄璇绘椂闀夸笖涓嶈兘瑕嗙洊鎽樿姣忔棩浜嬪疄鍜屼綅缃?ok 381 - G5-01 鏃т簨浠跺彧璐＄尞鎶ょ溂锛屼笉鍐欓槄璇绘椂闀夸笖涓嶈兘瑕嗙洊鎽樿姣忔棩浜嬪疄鍜屼綅缃?  ---
+  duration_ms: 873.1767
+  type: 'test'
+  ...
+# Subtest: 鎽樿涓ユ牸鎷掔粷鏈煡瀛楁銆侀潪瑙勮寖鏃堕棿銆佹湭鏉ユ椂闂淬€佸閽熻秴棰濄€侀敊缁熻鏃ュ拰閿欐寚绾?ok 382 - 鎽樿涓ユ牸鎷掔粷鏈煡瀛楁銆侀潪瑙勮寖鏃堕棿銆佹湭鏉ユ椂闂淬€佸閽熻秴棰濄€侀敊缁熻鏃ュ拰閿欐寚绾?  ---
+  duration_ms: 672.5225
+  type: 'test'
+  ...
+# Subtest: 浠?stat_date_change 鍙妸 endedAt 绮剧‘鏀惧湪涓嬩竴缁熻鏃?04:00 杈圭晫
+ok 383 - 浠?stat_date_change 鍙妸 endedAt 绮剧‘鏀惧湪涓嬩竴缁熻鏃?04:00 杈圭晫
+  ---
+  duration_ms: 611.5563
+  type: 'test'
+  ...
+# Subtest: 鏃х绾﹂娆℃櫄鍒扮洿鎺?closed锛屼笖鍏佽鎴鍓嶈繛缁櫄鍒?revision
+ok 384 - 鏃х绾﹂娆℃櫄鍒扮洿鎺?closed锛屼笖鍏佽鎴鍓嶈繛缁櫄鍒?revision
+  ---
+  duration_ms: 618.5879
+  type: 'test'
+  ...
+# Subtest: 鍚岀绾︽畫鐣檕pen浼氳瘽涓嶆尅鏂颁細璇濓紝涓斾笉瑕嗙洊鏃х疮璁℃绉?ok 385 - 鍚岀绾︽畫鐣檕pen浼氳瘽涓嶆尅鏂颁細璇濓紝涓斾笉瑕嗙洊鏃х疮璁℃绉?  ---
+  duration_ms: 590.3141
+  type: 'test'
+  ...
+# Subtest: 杩囨湡绉熺害娈嬬暀 open 浼氳瘽鏃舵柊璁惧 acquire 鎴愬姛骞跺叧闂畫鐣欎細璇?ok 386 - 杩囨湡绉熺害娈嬬暀 open 浼氳瘽鏃舵柊璁惧 acquire 鎴愬姛骞跺叧闂畫鐣欎細璇?  ---
+  duration_ms: 472.8412
+  type: 'test'
+  ...
+# Subtest: 鍏宠仈 open 浼氳瘽鏈秴鍋滄粸闃堝€兼椂缁湡姝ｅ父鎴愬姛
+ok 387 - 鍏宠仈 open 浼氳瘽鏈秴鍋滄粸闃堝€兼椂缁湡姝ｅ父鎴愬姛
+  ---
+  duration_ms: 451.3819
+  type: 'test'
+  ...
+# Subtest: 鍏宠仈 open 浼氳瘽鍋滄粸瓒呴槇鍊兼椂缁湡琚嫆
+ok 388 - 鍏宠仈 open 浼氳瘽鍋滄粸瓒呴槇鍊兼椂缁湡琚嫆
+  ---
+  duration_ms: 462.388
+  type: 'test'
+  ...
+# Subtest: 鍏宠仈 closed 浼氳瘽 measured_through_at 鍋滄粸瓒呴槇鍊兼椂缁湡琚嫆
+ok 389 - 鍏宠仈 closed 浼氳瘽 measured_through_at 鍋滄粸瓒呴槇鍊兼椂缁湡琚嫆
+  ---
+  duration_ms: 437.5401
+  type: 'test'
+  ...
+# Subtest: 鍚岃澶?re-acquire 鍏抽棴 open 浼氳瘽鍚?measured_through_at 鍋滄粸鏃剁画鏈熻鎷?ok 390 - 鍚岃澶?re-acquire 鍏抽棴 open 浼氳瘽鍚?measured_through_at 鍋滄粸鏃剁画鏈熻鎷?  ---
+  duration_ms: 438.5494
+  type: 'test'
+  ...
+# Subtest: 鍒氳幏鍙栫绾﹀皻鏃?open 浼氳瘽鏃剁画鏈熸甯告垚鍔?ok 391 - 鍒氳幏鍙栫绾﹀皻鏃?open 浼氳瘽鏃剁画鏈熸甯告垚鍔?  ---
+  duration_ms: 427.6584
+  type: 'test'
+  ...
+# Subtest: 鎷垮埌绉熺害浣嗕粠鏈垱寤轰换浣曚細璇濓紝瓒呰繃鍋滄粸闃堝€煎悗缁湡琚嫆
+ok 392 - 鎷垮埌绉熺害浣嗕粠鏈垱寤轰换浣曚細璇濓紝瓒呰繃鍋滄粸闃堝€煎悗缁湡琚嫆
+  ---
+  duration_ms: 441.6924
+  type: 'test'
+  ...
+# Subtest: 鍦ㄤ綅鑰呮椿璺冩彁浜ゆ椂鍙︿竴璁惧鎺ョ琚嫆
+ok 393 - 鍦ㄤ綅鑰呮椿璺冩彁浜ゆ椂鍙︿竴璁惧鎺ョ琚嫆
+  ---
+  duration_ms: 488.1151
+  type: 'test'
+  ...
+# Subtest: 鍦ㄤ綅鑰呬細璇濆仠婊炴椂鍙︿竴璁惧浠嶅彲姝ｅ父鎺ョ
+ok 394 - 鍦ㄤ綅鑰呬細璇濆仠婊炴椂鍙︿竴璁惧浠嶅彲姝ｅ父鎺ョ
+  ---
+  duration_ms: 419.0912
+  type: 'test'
+  ...
+# Subtest: 鍦ㄤ綅鑰呮棤浼氳瘽涓斿凡鍋滄粸鏃跺彟涓€璁惧鏃犻渶 takeover 鍗冲彲鑾峰彇
+ok 395 - 鍦ㄤ綅鑰呮棤浼氳瘽涓斿凡鍋滄粸鏃跺彟涓€璁惧鏃犻渶 takeover 鍗冲彲鑾峰彇
+  ---
+  duration_ms: 442.911
+  type: 'test'
+  ...
+# Subtest: 璺?session 鏅氬埌姝ｅ父绱姞 delta/OR锛屼絾杈冩棫浣嶇疆涓嶅洖閫€
+ok 396 - 璺?session 鏅氬埌姝ｅ父绱姞 delta/OR锛屼絾杈冩棫浣嶇疆涓嶅洖閫€
+  ---
+  duration_ms: 430.6009
+  type: 'test'
+  ...
+# Subtest: 浣嶇疆娴嬮噺鏃堕棿绮剧‘鐩稿悓鏃朵粎浠ユ洿澶ч〉鐮佺ǔ瀹氱牬鍚屽€?ok 397 - 浣嶇疆娴嬮噺鏃堕棿绮剧‘鐩稿悓鏃朵粎浠ユ洿澶ч〉鐮佺ǔ瀹氱牬鍚屽€?  ---
+  duration_ms: 476.3251
+  type: 'test'
+  ...
+# Subtest: 鐝骇鍦ㄤ細璇濆垱寤烘椂蹇収锛岃浆鐝悗鐨勬柊浼氳瘽褰掑叆鏂扮彮绾т笖鏃т簨瀹炰笉鏀瑰啓
+ok 398 - 鐝骇鍦ㄤ細璇濆垱寤烘椂蹇収锛岃浆鐝悗鐨勬柊浼氳瘽褰掑叆鏂扮彮绾т笖鏃т簨瀹炰笉鏀瑰啓
+  ---
+  duration_ms: 424.3197
+  type: 'test'
+  ...
+# Subtest: 姣忔棩姹囨€诲け璐ユ椂浼氳瘽鍜屼綅缃潎鍥炴粴锛屼笉浜х敓鍗婂啓
+ok 399 - 姣忔棩姹囨€诲け璐ユ椂浼氳瘽鍜屼綅缃潎鍥炴粴锛屼笉浜х敓鍗婂啓
+  ---
+  duration_ms: 416.4388
+  type: 'test'
+  ...
+# Subtest: reading-domain 鍒犻櫎鎸夌粍缁囬殧绂伙紱鍏釜鏈?cleanup 鍏堝叧鍘嗗彶宸茬粨鏉?open銆佷弗鏍煎垹闄?cutoff 鍓?closed 涓斿箓绛?ok 400 - reading-domain 鍒犻櫎鎸夌粍缁囬殧绂伙紱鍏釜鏈?cleanup 鍏堝叧鍘嗗彶宸茬粨鏉?open銆佷弗鏍煎垹闄?cutoff 鍓?closed 涓斿箓绛?  ---
+  duration_ms: 439.6714
+  type: 'test'
+  ...
+# (node:60080) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 涔︾睄鍧愭爣銆佽澶囩绾﹀拰绂荤嚎闃呰浜嬩欢鐪熷疄鎸佷箙鍖栦笖骞傜瓑
+ok 401 - 涔︾睄鍧愭爣銆佽澶囩绾﹀拰绂荤嚎闃呰浜嬩欢鐪熷疄鎸佷箙鍖栦笖骞傜瓑
+  ---
+  duration_ms: 1244.3798
+  type: 'test'
+  ...
+# Subtest: 鐪熷疄涔︾洰璧勪骇鍚屼簨鍔＄櫥璁般€佹牎楠屽苟鎸夌粍缁囪寖鍥存彁渚涙煡璇㈢鍙?ok 402 - 鐪熷疄涔︾洰璧勪骇鍚屼簨鍔＄櫥璁般€佹牎楠屽苟鎸夌粍缁囪寖鍥存彁渚涙煡璇㈢鍙?  ---
+  duration_ms: 1000.0276
+  type: 'test'
+  ...
+# Subtest: 绂荤嚎浜嬩欢鎸夋椂闂村苟闆嗛噸绠楁姢鐪硷紝涔卞簭涓婁紶涓嶅啓闃呰杩涘害涓斿啿绐佷笉闈欓粯閲嶆斁
+ok 403 - 绂荤嚎浜嬩欢鎸夋椂闂村苟闆嗛噸绠楁姢鐪硷紝涔卞簭涓婁紶涓嶅啓闃呰杩涘害涓斿啿绐佷笉闈欓粯閲嶆斁
+  ---
+  duration_ms: 654.8719
+  type: 'test'
+  ...
+# Subtest: 涔︾睄涓庡畨鎺掓寜涓嶅彲鍙樼粍缁囪寖鍥存嫆缁濊法缁勭粐璁块棶
+ok 404 - 涔︾睄涓庡畨鎺掓寜涓嶅彲鍙樼粍缁囪寖鍥存嫆缁濊法缁勭粐璁块棶
+  ---
+  duration_ms: 540.3595
+  type: 'test'
+  ...
+# Subtest: 澶氱彮瀹夋帓銆佸敮涓€璇惧爞鎺у埗绔拰鍗曟 AI 骞挎挱 outbox
+ok 405 - 澶氱彮瀹夋帓銆佸敮涓€璇惧爞鎺у埗绔拰鍗曟 AI 骞挎挱 outbox
+  ---
+  duration_ms: 767.5717
+  type: 'test'
+  ...
+# Subtest: 瀛︾敓璇惧爞鍔犲叆銆佸悓姝ャ€佸箍鎾洖鎵с€佹帀绾夸笌缁撴潫鐘舵€佸舰鎴愬悓涓€鎸佷箙闂幆
+ok 406 - 瀛︾敓璇惧爞鍔犲叆銆佸悓姝ャ€佸箍鎾洖鎵с€佹帀绾夸笌缁撴潫鐘舵€佸舰鎴愬悓涓€鎸佷箙闂幆
+  ---
+  duration_ms: 561.5601
+  type: 'test'
+  ...
+# Subtest: 闃呰瀹夋帓涓?outbox銆佸璁″悓浜嬪姟锛岄€氱煡鍏ラ槦澶辫触鏃朵笉鐣欎笅鍗婃垚鍝?ok 407 - 闃呰瀹夋帓涓?outbox銆佸璁″悓浜嬪姟锛岄€氱煡鍏ラ槦澶辫触鏃朵笉鐣欎笅鍗婃垚鍝?  ---
+  duration_ms: 461.6976
+  type: 'test'
+  ...
+# Subtest: 璇惧爞鏉冮檺浠ョ湡瀹炵彮绾ц祫婧愯鐩栨巿鏉冩暀甯堛€佸鏍＄鐞嗗憳鍜岃秺鏉冭鑹?ok 408 - 璇惧爞鏉冮檺浠ョ湡瀹炵彮绾ц祫婧愯鐩栨巿鏉冩暀甯堛€佸鏍＄鐞嗗憳鍜岃秺鏉冭鑹?  ---
+  duration_ms: 512.3437
+  type: 'test'
+  ...
+# Subtest: 鐢靛瓙涔﹀寘鏈湴妯℃嫙鍣ㄧ鍚嶃€佹潈闄愩€乶once 闃查噸鏀句笌杩斿洖濂戠害
+ok 409 - 鐢靛瓙涔﹀寘鏈湴妯℃嫙鍣ㄧ鍚嶃€佹潈闄愩€乶once 闃查噸鏀句笌杩斿洖濂戠害
+  ---
+  duration_ms: 504.2406
+  type: 'test'
+  ...
+# Subtest: 鍚屾 SQLite 浜嬪姟鎷掔粷 Promise 鍥炶皟骞跺洖婊氬凡鎵ц鍐欏叆
+ok 410 - 鍚屾 SQLite 浜嬪姟鎷掔粷 Promise 鍥炶皟骞跺洖婊氬凡鎵ц鍐欏叆
+  ---
+  duration_ms: 331.0234
+  type: 'test'
+  ...
+# (node:70708) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鎵撳崱銆佹璐?10%銆佽繛缁ぉ鏁般€佷笂鍛ㄥ拰涓冩棩琛ラ浂绾嚱鏁板浐瀹氳竟鐣?ok 411 - 鎵撳崱銆佹璐?10%銆佽繛缁ぉ鏁般€佷笂鍛ㄥ拰涓冩棩琛ラ浂绾嚱鏁板浐瀹氳竟鐣?  ---
+  duration_ms: 3.1685
+  type: 'test'
+  ...
+# Subtest: 鐝骇绾嚱鏁板绌虹彮绾ц繑鍥?null锛屽苟浠ュ叏浣撴湁鏁堝悕鍗曚綔涓轰汉鍧囧垎姣?ok 412 - 鐝骇绾嚱鏁板绌虹彮绾ц繑鍥?null锛屽苟浠ュ叏浣撴湁鏁堝悕鍗曚綔涓轰汉鍧囧垎姣?  ---
+  duration_ms: 0.9955
+  type: 'test'
+  ...
+# Subtest: /self 涓ユ牸杩斿洖鏂?DTO銆佺┖浜嬪疄璇箟鍜岄殣绉佽竟鐣?ok 413 - /self 涓ユ牸杩斿洖鏂?DTO銆佺┖浜嬪疄璇箟鍜岄殣绉佽竟鐣?  ---
+  duration_ms: 628.129
+  type: 'test'
+  ...
+# Subtest: /self 鏈€杩戜功绫嶄笉鍙闂椂鍙栦笅涓€鏉★紝鏁欏笀韬唤涓嶈兘鍐掑厖 self
+ok 414 - /self 鏈€杩戜功绫嶄笉鍙闂椂鍙栦笅涓€鏉★紝鏁欏笀韬唤涓嶈兘鍐掑厖 self
+  ---
+  duration_ms: 408.2203
+  type: 'test'
+  ...
+# Subtest: /scope 50 浜轰竴娆¤繑鍥?37/50銆佷竷鏃ヨˉ闆躲€佸鐢熻鎯呬笌绋冲畾濮撳悕鎺掑簭
+ok 415 - /scope 50 浜轰竴娆¤繑鍥?37/50銆佷竷鏃ヨˉ闆躲€佸鐢熻鎯呬笌绋冲畾濮撳悕鎺掑簭
+  ---
+  duration_ms: 807.9061
+  type: 'test'
+  ...
+# Subtest: /scope 绌虹彮绾т娇鐢?null锛涜浆鐝巻鍙?numerator 鎸夊彂鐢熸椂鐝骇銆佸垎姣嶄娇鐢ㄥ綋鍓嶅悕鍗?ok 416 - /scope 绌虹彮绾т娇鐢?null锛涜浆鐝巻鍙?numerator 鎸夊彂鐢熸椂鐝骇銆佸垎姣嶄娇鐢ㄥ綋鍓嶅悕鍗?  ---
+  duration_ms: 287.4763
+  type: 'test'
+  ...
+# Subtest: /scope 涓ユ牸鏍￠獙蹇呭～ query銆佺粍缁?404銆佸悓缁勭粐瓒婃潈 403 鍜?student 403
+ok 417 - /scope 涓ユ牸鏍￠獙蹇呭～ query銆佺粍缁?404銆佸悓缁勭粐瓒婃潈 403 鍜?student 403
+  ---
+  duration_ms: 258.6679
+  type: 'test'
+  ...
+# (node:70096) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 鍠滄銆佷功鍗曘€佷功绛俱€佹憳褰曞拰鎵规敞鍚屽煙鎸佷箙鍖栵紝鏃т簨浠朵笉浣滀负椤甸潰璇佹嵁杩斿洖
+ok 418 - 鍠滄銆佷功鍗曘€佷功绛俱€佹憳褰曞拰鎵规敞鍚屽煙鎸佷箙鍖栵紝鏃т簨浠朵笉浣滀负椤甸潰璇佹嵁杩斿洖
+  ---
+  duration_ms: 612.2374
+  type: 'test'
+  ...
+# Subtest: 鎽樺綍涓庢壒娉ㄩ敋鐐瑰繀椤诲畬鏁翠笖绮剧‘鍖归厤鍚岄〉姝ｆ枃鍧楋紝鏃犻敋鐐规棫鍐欏叆浠嶅吋瀹?ok 419 - 鎽樺綍涓庢壒娉ㄩ敋鐐瑰繀椤诲畬鏁翠笖绮剧‘鍖归厤鍚岄〉姝ｆ枃鍧楋紝鏃犻敋鐐规棫鍐欏叆浠嶅吋瀹?  ---
+  duration_ms: 396.7324
+  type: 'test'
+  ...
+# Subtest: 鎺掑簭淇敼鍒犻櫎瑕佹眰褰撳墠鐗堟湰涓庡綋鍓嶇鎴峰綊灞?ok 420 - 鎺掑簭淇敼鍒犻櫎瑕佹眰褰撳墠鐗堟湰涓庡綋鍓嶇鎴峰綊灞?  ---
+  duration_ms: 493.4532
+  type: 'test'
+  ...
+# Subtest: 瀹¤鍐欏叆澶辫触浼氬洖婊氶鍩熷啓鍏ワ紝璺ㄧ粍缁囨暟鎹笉浼氭硠闇?ok 421 - 瀹¤鍐欏叆澶辫触浼氬洖婊氶鍩熷啓鍏ワ紝璺ㄧ粍缁囨暟鎹笉浼氭硠闇?  ---
+  duration_ms: 353.7546
+  type: 'test'
+  ...
+# Subtest: server defaults to loopback and only changes host through an explicit override
+ok 422 - server defaults to loopback and only changes host through an explicit override
+  ---
+  duration_ms: 1.6032
+  type: 'test'
+  ...
+# Subtest: root and server packages declare the node:sqlite runtime floor
+ok 423 - root and server packages declare the node:sqlite runtime floor
+  ---
+  duration_ms: 3.9484
+  type: 'test'
+  ...
+1..423
+# tests 437
+# suites 0
+# pass 437
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 17538.0849
+
+EXIT:0
+
+
+===== spot:phase8-047-050-migration =====
+
+TAP version 13
+# (node:58120) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 12. 守卫测试不接触真实业务数据库
+ok 1 - 12. 守卫测试不接触真实业务数据库
+  ---
+  duration_ms: 167.6879
+  type: 'test'
+  ...
+# Subtest: 1. 全新库执行 047～050：文件存在、applied 含四 id、表和列存在
+ok 2 - 1. 全新库执行 047～050：文件存在、applied 含四 id、表和列存在
+  ---
+  duration_ms: 166.9431
+  type: 'test'
+  ...
+# Subtest: 2. 046 副本升级至 050：staged <047_ 先跑，插入 046 形基线，再挂 047～050
+ok 3 - 2. 046 副本升级至 050：staged <047_ 先跑，插入 046 形基线，再挂 047～050
+  ---
+  duration_ms: 336.4517
+  type: 'test'
+  ...
+# Subtest: 3. 重复启动 alreadyApplied：第二次 applied=[]，alreadyApplied 含 047～050
+ok 4 - 3. 重复启动 alreadyApplied：第二次 applied=[]，alreadyApplied 含 047～050
+  ---
+  duration_ms: 161.3581
+  type: 'test'
+  ...
+# Subtest: 4. checksum 稳定：两次 checksum 相等且长度 64
+ok 5 - 4. checksum 稳定：两次 checksum 相等且长度 64
+  ---
+  duration_ms: 163.1874
+  type: 'test'
+  ...
+# Subtest: 5. 047 登录/班级字段回填与唯一索引
+ok 6 - 5. 047 登录/班级字段回填与唯一索引
+  ---
+  duration_ms: 306.9443
+  type: 'test'
+  ...
+# Subtest: 6. 048 注册凭据表与唯一/角色约束，无默认 token
+ok 7 - 6. 048 注册凭据表与唯一/角色约束，无默认 token
+  ---
+  duration_ms: 317.7798
+  type: 'test'
+  ...
+# Subtest: 7. 049 审批与重置表 + pending 部分唯一 + 学生单 active 班
+ok 8 - 7. 049 审批与重置表 + pending 部分唯一 + 学生单 active 班
+  ---
+  duration_ms: 314.046
+  type: 'test'
+  ...
+# Subtest: 8. 050 grants 回填：基线 49 行、draft 不回填、id/actor 格式与当前版本口径
+ok 9 - 8. 050 grants 回填：基线 49 行、draft 不回填、id/actor 格式与当前版本口径
+  ---
+  duration_ms: 322.356
+  type: 'test'
+  ...
+# Subtest: 9. 当前基线形预期 49 行
+ok 10 - 9. 当前基线形预期 49 行
+  ---
+  duration_ms: 325.9423
+  type: 'test'
+  ...
+# Subtest: 10. 050 不重复插入：第二次 alreadyApplied，checksum 不变，grants 仍 49
+ok 11 - 10. 050 不重复插入：第二次 alreadyApplied，checksum 不变，grants 仍 49
+  ---
+  duration_ms: 319.7302
+  type: 'test'
+  ...
+# Subtest: 11. 不修改冻结阅读表 reading_summary_sessions / reading_daily_book_summaries
+ok 12 - 11. 不修改冻结阅读表 reading_summary_sessions / reading_daily_book_summaries
+  ---
+  duration_ms: 308.4238
+  type: 'test'
+  ...
+# Subtest: 050 空库（0 published × 0 班）允许插入 0 行
+ok 13 - 050 空库（0 published × 0 班）允许插入 0 行
+  ---
+  duration_ms: 152.9298
+  type: 'test'
+  ...
+# Subtest: bootstrap：全新库跑完全部迁移后演示数据必须含第二班
+ok 14 - bootstrap：全新库跑完全部迁移后演示数据必须含第二班
+  ---
+  duration_ms: 438.4638
+  type: 'test'
+  ...
+# Subtest: bootstrap：必须有 grade workspace（code=grade-admin, scope_type=grade）
+ok 15 - bootstrap：必须有 grade workspace（code=grade-admin, scope_type=grade）
+  ---
+  duration_ms: 423.6211
+  type: 'test'
+  ...
+# Subtest: bootstrap：必须有 grade_manager 账号与对应 role assignment
+ok 16 - bootstrap：必须有 grade_manager 账号与对应 role assignment
+  ---
+  duration_ms: 427.3085
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本已有 2 个旧班时 047 必须失败
+ok 17 - 负例：046 副本已有 2 个旧班时 047 必须失败
+  ---
+  duration_ms: 256.8182
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本已有 1 条 grant 时 050 必须失败
+ok 18 - 负例：046 副本已有 1 条 grant 时 050 必须失败
+  ---
+  duration_ms: 311.6384
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本某 published 书没有 version 时 050 必须失败
+ok 19 - 负例：046 副本某 published 书没有 version 时 050 必须失败
+  ---
+  duration_ms: 320.0006
+  type: 'test'
+  ...
+# Subtest: 负例：046 副本某学生已有 2 条 active class_memberships 时 049 必须失败
+ok 20 - 负例：046 副本某学生已有 2 条 active class_memberships 时 049 必须失败
+  ---
+  duration_ms: 248.9277
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 空 school_code 必须被触发器拒绝
+ok 21 - 负例：047 之后 INSERT 空 school_code 必须被触发器拒绝
+  ---
+  duration_ms: 159.3677
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 非法 stage 必须被触发器拒绝
+ok 22 - 负例：047 之后 INSERT 非法 stage 必须被触发器拒绝
+  ---
+  duration_ms: 243.8293
+  type: 'test'
+  ...
+# Subtest: 负例：047 之后 INSERT 错误 grade_id 必须被触发器拒绝
+ok 23 - 负例：047 之后 INSERT 错误 grade_id 必须被触发器拒绝
+  ---
+  duration_ms: 238.831
+  type: 'test'
+  ...
+# Subtest: 负例：049 之后同一学生第二条 pending enrollment 必须失败
+ok 24 - 负例：049 之后同一学生第二条 pending enrollment 必须失败
+  ---
+  duration_ms: 246.3408
+  type: 'test'
+  ...
+# Subtest: 负例：049 之后同一学生第二条 active student membership 必须失败
+ok 25 - 负例：049 之后同一学生第二条 active student membership 必须失败
+  ---
+  duration_ms: 243.488
+  type: 'test'
+  ...
+# Subtest: 负例：050 不得给 draft 书或 disabled 班插 grant
+ok 26 - 负例：050 不得给 draft 书或 disabled 班插 grant
+  ---
+  duration_ms: 325.7276
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7438.0228
+
+EXIT:0
+
+
+===== spot:phase8-identity-guards =====
+
+TAP version 13
+# (node:65912) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: H. POST /classes 必须用 class.create，resourceScope 必须带服务端计算的 gradeId
+ok 1 - H. POST /classes 必须用 class.create，resourceScope 必须带服务端计算的 gradeId
+  ---
+  duration_ms: 1.4354
+  type: 'test'
+  ...
+# Subtest: H. POST /classes body 为 {name,stage,entryYear,classNumber}，服务端生成 gradeId
+ok 2 - H. POST /classes body 为 {name,stage,entryYear,classNumber}，服务端生成 gradeId
+  ---
+  duration_ms: 368.0055
+  type: 'test'
+  ...
+# Subtest: H. PATCH 改届别须带 version，并对变更前/后 scope 都校验
+ok 3 - H. PATCH 改届别须带 version，并对变更前/后 scope 都校验
+  ---
+  duration_ms: 287.0704
+  type: 'test'
+  ...
+# Subtest: H. DELETE/restore 软停用 class+workspace，成员与 grants 保留
+ok 4 - H. DELETE/restore 软停用 class+workspace，成员与 grants 保留
+  ---
+  duration_ms: 287.3428
+  type: 'test'
+  ...
+# Subtest: H. 学年计算：固定 now 测 9 月 1 日边界、小学 6 / 初高中 3、upcoming/graduated
+ok 5 - H. 学年计算：固定 now 测 9 月 1 日边界、小学 6 / 初高中 3、upcoming/graduated
+  ---
+  duration_ms: 1.7936
+  type: 'test'
+  ...
+# Subtest: H. grade_group → grade_manager 别名不得再映射
+ok 6 - H. grade_group → grade_manager 别名不得再映射
+  ---
+  duration_ms: 0.6245
+  type: 'test'
+  ...
+# Subtest: H. 教师不得 POST /classes；跨组织 classId 与不存在同码同文案
+ok 7 - H. 教师不得 POST /classes；跨组织 classId 与不存在同码同文案
+  ---
+  duration_ms: 312.6984
+  type: 'test'
+  ...
+# (node:65400) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. 注册后零成员关系、一条 pending
+ok 8 - F. 注册后零成员关系、一条 pending
+  ---
+  duration_ms: 407.9549
+  type: 'test'
+  ...
+# Subtest: F. 批准一次性建学生三关系
+ok 9 - F. 批准一次性建学生三关系
+  ---
+  duration_ms: 287.8812
+  type: 'test'
+  ...
+# Subtest: F. 拒绝后可新申请；终态不可改 → 409 VERSION_CONFLICT
+ok 10 - F. 拒绝后可新申请；终态不可改 → 409 VERSION_CONFLICT
+  ---
+  duration_ms: 286.4249
+  type: 'test'
+  ...
+# Subtest: F. 重复 pending / 已有 active 班 / 教师审别班 / grade_manager 跨届 全部拒绝
+ok 11 - F. 重复 pending / 已有 active 班 / 教师审别班 / grade_manager 跨届 全部拒绝
+  ---
+  duration_ms: 338.3598
+  type: 'test'
+  ...
+# Subtest: F. If-Match 优先于 body version：If-Match 当前 + body 过期 → 200
+ok 12 - F. If-Match 优先于 body version：If-Match 当前 + body 过期 → 200
+  ---
+  duration_ms: 248.3077
+  type: 'test'
+  ...
+# Subtest: F. 并发两个批准：只有一次物化学生三关系，另一次 409
+ok 13 - F. 并发两个批准：只有一次物化学生三关系，另一次 409
+  ---
+  duration_ms: 271.8607
+  type: 'test'
+  ...
+# Subtest: F. If-Match 优先于 body version：If-Match 过期 + body 当前 → 409 VERSION_CONFLICT
+ok 14 - F. If-Match 优先于 body version：If-Match 过期 + body 当前 → 409 VERSION_CONFLICT
+  ---
+  duration_ms: 226.8759
+  type: 'test'
+  ...
+# (node:69776) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\core\\phase8-identity-guards\\harness.guard.test.js
+ok 3 - tests\\server\\core\\phase8-identity-guards\\harness.guard.test.js
+  ---
+  duration_ms: 196.4775
+  type: 'test'
+  ...
+# (node:67668) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. POST /auth/login 只接受 {schoolCode, loginName, password} 且登录成功
+ok 16 - A. POST /auth/login 只接受 {schoolCode, loginName, password} 且登录成功
+  ---
+  duration_ms: 395.4018
+  type: 'test'
+  ...
+# Subtest: A. username-only 登录不得再成功
+ok 17 - A. username-only 登录不得再成功
+  ---
+  duration_ms: 272.9773
+  type: 'test'
+  ...
+# Subtest: A. 登录失败统一 401「学校、账号或密码错误」
+ok 18 - A. 登录失败统一 401「学校、账号或密码错误」
+  ---
+  duration_ms: 351.1612
+  type: 'test'
+  ...
+# Subtest: A. pending 学生登录 200，defaultPath=/student/onboarding，activeWorkspaceId=null
+ok 19 - A. pending 学生登录 200，defaultPath=/student/onboarding，activeWorkspaceId=null
+  ---
+  duration_ms: 354.6832
+  type: 'test'
+  ...
+# Subtest: A. V 成立且零 active 教师班：defaultPath=/console/select-class
+ok 20 - A. V 成立且零 active 教师班：defaultPath=/console/select-class
+  ---
+  duration_ms: 296.916
+  type: 'test'
+  ...
+# Subtest: A. 不得把空 defaultPath 当成登录失败
+ok 21 - A. 不得把空 defaultPath 当成登录失败
+  ---
+  duration_ms: 300.7535
+  type: 'test'
+  ...
+# (node:65412) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 密码重置矩阵：教师对本班学生允许，对他班学生/本校教师拒绝
+ok 22 - G. 密码重置矩阵：教师对本班学生允许，对他班学生/本校教师拒绝
+  ---
+  duration_ms: 360.0094
+  type: 'test'
+  ...
+# Subtest: G. 密码重置矩阵：年级主任对本届学生+本校教师允许，跨届学生拒绝
+ok 23 - G. 密码重置矩阵：年级主任对本届学生+本校教师允许，跨届学生拒绝
+  ---
+  duration_ms: 307.9061
+  type: 'test'
+  ...
+# Subtest: G. 密码重置矩阵：校长全校允许；platform 对校长允许；跨组织 404
+ok 24 - G. 密码重置矩阵：校长全校允许；platform 对校长允许；跨组织 404
+  ---
+  duration_ms: 296.0637
+  type: 'test'
+  ...
+# Subtest: G. 重置码 30 分钟、撤销、单次；失败密码不消费；旧 session 全失效
+ok 25 - G. 重置码 30 分钟、撤销、单次；失败密码不消费；旧 session 全失效
+  ---
+  duration_ms: 384.9452
+  type: 'test'
+  ...
+# Subtest: G. 审计不含 token/password/hash
+ok 26 - G. 审计不含 token/password/hash
+  ---
+  duration_ms: 312.8683
+  type: 'test'
+  ...
+# (node:3084) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: I. roleActions：teacher 有 shelf 无 catalog；行政无 shelf/catalog；platform 有 catalog 无 shelf
+ok 27 - I. roleActions：teacher 有 shelf 无 catalog；行政无 shelf/catalog；platform 有 catalog 无 shelf
+  ---
+  duration_ms: 1.4157
+  type: 'test'
+  ...
+# Subtest: I. 废止 teacher.affiliation.approve：无 action
+ok 28 - I. 废止 teacher.affiliation.approve：无 action
+  ---
+  duration_ms: 0.3001
+  type: 'test'
+  ...
+# Subtest: I. teacher.affiliation.join_self / leave_self：允许 + 同组织越 scope 拒绝 + 跨组织 404
+ok 29 - I. teacher.affiliation.join_self / leave_self：允许 + 同组织越 scope 拒绝 + 跨组织 404
+  ---
+  duration_ms: 392.5621
+  type: 'test'
+  ...
+# Subtest: I. teacher.affiliation.force_assign / force_remove：允许 + 越 scope 403 + 跨组织 404
+ok 30 - I. teacher.affiliation.force_assign / force_remove：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 316.4339
+  type: 'test'
+  ...
+# Subtest: I. student.enrollment.review：允许 + 越 scope 403 + 跨组织 404
+ok 31 - I. student.enrollment.review：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 304.8365
+  type: 'test'
+  ...
+# Subtest: I. 10.2 写动作在 roleActions 中的允许/拒绝抽样
+ok 32 - I. 10.2 写动作在 roleActions 中的允许/拒绝抽样
+  ---
+  duration_ms: 0.5534
+  type: 'test'
+  ...
+# Subtest: I. registration.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+ok 33 - I. registration.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 315.1163
+  type: 'test'
+  ...
+# Subtest: I. password_reset.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+ok 34 - I. password_reset.student.issue / teacher.issue：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 277.6873
+  type: 'test'
+  ...
+# Subtest: I. class.create：允许 + 越 scope 403 + 跨组织 404
+ok 35 - I. class.create：允许 + 越 scope 403 + 跨组织 404
+  ---
+  duration_ms: 282.7437
+  type: 'test'
+  ...
+# Subtest: I. 行政角色指派：platform 指派校长 / 校长指派年级主任；越权 403；跨组织 404
+ok 36 - I. 行政角色指派：platform 指派校长 / 校长指派年级主任；越权 403；跨组织 404
+  ---
+  duration_ms: 250.9264
+  type: 'test'
+  ...
+# (node:70440) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. teacher/student 凭据分开；body 出现 role/organizationId/scopeId → 400
+ok 37 - E. teacher/student 凭据分开；body 出现 role/organizationId/scopeId → 400
+  ---
+  duration_ms: 369.8902
+  type: 'test'
+  ...
+# Subtest: E. 组织只从 token 反查；公开消费原文不落库、不进审计
+ok 38 - E. 组织只从 token 反查；公开消费原文不落库、不进审计
+  ---
+  duration_ms: 349.2645
+  type: 'test'
+  ...
+# Subtest: E. 撤销/到期/用尽公开端统一 404
+ok 39 - E. 撤销/到期/用尽公开端统一 404
+  ---
+  duration_ms: 286.8189
+  type: 'test'
+  ...
+# Subtest: E. 人数上限最后一名额并发只有一个成功；失败不计 use
+ok 40 - E. 人数上限最后一名额并发只有一个成功；失败不计 use
+  ---
+  duration_ms: 356.6964
+  type: 'test'
+  ...
+# Subtest: E. 同 loginName 跨校可注册；同校冲突 409 + details.suggestions 3 个
+ok 41 - E. 同 loginName 跨校可注册；同校冲突 409 + details.suggestions 3 个
+  ---
+  duration_ms: 296.8698
+  type: 'test'
+  ...
+# Subtest: E. 教师/学生默认 TTL 与 max_uses 可被显式覆盖
+ok 42 - E. 教师/学生默认 TTL 与 max_uses 可被显式覆盖
+  ---
+  duration_ms: 277.7496
+  type: 'test'
+  ...
+# Subtest: E. 教师默认 7 天 max_uses=1；学生默认 180 天 max_uses=NULL
+ok 43 - E. 教师默认 7 天 max_uses=1；学生默认 180 天 max_uses=NULL
+  ---
+  duration_ms: 239.737
+  type: 'test'
+  ...
+# Subtest: E. grade_manager 签发学生凭据必须是自己的 grade scope，body 改 scopeId → 400
+ok 44 - E. grade_manager 签发学生凭据必须是自己的 grade scope，body 改 scopeId → 400
+  ---
+  duration_ms: 224.6454
+  type: 'test'
+  ...
+# Subtest: E. grade_manager 可签发教师凭据（school 例外），但不能跨届建班/改学生
+ok 45 - E. grade_manager 可签发教师凭据（school 例外），但不能跨届建班/改学生
+  ---
+  duration_ms: 226.9515
+  type: 'test'
+  ...
+# (node:69132) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: J. 临时库路径不得是 server/data/readmate.sqlite
+ok 46 - J. 临时库路径不得是 server/data/readmate.sqlite
+  ---
+  duration_ms: 305.8639
+  type: 'test'
+  ...
+# Subtest: J. session-only 与公开注册必须打 identity router，禁止 integration-router
+ok 47 - J. session-only 与公开注册必须打 identity router，禁止 integration-router
+  ---
+  duration_ms: 1.2041
+  type: 'test'
+  ...
+# Subtest: J. 跨组织 id 与不存在 id 同码同文案 404
+ok 48 - J. 跨组织 id 与不存在 id 同码同文案 404
+  ---
+  duration_ms: 309.4231
+  type: 'test'
+  ...
+# Subtest: J. 缺失路由不得 fallback 成 200；POST /students 也不得再 200
+ok 49 - J. 缺失路由不得 fallback 成 200；POST /students 也不得再 200
+  ---
+  duration_ms: 300.0887
+  type: 'test'
+  ...
+# Subtest: J. 本套守卫只声明真库路径，绝不把 createIdentityTestApp 指向它
+ok 50 - J. 本套守卫只声明真库路径，绝不把 createIdentityTestApp 指向它
+  ---
+  duration_ms: 323.7069
+  type: 'test'
+  ...
+# (node:72020) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. session-only 路由只挂 identity router，且不经过 requireWorkspace
+ok 51 - C. session-only 路由只挂 identity router，且不经过 requireWorkspace
+  ---
+  duration_ms: 2.6914
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace pending 学生可 GET /onboarding/me（无 X-Workspace-Id）
+ok 52 - C. 零 workspace pending 学生可 GET /onboarding/me（无 X-Workspace-Id）
+  ---
+  duration_ms: 353.8723
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace 的 V 教师可 GET /teacher/class-directory（无 X-Workspace-Id）
+ok 53 - C. 零 workspace 的 V 教师可 GET /teacher/class-directory（无 X-Workspace-Id）
+  ---
+  duration_ms: 304.4426
+  type: 'test'
+  ...
+# Subtest: C. 零 workspace 的 V 教师可 PUT join，且不得为 V 创建 school 范围 teacher role
+ok 54 - C. 零 workspace 的 V 教师可 PUT join，且不得为 V 创建 school 范围 teacher role
+  ---
+  duration_ms: 287.1149
+  type: 'test'
+  ...
+# Subtest: C. 教师调用 GET /classes → 403
+ok 55 - C. 教师调用 GET /classes → 403
+  ---
+  duration_ms: 330.793
+  type: 'test'
+  ...
+# Subtest: C. GET /classes 仅 S/G 可访问
+ok 56 - C. GET /classes 仅 S/G 可访问
+  ---
+  duration_ms: 255.3986
+  type: 'test'
+  ...
+# Subtest: C. 已入班教师看本班走 GET /classes/:classId + C
+ok 57 - C. 已入班教师看本班走 GET /classes/:classId + C
+  ---
+  duration_ms: 264.5092
+  type: 'test'
+  ...
+# (node:4504) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. identity router 不得再注册 POST /students（无兼容 handler / 假 404 分支）
+ok 58 - B. identity router 不得再注册 POST /students（无兼容 handler / 假 404 分支）
+  ---
+  duration_ms: 0.9822
+  type: 'test'
+  ...
+# Subtest: B. POST /students 必须由标准不存在路由返回 404，且不能再物化已入班学生
+ok 59 - B. POST /students 必须由标准不存在路由返回 404，且不能再物化已入班学生
+  ---
+  duration_ms: 344.1372
+  type: 'test'
+  ...
+# (node:34260) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. join_self：session-only + V，立即生效，已 active 则 200 幂等且不得产生第二组
+ok 60 - D. join_self：session-only + V，立即生效，已 active 则 200 幂等且不得产生第二组
+  ---
+  duration_ms: 396.4305
+  type: 'test'
+  ...
+# Subtest: D. leave_self：不要求 X-Workspace-Id；完整 active → 同事务停用三者 200
+ok 61 - D. leave_self：不要求 X-Workspace-Id；完整 active → 同事务停用三者 200
+  ---
+  duration_ms: 280.1755
+  type: 'test'
+  ...
+# Subtest: D. leave_self：完整 disabled 或三者皆无 → 200 no-op；不得因 disabled/absent 先 403
+ok 62 - D. leave_self：完整 disabled 或三者皆无 → 200 no-op；不得因 disabled/absent 先 403
+  ---
+  duration_ms: 283.0833
+  type: 'test'
+  ...
+# Subtest: D. leave_self：残缺三元组 → 500 IDENTITY_INVARIANT_VIOLATION，且不自动修
+ok 63 - D. leave_self：残缺三元组 → 500 IDENTITY_INVARIANT_VIOLATION，且不自动修
+  ---
+  duration_ms: 314.6905
+  type: 'test'
+  ...
+# Subtest: D. leave_self / join_self：class 不存在与跨组织同码同文案 404
+ok 64 - D. leave_self / join_self：class 不存在与跨组织同码同文案 404
+  ---
+  duration_ms: 265.6405
+  type: 'test'
+  ...
+# Subtest: D. 外校 / disabled / graduated 拒绝加入
+ok 65 - D. 外校 / disabled / graduated 拒绝加入
+  ---
+  duration_ms: 274.6637
+  type: 'test'
+  ...
+# Subtest: D. 并发两个 join 最终只有一组三元组
+ok 66 - D. 并发两个 join 最终只有一组三元组
+  ---
+  duration_ms: 242.4856
+  type: 'test'
+  ...
+# Subtest: D. 任一表故意缺失时不自动修，报不变量错误
+ok 67 - D. 任一表故意缺失时不自动修，报不变量错误
+  ---
+  duration_ms: 224.7547
+  type: 'test'
+  ...
+# Subtest: D. teacher.affiliation.approve 不得存在（无 action、无路由、无 pending 教师审批模型）
+ok 68 - D. teacher.affiliation.approve 不得存在（无 action、无路由、无 pending 教师审批模型）
+  ---
+  duration_ms: 1.1519
+  type: 'test'
+  ...
+# Subtest: D. teacherCount 计完整 active 三元组；三表人数不一致 → IDENTITY_INVARIANT_VIOLATION
+ok 69 - D. teacherCount 计完整 active 三元组；三表人数不一致 → IDENTITY_INVARIANT_VIOLATION
+  ---
+  duration_ms: 222.182
+  type: 'test'
+  ...
+# Subtest: D. 强制指派/移除：S/G；目标须同校已验证教师；200 幂等；教师调用 403
+ok 70 - D. 强制指派/移除：S/G；目标须同校已验证教师；200 幂等；教师调用 403
+  ---
+  duration_ms: 244.3656
+  type: 'test'
+  ...
+# Subtest: D. 行政纠错 PATCH /students/:userId/class：教师 403；源+目标对称校验；目标即当前班 200 且不掩盖残缺
+ok 71 - D. 行政纠错 PATCH /students/:userId/class：教师 403；源+目标对称校验；目标即当前班 200 且不掩盖残缺
+  ---
+  duration_ms: 230.557
+  type: 'test'
+  ...
+1..71
+# tests 71
+# suites 0
+# pass 71
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3263.6471
+
+EXIT:0
+
+
+===== spot:phase8-reading-guards =====
+
+TAP version 13
+# (node:71912) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 删除全量 visibility 写模型：setBookVisibility(scope,classIds) 必须不再可用
+ok 1 - 删除全量 visibility 写模型：setBookVisibility(scope,classIds) 必须不再可用
+  ---
+  duration_ms: 191.8385
+  type: 'test'
+  ...
+# Subtest: class-local grant：只增本 class + 当前版本一行，200 幂等，不替换其他班
+ok 2 - class-local grant：只增本 class + 当前版本一行，200 幂等，不替换其他班
+  ---
+  duration_ms: 195.1518
+  type: 'test'
+  ...
+# Subtest: class-local revoke：只删本 class grant，不动其他班、不动未知 grantee_type
+ok 3 - class-local revoke：只删本 class grant，不动其他班、不动未知 grantee_type
+  ---
+  duration_ms: 190.4342
+  type: 'test'
+  ...
+# Subtest: shelf 领域函数禁止再调用 book.publish / setBookVisibility
+ok 4 - shelf 领域函数禁止再调用 book.publish / setBookVisibility
+  ---
+  duration_ms: 186.6605
+  type: 'test'
+  ...
+# Subtest: 两个并发 PUT 同班同书最终一行
+ok 5 - 两个并发 PUT 同班同书最终一行
+  ---
+  duration_ms: 180.9182
+  type: 'test'
+  ...
+# Subtest: 一个班撤下不影响他班
+ok 6 - 一个班撤下不影响他班
+  ---
+  duration_ms: 178.3439
+  type: 'test'
+  ...
+# (node:69252) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-21 getPost：有本班 grant 时 quote.text 仍返回
+ok 7 - D-21 getPost：有本班 grant 时 quote.text 仍返回
+  ---
+  duration_ms: 197.2852
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：无 grant 时保留帖子，quote.text=null 且 availability=unavailable
+ok 8 - D-21 getPost：无 grant 时保留帖子，quote.text=null 且 availability=unavailable
+  ---
+  duration_ms: 191.5939
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：仅他班 grant 时隐藏 quote.text
+ok 9 - D-21 getPost：仅他班 grant 时隐藏 quote.text
+  ---
+  duration_ms: 197.915
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：draft 即使已给本班 grant 也隐藏 quote.text（失败只归因发布状态）
+ok 10 - D-21 getPost：draft 即使已给本班 grant 也隐藏 quote.text（失败只归因发布状态）
+  ---
+  duration_ms: 185.9363
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：旧帖不改数据库；撤 grant 后读隐藏，恢复 grant 后读恢复
+ok 11 - D-21 getPost：旧帖不改数据库；撤 grant 后读隐藏，恢复 grant 后读恢复
+  ---
+  duration_ms: 188.4489
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：教师对 published 可看 quote.text（即使无 class grant）
+ok 12 - D-21 getPost：教师对 published 可看 quote.text（即使无 class grant）
+  ---
+  duration_ms: 178.1005
+  type: 'test'
+  ...
+# Subtest: D-21 getPost：跨组织不泄露帖子或 quote.text
+ok 13 - D-21 getPost：跨组织不泄露帖子或 quote.text
+  ---
+  duration_ms: 170.7393
+  type: 'test'
+  ...
+# (node:70464) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-23 acquireLease：published + 本班 grant → 成功并产生 lease
+ok 14 - D-23 acquireLease：published + 本班 grant → 成功并产生 lease
+  ---
+  duration_ms: 203.749
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：published + 无 grant → 404「书籍不存在或当前不可读取」，且不得写 lease
+ok 15 - D-23 acquireLease：published + 无 grant → 404「书籍不存在或当前不可读取」，且不得写 lease
+  ---
+  duration_ms: 184.9388
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：draft + 本班 grant → 404，失败只归因发布状态
+ok 16 - D-23 acquireLease：draft + 本班 grant → 404，失败只归因发布状态
+  ---
+  duration_ms: 189.3776
+  type: 'test'
+  ...
+# Subtest: D-23 acquireLease：外组织版本 → 同码同文案 404，不泄露存在性
+ok 17 - D-23 acquireLease：外组织版本 → 同码同文案 404，不泄露存在性
+  ---
+  duration_ms: 184.91
+  type: 'test'
+  ...
+# Subtest: D-23：已取得租约后撤下，现有 lease 可按 90 秒规则续到自然结束，结束后新 acquire 404
+ok 18 - D-23：已取得租约后撤下，现有 lease 可按 90 秒规则续到自然结束，结束后新 acquire 404
+  ---
+  duration_ms: 188.1798
+  type: 'test'
+  ...
+# Subtest: D-23：可见性前置必须在任何 lease 写事务之前
+ok 19 - D-23：可见性前置必须在任何 lease 写事务之前
+  ---
+  duration_ms: 172.3553
+  type: 'test'
+  ...
+# Subtest: D-23：takeOverLease 委托 acquire，自动受同一可见性约束
+ok 20 - D-23：takeOverLease 委托 acquire，自动受同一可见性约束
+  ---
+  duration_ms: 166.4334
+  type: 'test'
+  ...
+# (node:61080) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D-25：resolveBookAudience 不再返回 unrestricted，改为 bypassClassGrants/allowUnpublished/classIds
+ok 21 - D-25：resolveBookAudience 不再返回 unrestricted，改为 bypassClassGrants/allowUnpublished/classIds
+  ---
+  duration_ms: 196.6746
+  type: 'test'
+  ...
+# Subtest: D-25：platform 的 audience 为 bypassClassGrants=true 且 allowUnpublished=true
+ok 22 - D-25：platform 的 audience 为 bypassClassGrants=true 且 allowUnpublished=true
+  ---
+  duration_ms: 197.3918
+  type: 'test'
+  ...
+# Subtest: D-25：teacher 的 audience 为 bypassClassGrants=true 且 allowUnpublished=false
+ok 23 - D-25：teacher 的 audience 为 bypassClassGrants=true 且 allowUnpublished=false
+  ---
+  duration_ms: 186.5568
+  type: 'test'
+  ...
+# Subtest: D-25：student 的 audience 为 bypassClassGrants=false 且 allowUnpublished=false
+ok 24 - D-25：student 的 audience 为 bypassClassGrants=false 且 allowUnpublished=false
+  ---
+  duration_ms: 185.4304
+  type: 'test'
+  ...
+# Subtest: D-25：校长不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+ok 25 - D-25：校长不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+  ---
+  duration_ms: 183.4479
+  type: 'test'
+  ...
+# Subtest: D-25：年级主任不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+ok 26 - D-25：年级主任不得因 BOOK_LIBRARY_MANAGEMENT_ROLES 进入书库 audience
+  ---
+  duration_ms: 171.8938
+  type: 'test'
+  ...
+# Subtest: D-25：bypassClassGrants=true 只绕过 class grant，不可以把 draft 当成可见书
+ok 27 - D-25：bypassClassGrants=true 只绕过 class grant，不可以把 draft 当成可见书
+  ---
+  duration_ms: 174.9426
+  type: 'test'
+  ...
+# Subtest: D-25：教师书库只列 published；draft/archived 只对 platform
+ok 28 - D-25：教师书库只列 published；draft/archived 只对 platform
+  ---
+  duration_ms: 171.0316
+  type: 'test'
+  ...
+# Subtest: D-25：教师取 draft 资产必须 404，不得靠旧 unrestricted 放行
+ok 29 - D-25：教师取 draft 资产必须 404，不得靠旧 unrestricted 放行
+  ---
+  duration_ms: 160.7502
+  type: 'test'
+  ...
+# Subtest: D-25：新发布图书不自动投放（publish 不得自动写 grant）
+ok 30 - D-25：新发布图书不自动投放（publish 不得自动写 grant）
+  ---
+  duration_ms: 162.176
+  type: 'test'
+  ...
+# Subtest: D-25：bypassClassGrants=true 在仅有他班 grant 时仍可见，且这只是 grant 旁路
+ok 31 - D-25：bypassClassGrants=true 在仅有他班 grant 时仍可见，且这只是 grant 旁路
+  ---
+  duration_ms: 158.1149
+  type: 'test'
+  ...
+# (node:72532) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 默认全闭：无 grants 时 isBookVisibleToAudience 必须为 false（删除「无任何 grants 即 true」）
+ok 32 - 默认全闭：无 grants 时 isBookVisibleToAudience 必须为 false（删除「无任何 grants 即 true」）
+  ---
+  duration_ms: 206.0506
+  type: 'test'
+  ...
+# Subtest: 默认全闭：仅他班 class grant 时本班学生不可见
+ok 33 - 默认全闭：仅他班 class grant 时本班学生不可见
+  ---
+  duration_ms: 188.6048
+  type: 'test'
+  ...
+# Subtest: 默认全闭：本班 class grant + published 时学生可见
+ok 34 - 默认全闭：本班 class grant + published 时学生可见
+  ---
+  duration_ms: 178.7145
+  type: 'test'
+  ...
+# Subtest: 默认全闭：audience.classIds 为空必须不可见
+ok 35 - 默认全闭：audience.classIds 为空必须不可见
+  ---
+  duration_ms: 181.6974
+  type: 'test'
+  ...
+# Subtest: 默认全闭：未知 grantee_type 不得当可见，也不得靠兼容兜底变 true
+ok 36 - 默认全闭：未知 grantee_type 不得当可见，也不得靠兼容兜底变 true
+  ---
+  duration_ms: 181.2189
+  type: 'test'
+  ...
+# (node:70636) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 不变量：守卫测试不接触真实业务库
+ok 37 - 不变量：守卫测试不接触真实业务库
+  ---
+  duration_ms: 193.1268
+  type: 'test'
+  ...
+# Subtest: 不变量：冻结阅读摘要表 schema 不得被本阶段改动
+ok 38 - 不变量：冻结阅读摘要表 schema 不得被本阶段改动
+  ---
+  duration_ms: 186.8951
+  type: 'test'
+  ...
+# Subtest: 不变量：不得修改 90s TTL 常量与 renew / session-summaries 路由
+ok 39 - 不变量：不得修改 90s TTL 常量与 renew / session-summaries 路由
+  ---
+  duration_ms: 1.5514
+  type: 'test'
+  ...
+# Subtest: 不变量：三份 visibility 文件由 T8.7 拥有，不再要求对初始 HEAD 干净
+ok 40 - 不变量：三份 visibility 文件由 T8.7 拥有，不再要求对初始 HEAD 干净
+  ---
+  duration_ms: 1.5716
+  type: 'test'
+  ...
+# (node:33444) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\core\\phase8-reading-guards\\shared-harness.guard.test.js
+ok 7 - tests\\server\\core\\phase8-reading-guards\\shared-harness.guard.test.js
+  ---
+  duration_ms: 64.1738
+  type: 'test'
+  ...
+1..41
+# tests 41
+# suites 0
+# pass 41
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2056.4526
+
+EXIT:0
+
+
+===== spot:phase8-http-guards =====
+
+TAP version 13
+# (node:67448) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: F. console.js 必须有 class-local shelf API，并删除 visibility 写
+ok 1 - F. console.js 必须有 class-local shelf API，并删除 visibility 写
+  ---
+  duration_ms: 1.0616
+  type: 'test'
+  ...
+# Subtest: F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only
+ok 2 - F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only
+  ---
+  duration_ms: 0.4239
+  type: 'test'
+  ...
+# Subtest: F. student.js 必须有 registration / onboarding / enrollment 读方法
+ok 3 - F. student.js 必须有 registration / onboarding / enrollment 读方法
+  ---
+  duration_ms: 0.4572
+  type: 'test'
+  ...
+# (node:66548) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: B. integration-router 必须注册 class-local 书架路由，且不得调用 listAuthorizedClasses
+ok 4 - B. integration-router 必须注册 class-local 书架路由，且不得调用 listAuthorizedClasses
+  ---
+  duration_ms: 1.4233
+  type: 'test'
+  ...
+# Subtest: B. 教师对本班 PUT/GET/DELETE 书架 200 幂等，只改本班一行
+ok 5 - B. 教师对本班 PUT/GET/DELETE 书架 200 幂等，只改本班一行
+  ---
+  duration_ms: 403.056
+  type: 'test'
+  ...
+# Subtest: B. 他班或无 C workspace 操作书架必须 403 或 404
+ok 6 - B. 他班或无 C workspace 操作书架必须 403 或 404
+  ---
+  duration_ms: 351.1905
+  type: 'test'
+  ...
+# Subtest: B. 跨组织 classId 与不存在 classId 书架写必须同码同文案 404
+ok 7 - B. 跨组织 classId 与不存在 classId 书架写必须同码同文案 404
+  ---
+  duration_ms: 287.004
+  type: 'test'
+  ...
+# Subtest: B. 两名教师并发 PUT 同班同书最终只有一行 grant
+ok 8 - B. 两名教师并发 PUT 同班同书最终只有一行 grant
+  ---
+  duration_ms: 322.8774
+  type: 'test'
+  ...
+# Subtest: B. 一班撤下不得删除他班 grant
+ok 9 - B. 一班撤下不得删除他班 grant
+  ---
+  duration_ms: 276.0967
+  type: 'test'
+  ...
+# (node:71224) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: D. projectCommunityPosts 必须接到与 T8.4 同一 isBookVisibleToAudience
+ok 10 - D. projectCommunityPosts 必须接到与 T8.4 同一 isBookVisibleToAudience
+  ---
+  duration_ms: 1.1326
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 无 grant 时保留帖子但 quote.text=null
+ok 11 - D-21 HTTP：GET /community/posts 无 grant 时保留帖子但 quote.text=null
+  ---
+  duration_ms: 354.0667
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 仅他班 grant 时隐藏原文
+ok 12 - D-21 HTTP：GET /community/posts 仅他班 grant 时隐藏原文
+  ---
+  duration_ms: 272.0759
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 对 draft 书隐藏原文
+ok 13 - D-21 HTTP：GET /community/posts 对 draft 书隐藏原文
+  ---
+  duration_ms: 271.5818
+  type: 'test'
+  ...
+# Subtest: D-21 HTTP：GET /community/posts 有本班 grant 仍返原文
+ok 14 - D-21 HTTP：GET /community/posts 有本班 grant 仍返原文
+  ---
+  duration_ms: 262.8783
+  type: 'test'
+  ...
+# (node:45008) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: E. projectAssignments 必须接到与 T8.4 同一 isBookVisibleToAudience
+ok 15 - E. projectAssignments 必须接到与 T8.4 同一 isBookVisibleToAudience
+  ---
+  duration_ms: 1.1326
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：GET /assignments 对学生省略无 grant 的书整项
+ok 16 - D-22 HTTP：GET /assignments 对学生省略无 grant 的书整项
+  ---
+  duration_ms: 365.8184
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：GET /assignments 仅他班 grant 或 draft 也整项省略
+ok 17 - D-22 HTTP：GET /assignments 仅他班 grant 或 draft 也整项省略
+  ---
+  duration_ms: 291.2519
+  type: 'test'
+  ...
+# Subtest: D-22 HTTP：有本班 grant 返回安排；撤下后消失
+ok 18 - D-22 HTTP：有本班 grant 返回安排；撤下后消失
+  ---
+  duration_ms: 288.9546
+  type: 'test'
+  ...
+# (node:72116) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: G. 临时库路径不得指向真库，独立端口不得为 5191
+ok 19 - G. 临时库路径不得指向真库，独立端口不得为 5191
+  ---
+  duration_ms: 256.8278
+  type: 'test'
+  ...
+# Subtest: G. 登录后 GET /books 必须打到 integration-router，不得被 identity 兜底吞掉
+ok 20 - G. 登录后 GET /books 必须打到 integration-router，不得被 identity 兜底吞掉
+  ---
+  duration_ms: 317.3753
+  type: 'test'
+  ...
+# Subtest: G. 书架路由块不得调用 listAuthorizedClasses
+ok 21 - G. 书架路由块不得调用 listAuthorizedClasses
+  ---
+  duration_ms: 0.8008
+  type: 'test'
+  ...
+# (node:68980) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: C. 教师全局 publish/unpublish 必须 403，且不得改 grants
+ok 22 - C. 教师全局 publish/unpublish 必须 403，且不得改 grants
+  ---
+  duration_ms: 379.7376
+  type: 'test'
+  ...
+# Subtest: C. 校长与年级主任全局 publish 必须 403
+ok 23 - C. 校长与年级主任全局 publish 必须 403
+  ---
+  duration_ms: 337.9287
+  type: 'test'
+  ...
+# Subtest: C. platform publish/unpublish 仍 200，且不得创建或清空 grants
+ok 24 - C. platform publish/unpublish 仍 200，且不得创建或清空 grants
+  ---
+  duration_ms: 290.5314
+  type: 'test'
+  ...
+# (node:69932) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: tests\\server\\http\\phase8-http-guards\\shared-harness.guard.test.js
+ok 7 - tests\\server\\http\\phase8-http-guards\\shared-harness.guard.test.js
+  ---
+  duration_ms: 202.4787
+  type: 'test'
+  ...
+# (node:69560) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: A. integration-router 必须删除 GET/PUT /books/:bookId/visibility，无兼容 handler
+ok 26 - A. integration-router 必须删除 GET/PUT /books/:bookId/visibility，无兼容 handler
+  ---
+  duration_ms: 1.4018
+  type: 'test'
+  ...
+# Subtest: A. GET /books/:bookId/visibility 必须是标准 JSON 404，且 integration 链可到达
+ok 27 - A. GET /books/:bookId/visibility 必须是标准 JSON 404，且 integration 链可到达
+  ---
+  duration_ms: 370.2966
+  type: 'test'
+  ...
+# Subtest: A. PUT /books/:bookId/visibility 含 scope=organization 也必须标准 JSON 404，且不得清空他班 grant
+ok 28 - A. PUT /books/:bookId/visibility 含 scope=organization 也必须标准 JSON 404，且不得清空他班 grant
+  ---
+  duration_ms: 294.8142
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1865.326
+
+EXIT:0
+
+
+===== spot:phase8-attack-t87-gaps =====
+
+TAP version 13
+# (node:64584) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 已锁攻击只引用 T8.3A/T8.5A，不在本文件复制弱化版
+ok 1 - 已锁攻击只引用 T8.3A/T8.5A，不在本文件复制弱化版
+  ---
+  duration_ms: 1.3475
+  type: 'test'
+  ...
+# Subtest: 教师未加入班不得操作本班书架（零 workspace 教师）
+ok 2 - 教师未加入班不得操作本班书架（零 workspace 教师）
+  ---
+  duration_ms: 329.4842
+  type: 'test'
+  ...
+# Subtest: 教师未加入班不得审批该班成员
+ok 3 - 教师未加入班不得审批该班成员
+  ---
+  duration_ms: 258.5055
+  type: 'test'
+  ...
+# Subtest: 年级主任 school 例外不扩散到本届/跨届书架
+ok 4 - 年级主任 school 例外不扩散到本届/跨届书架
+  ---
+  duration_ms: 268.7761
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1061.8044
+
+EXIT:0

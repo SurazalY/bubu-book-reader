@@ -1,0 +1,177 @@
+first={
+  "applied": [
+    "047_login_and_class_identity.sql",
+    "048_registration_credentials.sql",
+    "049_enrollment_and_password_reset.sql",
+    "050_book_access_grant_backfill.sql"
+  ],
+  "alreadyApplied": [
+    "000_identity.sql",
+    "001_sessions.sql",
+    "002_reliability.sql",
+    "003_identity_hardening.sql",
+    "004_idempotency_lifecycle_and_scope_integrity.sql",
+    "005_organization_roles_and_idempotency_fencing.sql",
+    "010_reading_catalog.sql",
+    "011_reading_activity.sql",
+    "012_teaching_bridge.sql",
+    "013_reading_security_scopes.sql",
+    "014_book_catalog_metadata.sql",
+    "015_classroom_participation.sql",
+    "020_ai_safety.sql",
+    "021_ai_safety_hardening.sql",
+    "022_ai_safety_sqlite_adapter.sql",
+    "023_ai_safety_tenant_scope.sql",
+    "024_ai_safety_review_generation_and_idempotency_scope.sql",
+    "025_safety_notification_delivery.sql",
+    "026_safety_event_resolution.sql",
+    "030_community_reports_delivery.sql",
+    "031_summary_link_revocations.sql",
+    "032_contact_workspace_delivery_claims.sql",
+    "033_community_multistage_review.sql",
+    "040_student_library_objects.sql",
+    "041_eyecare_privacy.sql",
+    "042_ai_conversation_management.sql",
+    "043_reading_session_summaries.sql",
+    "044_reader_dual_mode_pilot.sql",
+    "045_book_catalog_grade_and_trusted_baseline.sql",
+    "046_reader_mode_preferences.sql"
+  ],
+  "migrationCount": 34
+}
+second={
+  "applied": [],
+  "alreadyApplied": [
+    "000_identity.sql",
+    "001_sessions.sql",
+    "002_reliability.sql",
+    "003_identity_hardening.sql",
+    "004_idempotency_lifecycle_and_scope_integrity.sql",
+    "005_organization_roles_and_idempotency_fencing.sql",
+    "010_reading_catalog.sql",
+    "011_reading_activity.sql",
+    "012_teaching_bridge.sql",
+    "013_reading_security_scopes.sql",
+    "014_book_catalog_metadata.sql",
+    "015_classroom_participation.sql",
+    "020_ai_safety.sql",
+    "021_ai_safety_hardening.sql",
+    "022_ai_safety_sqlite_adapter.sql",
+    "023_ai_safety_tenant_scope.sql",
+    "024_ai_safety_review_generation_and_idempotency_scope.sql",
+    "025_safety_notification_delivery.sql",
+    "026_safety_event_resolution.sql",
+    "030_community_reports_delivery.sql",
+    "031_summary_link_revocations.sql",
+    "032_contact_workspace_delivery_claims.sql",
+    "033_community_multistage_review.sql",
+    "040_student_library_objects.sql",
+    "041_eyecare_privacy.sql",
+    "042_ai_conversation_management.sql",
+    "043_reading_session_summaries.sql",
+    "044_reader_dual_mode_pilot.sql",
+    "045_book_catalog_grade_and_trusted_baseline.sql",
+    "046_reader_mode_preferences.sql",
+    "047_login_and_class_identity.sql",
+    "048_registration_credentials.sql",
+    "049_enrollment_and_password_reset.sql",
+    "050_book_access_grant_backfill.sql"
+  ],
+  "migrationCount": 34
+}
+checksumsFirst=[
+  {
+    "id": "047_login_and_class_identity.sql",
+    "checksum": "de7d7fcad2926427b7b8ed75e9a4bc3691de8fa3a88f8452c30ab9cf99285f48"
+  },
+  {
+    "id": "048_registration_credentials.sql",
+    "checksum": "97dcadc912e5c9593b60ccd84ade4987c7208acdd10f75fe42f2b140cf7fccea"
+  },
+  {
+    "id": "049_enrollment_and_password_reset.sql",
+    "checksum": "190cfb10e9fef84991724aeb2fe579c3a77dc6a669a61f637a8b70de7eb5cfff"
+  },
+  {
+    "id": "050_book_access_grant_backfill.sql",
+    "checksum": "bbb1a4bd103495acfc5e1ffed1e74cc960aae2fa3c2b0ad3ee31982af5eef763"
+  }
+]
+checksumsSecond=[
+  {
+    "id": "047_login_and_class_identity.sql",
+    "checksum": "de7d7fcad2926427b7b8ed75e9a4bc3691de8fa3a88f8452c30ab9cf99285f48"
+  },
+  {
+    "id": "048_registration_credentials.sql",
+    "checksum": "97dcadc912e5c9593b60ccd84ade4987c7208acdd10f75fe42f2b140cf7fccea"
+  },
+  {
+    "id": "049_enrollment_and_password_reset.sql",
+    "checksum": "190cfb10e9fef84991724aeb2fe579c3a77dc6a669a61f637a8b70de7eb5cfff"
+  },
+  {
+    "id": "050_book_access_grant_backfill.sql",
+    "checksum": "bbb1a4bd103495acfc5e1ffed1e74cc960aae2fa3c2b0ad3ee31982af5eef763"
+  }
+]
+pre={
+  "grants": 0,
+  "published": 49,
+  "classes": [
+    {
+      "id": "internal-demo-class",
+      "name": "三年级一班",
+      "status": "active",
+      "grade_id": "internal-demo-grade"
+    }
+  ],
+  "max": "046_reader_mode_preferences.sql",
+  "quick": "ok"
+}
+post={
+  "quick_check": "ok",
+  "published": 49,
+  "versions": 49,
+  "grants": 49,
+  "class_count": 1,
+  "classes": [
+    {
+      "id": "internal-demo-class",
+      "name": "三年级一班",
+      "status": "active",
+      "grade_id": "primary:2023",
+      "stage": "primary",
+      "entry_year": 2023,
+      "class_number": 1
+    }
+  ],
+  "schema_migrations_max": "050_book_access_grant_backfill.sql",
+  "schema_migrations_phase8": [
+    {
+      "id": "047_login_and_class_identity.sql",
+      "checksum": "de7d7fcad2926427b7b8ed75e9a4bc3691de8fa3a88f8452c30ab9cf99285f48",
+      "applied_at": "2026-08-18T12:44:19.015Z"
+    },
+    {
+      "id": "048_registration_credentials.sql",
+      "checksum": "97dcadc912e5c9593b60ccd84ade4987c7208acdd10f75fe42f2b140cf7fccea",
+      "applied_at": "2026-08-18T12:44:19.015Z"
+    },
+    {
+      "id": "049_enrollment_and_password_reset.sql",
+      "checksum": "190cfb10e9fef84991724aeb2fe579c3a77dc6a669a61f637a8b70de7eb5cfff",
+      "applied_at": "2026-08-18T12:44:19.015Z"
+    },
+    {
+      "id": "050_book_access_grant_backfill.sql",
+      "checksum": "bbb1a4bd103495acfc5e1ffed1e74cc960aae2fa3c2b0ad3ee31982af5eef763",
+      "applied_at": "2026-08-18T12:44:19.015Z"
+    }
+  ],
+  "student_active": 1,
+  "teacher_active": 2,
+  "grade_manager": 0,
+  "community_posts": 0,
+  "assignments": 0
+}

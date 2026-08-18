@@ -299,11 +299,11 @@ async function requestJson(baseUrl, path, options = {}) {
   }
 }
 
-async function login(baseUrl, username, password, key) {
+async function login(baseUrl, schoolCode, loginName, password, key) {
   return requestJson(baseUrl, '/auth/login', {
     method: 'POST',
     headers: { 'Idempotency-Key': key },
-    body: { username, password },
+    body: { schoolCode, loginName, password },
   })
 }
 
@@ -409,7 +409,7 @@ test('004 migrates 003 idempotency records to pending and succeeded without rewr
 test('HTTP login persists sessions, protects the login idempotency hash, and enforces input bounds', async (t) => {
   const { fixture, baseUrl, module } = await startHarness(t)
   const key = 'login-student-success'
-  const response = await login(baseUrl, fixture.studentUsername, fixture.password, key)
+  const response = await login(baseUrl, fixture.schoolId, fixture.studentUsername, fixture.password, key)
 
   assert.equal(response.status, 200)
   assert.equal(response.payload.data.user.id, fixture.studentId)
@@ -440,13 +440,13 @@ test('HTTP login persists sessions, protects the login idempotency hash, and enf
   assert.equal(health.payload.data.migrations, listMigrationFiles(defaultMigrationDirectory()).length)
 
   const excessivePassword = 'x'.repeat(MAX_PASSWORD_LENGTH + 1)
-  const excessive = await login(baseUrl, fixture.studentUsername, excessivePassword, 'login-password-too-long')
+  const excessive = await login(baseUrl, fixture.schoolId, fixture.studentUsername, excessivePassword, 'login-password-too-long')
   assert.equal(excessive.status, 400)
   assert.equal(excessive.payload.error.code, 'VALIDATION_FAILED')
   assert.equal(module.database.prepare('SELECT COUNT(*) AS count FROM sessions').get().count, 1)
 
   const failedPassword = randomBytes(32).toString('base64url')
-  const failed = await login(baseUrl, fixture.studentUsername, failedPassword, 'login-student-failure')
+  const failed = await login(baseUrl, fixture.schoolId, fixture.studentUsername, failedPassword, 'login-student-failure')
   assert.equal(failed.status, 401)
   assert.equal(failed.payload.error.code, 'AUTH_REQUIRED')
   assert.equal(module.database.prepare('SELECT COUNT(*) AS count FROM sessions').get().count, 1)
@@ -479,18 +479,18 @@ test('HTTP login persists sessions, protects the login idempotency hash, and enf
 test('disabled organizations block fresh login, replayed login, existing sessions, and school workspaces', async (t) => {
   const { fixture, baseUrl, module } = await startHarness(t)
   const key = 'login-before-organization-disable'
-  const activeLogin = await login(baseUrl, fixture.studentUsername, fixture.password, key)
+  const activeLogin = await login(baseUrl, fixture.schoolId, fixture.studentUsername, fixture.password, key)
   assert.equal(activeLogin.status, 200)
 
   module.database
     .prepare('UPDATE organizations SET status = ?, updated_at = ?, version = version + 1 WHERE id = ?')
     .run('disabled', new Date().toISOString(), fixture.schoolId)
 
-  const freshLogin = await login(baseUrl, fixture.studentUsername, fixture.password, 'login-after-organization-disable')
+  const freshLogin = await login(baseUrl, fixture.schoolId, fixture.studentUsername, fixture.password, 'login-after-organization-disable')
   assert.equal(freshLogin.status, 401)
   assert.equal(freshLogin.payload.error.code, 'AUTH_REQUIRED')
 
-  const replayedLogin = await login(baseUrl, fixture.studentUsername, fixture.password, key)
+  const replayedLogin = await login(baseUrl, fixture.schoolId, fixture.studentUsername, fixture.password, key)
   assert.equal(replayedLogin.status, 401)
   assert.equal(replayedLogin.payload.error.code, 'AUTH_REQUIRED')
 
@@ -500,7 +500,7 @@ test('disabled organizations block fresh login, replayed login, existing session
   assert.deepEqual(module.service.listWorkspaces(fixture.studentId), [])
   assert.equal(module.service.resolveWorkspace(fixture.studentId, fixture.studentWorkspaceId), null)
 
-  const platformLogin = await login(baseUrl, fixture.operatorUsername, fixture.password, 'platform-login-after-school-disable')
+  const platformLogin = await login(baseUrl, fixture.platformOrganizationId, fixture.operatorUsername, fixture.password, 'platform-login-after-school-disable')
   assert.equal(platformLogin.status, 200)
   assert.equal(platformLogin.payload.data.workspaces[0].id, fixture.platformWorkspaceId)
 })
@@ -510,15 +510,16 @@ test('a legacy forged cross-organization class membership cannot expand class sc
   const foreignOrganizationId = randomUUID()
   const foreignUserId = randomUUID()
   const now = new Date().toISOString()
+  const foreignUsername = `foreign-user-${randomUUID()}`
   module.database
-    .prepare('INSERT INTO organizations (id, name, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, 1)')
-    .run(foreignOrganizationId, `foreign-${randomUUID()}`, 'active', now, now)
+    .prepare('INSERT INTO organizations (id, name, school_code, status, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, 1)')
+    .run(foreignOrganizationId, `foreign-${randomUUID()}`, `foreign-${randomUUID().slice(0, 8)}`, 'active', now, now)
   module.database
     .prepare(`
-      INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version)
-      VALUES (?, ?, ?, ?, 'active', ?, ?, 1)
+      INSERT INTO users (id, organization_id, username, display_name, status, created_at, updated_at, version, login_name, account_code)
+      VALUES (?, ?, ?, ?, 'active', ?, ?, 1, ?, ?)
     `)
-    .run(foreignUserId, foreignOrganizationId, `foreign-user-${randomUUID()}`, `foreign-user-${randomUUID()}`, now, now)
+    .run(foreignUserId, foreignOrganizationId, foreignUsername, foreignUsername, now, now, foreignUsername, `F${randomUUID().slice(0, 7)}`)
   const insertForgedMembership = module.database
     .prepare(`
       INSERT INTO class_memberships (id, class_id, user_id, membership_role, status, created_at, updated_at, version)
@@ -537,14 +538,15 @@ test('a legacy forged cross-organization class membership cannot expand class sc
   const scope = module.service.getUserScope(foreignUserId)
   assert.equal(scope.classIds.includes(fixture.classAId), false)
 
-  const teacherLogin = await login(baseUrl, fixture.classTeacherUsername, fixture.password, 'login-cross-org-class-teacher')
+  const teacherLogin = await login(baseUrl, fixture.schoolId, fixture.classTeacherUsername, fixture.password, 'login-cross-org-class-teacher')
   const read = await requestJson(baseUrl, `/users/${foreignUserId}`, {
     headers: {
       Cookie: teacherLogin.cookie,
       'X-Workspace-Id': fixture.classWorkspaceId,
     },
   })
-  assert.equal(read.status, 403)
+  assert.equal(read.status, 404)
+  assert.equal(read.payload.error.code, 'RESOURCE_NOT_FOUND')
 
   const update = await updateUser(
     baseUrl,
@@ -555,7 +557,8 @@ test('a legacy forged cross-organization class membership cannot expand class sc
     `should-not-update-${randomUUID()}`,
     1,
   )
-  assert.equal(update.status, 403)
+  assert.equal(update.status, 404)
+  assert.equal(update.payload.error.code, 'RESOURCE_NOT_FOUND')
 })
 
 test('class, grade, own, school, and platform scopes use persisted memberships without widening student actions', async (t) => {
@@ -565,7 +568,7 @@ test('class, grade, own, school, and platform scopes use persisted memberships w
   assert.equal(studentScope.organizationId, fixture.schoolId)
   assert.deepEqual(studentScope.classIds, [fixture.classAId])
   assert.deepEqual(studentScope.gradeIds, [fixture.gradeAId])
-  const studentLogin = await login(baseUrl, fixture.studentUsername, fixture.password, 'login-student-permission')
+  const studentLogin = await login(baseUrl, fixture.schoolId, fixture.studentUsername, fixture.password, 'login-student-permission')
   const denied = await requestJson(baseUrl, `/users/${fixture.otherStudentId}`, {
     headers: {
       Cookie: studentLogin.cookie,
@@ -593,7 +596,7 @@ test('class, grade, own, school, and platform scopes use persisted memberships w
     )
   }
 
-  const teacherLogin = await login(baseUrl, fixture.classTeacherUsername, fixture.password, 'login-class-teacher')
+  const teacherLogin = await login(baseUrl, fixture.schoolId, fixture.classTeacherUsername, fixture.password, 'login-class-teacher')
   assert.equal(teacherLogin.payload.data.activeWorkspaceId, fixture.classWorkspaceId)
   assert.equal(teacherLogin.payload.data.navigation.defaultPath, '/console/home')
   assert.deepEqual(teacherLogin.payload.data.navigation.entries, [
@@ -621,7 +624,7 @@ test('class, grade, own, school, and platform scopes use persisted memberships w
   )
   assert.equal(classDenied.status, 403)
 
-  const gradeLogin = await login(baseUrl, fixture.gradeManagerUsername, fixture.password, 'login-grade-manager')
+  const gradeLogin = await login(baseUrl, fixture.schoolId, fixture.gradeManagerUsername, fixture.password, 'login-grade-manager')
   const gradeAllowed = await updateUser(
     baseUrl,
     fixture.studentId,
@@ -644,7 +647,7 @@ test('class, grade, own, school, and platform scopes use persisted memberships w
   )
   assert.equal(gradeDenied.status, 403)
 
-  const schoolLogin = await login(baseUrl, fixture.schoolAdminUsername, fixture.password, 'login-school-admin')
+  const schoolLogin = await login(baseUrl, fixture.schoolId, fixture.schoolAdminUsername, fixture.password, 'login-school-admin')
   const schoolAllowed = await updateUser(
     baseUrl,
     fixture.otherStudentId,
@@ -657,7 +660,7 @@ test('class, grade, own, school, and platform scopes use persisted memberships w
   assert.equal(schoolAllowed.status, 200)
   assert.equal(schoolAllowed.payload.data.version, 2)
 
-  const platformLogin = await login(baseUrl, fixture.operatorUsername, fixture.password, 'login-platform-operator')
+  const platformLogin = await login(baseUrl, fixture.platformOrganizationId, fixture.operatorUsername, fixture.password, 'login-platform-operator')
   const platformDisplayName = `platform-allowed-${randomUUID()}`
   const platformAllowed = await updateUser(
     baseUrl,

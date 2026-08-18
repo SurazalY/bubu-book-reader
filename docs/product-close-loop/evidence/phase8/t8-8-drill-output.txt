@@ -1,0 +1,39 @@
+T8.8 drill start 20260818T124417Z
+work=C:\Users\Yak\AppData\Local\Temp\t8-8-gate2-20260818T124417Z
+source=D:\Project\整书8.15\server\data\readmate.sqlite
+replica=C:\Users\Yak\AppData\Local\Temp\t8-8-gate2-20260818T124417Z\readmate-046-copy.sqlite
+SESSION_TOKEN_SECRET set=true
+INTERNAL_DEMO_PASSWORD set=true length=12
+source sqlite bytes=108261376 sha256=6e3e163d5f2d437c892b2cbfeb44906b6a78dad5a56f9577d0277e6819cff14b
+source wal exists=true bytes=9723232 sha256=559dc570f00a2463ef9ec816b06fc5aed6244277db5649e273c28623848b675d
+VACUUM INTO ok=true attempts=[{"label":"DatabaseSync(readOnly:true)","ok":true}]
+replica bytes=107020288 sha256=33561d9ed24831672396a63a0d08ed8210cd80128148309e5d4d69b1964ef64a
+pre quick_check="ok"
+pre orgs=1 classes=1 published=49 versions=49 grants=0
+pre student_active=1 teacher_active=2 grade_manager=0
+pre schema_max=046_reader_mode_preferences.sql
+pre classes=[{"id":"internal-demo-class","name":"三年级一班","status":"active","grade_id":"internal-demo-grade"}]
+student memberships=[{"studentUserId":"internal-demo-student","organizationId":"internal-demo-organization","userStatus":"active","username":"internal-student","classId":"internal-demo-class","membershipStatus":"active","classStatus":"active","classExists":"internal-demo-class"}]
+first runMigrations applied=["047_login_and_class_identity.sql","048_registration_credentials.sql","049_enrollment_and_password_reset.sql","050_book_access_grant_backfill.sql"]
+first alreadyApplied tail=["041_eyecare_privacy.sql","042_ai_conversation_management.sql","043_reading_session_summaries.sql","044_reader_dual_mode_pilot.sql","045_book_catalog_grade_and_trusted_baseline.sql","046_reader_mode_preferences.sql"]
+second applied=[]
+second alreadyApplied phase8=["047_login_and_class_identity.sql","048_registration_credentials.sql","049_enrollment_and_password_reset.sql","050_book_access_grant_backfill.sql"]
+post quick_check="ok" grants=49
+visibility diff allEmpty=true keys=internal-demo-organization::internal-demo-student
+env password vs replica hashes [{"userId":"internal-demo-student","loginName":"internal-student","envPasswordMatches":false},{"userId":"internal-ops-admin","loginName":"internal-ops-admin","envPasswordMatches":false},{"userId":"internal-principal","loginName":"internal-principal","envPasswordMatches":false},{"userId":"internal-teacher-li","loginName":"internal-teacher-li","envPasswordMatches":false},{"userId":"internal-teacher-wang","loginName":"internal-teacher-wang","envPasswordMatches":false}]
+rotated replica password hashes for internal-demo-student,internal-ops-admin,internal-principal,internal-teacher-li,internal-teacher-wang
+app1 listen 127.0.0.1:62621 applied=[]
+existing student login 200 ws=internal-demo-workspace
+existing student GET /books 200 count=49
+teacher publish 403 PERMISSION_DENIED unpublish 403
+app1 closed
+app2 listen 127.0.0.1:60171 applied=[] alreadyApplied phase8=["047_login_and_class_identity.sql","048_registration_credentials.sql","049_enrollment_and_password_reset.sql","050_book_access_grant_backfill.sql"]
+second class seed inserted=7
+new class grants=0
+draft book 4b650409-2910-4116-9bd6-913453364876 version 5d91bb42-cd14-4059-8a5f-0680b979c27c
+new student GET /books 200 count=0
+D-23 no-grant lease 404 书籍不存在或当前不可读取
+D-23 draft+grant lease 404 书籍不存在或当前不可读取
+after HTTP extras grants=50 (includes drill-only draft grant; snapshots were taken earlier)
+app2 closed
+ok flags {"vacuum":true,"baseline":true,"firstApplied047to050":true,"secondAppliedEmpty":true,"checksumUnchanged":true,"postGrants49":true,"postQuickOk":true,"visibilityDiffEmpty":true,"existingStudentSees49":true,"newStudentSees0":true,"teacherPublish403":true,"d23NoGrant404":true,"d23Draft404":true,"neverUsed5191":true}

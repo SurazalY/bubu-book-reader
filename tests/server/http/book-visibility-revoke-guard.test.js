@@ -16,6 +16,7 @@ import test from 'node:test'
 import { hashPassword } from '../../../server/auth/password.js'
 import { createReadmateApplication } from '../../../server/app.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
+import { resolveCurrentBookVersionId } from '../../../server/domains/reading/visibility.js'
 
 // ---------------------------------------------------------------------------
 // 夹具
@@ -26,8 +27,9 @@ function revokeFixture() {
   const id = (name) => `${name}-${suffix}`
 
   const organizationId = id('org')
-  const gradeOneId = id('grade-one')
-  const gradeTwoId = id('grade-two')
+  const schoolCode = `rvk${suffix}`
+  const gradeOneId = 'primary:2023'
+  const gradeTwoId = 'primary:2024'
   const classAId = id('class-a')
   const classBId = id('class-b')
   const classCId = id('class-c')
@@ -48,11 +50,16 @@ function revokeFixture() {
     gradeAdminTwo: { id: id('grade-admin-two'), displayName: '二年级主任' },
     admin: { id: id('school-admin'), displayName: '校长' },
   }
-  for (const [key, person] of Object.entries(people)) person.username = `${key}-${suffix}`
+  for (const [key, person] of Object.entries(people)) {
+    person.username = `${key}-${suffix}`
+    person.loginName = person.username
+    person.schoolCode = schoolCode
+  }
 
   return {
     password,
     people,
+    schoolCode,
     organizationId,
     gradeOneId,
     gradeTwoId,
@@ -66,7 +73,7 @@ function revokeFixture() {
     wsSchoolId,
     wsGradeTwoId,
     seed: {
-      organizations: [{ id: organizationId, name: '删除侧校验测试学校' }],
+      organizations: [{ id: organizationId, name: '删除侧校验测试学校', schoolCode }],
       users: Object.values(people).map(({ id: userId, username, displayName }) => ({
         id: userId, organizationId, username, displayName,
       })),
@@ -84,11 +91,11 @@ function revokeFixture() {
         { id: randomUUID(), userId: people.admin.id, workspaceId: wsSchoolId },
       ],
       classes: [
-        { id: classAId, organizationId, gradeId: gradeOneId, name: '一年级 A 班' },
-        { id: classBId, organizationId, gradeId: gradeOneId, name: '一年级 B 班' },
-        { id: classCId, organizationId, gradeId: gradeTwoId, name: '二年级 C 班' },
-        { id: classToDisableId, organizationId, gradeId: gradeTwoId, name: '待停用空班' },
-        { id: classToDeleteId, organizationId, gradeId: gradeTwoId, name: '待删除空班' },
+        { id: classAId, organizationId, gradeId: gradeOneId, name: '一年级 A 班', stage: 'primary', entryYear: 2023, classNumber: 1 },
+        { id: classBId, organizationId, gradeId: gradeOneId, name: '一年级 B 班', stage: 'primary', entryYear: 2023, classNumber: 2 },
+        { id: classCId, organizationId, gradeId: gradeTwoId, name: '二年级 C 班', stage: 'primary', entryYear: 2024, classNumber: 1 },
+        { id: classToDisableId, organizationId, gradeId: gradeTwoId, name: '待停用空班', stage: 'primary', entryYear: 2024, classNumber: 2 },
+        { id: classToDeleteId, organizationId, gradeId: gradeTwoId, name: '待删除空班', stage: 'primary', entryYear: 2024, classNumber: 3 },
       ],
       classMemberships: [
         { id: randomUUID(), classId: classAId, userId: people.studentA.id, membershipRole: 'student' },
@@ -99,7 +106,7 @@ function revokeFixture() {
         { id: randomUUID(), organizationId, userId: people.studentA.id, workspaceId: wsAId, roleCode: 'student', scopeType: 'class', scopeId: classAId },
         { id: randomUUID(), organizationId, userId: people.studentB.id, workspaceId: wsBId, roleCode: 'student', scopeType: 'class', scopeId: classBId },
         { id: randomUUID(), organizationId, userId: people.teacherA.id, workspaceId: wsAId, roleCode: 'class_teacher', scopeType: 'class', scopeId: classAId },
-        { id: randomUUID(), organizationId, userId: people.gradeAdminTwo.id, workspaceId: wsGradeTwoId, roleCode: 'grade_admin', scopeType: 'grade', scopeId: gradeTwoId },
+        { id: randomUUID(), organizationId, userId: people.gradeAdminTwo.id, workspaceId: wsGradeTwoId, roleCode: 'grade_manager', scopeType: 'grade', scopeId: gradeTwoId },
         { id: randomUUID(), organizationId, userId: people.admin.id, workspaceId: wsSchoolId, roleCode: 'school_admin', scopeType: 'school', scopeId: organizationId },
       ],
       credentials: Object.values(people).map(({ id: userId }) => ({ id: randomUUID(), userId, passwordHash })),
@@ -149,7 +156,7 @@ async function login(baseUrl, fixture, person) {
   const response = await request(baseUrl, jar, '/auth/login', {
     method: 'POST',
     idempotencyKey: `login-${person.id}-${randomUUID()}`,
-    body: { username: person.username, password: fixture.password },
+    body: { schoolCode: person.schoolCode, loginName: person.loginName ?? person.username, password: fixture.password },
   })
   assert.equal(response.status, 200, JSON.stringify(response.payload))
   return jar
@@ -247,6 +254,9 @@ async function startHarness(t) {
     baseUrl,
     createBook: (title) => createBook(application, fixture, asset, title),
     login: (person) => login(baseUrl, fixture, person),
+    grantCurrentBookToClass: (options) => grantCurrentBookToClass(application.database, options),
+    putShelf: (jar, workspaceId, classId, bookId) => putShelf(baseUrl, jar, workspaceId, classId, bookId),
+    deleteShelf: (jar, workspaceId, classId, bookId) => deleteShelf(baseUrl, jar, workspaceId, classId, bookId),
   }
 }
 
@@ -261,6 +271,39 @@ async function setVisibility(baseUrl, jar, workspaceId, bookId, body) {
     idempotencyKey: `revoke-visibility-${bookId}-${randomUUID()}`,
     body,
   })
+}
+
+async function putShelf(baseUrl, jar, workspaceId, classId, bookId) {
+  return request(baseUrl, jar, `/classes/${classId}/shelf/${bookId}`, {
+    method: 'PUT',
+    workspaceId,
+    idempotencyKey: `revoke-shelf-put-${bookId}-${randomUUID()}`,
+    body: {},
+  })
+}
+
+async function deleteShelf(baseUrl, jar, workspaceId, classId, bookId) {
+  return request(baseUrl, jar, `/classes/${classId}/shelf/${bookId}`, {
+    method: 'DELETE',
+    workspaceId,
+    idempotencyKey: `revoke-shelf-del-${bookId}-${randomUUID()}`,
+  })
+}
+
+function grantCurrentBookToClass(database, { bookId, classId, organizationId, actorId, granteeType = 'class' }) {
+  if (!bookId || !classId || !organizationId || !actorId) {
+    throw new Error('grantCurrentBookToClass 不得推断组织/班级')
+  }
+  const bookVersionId = resolveCurrentBookVersionId(database, { bookId, organizationId })
+  assert.ok(bookVersionId, `grantCurrentBookToClass 需要当前版本：bookId=${bookId}`)
+  const now = new Date().toISOString()
+  database.prepare(`
+    INSERT INTO book_access_grants (
+      id, book_version_id, grantee_type, grantee_id,
+      organization_id_at_creation, actor_id_at_creation, created_at, updated_at, version
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+  `).run(randomUUID(), bookVersionId, granteeType, classId, organizationId, actorId, now, now)
+  return bookVersionId
 }
 
 function grantedClassIds(database, bookId) {
@@ -309,19 +352,19 @@ function assertStudentBlocked(probe, label) {
 // F-1：删除侧的授权范围校验
 // ===========================================================================
 
-test('F-1 需求 1/2/8：校长限定到 C 班后，A 班班主任的 organization 与 classes:[A 班] 都被 403，C 班 grants 行仍在', async (t) => {
+test('F-1 需求 1/2/8：C 班 grant 后，A 班教师的旧 organization/DELETE 他班都被拒，C 班 grant 仍在', async (t) => {
   const harness = await startHarness(t)
   const { fixture, baseUrl, database } = harness
-  const viaOrganization = await harness.createBook('校长限定给 C 班的书（organization 攻击）')
-  const viaClasses = await harness.createBook('校长限定给 C 班的书（classes 覆盖攻击）')
+  const viaOrganization = await harness.createBook('已投放 C 班的书（organization 攻击）')
+  const viaClasses = await harness.createBook('已投放 C 班的书（覆盖攻击）')
 
-  const adminJar = await harness.login(fixture.people.admin)
   for (const book of [viaOrganization, viaClasses]) {
-    const restricted = await setVisibility(baseUrl, adminJar, fixture.wsSchoolId, book.bookId, {
-      scope: 'classes',
-      classIds: [fixture.classCId],
+    harness.grantCurrentBookToClass({
+      bookId: book.bookId,
+      classId: fixture.classCId,
+      organizationId: fixture.organizationId,
+      actorId: fixture.people.admin.id,
     })
-    assert.equal(restricted.status, 200, JSON.stringify(restricted.payload))
     assert.deepEqual(grantedClassIds(database, book.bookId), [fixture.classCId])
   }
 
@@ -329,71 +372,63 @@ test('F-1 需求 1/2/8：校长限定到 C 班后，A 班班主任的 organizati
   const studentAJar = await harness.login(fixture.people.studentA)
   const studentBJar = await harness.login(fixture.people.studentB)
 
-  // 需求 1：放开到全组织 —— 等于把书授权给包含 B 班、C 班在内的所有班，必须 403。
   const widened = await setVisibility(baseUrl, teacherAJar, fixture.wsAId, viaOrganization.bookId, {
     scope: 'organization',
   })
-  assert.equal(widened.status, 403, `organization 必须 403：${JSON.stringify(widened.payload)}`)
-  assert.equal(widened.payload.error.code, 'PERMISSION_DENIED')
-  // 需求 8：details.classIds 装的是「要移除、却不在操作者授权范围内」的班级。
-  assert.deepEqual(widened.payload.error.details.classIds, [fixture.classCId])
+  assert.equal(widened.status, 404, `organization 必须 404：${JSON.stringify(widened.payload)}`)
+  assert.equal(widened.payload.error.code, 'RESOURCE_NOT_FOUND')
   assert.deepEqual(
     grantedClassIds(database, viaOrganization.bookId),
     [fixture.classCId],
-    '被拒的 organization 请求不得删掉校长设置的 grants 行',
+    '被拒的 organization 请求不得删掉 C 班 grants 行',
   )
   assertStudentBlocked(
     await probeStudent(baseUrl, studentBJar, fixture.wsBId, viaOrganization),
-    'organization 被拒后 B 班学生',
+    'organization 被拒后 B 班学生（原因：只 grant 他班）',
   )
   assertStudentBlocked(
     await probeStudent(baseUrl, studentAJar, fixture.wsAId, viaOrganization),
-    'organization 被拒后 A 班学生',
+    'organization 被拒后 A 班学生（原因：只 grant 他班）',
   )
 
-  // 需求 2：收窄到自己班 —— 等价于删掉 C 班的授权，必须 403。
-  const hijacked = await setVisibility(baseUrl, teacherAJar, fixture.wsAId, viaClasses.bookId, {
-    scope: 'classes',
-    classIds: [fixture.classAId],
-  })
-  assert.equal(hijacked.status, 403, `classes:[A 班] 必须 403：${JSON.stringify(hijacked.payload)}`)
+  const hijacked = await harness.deleteShelf(teacherAJar, fixture.wsAId, fixture.classCId, viaClasses.bookId)
+  assert.equal(hijacked.status, 403, `DELETE 他班必须 403：${JSON.stringify(hijacked.payload)}`)
   assert.equal(hijacked.payload.error.code, 'PERMISSION_DENIED')
-  assert.deepEqual(hijacked.payload.error.details.classIds, [fixture.classCId])
   assert.deepEqual(
     grantedClassIds(database, viaClasses.bookId),
     [fixture.classCId],
-    '被拒的 classes 请求不得覆盖校长设置的 grants 行',
+    '被拒的 DELETE 不得覆盖 C 班 grants 行',
   )
 })
 
-test('F-1 需求 3/4：书无 grants 时班主任可限定到本班，且他本人随后可以撤销回全组织可见', async (t) => {
+test('F-1 需求 3/4：教师可投放/撤下本班；撤下后默认全闭，不得 organization 全开', async (t) => {
   const harness = await startHarness(t)
   const { fixture, baseUrl, database } = harness
-  const book = await harness.createBook('班主任自己限定再自己撤销的书')
+  const book = await harness.createBook('班主任自己投放再自己撤下的书')
 
   const teacherAJar = await harness.login(fixture.people.teacherA)
   const studentAJar = await harness.login(fixture.people.studentA)
   const studentBJar = await harness.login(fixture.people.studentB)
 
-  // 需求 4：本功能的主用例不能被删除侧校验误伤 —— 无 grants 时没有任何班级被移除。
-  const restricted = await setVisibility(baseUrl, teacherAJar, fixture.wsAId, book.bookId, {
-    scope: 'classes',
-    classIds: [fixture.classAId],
-  })
-  assert.equal(restricted.status, 200, `无 grants 时限定到本班必须 200：${JSON.stringify(restricted.payload)}`)
+  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), '投放前 A 班学生（原因：无 grant）')
+  const restricted = await harness.putShelf(teacherAJar, fixture.wsAId, fixture.classAId, book.bookId)
+  assert.equal(restricted.status, 200, `无 grants 时投放本班必须 200：${JSON.stringify(restricted.payload)}`)
   assert.deepEqual(grantedClassIds(database, book.bookId), [fixture.classAId])
-  assertStudentSees(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), '限定到 A 班后 A 班学生')
-  assertStudentBlocked(await probeStudent(baseUrl, studentBJar, fixture.wsBId, book), '限定到 A 班后 B 班学生')
+  assertStudentSees(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), '投放到 A 班后 A 班学生')
+  assertStudentBlocked(await probeStudent(baseUrl, studentBJar, fixture.wsBId, book), '投放到 A 班后 B 班学生（原因：只 grant 他班）')
 
-  // 需求 3：撤销自己的操作必须可行 —— 被移除的 A 班在他自己的授权范围内。
   const reopened = await setVisibility(baseUrl, teacherAJar, fixture.wsAId, book.bookId, { scope: 'organization' })
-  assert.equal(reopened.status, 200, `撤销自己的限定必须 200：${JSON.stringify(reopened.payload)}`)
-  assert.equal(reopened.payload.data.scope, 'organization')
-  assert.deepEqual(grantRows(database, book.bookId), [], 'grants 必须被清空')
-  assertStudentSees(await probeStudent(baseUrl, studentBJar, fixture.wsBId, book), '撤销后 B 班学生')
+  assert.equal(reopened.status, 404, `旧 organization 必须 404：${JSON.stringify(reopened.payload)}`)
+  assert.deepEqual(grantedClassIds(database, book.bookId), [fixture.classAId], 'organization 404 不得清空本班 grant')
+
+  const revoked = await harness.deleteShelf(teacherAJar, fixture.wsAId, fixture.classAId, book.bookId)
+  assert.equal(revoked.status, 200, `撤下本班必须 200：${JSON.stringify(revoked.payload)}`)
+  assert.deepEqual(grantRows(database, book.bookId), [], '本班 grant 必须被清空')
+  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), '撤下后 A 班学生（原因：无 grant）')
+  assertStudentBlocked(await probeStudent(baseUrl, studentBJar, fixture.wsBId, book), '撤下后 B 班学生（原因：无 grant）')
 })
 
-test('F-1 需求 5：悬空 grants（班级已停用 / 已删除）不锁死可见范围，校长与班主任都能一键清除', async (t) => {
+test('F-1 需求 5：悬空 grants 对学生不可见（原因：学生不在该班）；旧 organization 不得再清空', async (t) => {
   const harness = await startHarness(t)
   const { fixture, baseUrl, database } = harness
   const disabledBook = await harness.createBook('grants 指向已停用班级的书')
@@ -407,39 +442,34 @@ test('F-1 需求 5：悬空 grants（班级已停用 / 已删除）不锁死可�
     [disabledBook, fixture.classToDisableId],
     [deletedBook, fixture.classToDeleteId],
   ]) {
-    const restricted = await setVisibility(baseUrl, adminJar, fixture.wsSchoolId, book.bookId, {
-      scope: 'classes',
-      classIds: [classId],
+    harness.grantCurrentBookToClass({
+      bookId: book.bookId,
+      classId,
+      organizationId: fixture.organizationId,
+      actorId: fixture.people.admin.id,
     })
-    assert.equal(restricted.status, 200, JSON.stringify(restricted.payload))
     assert.deepEqual(grantedClassIds(database, book.bookId), [classId])
   }
-  // 运行期解散一个班、删除另一个班：两个 grants 都变成悬空引用，
-  // 因此都不在任何人（包括校长）的 listAuthorizedClasses 结果里。
   database.prepare("UPDATE classes SET status = 'disabled' WHERE id = ?").run(fixture.classToDisableId)
   database.prepare('DELETE FROM classes WHERE id = ?').run(fixture.classToDeleteId)
-  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, disabledBook), '悬空 grants（停用班）')
-  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, deletedBook), '悬空 grants（删除班）')
+  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, disabledBook), '悬空 grants（停用班，原因：学生不在该班）')
+  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, deletedBook), '悬空 grants（删除班，原因：学生不在该班）')
 
-  // 校长清停用班的悬空 grants。
   const clearedByAdmin = await setVisibility(baseUrl, adminJar, fixture.wsSchoolId, disabledBook.bookId, {
     scope: 'organization',
   })
-  assert.equal(clearedByAdmin.status, 200, `悬空 grants 必须可被清除：${JSON.stringify(clearedByAdmin.payload)}`)
-  assert.deepEqual(grantRows(database, disabledBook.bookId), [])
-  assertStudentSees(await probeStudent(baseUrl, studentAJar, fixture.wsAId, disabledBook), '清除停用班悬空 grants 后')
+  assert.equal(clearedByAdmin.status, 404, `旧 organization 必须 404：${JSON.stringify(clearedByAdmin.payload)}`)
+  assert.deepEqual(grantedClassIds(database, disabledBook.bookId), [fixture.classToDisableId])
+  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, disabledBook), 'organization 404 后仍不可见')
 
-  // 豁免不只对校长生效：class 范围的班主任同样能清掉指向已删除班级的悬空 grants，
-  // 否则这本书会变成谁都改不了可见范围的永久死锁。
   const clearedByTeacher = await setVisibility(baseUrl, teacherAJar, fixture.wsAId, deletedBook.bookId, {
     scope: 'organization',
   })
-  assert.equal(clearedByTeacher.status, 200, `班主任也必须能清悬空 grants：${JSON.stringify(clearedByTeacher.payload)}`)
-  assert.deepEqual(grantRows(database, deletedBook.bookId), [])
-  assertStudentSees(await probeStudent(baseUrl, studentAJar, fixture.wsAId, deletedBook), '清除删除班悬空 grants 后')
+  assert.equal(clearedByTeacher.status, 404, `教师旧 organization 必须 404：${JSON.stringify(clearedByTeacher.payload)}`)
+  assert.deepEqual(grantedClassIds(database, deletedBook.bookId), [fixture.classToDeleteId])
 })
 
-test('F-1 需求 6：校长（school 范围）授权集合覆盖本组织全部班级，任意组合都能操作', async (t) => {
+test('F-1 需求 6：校长不得改班级书架；旧 visibility 任意组合都 404 且不得改 grants', async (t) => {
   const harness = await startHarness(t)
   const { fixture, baseUrl, database } = harness
   const book = await harness.createBook('校长任意组合书')
@@ -447,64 +477,55 @@ test('F-1 需求 6：校长（school 范围）授权集合覆盖本组织全部�
   const teacherAJar = await harness.login(fixture.people.teacherA)
   const adminJar = await harness.login(fixture.people.admin)
 
-  // 先由班主任限定到 A 班，制造「grants 由别人设置」的前置状态。
-  const byTeacher = await setVisibility(baseUrl, teacherAJar, fixture.wsAId, book.bookId, {
-    scope: 'classes',
-    classIds: [fixture.classAId],
-  })
+  const byTeacher = await harness.putShelf(teacherAJar, fixture.wsAId, fixture.classAId, book.bookId)
   assert.equal(byTeacher.status, 200, JSON.stringify(byTeacher.payload))
 
   const steps = [
-    { body: { scope: 'classes', classIds: [fixture.classCId] }, grants: [fixture.classCId] },
-    { body: { scope: 'classes', classIds: [fixture.classAId, fixture.classBId] }, grants: [fixture.classAId, fixture.classBId].sort() },
-    { body: { scope: 'organization' }, grants: [] },
-    { body: { scope: 'classes', classIds: [fixture.classAId, fixture.classBId, fixture.classCId] }, grants: [fixture.classAId, fixture.classBId, fixture.classCId].sort() },
-    { body: { scope: 'classes', classIds: [fixture.classBId] }, grants: [fixture.classBId] },
-    { body: { scope: 'organization' }, grants: [] },
+    { body: { scope: 'classes', classIds: [fixture.classCId] } },
+    { body: { scope: 'classes', classIds: [fixture.classAId, fixture.classBId] } },
+    { body: { scope: 'organization' } },
+    { body: { scope: 'classes', classIds: [fixture.classAId, fixture.classBId, fixture.classCId] } },
+    { body: { scope: 'classes', classIds: [fixture.classBId] } },
   ]
   for (const [index, step] of steps.entries()) {
     const response = await setVisibility(baseUrl, adminJar, fixture.wsSchoolId, book.bookId, step.body)
-    assert.equal(response.status, 200, `第 ${index + 1} 步：${JSON.stringify(response.payload)}`)
-    assert.deepEqual(grantedClassIds(database, book.bookId), step.grants, `第 ${index + 1} 步 grants 行不符`)
+    assert.equal(response.status, 404, `第 ${index + 1} 步旧 visibility 必须 404：${JSON.stringify(response.payload)}`)
+    assert.deepEqual(grantedClassIds(database, book.bookId), [fixture.classAId], `第 ${index + 1} 步不得改教师投放的 A 班 grant`)
   }
+  const adminShelf = await harness.putShelf(adminJar, fixture.wsSchoolId, fixture.classCId, book.bookId)
+  assert.equal(adminShelf.status, 403, `校长无 C workspace 不得改书架：${JSON.stringify(adminShelf.payload)}`)
+  assert.deepEqual(grantedClassIds(database, book.bookId), [fixture.classAId])
 })
 
 // 收紧的边界：删除侧校验按「操作者授权范围」判定，与角色无关。年级范围操作者的正向能力
 // （授权本年级班）没有被误伤，但它同样不能顺手抹掉别年级已有的授权。
-test('F-1 收紧的边界：年级范围操作者仍可授权本年级班，但不能连带移除别年级的既有授权', async (t) => {
+test('F-1 收紧的边界：年级主任对本届/跨届书架都必须 403，不得改既有他班 grant', async (t) => {
   const harness = await startHarness(t)
   const { fixture, baseUrl, database } = harness
   const freshBook = await harness.createBook('无 grants 的书')
-  const gradeOneBook = await harness.createBook('已被限定到一年级两个班的书')
+  const gradeOneBook = await harness.createBook('已被投放到一年级两个班的书')
 
-  const adminJar = await harness.login(fixture.people.admin)
   const gradeTwoJar = await harness.login(fixture.people.gradeAdminTwo)
 
-  // 正向能力未被误伤：书上没有任何 grants 时，二年级主任可以授权给本年级的 C 班。
-  const ownGrade = await setVisibility(baseUrl, gradeTwoJar, fixture.wsGradeTwoId, freshBook.bookId, {
-    scope: 'classes',
-    classIds: [fixture.classCId],
-  })
-  assert.equal(ownGrade.status, 200, `二年级主任授权本年级班必须 200：${JSON.stringify(ownGrade.payload)}`)
-  assert.deepEqual(grantedClassIds(database, freshBook.bookId), [fixture.classCId])
+  const ownGrade = await harness.putShelf(gradeTwoJar, fixture.wsGradeTwoId, fixture.classCId, freshBook.bookId)
+  assert.equal(ownGrade.status, 403, `二年级主任授权本届班必须 403：${JSON.stringify(ownGrade.payload)}`)
+  assert.deepEqual(grantedClassIds(database, freshBook.bookId), [])
 
-  // 收紧生效：同一个请求打在「已被限定到一年级 A/B 班」的书上时，
-  // 意味着要移除两个不在他授权范围内的班级授权，必须 403。
-  const seeded = await setVisibility(baseUrl, adminJar, fixture.wsSchoolId, gradeOneBook.bookId, {
-    scope: 'classes',
-    classIds: [fixture.classAId, fixture.classBId],
+  harness.grantCurrentBookToClass({
+    bookId: gradeOneBook.bookId,
+    classId: fixture.classAId,
+    organizationId: fixture.organizationId,
+    actorId: fixture.people.teacherA.id,
   })
-  assert.equal(seeded.status, 200, JSON.stringify(seeded.payload))
-  const crossGradeRevoke = await setVisibility(baseUrl, gradeTwoJar, fixture.wsGradeTwoId, gradeOneBook.bookId, {
-    scope: 'classes',
-    classIds: [fixture.classCId],
+  harness.grantCurrentBookToClass({
+    bookId: gradeOneBook.bookId,
+    classId: fixture.classBId,
+    organizationId: fixture.organizationId,
+    actorId: fixture.people.teacherA.id,
   })
-  assert.equal(crossGradeRevoke.status, 403, `跨年级移除必须 403：${JSON.stringify(crossGradeRevoke.payload)}`)
+  const crossGradeRevoke = await harness.deleteShelf(gradeTwoJar, fixture.wsGradeTwoId, fixture.classAId, gradeOneBook.bookId)
+  assert.equal(crossGradeRevoke.status, 403, `跨届撤书架必须 403：${JSON.stringify(crossGradeRevoke.payload)}`)
   assert.equal(crossGradeRevoke.payload.error.code, 'PERMISSION_DENIED')
-  assert.deepEqual(
-    crossGradeRevoke.payload.error.details.classIds,
-    [fixture.classAId, fixture.classBId].sort(),
-  )
   assert.deepEqual(
     grantedClassIds(database, gradeOneBook.bookId),
     [fixture.classAId, fixture.classBId].sort(),
@@ -516,14 +537,14 @@ test('F-1 收紧的边界：年级范围操作者仍可授权本年级班，但�
 // F-4：scope=organization 这条逃生通道必须清得掉任何 grantee_type
 // ===========================================================================
 
-test('F-4 需求 7：非 class 类型的 grants 行也会被 scope=organization 清除，书恢复对学生可见', async (t) => {
+test('F-4 需求 7：非 class 类型 grant 不得当可见；旧 organization 不得清除', async (t) => {
   const harness = await startHarness(t)
   const { fixture, baseUrl, database } = harness
   const book = await harness.createBook('被非 class grants 卡住的书')
 
   const adminJar = await harness.login(fixture.people.admin)
   const studentAJar = await harness.login(fixture.people.studentA)
-  assertStudentSees(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), '插入前')
+  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), '插入前（原因：无 grant）')
 
   // book_access_grants.grantee_type 没有 CHECK 约束，今天也没有 HTTP 路径能造出非 class 行
   //（setBookVisibility 写死 'class'），所以这里直接插一行，模拟「设计文档里正在讨论的新
@@ -547,15 +568,10 @@ test('F-4 需求 7：非 class 类型的 grants 行也会被 scope=organization 
   // 可见性谓词有意不过滤 grantee_type：未知类型按「受限」处理，方向是 fail closed。
   assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), '插入非 class grants 后')
 
-  // 逃生通道必须在任何 grantee_type 下都有效。
   const reopened = await setVisibility(baseUrl, adminJar, fixture.wsSchoolId, book.bookId, { scope: 'organization' })
-  assert.equal(reopened.status, 200, JSON.stringify(reopened.payload))
-  assert.deepEqual(
-    grantRows(database, book.bookId),
-    [],
-    'scope=organization 必须清除本书全部版本的全部 grants 行，不限 grantee_type',
-  )
-  assertStudentSees(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), '恢复全组织可见后')
+  assert.equal(reopened.status, 404, JSON.stringify(reopened.payload))
+  assert.equal(grantRows(database, book.bookId).length, 1, '旧 organization 不得清除非 class grants')
+  assertStudentBlocked(await probeStudent(baseUrl, studentAJar, fixture.wsAId, book), 'organization 404 后仍不可见')
 })
 
 test('F-4 边界：scope=classes 只改班级维度，不牵连非 class 类型的 grants 行', async (t) => {
@@ -580,10 +596,8 @@ test('F-4 边界：scope=classes 只改班级维度，不牵连非 class 类型�
     now,
   )
 
-  const applied = await setVisibility(baseUrl, adminJar, fixture.wsSchoolId, book.bookId, {
-    scope: 'classes',
-    classIds: [fixture.classAId],
-  })
+  const teacherAJar = await harness.login(fixture.people.teacherA)
+  const applied = await harness.putShelf(teacherAJar, fixture.wsAId, fixture.classAId, book.bookId)
   assert.equal(applied.status, 200, JSON.stringify(applied.payload))
   assert.deepEqual(
     grantRows(database, book.bookId).map((row) => `${row.granteeType}:${row.granteeId}`),

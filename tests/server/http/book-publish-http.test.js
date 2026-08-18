@@ -7,6 +7,7 @@ import test from 'node:test'
 
 import { hashPassword } from '../../../server/auth/password.js'
 import { createReadmateApplication } from '../../../server/app.js'
+import { loginBody } from '../helpers/phase8-old-fixture.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
 import { workspaceResourceScope } from '../../../server/integration/context.js'
 
@@ -20,6 +21,8 @@ function identityFixture() {
   const studentId = `student-${suffix}`
   const teacherId = `teacher-${suffix}`
   const adminId = `admin-${suffix}`
+  const opsId = `ops-${suffix}`
+  const platformWorkspaceId = `platform-workspace-${suffix}`
   const foreignAdminId = `foreign-admin-${suffix}`
   const password = randomBytes(24).toString('base64url')
   const passwordHash = hashPassword(password)
@@ -27,23 +30,27 @@ function identityFixture() {
     { id: studentId, username: `student-${suffix}`, displayName: '发布权限学生', roleCode: 'student', scopeType: 'class', scopeId: classId },
     { id: teacherId, username: `teacher-${suffix}`, displayName: '发布权限教师', roleCode: 'teacher', scopeType: 'class', scopeId: classId },
     { id: adminId, username: `admin-${suffix}`, displayName: '发布权限管理员', roleCode: 'school_admin', scopeType: 'class', scopeId: classId },
+    { id: opsId, username: `ops-${suffix}`, displayName: '发布权限平台运营', roleCode: 'platform_ops', scopeType: 'platform', scopeId: 'readmate-platform' },
   ]
   return {
     organizationId,
+    schoolCode: organizationId,
     foreignOrganizationId,
     classId,
     gradeId,
     workspaceId,
+    platformWorkspaceId,
     studentId,
     teacherId,
     adminId,
+    opsId,
     foreignAdminId,
     password,
     users,
     seed: {
       organizations: [
-        { id: organizationId, name: '发布权限联调学校' },
-        { id: foreignOrganizationId, name: '发布权限外校' },
+        { id: organizationId, name: '发布权限联调学校', schoolCode: organizationId },
+        { id: foreignOrganizationId, name: '发布权限外校', schoolCode: foreignOrganizationId },
       ],
       users: [
         ...users.map(({ id, username, displayName }) => ({ id, organizationId, username, displayName })),
@@ -56,17 +63,38 @@ function identityFixture() {
         name: '发布权限联调班级',
         scopeType: 'class',
         scopeId: classId,
-      }],
-      workspaceMemberships: users.map(({ id }) => ({ id: randomUUID(), userId: id, workspaceId })),
-      roleAssignments: users.map(({ id, roleCode, scopeType, scopeId }) => ({
-        id: randomUUID(),
+      }, {
+        id: platformWorkspaceId,
         organizationId,
-        userId: id,
-        workspaceId,
-        roleCode,
-        scopeType,
-        scopeId,
-      })),
+        code: 'platform-ops',
+        name: '发布权限平台运营',
+        scopeType: 'platform',
+        scopeId: 'readmate-platform',
+      }],
+      workspaceMemberships: [
+        ...users.filter(({ id }) => id !== opsId).map(({ id }) => ({ id: randomUUID(), userId: id, workspaceId })),
+        { id: randomUUID(), userId: opsId, workspaceId: platformWorkspaceId },
+      ],
+      roleAssignments: [
+        ...users.filter(({ id }) => id !== opsId).map(({ id, roleCode, scopeType, scopeId }) => ({
+          id: randomUUID(),
+          organizationId,
+          userId: id,
+          workspaceId,
+          roleCode,
+          scopeType,
+          scopeId,
+        })),
+        {
+          id: randomUUID(),
+          organizationId,
+          userId: opsId,
+          workspaceId: platformWorkspaceId,
+          roleCode: 'platform_ops',
+          scopeType: 'platform',
+          scopeId: 'readmate-platform',
+        },
+      ],
       classes: [{ id: classId, organizationId, gradeId, name: '发布权限一班' }],
       classMemberships: [
         { id: randomUUID(), classId, userId: studentId, membershipRole: 'student' },
@@ -112,7 +140,7 @@ async function login(baseUrl, fixture, user) {
   const response = await requestJson(baseUrl, jar, '/auth/login', {
     method: 'POST',
     idempotencyKey: `login-${user.id}`,
-    body: { username: user.username, password: fixture.password },
+    body: loginBody(fixture, user),
   })
   assert.equal(response.status, 200, JSON.stringify(response.payload))
   return jar
@@ -299,16 +327,16 @@ test('学生带合法会话和工作空间头调用发布/下架必须 403', asy
   assert.equal(bookStatus(application.database, published.bookId).status, 'published')
 })
 
-test('class 范围教师经真实 HTTP 发布和下架，并写入审计', async (t) => {
+test('平台运营经真实 HTTP 发布和下架，并写入审计', async (t) => {
   const { application, fixture, baseUrl } = await startHarness(t)
   const published = await createTextBook(application, fixture, { published: true })
   const draft = await createTextBook(application, fixture, { published: false })
-  const teacher = fixture.users.find((user) => user.id === fixture.teacherId)
-  const jar = await login(baseUrl, fixture, teacher)
+  const ops = fixture.users.find((user) => user.id === fixture.opsId)
+  const jar = await login(baseUrl, fixture, ops)
 
   const unpublished = await requestJson(baseUrl, jar, `/books/${published.bookId}/unpublish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: `teacher-unpublish-${published.bookId}`,
     body: {},
   })
@@ -320,7 +348,7 @@ test('class 范围教师经真实 HTTP 发布和下架，并写入审计', async
 
   const republished = await requestJson(baseUrl, jar, `/books/${published.bookId}/publish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: `teacher-publish-${published.bookId}`,
     body: {},
   })
@@ -331,7 +359,7 @@ test('class 范围教师经真实 HTTP 发布和下架，并写入审计', async
 
   const firstPublish = await requestJson(baseUrl, jar, `/books/${draft.bookId}/publish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: `teacher-publish-${draft.bookId}`,
     body: {},
   })
@@ -342,12 +370,12 @@ test('class 范围教师经真实 HTTP 发布和下架，并写入审计', async
 test('发布接口要求幂等键，重放不二次变更也不二次审计', async (t) => {
   const { application, fixture, baseUrl } = await startHarness(t)
   const draft = await createTextBook(application, fixture, { published: false })
-  const teacher = fixture.users.find((user) => user.id === fixture.teacherId)
-  const jar = await login(baseUrl, fixture, teacher)
+  const ops = fixture.users.find((user) => user.id === fixture.opsId)
+  const jar = await login(baseUrl, fixture, ops)
 
   const missingKey = await requestJson(baseUrl, jar, `/books/${draft.bookId}/publish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     body: {},
   })
   assert.equal(missingKey.status, 400, JSON.stringify(missingKey.payload))
@@ -356,7 +384,7 @@ test('发布接口要求幂等键，重放不二次变更也不二次审计', as
 
   const missingUnpublishKey = await requestJson(baseUrl, jar, `/books/${draft.bookId}/unpublish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     body: {},
   })
   assert.equal(missingUnpublishKey.status, 400, JSON.stringify(missingUnpublishKey.payload))
@@ -365,7 +393,7 @@ test('发布接口要求幂等键，重放不二次变更也不二次审计', as
   const key = `publish-once-${draft.bookId}`
   const first = await requestJson(baseUrl, jar, `/books/${draft.bookId}/publish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: key,
     body: {},
   })
@@ -377,7 +405,7 @@ test('发布接口要求幂等键，重放不二次变更也不二次审计', as
 
   const replay = await requestJson(baseUrl, jar, `/books/${draft.bookId}/publish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: key,
     body: {},
   })
@@ -399,12 +427,12 @@ test('trusted-baseline v2 包经真实 HTTP 下架后再发布能通过质量闸
   assert.equal(version.package_format, 'book-package/v2')
   assert.equal(version.package_quality_status, 'trusted-baseline')
 
-  const teacher = fixture.users.find((user) => user.id === fixture.teacherId)
-  const jar = await login(baseUrl, fixture, teacher)
+  const ops = fixture.users.find((user) => user.id === fixture.opsId)
+  const jar = await login(baseUrl, fixture, ops)
 
   const unpublished = await requestJson(baseUrl, jar, `/books/${created.bookId}/unpublish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: `roundtrip-unpublish-${created.bookId}`,
     body: {},
   })
@@ -413,7 +441,7 @@ test('trusted-baseline v2 包经真实 HTTP 下架后再发布能通过质量闸
 
   const republished = await requestJson(baseUrl, jar, `/books/${created.bookId}/publish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: `roundtrip-publish-${created.bookId}`,
     body: {},
   })
@@ -434,12 +462,12 @@ test('跨组织发布返回 404，对草稿下架也返回 404', async (t) => {
     workspaceId: fixture.workspaceId,
   })
   const localDraft = await createTextBook(application, fixture, { published: false })
-  const teacher = fixture.users.find((user) => user.id === fixture.teacherId)
-  const jar = await login(baseUrl, fixture, teacher)
+  const ops = fixture.users.find((user) => user.id === fixture.opsId)
+  const jar = await login(baseUrl, fixture, ops)
 
   const crossOrg = await requestJson(baseUrl, jar, `/books/${foreignDraft.bookId}/publish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: `cross-org-publish-${foreignDraft.bookId}`,
     body: {},
   })
@@ -449,7 +477,7 @@ test('跨组织发布返回 404，对草稿下架也返回 404', async (t) => {
 
   const draftUnpublish = await requestJson(baseUrl, jar, `/books/${localDraft.bookId}/unpublish`, {
     method: 'POST',
-    workspaceId: fixture.workspaceId,
+    workspaceId: fixture.platformWorkspaceId,
     idempotencyKey: `draft-unpublish-${localDraft.bookId}`,
     body: {},
   })

@@ -1,0 +1,36 @@
+﻿
+> book-reader-app@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming...
+鉁?1757 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                              0.95 kB 鈹?gzip:   0.54 kB
+dist/assets/pdf.worker.min-CLrFZWeq.mjs  1,312.45 kB
+dist/assets/index-CMHPTn3n.css             142.94 kB 鈹?gzip:  25.82 kB
+dist/assets/Blog-By9l6voy.js                10.59 kB 鈹?gzip:   5.31 kB
+dist/assets/About-5be536Gb.js               10.67 kB 鈹?gzip:   4.50 kB
+dist/assets/Resources-CIq_cLpR.js           14.35 kB 鈹?gzip:   5.53 kB
+dist/assets/index.es-EflsLKJi.js            47.70 kB 鈹?gzip:  12.48 kB
+dist/assets/index-IWqhIMAM.js               52.37 kB 鈹?gzip:  19.48 kB
+dist/assets/vendor-react-CExCtMBe.js       165.74 kB 鈹?gzip:  53.98 kB
+dist/assets/ConsoleApp-2BJewBop.js         332.68 kB 鈹?gzip:  99.41 kB
+dist/assets/vendor-icons-DwfL3uyf.js       776.44 kB 鈹?gzip: 135.05 kB
+dist/assets/StudentApp-C9ZgXPVi.js         833.46 kB 鈹?gzip: 254.06 kB
+node.exe : 
+所在位置 D:\IDE\Node.js\npm.ps1:29 字符: 3
++   & $NODE_EXE $NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-m
+anualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+鉁?built in 8.07s
+
+EXIT:0

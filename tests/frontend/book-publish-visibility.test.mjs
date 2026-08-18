@@ -9,7 +9,7 @@ import {
   DRAFT_BOOK_READER_HINT,
   filterLibraryBooks,
 } from '../../src/console/pages/teaching/bookLibraryFilters.js'
-import { loadBookVisibility } from '../../src/console/state/useBookVisibility.js'
+import { loadClassShelf } from '../../src/console/state/useBookVisibility.js'
 import {
   HUMAN_REVIEW_REQUIRED_MESSAGE,
   OUT_OF_SCOPE_CLASSES_PREFIX,
@@ -25,7 +25,7 @@ function response(data, meta = {}) {
   return Promise.resolve({ data, meta })
 }
 
-test('发布、下架、设置可见范围三个写操作都带 Idempotency-Key', async () => {
+test('发布、下架仍带 Idempotency-Key；可见范围改为本班书架 PUT/DELETE', async () => {
   const calls = []
   const api = createConsoleApi({
     post(path, options) {
@@ -34,40 +34,51 @@ test('发布、下架、设置可见范围三个写操作都带 Idempotency-Key'
     },
     put(path, options) {
       calls.push({ method: 'PUT', path, options })
-      return response({ bookId: 'book-005', scope: 'organization', classIds: [] })
+      return response({ bookId: 'book-005', classId: 'class-1', teacherCount: 1 })
+    },
+    delete(path, options) {
+      calls.push({ method: 'DELETE', path, options })
+      return response({ bookId: 'book-005', classId: 'class-1', teacherCount: 1 })
     },
   })
 
   await api.publishBook('book-005', { workspaceId: 'ws-1', idempotencyKey: 'publish-key-1' })
   await api.unpublishBook('book-005', { workspaceId: 'ws-1', idempotencyKey: 'unpublish-key-1' })
-  await api.setBookVisibility('book-005', { scope: 'organization' }, {
+  await api.putClassShelfBook('class-1', 'book-005', {
     workspaceId: 'ws-1',
-    idempotencyKey: 'visibility-key-1',
+    idempotencyKey: 'shelf-put-1',
+  })
+  await api.deleteClassShelfBook('class-1', 'book-005', {
+    workspaceId: 'ws-1',
+    idempotencyKey: 'shelf-del-1',
   })
 
   assert.deepEqual(calls.map((call) => [call.method, call.path, call.options.idempotencyKey, call.options.workspaceId]), [
     ['POST', '/books/book-005/publish', 'publish-key-1', 'ws-1'],
     ['POST', '/books/book-005/unpublish', 'unpublish-key-1', 'ws-1'],
-    ['PUT', '/books/book-005/visibility', 'visibility-key-1', 'ws-1'],
+    ['PUT', '/classes/class-1/shelf/book-005', 'shelf-put-1', 'ws-1'],
+    ['DELETE', '/classes/class-1/shelf/book-005', 'shelf-del-1', 'ws-1'],
   ])
-  assert.equal(calls[2].options.body.scope, 'organization')
-  assert.equal(Object.hasOwn(calls[2].options.body, 'classIds'), false)
+  assert.equal(typeof api.setBookVisibility, 'undefined')
+  assert.equal(typeof api.getBookVisibility, 'undefined')
 })
 
-test('可见范围班级选择器走 GET /classes，不走旧的 listClasses 拼装', async () => {
+test('班级书架走 GET /classes/:id/shelf，不走旧 visibility / listClasses', async () => {
   const calls = []
-  const api = createConsoleApi({
-    get(path, options) {
-      calls.push({ path, options })
-      return response({ items: [{ id: 'class-empty', name: '新建空班', gradeId: 'grade-1', studentCount: 0 }] })
+  const api = {
+    getClassShelf(classId, options) {
+      calls.push({ path: `/classes/${classId}/shelf`, options })
+      return response({ items: [{ bookId: 'book-1', title: '已投放' }], teacherCount: 1 })
     },
-  })
+    putClassShelfBook() {},
+    deleteClassShelfBook() {},
+  }
 
-  const result = await api.listAuthorizedClasses({ workspaceId: 'ws-1' })
+  const result = await loadClassShelf(api, { workspaceId: 'ws-1', classId: 'class-1' })
   assert.equal(calls.length, 1)
-  assert.equal(calls[0].path, '/classes')
+  assert.equal(calls[0].path, '/classes/class-1/shelf')
   assert.equal(calls[0].options.workspaceId, 'ws-1')
-  assert.equal(result.data.items[0].studentCount, 0)
+  assert.equal(result.data.items[0].bookId, 'book-1')
 
   const [consoleApi, visibilityHook, panel, detail, library, stage4] = await Promise.all([
     readFile(new URL('../../src/api/console.js', import.meta.url), 'utf8'),
@@ -78,9 +89,11 @@ test('可见范围班级选择器走 GET /classes，不走旧的 listClasses 拼
     readFile(new URL('../../src/api/stage4.js', import.meta.url), 'utf8'),
   ])
 
-  assert.match(consoleApi, /listAuthorizedClasses:\s*\(options = \{\}\) => client\.get\('\/classes'/)
-  assert.match(visibilityHook, /listAuthorizedClasses/)
-  assert.match(visibilityHook, /getBookVisibility/)
+  assert.match(consoleApi, /getClassShelf:/)
+  assert.match(consoleApi, /putClassShelfBook:/)
+  assert.match(visibilityHook, /loadClassShelf|getClassShelf/)
+  assert.doesNotMatch(visibilityHook, /getBookVisibility|setBookVisibility/)
+  assert.doesNotMatch(visibilityHook, /listAuthorizedClasses/)
   assert.doesNotMatch(visibilityHook, /listClasses\(/)
   assert.doesNotMatch(visibilityHook, /\/students/)
   assert.doesNotMatch(panel, /listClasses\(/)
@@ -124,14 +137,14 @@ test('收窄可见范围会基于 references 给出提示，而不是无声保�
   assert.equal(widen.losingClasses.length, 0)
 })
 
-test('可见范围编辑页在保存前弹出确认，文案锁住 references 提示', async () => {
+test('本班书架撤下前弹出确认，投放/撤下只改本班', async () => {
   const panel = await readFile(new URL('../../src/console/pages/teaching/BookVisibilityPanel.jsx', import.meta.url), 'utf8')
-  assert.match(panel, /previewVisibilityImpact/)
-  assert.match(panel, /describeVisibilityImpact/)
+  assert.match(panel, /putClassShelfBook/)
+  assert.match(panel, /deleteClassShelfBook/)
   assert.match(panel, /<ConfirmModal/)
-  assert.match(panel, /保存前确认影响/)
-  assert.match(panel, /classesError/)
-  assert.match(panel, /班级列表读取失败，当前可见范围可以查看，但暂时不能编辑/)
+  assert.match(panel, /确认从本班撤下/)
+  assert.match(panel, /投放本班/)
+  assert.doesNotMatch(panel, /getBookVisibility|setBookVisibility/)
   assert.doesNotMatch(panel, /listClasses\(/)
   assert.doesNotMatch(panel, /assignment\.delete|删除阅读安排/)
 })
@@ -265,7 +278,7 @@ test('教师端发布管理页面不引用学生端筛选，也不走旧 listCla
   assert.match(library, /filterLibraryBooks/)
   assert.match(library, /<ConfirmModal/)
   assert.match(detail, /<BookVisibilityPanel/)
-  assert.match(detail, /<ConfirmModal/)
+  assert.doesNotMatch(detail, /<ConfirmModal/)
   assert.match(filters, /book\?\.grade/)
 })
 
@@ -277,45 +290,43 @@ test('关联阅读安排行保留参与完成率，空值显示破折号', async
   )
 })
 
-test('草稿书在书库卡片、列表行和详情页都禁用教师阅读器', async () => {
-  const [detail, library] = await Promise.all([
+test('草稿书不能投放到班级书架，详情页禁用教师阅读器', async () => {
+  const [detail, library, filters] = await Promise.all([
     readFile(new URL('../../src/console/pages/teaching/BookDetail.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../../src/console/pages/teaching/BookLibrary.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../../src/console/pages/teaching/bookLibraryFilters.js', import.meta.url), 'utf8'),
   ])
-  assert.match(detail, /DRAFT_BOOK_READER_HINT/)
   assert.match(detail, /用教师阅读器打开/)
-  assert.match(library, /function TeacherReaderButton/)
-  assert.match(library, /DRAFT_BOOK_READER_HINT/)
+  assert.match(detail, /published \? \(/)
+  assert.match(detail, /<Btn tone="primary" icon="BookOpen" disabled>/)
+  assert.match(detail, /不能投放到班级书架/)
+  assert.match(detail, /manageShelf && published/)
+  assert.doesNotMatch(library, /function TeacherReaderButton/)
+  assert.doesNotMatch(library, /publishBook|unpublishBook/)
   assert.equal(DRAFT_BOOK_READER_HINT, '这本书当前是草稿，重新发布后才能在阅读器里打开。')
-  assert.equal((library.match(/TeacherReaderButton/g) || []).length >= 3, true)
+  assert.match(filters, /DRAFT_BOOK_READER_HINT/)
 })
 
-test('GET /classes 失败时仍返回可见范围，GET /visibility 失败则整次加载失败', async () => {
-  const visibilityOk = {
-    async getBookVisibility() {
-      return { data: { scope: 'organization', classIds: [], classes: [] }, meta: {} }
+test('缺 classId 时 loadClassShelf 返回空架；getClassShelf 失败则整次加载失败', async () => {
+  const empty = await loadClassShelf({
+    async getClassShelf() {
+      throw new Error('缺 classId 不得打书架接口')
     },
-    async listAuthorizedClasses() {
-      const error = new Error('没有权限读取班级列表')
-      error.status = 403
-      throw error
-    },
-  }
-  const partial = await loadBookVisibility(visibilityOk, { workspaceId: 'ws-1', bookId: 'book-1' })
-  assert.equal(partial.data.visibility.scope, 'organization')
-  assert.deepEqual(partial.data.classes, [])
-  assert.ok(partial.data.classesError)
+    async putClassShelfBook() {},
+    async deleteClassShelfBook() {},
+  }, { workspaceId: 'ws-1' })
+  assert.deepEqual(empty.data.items, [])
+  assert.equal(empty.data.classId, null)
 
-  const visibilityFail = {
-    async getBookVisibility() {
-      throw new Error('可见范围读取失败')
+  const shelfFail = {
+    async getClassShelf() {
+      throw new Error('本班书架读取失败')
     },
-    async listAuthorizedClasses() {
-      return { data: { items: [{ id: 'class-1', name: '一年级 A 班' }] }, meta: {} }
-    },
+    async putClassShelfBook() {},
+    async deleteClassShelfBook() {},
   }
   await assert.rejects(
-    () => loadBookVisibility(visibilityFail, { workspaceId: 'ws-1', bookId: 'book-1' }),
-    /可见范围读取失败/,
+    () => loadClassShelf(shelfFail, { workspaceId: 'ws-1', classId: 'class-1' }),
+    /本班书架读取失败/,
   )
 })

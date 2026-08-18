@@ -6,6 +6,8 @@ import Home from './pages/Home.jsx'
 import Shelf from './pages/Shelf.jsx'
 import Me from './pages/Me.jsx'
 import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+import Onboarding from './pages/Onboarding.jsx'
 import Reader from './pages/Reader.jsx'
 import BookDetail from './pages/BookDetail.jsx'
 import Lists from './pages/Lists.jsx'
@@ -29,6 +31,9 @@ export default function StudentApp() {
       <Backdrop />
       <Routes>
         <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+        <Route path="register/:token" element={<Register />} />
+        <Route path="onboarding" element={<Onboarding />} />
         <Route path="*" element={<StudentRuntime />} />
       </Routes>
     </div>

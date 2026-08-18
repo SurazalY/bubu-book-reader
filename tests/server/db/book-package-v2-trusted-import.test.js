@@ -10,10 +10,11 @@ import { bootstrapInternalDemo } from '../../../server/db/bootstrap-internal-dem
 import { importBookPackageV2 } from '../../../server/db/import-book-package-v2.js'
 import { createReadingDomain } from '../../../server/domains/reading/catalog.js'
 import { projectBooks } from '../../../server/integration/projections.js'
+import { grantBookToClass } from '../helpers/phase8-old-fixture.js'
 import { createTrustedPackage } from './trusted-package-fixture.js'
 
-const ACTOR_ID = 'internal-principal'
-const WORKSPACE_ID = 'internal-demo-school-workspace'
+const ACTOR_ID = 'internal-ops-admin'
+const WORKSPACE_ID = 'internal-demo-platform-workspace'
 const ORGANIZATION_ID = 'internal-demo-organization'
 
 async function createEnvironment(context) {
@@ -59,7 +60,7 @@ function readingDomain(database, overrides = {}) {
   return createReadingDomain({
     db: database,
     actor: { id: ACTOR_ID },
-    workspace: { id: WORKSPACE_ID, organizationId: ORGANIZATION_ID, scopeType: 'school', scopeId: ORGANIZATION_ID },
+    workspace: { id: WORKSPACE_ID, organizationId: ORGANIZATION_ID, scopeType: 'platform', scopeId: 'readmate-platform' },
     authorize: async () => true,
     audit: async () => undefined,
     idFactory: () => `trusted-test-${++sequence}`,
@@ -219,8 +220,15 @@ test('GET /books 投影带出编目年级且保留既有字段', async (t) => {
   await importTrusted(environment, fixture, { acceptTrusted: true })
 
   const database = openDatabase(environment)
+  grantBookToClass(database, {
+    bookId: fixture.bookId,
+    classId: 'internal-demo-class',
+    organizationId: ORGANIZATION_ID,
+    actorId: ACTOR_ID,
+    bookVersionId: fixture.versionId,
+  })
   const rows = await readingDomain(database).listBooks()
-  const [projected] = projectBooks(database, 'internal-demo-student', WORKSPACE_ID, rows)
+  const [projected] = projectBooks(database, 'internal-demo-student', 'internal-demo-workspace', rows)
   assert.equal(projected.id, fixture.bookId)
   assert.equal(projected.grade, fixture.grade)
   assert.equal(projected.title, fixture.title)

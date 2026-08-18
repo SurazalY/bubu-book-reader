@@ -1,0 +1,126 @@
+{
+  "task": "T8.9-preflight",
+  "verdict": "preflight pass / 可以派停机迁移",
+  "stamp": "20260818T134256Z",
+  "collectedAt": "2026-08-18T13:42:57.390Z",
+  "git": {
+    "branch": "feat/product-close-loop",
+    "head": "b3cd4b532cd4e7e44398bd465112e9ff84a9684e",
+    "documentedBaselinePrefix": "b3cd4b5",
+    "headMatchesDocumentedPrefix": true,
+    "dirtyWorkspaceExpected": true
+  },
+  "live5191": {
+    "localAddress": "127.0.0.1",
+    "state": "Listen",
+    "owningProcess": 66104,
+    "listenerCount": 1,
+    "commandLine": "node  server/index.js",
+    "parent": "npm run server",
+    "packageScript": "node server/index.js",
+    "createdAtLocal": "2026-08-18 12:48:08",
+    "health": {
+      "httpStatus": 200,
+      "status": "ok",
+      "database": "sqlite",
+      "migrations": 30
+    },
+    "identifiedAsThisRepoOldBackend": true
+  },
+  "source": {
+    "path": "D:\\Project\\整书8.15\\server\\data\\readmate.sqlite",
+    "sqlite": {
+      "bytes": 108261376,
+      "sha256": "6e3e163d5f2d437c892b2cbfeb44906b6a78dad5a56f9577d0277e6819cff14b"
+    },
+    "wal": {
+      "bytes": 9723232,
+      "sha256": "559dc570f00a2463ef9ec816b06fc5aed6244277db5649e273c28623848b675d"
+    },
+    "shm": {
+      "bytes": 32768,
+      "sha256": "876f1195f345564ec5c0fed079dc57cd21341bf7a81268085a7b594dd281a0d0"
+    }
+  },
+  "replica": {
+    "path": "C:\\Users\\Yak\\AppData\\Local\\Temp\\t8-9-preflight-20260818T134256Z\\readmate-046-preflight.sqlite",
+    "reusedT88Copy": false,
+    "bytes": 107020288,
+    "sha256": "33561d9ed24831672396a63a0d08ed8210cd80128148309e5d4d69b1964ef64a",
+    "quick_check": "ok"
+  },
+  "diskMigrations": {
+    "count": 34,
+    "maxPrefix": "050",
+    "has047to050": true,
+    "files047to050": [
+      "047_login_and_class_identity.sql",
+      "048_registration_credentials.sql",
+      "049_enrollment_and_password_reset.sql",
+      "050_book_access_grant_backfill.sql"
+    ],
+    "note": "disk code only; live schema_migrations max remains 046"
+  },
+  "baseline11_1": {
+    "allPass": true,
+    "activeOrg": "internal-demo-organization",
+    "activeClass": {
+      "id": "internal-demo-class",
+      "name": "三年级一班",
+      "grade_id": "internal-demo-grade",
+      "status": "active"
+    },
+    "published": 49,
+    "versions": 49,
+    "grants": 0,
+    "studentActive": 1,
+    "studentUserId": "internal-demo-student",
+    "teacherActive": 2,
+    "teacherUserIds": ["internal-teacher-li", "internal-teacher-wang"],
+    "workspaces": {
+      "class": 1,
+      "school": 1,
+      "platform": 1,
+      "grade": 0
+    },
+    "grade_manager_rows": 0,
+    "schema_migrations_max": "046_reader_mode_preferences.sql",
+    "applied047to050": []
+  },
+  "startupEntry": {
+    "indexCallsCreateReadmateApplicationThenListen": true,
+    "identityRunsMigrationsBeforeListen": true,
+    "bootstrapInternalDemoNotOnListenPath": true
+  },
+  "loginProbe": {
+    "usedEnvPassword": true,
+    "envPasswordLength": 20,
+    "passwordWrittenToEvidence": false,
+    "credentialsUpdated": false,
+    "oldBody": {
+      "student": 200,
+      "teacher": 200,
+      "principal": 200
+    },
+    "newBody": {
+      "student": 400,
+      "teacher": 400,
+      "principal": 400,
+      "errorCode": "VALIDATION_FAILED",
+      "errorMessage": "username 与 password 均为必填项"
+    },
+    "httpAcceptanceReady": true
+  },
+  "visibility": {
+    "written": true,
+    "path": "docs/product-close-loop/evidence/phase8/t8-9-pre-visibility-sets.json",
+    "semantics": "old-running-5191",
+    "studentBooksHttpStatus": 200,
+    "count": 49
+  },
+  "stop": {
+    "hit": false,
+    "reasons": []
+  },
+  "mayDispatchShutdownMigration": true
+}

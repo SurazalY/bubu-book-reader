@@ -4,7 +4,6 @@ import { cx, Icon } from '../../../components/ui.jsx'
 import { GlassCard } from '../../components/Glass.jsx'
 import { PagePanel } from '../../components/PagePanel.jsx'
 import { Btn, Field, IconBtn, StatusTag, SubHead } from '../../components/Controls.jsx'
-import { Modal } from '../../components/Overlay.jsx'
 import BookFlip from '../../components/BookFlip.jsx'
 import { getPages, IMPORT_CANDIDATES } from '../../data/fixtures/books.js'
 
@@ -27,7 +26,6 @@ export default function BookImport() {
   const [file, setFile] = useState(null)
   const [meta, setMeta] = useState(null)
   const [page, setPage] = useState(1)
-  const [doneOpen, setDoneOpen] = useState(false)
 
   // 预览页按确认后的章数重新分页：改了分章方式，预览跟着变
   const pages = useMemo(() => getPages({ chapters: meta?.chapters || 10 }, 10), [meta?.chapters])
@@ -51,7 +49,7 @@ export default function BookImport() {
   return (
     <PagePanel
       title="导入书目"
-      desc="导入后先进入「审核中」，审核通过才上架到学生端；解析异常的地方会在预览里标出来。"
+      desc="学校端本期不提供书库导入。导入由技术团队在受控后端处理。"
       toolbar={
         <Btn icon="ArrowLeft" onClick={() => navigate('/console/teaching/books')}>
           返回书库
@@ -109,36 +107,8 @@ export default function BookImport() {
           setPage={setPage}
           onBack={() => setStep(file?.needEdit ? 'edit' : 'pick')}
           onCancel={() => navigate('/console/teaching/books')}
-          onUpload={() => setDoneOpen(true)}
         />
       )}
-
-      <Modal
-        open={doneOpen}
-        onClose={() => setDoneOpen(false)}
-        icon="CircleCheck"
-        title="已提交导入"
-        desc="演示环境不会真正上传文件。"
-        width="max-w-[460px]"
-        footer={
-          <>
-            <Btn onClick={() => setDoneOpen(false)}>继续导入</Btn>
-            <Btn tone="primary" onClick={() => navigate('/console/teaching/books')}>
-              回到书库
-            </Btn>
-          </>
-        }
-      >
-        <div className="space-y-2 text-[13px] text-ink-700">
-          <p className="flex items-center gap-2">
-            《{meta?.title}》已提交，状态为
-            <StatusTag tone="warning">审核中</StatusTag>
-          </p>
-          <p className="text-[12.5px] text-ink-500 leading-relaxed">
-            审核期间学生端看不到这本书；通过后自动上架，并给导入人发一条站内通知。
-          </p>
-        </div>
-      </Modal>
     </PagePanel>
   )
 }
@@ -150,7 +120,7 @@ function PickStep({ onPick }) {
         <Icon name="Upload" className="w-7 h-7 text-ink-400 mx-auto" strokeWidth={1.6} />
         <p className="text-[13.5px] font-medium text-ink-700 mt-2.5">把文件拖到这里，或从下面的待导入列表选一个</p>
         <p className="text-[12px] text-ink-500 mt-1.5">
-          支持 EPUB / TXT / PDF，单个文件不超过 50 MB；演示环境不接受真实文件，请直接选下面的样例。
+          支持 EPUB / TXT / PDF，单个文件不超过 50 MB。学校端本期不接受本地上传，全局书库导入只由技术团队处理。
         </p>
       </div>
 
@@ -271,7 +241,7 @@ function EditStep({ file, meta, setMeta, onBack, onNext, onCancel }) {
   )
 }
 
-function PreviewStep({ file, meta, pages, page, setPage, onBack, onCancel, onUpload }) {
+function PreviewStep({ file, meta, pages, page, setPage, onBack, onCancel }) {
   const [jump, setJump] = useState('')
   const total = pages.length
 
@@ -345,11 +315,13 @@ function PreviewStep({ file, meta, pages, page, setPage, onBack, onCancel, onUpl
       <StepFooter
         onBack={onBack}
         onCancel={onCancel}
-        hint="上传后状态为「审核中」，通过后才在学生端出现"
+        hint="学校端本期不提供书库导入"
         primary={
-          <Btn tone="primary" icon="Upload" onClick={onUpload}>
-            上传
-          </Btn>
+          <span title="学校端本期不提供书库导入">
+            <Btn tone="primary" icon="Upload" disabled>
+              上传
+            </Btn>
+          </span>
         }
       />
     </div>

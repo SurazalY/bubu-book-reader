@@ -1,3 +1,5 @@
+import { isBookVisibleToAudience, resolveBookAudience } from '../domains/reading/visibility.js'
+
 function parseJson(value, fallback) {
   if (typeof value !== 'string' || !value) return fallback
   try {
@@ -311,51 +313,98 @@ export function projectCommunityPosts(database, { organizationId, workspace, act
       workspace_id_at_review AS workspaceId, class_id_at_review AS classId, created_at AS createdAt
     FROM post_reviews WHERE post_id = ? ORDER BY created_at, id
   `)
+  const audience = resolveBookAudience(database, {
+    organizationId,
+    userId: actorId,
+    workspaceId: workspace.id,
+  })
   return rows
     .filter((row) => scope === 'all' || (scope === 'pending'
       ? (canReviewClass && row.status === 'submitted' && row.class_id_at_creation === classId) || (canReviewSchool && row.scope === 'school' && row.status === 'class_approved')
       : row.scope === scope))
-    .map((row) => ({
-      id: row.id,
-      title: row.title,
-      body: row.body,
-      status: row.status,
-      scope: row.scope,
-      classId: row.class_id_at_creation,
-      workspaceId: row.workspace_id_at_creation,
-      quote: row.quote_book_id ? { bookId: row.quote_book_id, page: row.quote_page, text: row.quote_text } : null,
-      aiAssisted: Boolean(row.ai_assisted),
-      author: { id: row.author_id, displayName: row.author_name },
-      reactions: reactions.all(row.id).map((reaction) => ({ type: reaction.reaction_type, count: reaction.count })),
-      viewerReactionTypes: viewerReactions.all(row.id, actorId).map((reaction) => reaction.reaction_type),
-      reviews: reviews.all(row.id),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    }))
+    .map((row) => {
+      let quote = null
+      if (row.quote_book_id) {
+        const book = database.prepare(`
+          SELECT id, status FROM books
+          WHERE id = ? AND organization_id_at_creation = ?
+        `).get(row.quote_book_id, organizationId)
+        const readable = Boolean(
+          book
+          && (book.status === 'published' || audience.allowUnpublished)
+          && isBookVisibleToAudience(database, {
+            bookId: book.id,
+            organizationId,
+            audience,
+          }),
+        )
+        quote = {
+          bookId: row.quote_book_id,
+          page: row.quote_page,
+          text: readable ? row.quote_text : null,
+          availability: readable ? 'available' : 'unavailable',
+        }
+      }
+      return {
+        id: row.id,
+        title: row.title,
+        body: row.body,
+        status: row.status,
+        scope: row.scope,
+        classId: row.class_id_at_creation,
+        workspaceId: row.workspace_id_at_creation,
+        quote,
+        aiAssisted: Boolean(row.ai_assisted),
+        author: { id: row.author_id, displayName: row.author_name },
+        reactions: reactions.all(row.id).map((reaction) => ({ type: reaction.reaction_type, count: reaction.count })),
+        viewerReactionTypes: viewerReactions.all(row.id, actorId).map((reaction) => reaction.reaction_type),
+        reviews: reviews.all(row.id),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      }
+    })
 }
 
-export function projectAssignments(database, organizationId, workspaceId) {
+export function projectAssignments(database, organizationId, workspaceId, actorId) {
+  const audience = resolveBookAudience(database, {
+    organizationId,
+    userId: actorId,
+    workspaceId,
+  })
   const rows = database.prepare(`
-    SELECT assignment.*, book.title AS book_title,
+    SELECT assignment.*, book.id AS book_id, book.status AS book_status, book.title AS book_title,
       GROUP_CONCAT(class.id) AS class_ids, GROUP_CONCAT(class.name) AS class_names
     FROM reading_assignments AS assignment
     JOIN book_versions AS version ON version.id = assignment.book_version_id
     JOIN books AS book ON book.id = version.book_id
+      AND book.organization_id_at_creation = assignment.organization_id_at_creation
     LEFT JOIN assignment_classes AS link ON link.assignment_id = assignment.id
     LEFT JOIN classes AS class ON class.id = link.class_id AND class.organization_id = assignment.organization_id_at_creation
     WHERE assignment.organization_id_at_creation = ? AND assignment.workspace_id_at_creation = ?
     GROUP BY assignment.id
     ORDER BY assignment.created_at DESC
   `).all(organizationId, workspaceId)
-  return rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    book: { id: row.book_version_id, title: row.book_title },
-    class: { id: row.class_ids?.split(',')[0] ?? null, name: row.class_names?.split(',')[0] ?? null },
-    startsAt: row.starts_at,
-    endsAt: row.ends_at,
-    status: row.ends_at && Date.parse(row.ends_at) < Date.now() ? 'ended' : 'scheduled',
-  }))
+  return rows.flatMap((row) => {
+    const bookVisible = isBookVisibleToAudience(database, {
+      bookId: row.book_id,
+      organizationId,
+      audience,
+    })
+    if (!audience.bypassClassGrants) {
+      const published = row.book_status === 'published'
+      if (!published && !audience.allowUnpublished) return []
+      if (!bookVisible) return []
+    }
+    return [{
+      id: row.id,
+      title: row.title,
+      book: { id: row.book_version_id, title: row.book_title },
+      class: { id: row.class_ids?.split(',')[0] ?? null, name: row.class_names?.split(',')[0] ?? null },
+      startsAt: row.starts_at,
+      endsAt: row.ends_at,
+      status: row.ends_at && Date.parse(row.ends_at) < Date.now() ? 'ended' : 'scheduled',
+    }]
+  })
 }
 
 export function projectUsageSummary(database, organizationId, workspaceId) {

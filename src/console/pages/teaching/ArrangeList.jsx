@@ -254,7 +254,7 @@ function CreateArrangeModal({ open, onClose, books, classes, createState, onCrea
       title={step === 1 ? '创建阅读安排 · 先选一本书' : '创建阅读安排 · 填写范围与时间'}
       desc={
         step === 1
-          ? '只能选已上架的书；审核中与已下架的书不能用来建安排。'
+          ? '只能选已发布的书；未发布的书不能用来建安排。'
           : `已选《${book?.title}》，接着选班级、填说明与起止时间。`
       }
       width="max-w-[640px]"

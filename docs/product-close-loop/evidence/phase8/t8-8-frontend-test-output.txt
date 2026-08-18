@@ -1,0 +1,1838 @@
+
+> book-reader-app@0.1.0 test:frontend
+> node --test tests/frontend/*.mjs
+
+TAP version 13
+# Subtest: 统一成功信封保留 data 与 meta
+ok 1 - 统一成功信封保留 data 与 meta
+  ---
+  duration_ms: 2.9305
+  type: 'test'
+  ...
+# Subtest: 统一失败信封暴露服务端错误码与请求标识
+ok 2 - 统一失败信封暴露服务端错误码与请求标识
+  ---
+  duration_ms: 0.485
+  type: 'test'
+  ...
+# Subtest: 客户端发送真实工作空间上下文且保留 Cookie 会话
+ok 3 - 客户端发送真实工作空间上下文且保留 Cookie 会话
+  ---
+  duration_ms: 0.8122
+  type: 'test'
+  ...
+# Subtest: 写请求拒绝缺少 Idempotency-Key 的本地伪提交
+ok 4 - 写请求拒绝缺少 Idempotency-Key 的本地伪提交
+  ---
+  duration_ms: 0.4107
+  type: 'test'
+  ...
+# Subtest: 安全事件关闭适配器保留工作空间、幂等键和人工说明
+ok 5 - 安全事件关闭适配器保留工作空间、幂等键和人工说明
+  ---
+  duration_ms: 1.2976
+  type: 'test'
+  ...
+# Subtest: 登录适配器只提交 schoolCode+loginName+password 并使用真实幂等写请求
+ok 6 - 登录适配器只提交 schoolCode+loginName+password 并使用真实幂等写请求
+  ---
+  duration_ms: 0.4937
+  type: 'test'
+  ...
+# Subtest: 安全详情只映射服务端阈值、符合条数与复核结论
+ok 7 - 安全详情只映射服务端阈值、符合条数与复核结论
+  ---
+  duration_ms: 0.7722
+  type: 'test'
+  ...
+# Subtest: 学生端运行时 DTO 只保留真实 API 数据，不携带过渡壳标记
+ok 8 - 学生端运行时 DTO 只保留真实 API 数据，不携带过渡壳标记
+  ---
+  duration_ms: 0.5348
+  type: 'test'
+  ...
+# Subtest: 四条真实路由保留 Claude 页面组件树，并具备成功与失败分支
+ok 9 - 四条真实路由保留 Claude 页面组件树，并具备成功与失败分支
+  ---
+  duration_ms: 13.3535
+  type: 'test'
+  ...
+# Subtest: 生产构建的静态资源使用站点根路径，深链接不会请求嵌套路由下的 assets
+ok 10 - 生产构建的静态资源使用站点根路径，深链接不会请求嵌套路由下的 assets
+  ---
+  duration_ms: 2.8433
+  type: 'test'
+  ...
+# Subtest: 学生运行时上下文不初始化过渡业务数据或 localStorage
+ok 11 - 学生运行时上下文不初始化过渡业务数据或 localStorage
+  ---
+  duration_ms: 1.5217
+  type: 'test'
+  ...
+# Subtest: 最终学生与权限入口模块图不带 fixture、演示数据或业务存储
+ok 12 - 最终学生与权限入口模块图不带 fixture、演示数据或业务存储
+  ---
+  duration_ms: 65.406
+  type: 'test'
+  ...
+# Subtest: 学生阅读器只把 API 分页正文映射为可渲染块
+ok 13 - 学生阅读器只把 API 分页正文映射为可渲染块
+  ---
+  duration_ms: 0.8452
+  type: 'test'
+  ...
+# Subtest: 学生 AI 面板只消费服务端会话、额度并用真实写请求发送
+ok 14 - 学生 AI 面板只消费服务端会话、额度并用真实写请求发送
+  ---
+  duration_ms: 2.7494
+  type: 'test'
+  ...
+# Subtest: 权限首页仅从契约 API DTO 组装指标、安排和安全提醒
+ok 15 - 权限首页仅从契约 API DTO 组装指标、安排和安全提醒
+  ---
+  duration_ms: 0.9284
+  type: 'test'
+  ...
+# Subtest: 权限首页在安全事件被拒绝时保留可读的统计和安排，并明确显示权限边界
+ok 16 - 权限首页在安全事件被拒绝时保留可读的统计和安排，并明确显示权限边界
+  ---
+  duration_ms: 0.5295
+  type: 'test'
+  ...
+# Subtest: 书架 DTO 只保留后端 title、cover 与可用 assets
+ok 17 - 书架 DTO 只保留后端 title、cover 与可用 assets
+  ---
+  duration_ms: 0.6986
+  type: 'test'
+  ...
+# Subtest: 权限端运行时 DTO 不从静态工作空间推导授权
+ok 18 - 权限端运行时 DTO 不从静态工作空间推导授权
+  ---
+  duration_ms: 0.3752
+  type: 'test'
+  ...
+# Subtest: 学生首页与书架封面走受保护资产接口，不回退公开 /covers/
+ok 19 - 学生首页与书架封面走受保护资产接口，不回退公开 /covers/
+  ---
+  duration_ms: 5.6349
+  type: 'test'
+  ...
+# Subtest: 共享 ui BookCover 走带头 fetch，且不再出现公开 /covers/ 回退
+ok 20 - 共享 ui BookCover 走带头 fetch，且不再出现公开 /covers/ 回退
+  ---
+  duration_ms: 1.7836
+  type: 'test'
+  ...
+# Subtest: 教师端书库封面走带头 fetch，不把受保护 URL 写入 CSS url()
+ok 21 - 教师端书库封面走带头 fetch，不把受保护 URL 写入 CSS url()
+  ---
+  duration_ms: 2.6401
+  type: 'test'
+  ...
+# Subtest: 社区帖卡不再使用公开 /covers/ 字面量
+ok 22 - 社区帖卡不再使用公开 /covers/ 字面量
+  ---
+  duration_ms: 1.187
+  type: 'test'
+  ...
+# Subtest: 源码里不存在把受保护封面 URL 直接塞进裸 img src 或 CSS url() 的展示位
+ok 23 - 源码里不存在把受保护封面 URL 直接塞进裸 img src 或 CSS url() 的展示位
+  ---
+  duration_ms: 173.6182
+  type: 'test'
+  ...
+# Subtest: 资产接口返回 404 时 loadProtectedAsset 降级为失败且不抛异常
+ok 24 - 资产接口返回 404 时 loadProtectedAsset 降级为失败且不抛异常
+  ---
+  duration_ms: 0.9884
+  type: 'test'
+  ...
+# Subtest: 资产接口 403/400 与网络错误同样降级，不把异常抛给调用方
+ok 25 - 资产接口 403/400 与网络错误同样降级，不把异常抛给调用方
+  ---
+  duration_ms: 2.1777
+  type: 'test'
+  ...
+# Subtest: ui BookCover 与教师书库在失败时走占位而不是抛异常
+ok 26 - ui BookCover 与教师书库在失败时走占位而不是抛异常
+  ---
+  duration_ms: 3.5041
+  type: 'test'
+  ...
+# Subtest: 学生首页与书架封面走受保护资产接口，不回退公开 /covers/
+ok 27 - 学生首页与书架封面走受保护资产接口，不回退公开 /covers/
+  ---
+  duration_ms: 9.2327
+  type: 'test'
+  ...
+# Subtest: 共享 ui BookCover 走带头 fetch，且不再出现公开 /covers/ 回退
+ok 28 - 共享 ui BookCover 走带头 fetch，且不再出现公开 /covers/ 回退
+  ---
+  duration_ms: 1.5555
+  type: 'test'
+  ...
+# Subtest: 教师端书库封面走带头 fetch，不把受保护 URL 写入 CSS url()
+ok 29 - 教师端书库封面走带头 fetch，不把受保护 URL 写入 CSS url()
+  ---
+  duration_ms: 1.3473
+  type: 'test'
+  ...
+# Subtest: 社区帖卡不再使用公开 /covers/ 字面量
+ok 30 - 社区帖卡不再使用公开 /covers/ 字面量
+  ---
+  duration_ms: 1.0454
+  type: 'test'
+  ...
+# Subtest: 源码里不存在把受保护封面 URL 直接塞进裸 img src 或 CSS url() 的展示位
+ok 31 - 源码里不存在把受保护封面 URL 直接塞进裸 img src 或 CSS url() 的展示位
+  ---
+  duration_ms: 207.8973
+  type: 'test'
+  ...
+# Subtest: 资产接口返回 404 时 loadProtectedAsset 降级为失败且不抛异常
+ok 32 - 资产接口返回 404 时 loadProtectedAsset 降级为失败且不抛异常
+  ---
+  duration_ms: 0.9729
+  type: 'test'
+  ...
+# Subtest: 资产接口 403/400 与网络错误同样降级，不把异常抛给调用方
+ok 33 - 资产接口 403/400 与网络错误同样降级，不把异常抛给调用方
+  ---
+  duration_ms: 2.2126
+  type: 'test'
+  ...
+# Subtest: ui BookCover 与教师书库在失败时走占位而不是抛异常
+ok 34 - ui BookCover 与教师书库在失败时走占位而不是抛异常
+  ---
+  duration_ms: 3.2998
+  type: 'test'
+  ...
+# Subtest: 发布、下架仍带 Idempotency-Key；可见范围改为本班书架 PUT/DELETE
+ok 35 - 发布、下架仍带 Idempotency-Key；可见范围改为本班书架 PUT/DELETE
+  ---
+  duration_ms: 2.1907
+  type: 'test'
+  ...
+# Subtest: 班级书架走 GET /classes/:id/shelf，不走旧 visibility / listClasses
+ok 36 - 班级书架走 GET /classes/:id/shelf，不走旧 visibility / listClasses
+  ---
+  duration_ms: 5.8972
+  type: 'test'
+  ...
+# Subtest: 收窄可见范围会基于 references 给出提示，而不是无声保存
+ok 37 - 收窄可见范围会基于 references 给出提示，而不是无声保存
+  ---
+  duration_ms: 1.6091
+  type: 'test'
+  ...
+# Subtest: 本班书架撤下前弹出确认，投放/撤下只改本班
+ok 38 - 本班书架撤下前弹出确认，投放/撤下只改本班
+  ---
+  duration_ms: 3.3367
+  type: 'test'
+  ...
+# Subtest: 新增封面展示位没有裸 img 取受保护资产
+ok 39 - 新增封面展示位没有裸 img 取受保护资产
+  ---
+  duration_ms: 4.1932
+  type: 'test'
+  ...
+# Subtest: 同一次写操作重试复用同一个 Idempotency-Key，新操作换新键
+ok 40 - 同一次写操作重试复用同一个 Idempotency-Key，新操作换新键
+  ---
+  duration_ms: 0.5566
+  type: 'test'
+  ...
+# Subtest: 422 HUMAN_REVIEW_REQUIRED 与 403 details.classIds 给出可读提示
+ok 41 - 422 HUMAN_REVIEW_REQUIRED 与 403 details.classIds 给出可读提示
+  ---
+  duration_ms: 0.5512
+  type: 'test'
+  ...
+# Subtest: organization 写体不带 classIds，classes 写体带 classIds
+ok 42 - organization 写体不带 classIds，classes 写体带 classIds
+  ---
+  duration_ms: 0.6214
+  type: 'test'
+  ...
+# Subtest: 教师端书库按投影字段 grade 筛选，缺年级只进全部与未标注
+ok 43 - 教师端书库按投影字段 grade 筛选，缺年级只进全部与未标注
+  ---
+  duration_ms: 0.8755
+  type: 'test'
+  ...
+# Subtest: 书库管理列表分别请求 published 与 draft，班级选择器不在这条链上
+ok 44 - 书库管理列表分别请求 published 与 draft，班级选择器不在这条链上
+  ---
+  duration_ms: 1.3832
+  type: 'test'
+  ...
+# Subtest: 教师端管理书目合并 published 与 draft，重复 id 以 published 为准
+ok 45 - 教师端管理书目合并 published 与 draft，重复 id 以 published 为准
+  ---
+  duration_ms: 0.3485
+  type: 'test'
+  ...
+# Subtest: 书目详情会回退到 draft 列表，避免下架后详情空白
+ok 46 - 书目详情会回退到 draft 列表，避免下架后详情空白
+  ---
+  duration_ms: 0.664
+  type: 'test'
+  ...
+# Subtest: 教师端发布管理页面不引用学生端筛选，也不走旧 listClasses
+ok 47 - 教师端发布管理页面不引用学生端筛选，也不走旧 listClasses
+  ---
+  duration_ms: 8.6792
+  type: 'test'
+  ...
+# Subtest: 关联阅读安排行保留参与完成率，空值显示破折号
+ok 48 - 关联阅读安排行保留参与完成率，空值显示破折号
+  ---
+  duration_ms: 1.4787
+  type: 'test'
+  ...
+# Subtest: 草稿书不能投放到班级书架，详情页禁用教师阅读器
+ok 49 - 草稿书不能投放到班级书架，详情页禁用教师阅读器
+  ---
+  duration_ms: 1.6322
+  type: 'test'
+  ...
+# Subtest: 缺 classId 时 loadClassShelf 返回空架；getClassShelf 失败则整次加载失败
+ok 50 - 缺 classId 时 loadClassShelf 返回空架；getClassShelf 失败则整次加载失败
+  ---
+  duration_ms: 1.0413
+  type: 'test'
+  ...
+# Subtest: 教师阅读器保留原壳并通过真实课堂 hook 接线
+ok 51 - 教师阅读器保留原壳并通过真实课堂 hook 接线
+  ---
+  duration_ms: 8.1724
+  type: 'test'
+  ...
+# Subtest: 课堂 API 覆盖教师控制与学生接收回执
+ok 52 - 课堂 API 覆盖教师控制与学生接收回执
+  ---
+  duration_ms: 2.2702
+  type: 'test'
+  ...
+# Subtest: 社区 API 适配器只调用真实路由并透传工作空间与幂等键
+ok 53 - 社区 API 适配器只调用真实路由并透传工作空间与幂等键
+  ---
+  duration_ms: 2.226
+  type: 'test'
+  ...
+# Subtest: 社区 hook 不再把 fixture 或 localStorage 当作业务真相
+ok 54 - 社区 hook 不再把 fixture 或 localStorage 当作业务真相
+  ---
+  duration_ms: 5.9741
+  type: 'test'
+  ...
+# Subtest: 学生社区真实路由可达且控制台卡片不再导入 fixture
+ok 55 - 学生社区真实路由可达且控制台卡片不再导入 fixture
+  ---
+  duration_ms: 3.1053
+  type: 'test'
+  ...
+# Subtest: 最长子路由决定权限端一级栏与二级栏高亮
+ok 56 - 最长子路由决定权限端一级栏与二级栏高亮
+  ---
+  duration_ms: 1.7782
+  type: 'test'
+  ...
+# Subtest: 平台审计只向平台工作空间开放，普通工作空间在前端即被拒绝
+ok 57 - 平台审计只向平台工作空间开放，普通工作空间在前端即被拒绝
+  ---
+  duration_ms: 0.2083
+  type: 'test'
+  ...
+# Subtest: 权限端所有业务一级项都有真实二级入口
+ok 58 - 权限端所有业务一级项都有真实二级入口
+  ---
+  duration_ms: 0.3997
+  type: 'test'
+  ...
+# Subtest: 单页面业务模块和平台审计也能解析出二级选中态
+ok 59 - 单页面业务模块和平台审计也能解析出二级选中态
+  ---
+  duration_ms: 0.1217
+  type: 'test'
+  ...
+# Subtest: 阅读安排页面保留原壳结构且生产入口不再导入 fixture
+ok 60 - 阅读安排页面保留原壳结构且生产入口不再导入 fixture
+  ---
+  duration_ms: 6.3579
+  type: 'test'
+  ...
+# Subtest: 阅读安排适配器使用真实书籍版本与当前 class 工作空间
+ok 61 - 阅读安排适配器使用真实书籍版本与当前 class 工作空间
+  ---
+  duration_ms: 5.1504
+  type: 'test'
+  ...
+# Subtest: 权限端 API 用真实幂等写请求创建安排
+ok 62 - 权限端 API 用真实幂等写请求创建安排
+  ---
+  duration_ms: 0.9313
+  type: 'test'
+  ...
+# Subtest: 权限端社区 DTO 保留真实作者、书目和两级审核状态
+ok 63 - 权限端社区 DTO 保留真实作者、书目和两级审核状态
+  ---
+  duration_ms: 2.7623
+  type: 'test'
+  ...
+# Subtest: 权限端社区审核动作只映射到真实后端决策
+ok 64 - 权限端社区审核动作只映射到真实后端决策
+  ---
+  duration_ms: 1.0301
+  type: 'test'
+  ...
+# Subtest: 权限端社区 hook 调用真实列表和审核接口
+ok 65 - 权限端社区 hook 调用真实列表和审核接口
+  ---
+  duration_ms: 6.4766
+  type: 'test'
+  ...
+# Subtest: 真实会话 DTO 保留班级学生索引并隐藏私密标题
+ok 66 - 真实会话 DTO 保留班级学生索引并隐藏私密标题
+  ---
+  duration_ms: 24.8109
+  type: 'test'
+  ...
+# Subtest: 安全最小上下文优先于私密锁并映射真实消息
+ok 67 - 安全最小上下文优先于私密锁并映射真实消息
+  ---
+  duration_ms: 0.4405
+  type: 'test'
+  ...
+# Subtest: 护眼页保留真实接线，班级阅读统计使用独立真实 scope state
+ok 68 - 护眼页保留真实接线，班级阅读统计使用独立真实 scope state
+  ---
+  duration_ms: 7.0424
+  type: 'test'
+  ...
+# Subtest: 权限端生产入口模块图不加载 fixture、mock 或本地业务存储
+ok 69 - 权限端生产入口模块图不加载 fixture、mock 或本地业务存储
+  ---
+  duration_ms: 68.3085
+  type: 'test'
+  ...
+# Subtest: 学生端生产入口模块图不加载 fixture、mock 或本地业务存储
+ok 70 - 学生端生产入口模块图不加载 fixture、mock 或本地业务存储
+  ---
+  duration_ms: 66.3188
+  type: 'test'
+  ...
+# Subtest: 历史 fixture 页面和旧导航不在三个生产入口的可达模块图内
+ok 71 - 历史 fixture 页面和旧导航不在三个生产入口的可达模块图内
+  ---
+  duration_ms: 211.1682
+  type: 'test'
+  ...
+# Subtest: 家长发送页不保留只改本地状态的模拟开关
+ok 72 - 家长发送页不保留只改本地状态的模拟开关
+  ---
+  duration_ms: 1.3146
+  type: 'test'
+  ...
+# Subtest: 真实登录页不导入旧找回壳，也不展示固定邮箱
+ok 73 - 真实登录页不导入旧找回壳，也不展示固定邮箱
+  ---
+  duration_ms: 1.6129
+  type: 'test'
+  ...
+# Subtest: 权限端目标页面的 fixture 缺口清单完整且没有被可达路由静默加载
+ok 74 - 权限端目标页面的 fixture 缺口清单完整且没有被可达路由静默加载
+  ---
+  duration_ms: 6.5912
+  type: 'test'
+  ...
+# Subtest: 未接入的冻结页面继续走诚实的 unavailable 页面而不是删除导航
+ok 75 - 未接入的冻结页面继续走诚实的 unavailable 页面而不是删除导航
+  ---
+  duration_ms: 0.8358
+  type: 'test'
+  ...
+# Subtest: 学生会话适配器仅调用真实 API，所有写操作带工作空间与幂等键
+ok 76 - 学生会话适配器仅调用真实 API，所有写操作带工作空间与幂等键
+  ---
+  duration_ms: 8.6168
+  type: 'test'
+  ...
+# Subtest: 学生快照保留标题、私密、删除区、书页选文引用、额度及恢复时间
+ok 77 - 学生快照保留标题、私密、删除区、书页选文引用、额度及恢复时间
+  ---
+  duration_ms: 0.616
+  type: 'test'
+  ...
+# Subtest: 权限端构造班级学生书籍标题查询，并规范化三级索引
+ok 78 - 权限端构造班级学生书籍标题查询，并规范化三级索引
+  ---
+  duration_ms: 0.9226
+  type: 'test'
+  ...
+# Subtest: 生产适配器不导入 fixture、mock、localStorage 或旧种子会话
+ok 79 - 生产适配器不导入 fixture、mock、localStorage 或旧种子会话
+  ---
+  duration_ms: 12.7184
+  type: 'test'
+  ...
+# Subtest: 学生四个底栏入口连接冻结页面且书架个人主页不导入演示数据
+ok 80 - 学生四个底栏入口连接冻结页面且书架个人主页不导入演示数据
+  ---
+  duration_ms: 9.303
+  type: 'test'
+  ...
+# Subtest: 权限端栏目根路径进入真实页面且安全入口不加载 fixture 列表
+ok 81 - 权限端栏目根路径进入真实页面且安全入口不加载 fixture 列表
+  ---
+  duration_ms: 9.1044
+  type: 'test'
+  ...
+# Subtest: 学生适配器只调用真实护眼与隐私 API，并为决定写入提供幂等键
+ok 82 - 学生适配器只调用真实护眼与隐私 API，并为决定写入提供幂等键
+  ---
+  duration_ms: 5.6822
+  type: 'test'
+  ...
+# Subtest: 断网后沿用最后一次强制休息截止时间，到时自动恢复但不伪造新服务端数据
+ok 83 - 断网后沿用最后一次强制休息截止时间，到时自动恢复但不伪造新服务端数据
+  ---
+  duration_ms: 1.0577
+  type: 'test'
+  ...
+# Subtest: 权限端适配器保留范围、用途、误判语义和幂等写入
+ok 84 - 权限端适配器保留范围、用途、误判语义和幂等写入
+  ---
+  duration_ms: 1.5353
+  type: 'test'
+  ...
+# Subtest: B 线生产状态模块不导入 fixture、mock 或 localStorage 业务真相
+ok 85 - B 线生产状态模块不导入 fixture、mock 或 localStorage 业务真相
+  ---
+  duration_ms: 12.8822
+  type: 'test'
+  ...
+# Subtest: 四页仅第 1 页超大时设计尺寸等于正文中位数，不等于封面
+ok 86 - 四页仅第 1 页超大时设计尺寸等于正文中位数，不等于封面
+  ---
+  duration_ms: 5.3734
+  type: 'test'
+  ...
+# Subtest: 四页宽度接近 460–480 时设计尺寸仍是正文量级
+ok 87 - 四页宽度接近 460–480 时设计尺寸仍是正文量级
+  ---
+  duration_ms: 0.7698
+  type: 'test'
+  ...
+# Subtest: 单页书直接使用该页尺寸
+ok 88 - 单页书直接使用该页尺寸
+  ---
+  duration_ms: 1.0342
+  type: 'test'
+  ...
+# Subtest: 空数组与非法输入拒绝回退到封面
+ok 89 - 空数组与非法输入拒绝回退到封面
+  ---
+  duration_ms: 1.563
+  type: 'test'
+  ...
+# Subtest: 抽样页号为第 1、2、中间、末页且去重
+ok 90 - 抽样页号为第 1、2、中间、末页且去重
+  ---
+  duration_ms: 0.7001
+  type: 'test'
+  ...
+# Subtest: PDF_ZOOM_SCALE 落在「汉字够 12–14 设备像素」且不超出扫描件解析度的区间
+ok 91 - PDF_ZOOM_SCALE 落在「汉字够 12–14 设备像素」且不超出扫描件解析度的区间
+  ---
+  duration_ms: 0.3261
+  type: 'test'
+  ...
+# Subtest: applyPdfZoom 放大不小于铺满、不超出舞台宽度
+ok 92 - applyPdfZoom 放大不小于铺满、不超出舞台宽度
+  ---
+  duration_ms: 0.702
+  type: 'test'
+  ...
+# Subtest: applyPdfZoom 拒绝非法倍率而不是静默返回 NaN
+ok 93 - applyPdfZoom 拒绝非法倍率而不是静默返回 NaN
+  ---
+  duration_ms: 0.6359
+  type: 'test'
+  ...
+# Subtest: pdfCanvasOutputScale 至少为 2 且至少是 dpr 的两倍
+ok 94 - pdfCanvasOutputScale 至少为 2 且至少是 dpr 的两倍
+  ---
+  duration_ms: 1.0912
+  type: 'test'
+  ...
+# Subtest: T8.5B login envelope 只提交 schoolCode+loginName+password
+ok 95 - T8.5B login envelope 只提交 schoolCode+loginName+password
+  ---
+  duration_ms: 3.3661
+  type: 'test'
+  ...
+# Subtest: T8.5B console shelf envelope 打 class-local 路径且无 visibility
+ok 96 - T8.5B console shelf envelope 打 class-local 路径且无 visibility
+  ---
+  duration_ms: 2.0362
+  type: 'test'
+  ...
+# Subtest: T8.5B student registration/onboarding envelope
+ok 97 - T8.5B student registration/onboarding envelope
+  ---
+  duration_ms: 1.5706
+  type: 'test'
+  ...
+# Subtest: T8.6A 登录只接受服务端路径，空 defaultPath 不是失败
+ok 98 - T8.6A 登录只接受服务端路径，空 defaultPath 不是失败
+  ---
+  duration_ms: 2.4161
+  type: 'test'
+  ...
+# Subtest: T8.6A 教师选班：teacherCount>0 才确认，取消不发 PUT
+ok 99 - T8.6A 教师选班：teacherCount>0 才确认，取消不发 PUT
+  ---
+  duration_ms: 3.4349
+  type: 'test'
+  ...
+# Subtest: T8.6A 建班 body 只有 name/stage/entryYear/classNumber
+ok 100 - T8.6A 建班 body 只有 name/stage/entryYear/classNumber
+  ---
+  duration_ms: 0.8127
+  type: 'test'
+  ...
+# Subtest: T8.6A 年级主任可做教师账号支持，文案禁止暗示跨届或书架
+ok 101 - T8.6A 年级主任可做教师账号支持，文案禁止暗示跨届或书架
+  ---
+  duration_ms: 0.7834
+  type: 'test'
+  ...
+# Subtest: T8.6A 审批辨认用尾 4 位，rawToken 只拼一次加入路径
+ok 102 - T8.6A 审批辨认用尾 4 位，rawToken 只拼一次加入路径
+  ---
+  duration_ms: 0.9804
+  type: 'test'
+  ...
+# Subtest: T8.6A identityApi 打契约路径且写请求带幂等键
+ok 103 - T8.6A identityApi 打契约路径且写请求带幂等键
+  ---
+  duration_ms: 2.1552
+  type: 'test'
+  ...
+# Subtest: T8.6A 页面已去掉演示不写入文案，并挂上真路由
+ok 104 - T8.6A 页面已去掉演示不写入文案，并挂上真路由
+  ---
+  duration_ms: 33.8093
+  type: 'test'
+  ...
+# Subtest: T8.6B console.js 已有 class-local shelf 三方法，缺方法则停手
+ok 105 - T8.6B console.js 已有 class-local shelf 三方法，缺方法则停手
+  ---
+  duration_ms: 5.2179
+  type: 'test'
+  ...
+# Subtest: T8.6B 只有 class workspace 能管理本班书架
+ok 106 - T8.6B 只有 class workspace 能管理本班书架
+  ---
+  duration_ms: 0.4564
+  type: 'test'
+  ...
+# Subtest: T8.6B 空书架文案与 teacherCount 常驻提示
+ok 107 - T8.6B 空书架文案与 teacherCount 常驻提示
+  ---
+  duration_ms: 0.4265
+  type: 'test'
+  ...
+# Subtest: T8.6B loadClassShelf 只打 GET /classes/:id/shelf，不打 visibility / GET /classes
+ok 108 - T8.6B loadClassShelf 只打 GET /classes/:id/shelf，不打 visibility / GET /classes
+  ---
+  duration_ms: 2.6315
+  type: 'test'
+  ...
+# Subtest: T8.6B 投放 PUT / 撤下 DELETE 只打本班路径，写后读取 teacherCount
+ok 109 - T8.6B 投放 PUT / 撤下 DELETE 只打本班路径，写后读取 teacherCount
+  ---
+  duration_ms: 1.4182
+  type: 'test'
+  ...
+# Subtest: T8.6B 同一次投放/撤下重试复用同一个 Idempotency-Key
+ok 110 - T8.6B 同一次投放/撤下重试复用同一个 Idempotency-Key
+  ---
+  duration_ms: 0.4535
+  type: 'test'
+  ...
+# Subtest: T8.6B 书架写错误可读，不提全局发布
+ok 111 - T8.6B 书架写错误可读，不提全局发布
+  ---
+  duration_ms: 0.646
+  type: 'test'
+  ...
+# Subtest: T8.6B 书架 items 解析与本班判定
+ok 112 - T8.6B 书架 items 解析与本班判定
+  ---
+  duration_ms: 0.4683
+  type: 'test'
+  ...
+# Subtest: T8.6B 教学页删除全局发布/旧 visibility，改本班投放且校长年级无入口
+ok 113 - T8.6B 教学页删除全局发布/旧 visibility，改本班投放且校长年级无入口
+  ---
+  duration_ms: 21.9443
+  type: 'test'
+  ...
+# Subtest: T8.6B 校长/年级主任源码路径没有本班投放按钮的无条件渲染
+ok 114 - T8.6B 校长/年级主任源码路径没有本班投放按钮的无条件渲染
+  ---
+  duration_ms: 5.0441
+  type: 'test'
+  ...
+# Subtest: 双模式共用物理页，原版 PDF 只渲染近页且禁用文字选择
+ok 115 - 双模式共用物理页，原版 PDF 只渲染近页且禁用文字选择
+  ---
+  duration_ms: 16.5051
+  type: 'test'
+  ...
+# Subtest: 原版模式从受保护资产用 PDF.js 加载，页数不一致显式失败
+ok 116 - 原版模式从受保护资产用 PDF.js 加载，页数不一致显式失败
+  ---
+  duration_ms: 2.7159
+  type: 'test'
+  ...
+# Subtest: 浏览器侧 pdfjs 只允许 legacy 构建，防止现代构建在无 getOrInsertComputed 的浏览器里炸掉
+ok 117 - 浏览器侧 pdfjs 只允许 legacy 构建，防止现代构建在无 getOrInsertComputed 的浏览器里炸掉
+  ---
+  duration_ms: 2.6207
+  type: 'test'
+  ...
+# Subtest: useProtectedPdfDocument 抽样多页经 pickPdfPageDesign 定尺，不得只靠 getPage(1)
+ok 118 - useProtectedPdfDocument 抽样多页经 pickPdfPageDesign 定尺，不得只靠 getPage(1)
+  ---
+  duration_ms: 4.6513
+  type: 'test'
+  ...
+# Subtest: PdfBookPage 用 pdfCanvasOutputScale 提高 backing，不再只乘 1×dpr
+ok 119 - PdfBookPage 用 pdfCanvasOutputScale 提高 backing，不再只乘 1×dpr
+  ---
+  duration_ms: 2.8424
+  type: 'test'
+  ...
+# Subtest: D-19：canvas 的 CSS 尺寸必须取整，且高度按本页自身宽高比推，不得用 designHeight
+ok 120 - D-19：canvas 的 CSS 尺寸必须取整，且高度按本页自身宽高比推，不得用 designHeight
+  ---
+  duration_ms: 4.5882
+  type: 'test'
+  ...
+# Subtest: D-19：原版 PDF 放大档只在原版模式生效，且必须走 applyPdfZoom
+ok 121 - D-19：原版 PDF 放大档只在原版模式生效，且必须走 applyPdfZoom
+  ---
+  duration_ms: 3.5728
+  type: 'test'
+  ...
+# Subtest: D-19：顶栏底栏收起时必须真的退出 flex 流，否则舞台不会变高
+ok 122 - D-19：顶栏底栏收起时必须真的退出 flex 流，否则舞台不会变高
+  ---
+  duration_ms: 3.2758
+  type: 'test'
+  ...
+# Subtest: D-05 / D-11 / D-17 的三处结构不得被后续改动带走
+ok 123 - D-05 / D-11 / D-17 的三处结构不得被后续改动带走
+  ---
+  duration_ms: 3.225
+  type: 'test'
+  ...
+# Subtest: OCR 文字模式只输出可选择 DOM，不再在页图上叠 OCR 层
+ok 124 - OCR 文字模式只输出可选择 DOM，不再在页图上叠 OCR 层
+  ---
+  duration_ms: 2.3774
+  type: 'test'
+  ...
+# Subtest: 摘录页两处跳阅读器用 pageNo，不再写 ?page=
+ok 125 - 摘录页两处跳阅读器用 pageNo，不再写 ?page=
+  ---
+  duration_ms: 11.6893
+  type: 'test'
+  ...
+# Subtest: 社区帖详情跳阅读器用 pageNo，不再写 ?page=
+ok 126 - 社区帖详情跳阅读器用 pageNo，不再写 ?page=
+  ---
+  duration_ms: 4.3463
+  type: 'test'
+  ...
+# Subtest: src 里跳进学生阅读器的查询参数不得再用 ?page=
+ok 127 - src 里跳进学生阅读器的查询参数不得再用 ?page=
+  ---
+  duration_ms: 240.2975
+  type: 'test'
+  ...
+# Subtest: 阅读器位置解析只认 pageNo，与跳转参数对齐
+ok 128 - 阅读器位置解析只认 pageNo，与跳转参数对齐
+  ---
+  duration_ms: 2.7474
+  type: 'test'
+  ...
+# Subtest: toBook 映射 preferredReaderMode，非法值回落 null，且不写进 progress
+ok 129 - toBook 映射 preferredReaderMode，非法值回落 null，且不写进 progress
+  ---
+  duration_ms: 2.2659
+  type: 'test'
+  ...
+# Subtest: 学生 API PUT /reading/reader-preference 带幂等键，且不转发他人 userId
+ok 130 - 学生 API PUT /reading/reader-preference 带幂等键，且不转发他人 userId
+  ---
+  duration_ms: 2.1611
+  type: 'test'
+  ...
+# Subtest: Reader 打开时服务端偏好覆盖默认，切换时 fire-and-forget，且不落本地存储
+ok 131 - Reader 打开时服务端偏好覆盖默认，切换时 fire-and-forget，且不落本地存储
+  ---
+  duration_ms: 12.2591
+  type: 'test'
+  ...
+# Subtest: reader quote text and offsets share the same raw DOM source
+ok 132 - reader quote text and offsets share the same raw DOM source
+  ---
+  duration_ms: 1.8556
+  type: 'test'
+  ...
+# Subtest: reading footprint renders the strict streak day unit instead of an undefined DTO field
+ok 133 - reading footprint renders the strict streak day unit instead of an undefined DTO field
+  ---
+  duration_ms: 0.3439
+  type: 'test'
+  ...
+# Subtest: 空白页判定走 kind / blank / normalizedText / blocks 字段链
+ok 134 - 空白页判定走 kind / blank / normalizedText / blocks 字段链
+  ---
+  duration_ms: 2.691
+  type: 'test'
+  ...
+# Subtest: API 空白页 DTO 保留空的 normalizedText，合成 loading/error 页不会被判成空白
+ok 135 - API 空白页 DTO 保留空的 normalizedText，合成 loading/error 页不会被判成空白
+  ---
+  duration_ms: 3.5297
+  type: 'test'
+  ...
+# Subtest: 文字模式空白页是独立渲染分支，文案与 loading/error/接口空可区分
+ok 136 - 文字模式空白页是独立渲染分支，文案与 loading/error/接口空可区分
+  ---
+  duration_ms: 15.4951
+  type: 'test'
+  ...
+# Subtest: 文字页正文容器可纵向滚动，且不回退 D-19 视口契约
+ok 137 - 文字页正文容器可纵向滚动，且不回退 D-19 视口契约
+  ---
+  duration_ms: 3.9099
+  type: 'test'
+  ...
+# Subtest: 翻页手势没有 wheel 监听；翻页只认横向主导位移
+ok 138 - 翻页手势没有 wheel 监听；翻页只认横向主导位移
+  ---
+  duration_ms: 2.5162
+  type: 'test'
+  ...
+# Subtest: FINGERPRINT_FIELDS 仍是冻结的 15 个字段且顺序不变
+ok 139 - FINGERPRINT_FIELDS 仍是冻结的 15 个字段且顺序不变
+  ---
+  duration_ms: 11.4134
+  type: 'test'
+  ...
+# Subtest: 阅读监测租约 API 只把协议字段放入 body，范围只进入工作空间 header 上下文
+ok 140 - 阅读监测租约 API 只把协议字段放入 body，范围只进入工作空间 header 上下文
+  ---
+  duration_ms: 3.4748
+  type: 'test'
+  ...
+# Subtest: 阅读摘要 API 可直接适配 C 端口输入且不泄漏 scope/device/未知字段
+ok 141 - 阅读摘要 API 可直接适配 C 端口输入且不泄漏 scope/device/未知字段
+  ---
+  duration_ms: 1.9026
+  type: 'test'
+  ...
+# Subtest: self/scope API 只发送冻结查询，scope 搜索筛选和身份字段不会进入 query
+ok 142 - self/scope API 只发送冻结查询，scope 搜索筛选和身份字段不会进入 query
+  ---
+  duration_ms: 1.4019
+  type: 'test'
+  ...
+# Subtest: 有效停留4:59、5:00与8:00的单段上限正确
+ok 143 - 有效停留4:59、5:00与8:00的单段上限正确
+  ---
+  duration_ms: 5.4563
+  type: 'test'
+  ...
+# Subtest: 真实确认交互切段后可重新获得5分钟，仅后台时间为0
+ok 144 - 真实确认交互切段后可重新获得5分钟，仅后台时间为0
+  ---
+  duration_ms: 1.6581
+  type: 'test'
+  ...
+# Subtest: 逐页有效覆盖按阅读模式分账且确认交互记到显式锚点页
+ok 145 - 逐页有效覆盖按阅读模式分账且确认交互记到显式锚点页
+  ---
+  duration_ms: 2.4885
+  type: 'test'
+  ...
+# Subtest: 租约失效或待确认区满载后停止新增累计
+ok 146 - 租约失效或待确认区满载后停止新增累计
+  ---
+  duration_ms: 1.0166
+  type: 'test'
+  ...
+# Subtest: 跳读需要连续两个相邻视图均大于0且小于5秒
+ok 147 - 跳读需要连续两个相邻视图均大于0且小于5秒
+  ---
+  duration_ms: 0.9968
+  type: 'test'
+  ...
+# Subtest: 定位、恢复、教师同步和布局变化不构成跳读
+ok 148 - 定位、恢复、教师同步和布局变化不构成跳读
+  ---
+  duration_ms: 2.8779
+  type: 'test'
+  ...
+# Subtest: 回退正好3页且目标视图有效停留超过30秒才记录回读
+ok 149 - 回退正好3页且目标视图有效停留超过30秒才记录回读
+  ---
+  duration_ms: 0.6961
+  type: 'test'
+  ...
+# Subtest: 回退2页、教师同步或恢复位置都不建立回读候选
+ok 150 - 回退2页、教师同步或恢复位置都不建立回读候选
+  ---
+  duration_ms: 0.7787
+  type: 'test'
+  ...
+# Subtest: 真实监测端口按I签名调用且不把scope/device送入API输入
+ok 151 - 真实监测端口按I签名调用且不把scope/device送入API输入
+  ---
+  duration_ms: 4.0831
+  type: 'test'
+  ...
+# Subtest: 监测范围从服务端会话解析组织/学生/工作空间且拒绝跨身份
+ok 152 - 监测范围从服务端会话解析组织/学生/工作空间且拒绝跨身份
+  ---
+  duration_ms: 2.0399
+  type: 'test'
+  ...
+# Subtest: Reader稳定memoized monitor配置并由同一新租约启动旧护眼序号
+ok 153 - Reader稳定memoized monitor配置并由同一新租约启动旧护眼序号
+  ---
+  duration_ms: 11.7984
+  type: 'test'
+  ...
+# Subtest: 北京时间04:00精确切换统计日，时钟可注入
+ok 154 - 北京时间04:00精确切换统计日，时钟可注入
+  ---
+  duration_ms: 4.7114
+  type: 'test'
+  ...
+# Subtest: 稳定单双页视图统一使用最小可见页作主页
+ok 155 - 稳定单双页视图统一使用最小可见页作主页
+  ---
+  duration_ms: 0.8991
+  type: 'test'
+  ...
+# Subtest: 继续阅读query严格打开指定版本和页码
+ok 156 - 继续阅读query严格打开指定版本和页码
+  ---
+  duration_ms: 0.8148
+  type: 'test'
+  ...
+# Subtest: 错误版本、跨书版本、不可访问与非整数/越界页码都明确失败
+ok 157 - 错误版本、跨书版本、不可访问与非整数/越界页码都明确失败
+  ---
+  duration_ms: 0.8406
+  type: 'test'
+  ...
+# Subtest: 正文响应不得静默换版本、跨书或换页
+ok 158 - 正文响应不得静默换版本、跨书或换页
+  ---
+  duration_ms: 0.5611
+  type: 'test'
+  ...
+# Subtest: 待确认区设备隔离键只使用acquire返回的可信设备
+ok 159 - 待确认区设备隔离键只使用acquire返回的可信设备
+  ---
+  duration_ms: 24.9172
+  type: 'test'
+  ...
+# Subtest: 统计日边界先以stat_date_change结束旧会话，再建新会话
+ok 160 - 统计日边界先以stat_date_change结束旧会话，再建新会话
+  ---
+  duration_ms: 6.654
+  type: 'test'
+  ...
+# Subtest: 租约结束原因由服务端权威关闭，客户端只提交截止前的开放摘要
+ok 161 - 租约结束原因由服务端权威关闭，客户端只提交截止前的开放摘要
+  ---
+  duration_ms: 5.1881
+  type: 'test'
+  ...
+# Subtest: 租约过期回调迟到30秒也不会计入expiresAt之后的时长
+ok 162 - 租约过期回调迟到30秒也不会计入expiresAt之后的时长
+  ---
+  duration_ms: 6.1305
+  type: 'test'
+  ...
+# Subtest: 第512条刚达记录硬上限时立即停止新增有效累计
+ok 163 - 第512条刚达记录硬上限时立即停止新增有效累计
+  ---
+  duration_ms: 12.0995
+  type: 'test'
+  ...
+# Subtest: 字节数刚达2MiB硬上限时立即停止新增有效累计
+ok 164 - 字节数刚达2MiB硬上限时立即停止新增有效累计
+  ---
+  duration_ms: 3.4534
+  type: 'test'
+  ...
+# Subtest: 满载后drain必须低于80%压力线才恢复计时
+ok 165 - 满载后drain必须低于80%压力线才恢复计时
+  ---
+  duration_ms: 11.226
+  type: 'test'
+  ...
+# Subtest: tickDirect抛错后定时链仍会进行下一次尝试
+ok 166 - tickDirect抛错后定时链仍会进行下一次尝试
+  ---
+  duration_ms: 8.389
+  type: 'test'
+  ...
+# Subtest: 摘要提交LEASE_CONFLICT后定时链不永久停摆
+ok 167 - 摘要提交LEASE_CONFLICT后定时链不永久停摆
+  ---
+  duration_ms: 7.3588
+  type: 'test'
+  ...
+# Subtest: 约5分钟、后台、网络恢复和关闭均触发累计摘要
+ok 168 - 约5分钟、后台、网络恢复和关闭均触发累计摘要
+  ---
+  duration_ms: 7.8526
+  type: 'test'
+  ...
+# Subtest: 真实生命周期事件在后台、freeze和网络恢复时额外提交
+ok 169 - 真实生命周期事件在后台、freeze和网络恢复时额外提交
+  ---
+  duration_ms: 7.3755
+  type: 'test'
+  ...
+# Subtest: 提交队列堵塞时关闭等待在有界超时后仍能完成
+ok 170 - 提交队列堵塞时关闭等待在有界超时后仍能完成
+  ---
+  duration_ms: 6.0913
+  type: 'test'
+  ...
+# Subtest: closeAndWait 生产路径把有界超时传给关闭等待
+ok 171 - closeAndWait 生产路径把有界超时传给关闭等待
+  ---
+  duration_ms: 3.1159
+  type: 'test'
+  ...
+# Subtest: 首页刷新协调在accepted终态前不解锁
+ok 172 - 首页刷新协调在accepted终态前不解锁
+  ---
+  duration_ms: 2.5292
+  type: 'test'
+  ...
+# Subtest: Reader所有移动调用都显式携带来源，底栏不再推导百分比或finished
+ok 173 - Reader所有移动调用都显式携带来源，底栏不再推导百分比或finished
+  ---
+  duration_ms: 3.1678
+  type: 'test'
+  ...
+# Subtest: 新摘要不发screenOn，旧护眼事件仅以document visibility作为代理
+ok 174 - 新摘要不发screenOn，旧护眼事件仅以document visibility作为代理
+  ---
+  duration_ms: 2.3635
+  type: 'test'
+  ...
+# Subtest: 租约按权威expiresAt在剩30/15/5秒窗口续租重试
+ok 175 - 租约按权威expiresAt在剩30/15/5秒窗口续租重试
+  ---
+  duration_ms: 11.4624
+  type: 'test'
+  ...
+# Subtest: 续租接管冲突立即停止，过期不会本地复活
+ok 176 - 续租接管冲突立即停止，过期不会本地复活
+  ---
+  duration_ms: 3.9565
+  type: 'test'
+  ...
+# Subtest: 过期timer迟到时仍以服务端expiresAt作为权威失效截止
+ok 177 - 过期timer迟到时仍以服务端expiresAt作为权威失效截止
+  ---
+  duration_ms: 3.3774
+  type: 'test'
+  ...
+# Subtest: 客户端规范指纹与冻结JSON字段顺序完全一致
+ok 178 - 客户端规范指纹与冻结JSON字段顺序完全一致
+  ---
+  duration_ms: 5.7786
+  type: 'test'
+  ...
+# Subtest: revision从1严格连续，8个结束原因均受控
+ok 179 - revision从1严格连续，8个结束原因均受控
+  ---
+  duration_ms: 1.6431
+  type: 'test'
+  ...
+# Subtest: IndexedDB待确认区按组织/学生/工作空间/设备隔离并在请求前完成事务
+ok 180 - IndexedDB待确认区按组织/学生/工作空间/设备隔离并在请求前完成事务
+  ---
+  duration_ms: 22.5691
+  type: 'test'
+  ...
+# Subtest: 同revision相同内容稳定重放，异内容本地冲突
+ok 181 - 同revision相同内容稳定重放，异内容本地冲突
+  ---
+  duration_ms: 15.3027
+  type: 'test'
+  ...
+# Subtest: IndexedDB对序列化后超过2MiB的单条摘要直接显式拒绝
+ok 182 - IndexedDB对序列化后超过2MiB的单条摘要直接显式拒绝
+  ---
+  duration_ms: 39.3493
+  type: 'test'
+  ...
+# Subtest: 摘要必须先原子持久化再串行请求，三种终态均删除
+ok 183 - 摘要必须先原子持久化再串行请求，三种终态均删除
+  ---
+  duration_ms: 4.5489
+  type: 'test'
+  ...
+# Subtest: 网络和revision/权限冲突保留记录并停止后续串行修订
+ok 184 - 网络和revision/权限冲突保留记录并停止后续串行修订
+  ---
+  duration_ms: 1.2577
+  type: 'test'
+  ...
+# Subtest: LEASE_CONFLICT移出队头以免毒死后续摘要
+ok 185 - LEASE_CONFLICT移出队头以免毒死后续摘要
+  ---
+  duration_ms: 1.0079
+  type: 'test'
+  ...
+# Subtest: 512条或2MiB是硬上限，80%压力阈值可观测
+ok 186 - 512条或2MiB是硬上限，80%压力阈值可观测
+  ---
+  duration_ms: 1.1701
+  type: 'test'
+  ...
+# Subtest: 满载时先尝试drain，仍无法排空则显式失败而不覆盖
+ok 187 - 满载时先尝试drain，仍无法排空则显式失败而不覆盖
+  ---
+  duration_ms: 3.4485
+  type: 'test'
+  ...
+# Subtest: runtime晚到时显式pageNo=4同步覆盖旧的初始1，后续同URL保留当前主页
+ok 188 - runtime晚到时显式pageNo=4同步覆盖旧的初始1，后续同URL保留当前主页
+  ---
+  duration_ms: 1.1051
+  type: 'test'
+  ...
+# Subtest: 三维组件首次错误onFlip=0不能覆盖显式末页leaf=2
+ok 189 - 三维组件首次错误onFlip=0不能覆盖显式末页leaf=2
+  ---
+  duration_ms: 2.0436
+  type: 'test'
+  ...
+# Subtest: Reader末页双页初始化不制造幽灵页，且仍不显示完成度语义
+ok 190 - Reader末页双页初始化不制造幽灵页，且仍不显示完成度语义
+  ---
+  duration_ms: 12.0191
+  type: 'test'
+  ...
+# Subtest: 同一本书换页不把pageNo或查询串写进ReaderView的key
+ok 191 - 同一本书换页不把pageNo或查询串写进ReaderView的key
+  ---
+  duration_ms: 2.8076
+  type: 'test'
+  ...
+# Subtest: 直接打开末页只保留位置，不产生完成度或读完语义
+ok 192 - 直接打开末页只保留位置，不产生完成度或读完语义
+  ---
+  duration_ms: 3.3844
+  type: 'test'
+  ...
+# Subtest: 可达旧消费者不再访问页码完成度、读完或旧事件阅读秒数字段
+ok 193 - 可达旧消费者不再访问页码完成度、读完或旧事件阅读秒数字段
+  ---
+  duration_ms: 16.0724
+  type: 'test'
+  ...
+# Subtest: 报告指标移除页数、完成度与开始书目，仅保留非旧阅读指标
+ok 194 - 报告指标移除页数、完成度与开始书目，仅保留非旧阅读指标
+  ---
+  duration_ms: 1.8593
+  type: 'test'
+  ...
+# Subtest: Foundation 仍不可达，且不再保留被物理移除的 BookProgress 示例
+ok 195 - Foundation 仍不可达，且不再保留被物理移除的 BookProgress 示例
+  ---
+  duration_ms: 84.2819
+  type: 'test'
+  ...
+# Subtest: self DTO is strict and final page only builds an exact position URL
+ok 196 - self DTO is strict and final page only builds an exact position URL
+  ---
+  duration_ms: 4.0214
+  type: 'test'
+  ...
+# Subtest: self controller keeps the last good fact stale and never advances dataUpdatedAt on failure
+ok 197 - self controller keeps the last good fact stale and never advances dataUpdatedAt on failure
+  ---
+  duration_ms: 9.28
+  type: 'test'
+  ...
+# Subtest: scope DTO requires exact seven-day series and honest empty-class null metrics
+ok 198 - scope DTO requires exact seven-day series and honest empty-class null metrics
+  ---
+  duration_ms: 3.2025
+  type: 'test'
+  ...
+# Subtest: scope controller composes classes, polls only while visible, refreshes immediately on return, and retains stale data
+ok 199 - scope controller composes classes, polls only while visible, refreshes immediately on return, and retains stale data
+  ---
+  duration_ms: 36.888
+  type: 'test'
+  ...
+# Subtest: class option and Beijing 04:00 helpers are deterministic
+ok 200 - class option and Beijing 04:00 helpers are deterministic
+  ---
+  duration_ms: 0.7068
+  type: 'test'
+  ...
+# Subtest: 学生简报固定使用四种中性鼓励文案
+ok 201 - 学生简报固定使用四种中性鼓励文案
+  ---
+  duration_ms: 2.9055
+  type: 'test'
+  ...
+# Subtest: 五分钟边界信任服务端 checked 与 remaining，299/300 不被页面重算
+ok 202 - 五分钟边界信任服务端 checked 与 remaining，299/300 不被页面重算
+  ---
+  duration_ms: 1.376
+  type: 'test'
+  ...
+# Subtest: 0 秒、0 streak、null 更新时间与 null 最近阅读都是显式空值
+ok 203 - 0 秒、0 streak、null 更新时间与 null 最近阅读都是显式空值
+  ---
+  duration_ms: 0.6777
+  type: 'test'
+  ...
+# Subtest: 缺失 DTO 字段时拒绝补 0
+ok 204 - 缺失 DTO 字段时拒绝补 0
+  ---
+  duration_ms: 0.4641
+  type: 'test'
+  ...
+# Subtest: Home 接入真实 self resource，继续阅读只使用 hook 的精确 URL
+ok 205 - Home 接入真实 self resource，继续阅读只使用 hook 的精确 URL
+  ---
+  duration_ms: 18.1693
+  type: 'test'
+  ...
+# Subtest: 教师总览使用服务端口径显示 37/50=74%，不在视图模型重算
+ok 206 - 教师总览使用服务端口径显示 37/50=74%，不在视图模型重算
+  ---
+  duration_ms: 5.3325
+  type: 'test'
+  ...
+# Subtest: 空班级 rate/perCapita 保持 null 空态，七日数组仍然恰好 7 项
+ok 207 - 空班级 rate/perCapita 保持 null 空态，七日数组仍然恰好 7 项
+  ---
+  duration_ms: 1.2035
+  type: 'test'
+  ...
+# Subtest: 未打卡筛选包含 0～299 秒，只信任 checkedIn 布尔值
+ok 208 - 未打卡筛选包含 0～299 秒，只信任 checkedIn 布尔值
+  ---
+  duration_ms: 2.0587
+  type: 'test'
+  ...
+# Subtest: 搜索规范化全角与空白，排序使用规范化姓名 + studentId 稳定打破同名
+ok 209 - 搜索规范化全角与空白，排序使用规范化姓名 + studentId 稳定打破同名
+  ---
+  duration_ms: 1.006
+  type: 'test'
+  ...
+# Subtest: 教师对比只展示中性事实，no_baseline 不伪装成持平
+ok 210 - 教师对比只展示中性事实，no_baseline 不伪装成持平
+  ---
+  duration_ms: 0.7148
+  type: 'test'
+  ...
+# Subtest: ClassOverview 接入真实 scope state，展示所有状态、双趋势与抽屉焦点边界
+ok 211 - ClassOverview 接入真实 scope state，展示所有状态、双趋势与抽屉焦点边界
+  ---
+  duration_ms: 18.4459
+  type: 'test'
+  ...
+# Subtest: 最近阅读页码超出总页数时拒绝展示
+ok 212 - 最近阅读页码超出总页数时拒绝展示
+  ---
+  duration_ms: 1.4688
+  type: 'test'
+  ...
+# Subtest: 学生阅读统计适配器只读取严格 self，不兼容旧等级、按书排行与完成度字段
+ok 213 - 学生阅读统计适配器只读取严格 self，不兼容旧等级、按书排行与完成度字段
+  ---
+  duration_ms: 5.3252
+  type: 'test'
+  ...
+# Subtest: 权限端统计适配器只传 classId/statDate，并严格拒绝旧范围和竞争排名字段
+ok 214 - 权限端统计适配器只传 classId/statDate，并严格拒绝旧范围和竞争排名字段
+  ---
+  duration_ms: 5.5813
+  type: 'test'
+  ...
+# Subtest: 生产统计状态模块不导入 fixture、mock、MOOC 或 localStorage 业务真相
+ok 215 - 生产统计状态模块不导入 fixture、mock、MOOC 或 localStorage 业务真相
+  ---
+  duration_ms: 13.0859
+  type: 'test'
+  ...
+# Subtest: 阅读器刷新后从服务端租约返回的下一离线序号继续写入
+ok 216 - 阅读器刷新后从服务端租约返回的下一离线序号继续写入
+  ---
+  duration_ms: 3.8514
+  type: 'test'
+  ...
+# Subtest: 新monitor的movement source不得泄漏到旧page_turn payload
+ok 217 - 新monitor的movement source不得泄漏到旧page_turn payload
+  ---
+  duration_ms: 12.2586
+  type: 'test'
+  ...
+# Subtest: 报告页面不得从 fixture 或浏览器存储读取业务数据
+ok 218 - 报告页面不得从 fixture 或浏览器存储读取业务数据
+  ---
+  duration_ms: 15.4153
+  type: 'test'
+  ...
+# Subtest: 报告 API 覆盖学生、报告、审核、联系人与发送处理契约
+ok 219 - 报告 API 覆盖学生、报告、审核、联系人与发送处理契约
+  ---
+  duration_ms: 4.7218
+  type: 'test'
+  ...
+# Subtest: 报告 API 把读写请求交给真实端点并保留调用方的写入选项
+ok 220 - 报告 API 把读写请求交给真实端点并保留调用方的写入选项
+  ---
+  duration_ms: 3.9909
+  type: 'test'
+  ...
+# Subtest: 报告状态 hook 只从 API 组织加载、生成、审核与发送状态
+ok 221 - 报告状态 hook 只从 API 组织加载、生成、审核与发送状态
+  ---
+  duration_ms: 7.2625
+  type: 'test'
+  ...
+# {
+#   "routes": [
+#     {
+#       "route": "/student/home",
+#       "app": "src/student/StudentApp.jsx",
+#       "page": "src/student/pages/Home.jsx",
+#       "routePresent": true,
+#       "successPathPresent": true,
+#       "failurePathPresent": true,
+#       "runtimeGatePresent": false
+#     },
+#     {
+#       "route": "/student/reader/:bookId",
+#       "app": "src/student/StudentApp.jsx",
+#       "page": "src/student/pages/Reader.jsx",
+#       "routePresent": true,
+#       "successPathPresent": true,
+#       "failurePathPresent": true,
+#       "runtimeGatePresent": false
+#     },
+#     {
+#       "route": "/console/home",
+#       "app": "src/console/ConsoleApp.jsx",
+#       "page": "src/console/pages/Home.jsx",
+#       "routePresent": true,
+#       "successPathPresent": true,
+#       "failurePathPresent": true,
+#       "runtimeGatePresent": false
+#     },
+#     {
+#       "route": "/console/safety/:eventId",
+#       "app": "src/console/ConsoleApp.jsx",
+#       "page": "src/console/pages/safety/SafetyDetail.jsx",
+#       "routePresent": true,
+#       "successPathPresent": true,
+#       "failurePathPresent": true,
+#       "runtimeGatePresent": false
+#     }
+#   ],
+#   "graphs": [
+#     {
+#       "entry": "src/student/StudentApp.jsx",
+#       "modules": [
+#         "src/adapters/student.js",
+#         "src/api/auth.js",
+#         "src/api/client.js",
+#         "src/api/envelope.js",
+#         "src/api/student.js",
+#         "src/api/useApiResource.js",
+#         "src/components/ui.jsx",
+#         "src/console/pages/accounts/identityUi.js",
+#         "src/shared/RuntimeIcon.jsx",
+#         "src/shared/cx.js",
+#         "src/shared/format.js",
+#         "src/shared/useProtectedAssetUrl.js",
+#         "src/student/StudentApp.jsx",
+#         "src/student/community/CommunityRuntimeContext.jsx",
+#         "src/student/community/presentation.js",
+#         "src/student/components/AiHistory.jsx",
+#         "src/student/components/AiMessages.jsx",
+#         "src/student/components/AiPanel.jsx",
+#         "src/student/components/Avatar.jsx",
+#         "src/student/components/Backdrop.jsx",
+#         "src/student/components/BookCard.jsx",
+#         "src/student/components/BookCover.jsx",
+#         "src/student/components/BookPage.jsx",
+#         "src/student/components/BottomNav.jsx",
+#         "src/student/components/BrandMark.jsx",
+#         "src/student/components/ClassroomLayer.jsx",
+#         "src/student/components/Clock.jsx",
+#         "src/student/components/Glass.jsx",
+#         "src/student/components/MascotDock.jsx",
+#         "src/student/components/MascotFrame.jsx",
+#         "src/student/components/MyPostsPanel.jsx",
+#         "src/student/components/PageArt.jsx",
+#         "src/student/components/PageHead.jsx",
+#         "src/student/components/PdfBookPage.jsx",
+#         "src/student/components/PostCard.jsx",
+#         "src/student/components/Progress.jsx",
+#         "src/student/components/Reactions.jsx",
+#         "src/student/components/ReaderOverlays.jsx",
+#         "src/student/components/StudentShell.jsx",
+#         "src/student/components/book-page-blank.js",
+#         "src/student/components/mascotPresentation.js",
+#         "src/student/components/reading-monitor/DailyReadingBrief.jsx",
+#         "src/student/components/reading-monitor/dailyReadingBriefModel.js",
+#         "src/student/hooks/useReaderGesture.js",
+#         "src/student/pages/BookDetail.jsx",
+#         "src/student/pages/Community.jsx",
+#         "src/student/pages/Compose.jsx",
+#         "src/student/pages/Footprint.jsx",
+#         "src/student/pages/Highlights.jsx",
+#         "src/student/pages/Home.jsx",
+#         "src/student/pages/Level.jsx",
+#         "src/student/pages/ListDetail.jsx",
+#         "src/student/pages/Lists.jsx",
+#         "src/student/pages/Login.jsx",
+#         "src/student/pages/Me.jsx",
+#         "src/student/pages/MyPosts.jsx",
+#         "src/student/pages/Notes.jsx",
+#         "src/student/pages/Onboarding.jsx",
+#         "src/student/pages/PostDetail.jsx",
+#         "src/student/pages/Ranking.jsx",
+#         "src/student/pages/Reader.jsx",
+#         "src/student/pages/Register.jsx",
+#         "src/student/pages/Shelf.jsx",
+#         "src/student/pages/TeacherHub.jsx",
+#         "src/student/pages/Usage.jsx",
+#         "src/student/pages/shelfFilters.js",
+#         "src/student/pdf-page-design.js",
+#         "src/student/reading-monitor/activity.js",
+#         "src/student/reading-monitor/apiPorts.js",
+#         "src/student/reading-monitor/clock.js",
+#         "src/student/reading-monitor/constants.js",
+#         "src/student/reading-monitor/coordinator.js",
+#         "src/student/reading-monitor/index.js",
+#         "src/student/reading-monitor/leaseController.js",
+#         "src/student/reading-monitor/pendingQueue.js",
+#         "src/student/reading-monitor/pendingStore.js",
+#         "src/student/reading-monitor/summary.js",
+#         "src/student/reading-monitor/view.js",
+#         "src/student/reading-monitor/viewModel.js",
+#         "src/student/state/StudentContext.jsx",
+#         "src/student/state/useClassroomRuntime.js",
+#         "src/student/state/useCommunity.js",
+#         "src/student/state/useConversationManager.js",
+#         "src/student/state/useEyeCarePrivacy.js",
+#         "src/student/state/usePersonalReadingAdapter.js",
+#         "src/student/state/useReadingLibrary.js",
+#         "src/student/state/useReadingStatistics.js",
+#         "src/student/state/useReadingTelemetry.js",
+#         "src/student/state/useRefreshStudentRuntimeOnMount.js",
+#         "src/student/state/useStudentAiRuntime.js",
+#         "src/student/state/useStudentReaderPages.js",
+#         "src/student/state/useStudentRuntime.js"
+#       ],
+#       "forbiddenImports": [],
+#       "storageReferences": [],
+#       "allowedStorageReferences": [
+#         "src/student/reading-monitor/pendingStore.js"
+#       ]
+#     },
+#     {
+#       "entry": "src/console/ConsoleApp.jsx",
+#       "modules": [
+#         "src/adapters/console.js",
+#         "src/adapters/consoleAssignments.js",
+#         "src/adapters/consoleHome.js",
+#         "src/adapters/safety.js",
+#         "src/adapters/student.js",
+#         "src/api/auth.js",
+#         "src/api/client.js",
+#         "src/api/console.js",
+#         "src/api/envelope.js",
+#         "src/api/reports.js",
+#         "src/api/stage4.js",
+#         "src/api/student.js",
+#         "src/api/useApiResource.js",
+#         "src/components/ui.jsx",
+#         "src/console/ConsoleApp.jsx",
+#         "src/console/components/Backdrop.jsx",
+#         "src/console/components/BookFlip.jsx",
+#         "src/console/components/BrandMark.jsx",
+#         "src/console/components/CommunityPostCard.jsx",
+#         "src/console/components/Controls.jsx",
+#         "src/console/components/Glass.jsx",
+#         "src/console/components/MiniChart.jsx",
+#         "src/console/components/Overlay.jsx",
+#         "src/console/components/PagePanel.jsx",
+#         "src/console/components/Progress.jsx",
+#         "src/console/components/reading-monitor/ReadingStatisticsView.jsx",
+#         "src/console/components/reading-monitor/readingStatisticsViewModel.js",
+#         "src/console/components/shell/ConsoleShell.jsx",
+#         "src/console/components/shell/PrimaryRail.jsx",
+#         "src/console/components/shell/SecondaryRail.jsx",
+#         "src/console/components/shell/TopBar.jsx",
+#         "src/console/components/shell/activeNavigation.js",
+#         "src/console/pages/ClassOverview.jsx",
+#         "src/console/pages/Community.jsx",
+#         "src/console/pages/Home.jsx",
+#         "src/console/pages/Login.jsx",
+#         "src/console/pages/PlatformAudit.jsx",
+#         "src/console/pages/SelectClass.jsx",
+#         "src/console/pages/accounts/ClassDetail.jsx",
+#         "src/console/pages/accounts/ClassList.jsx",
+#         "src/console/pages/accounts/OrgAccounts.jsx",
+#         "src/console/pages/accounts/StudentDetail.jsx",
+#         "src/console/pages/accounts/StudentDirectory.jsx",
+#         "src/console/pages/accounts/identityApi.js",
+#         "src/console/pages/accounts/identityUi.js",
+#         "src/console/pages/classes/EyeCare.jsx",
+#         "src/console/pages/reports/ParentSend.jsx",
+#         "src/console/pages/reports/ReportCenter.jsx",
+#         "src/console/pages/reports/ReportDetail.jsx",
+#         "src/console/pages/reports/Templates.jsx",
+#         "src/console/pages/safety/SafetyDetail.jsx",
+#         "src/console/pages/teaching/ArrangeDetail.jsx",
+#         "src/console/pages/teaching/ArrangeList.jsx",
+#         "src/console/pages/teaching/BookDetail.jsx",
+#         "src/console/pages/teaching/BookLibrary.jsx",
+#         "src/console/pages/teaching/BookVisibilityPanel.jsx",
+#         "src/console/pages/teaching/TeacherReader.jsx",
+#         "src/console/pages/teaching/bookLibraryFilters.js",
+#         "src/console/pages/teaching/bookManagement.js",
+#         "src/console/pages/usage/Privacy.jsx",
+#         "src/console/pages/usage/Sessions.jsx",
+#         "src/console/pages/usage/UsageOverview.jsx",
+#         "src/console/state/ConsoleContext.jsx",
+#         "src/console/state/communityRuntime.js",
+#         "src/console/state/consoleAccess.js",
+#         "src/console/state/conversationViewModel.js",
+#         "src/console/state/navigation.js",
+#         "src/console/state/useAssignmentsData.js",
+#         "src/console/state/useBookVisibility.js",
+#         "src/console/state/useBookWriteActions.js",
+#         "src/console/state/useConsoleCommunityRuntime.js",
+#         "src/console/state/useConsoleHomeData.js",
+#         "src/console/state/useConsoleRuntime.js",
+#         "src/console/state/useConversationData.js",
+#         "src/console/state/usePrivacyEyeCareData.js",
+#         "src/console/state/useReadingStatistics.js",
+#         "src/console/state/useReportsData.js",
+#         "src/console/state/useSafetyEvent.js",
+#         "src/console/state/useStage4ConsoleData.js",
+#         "src/console/state/useTeacherReaderRuntime.js",
+#         "src/console/state/useUsageSummary.js",
+#         "src/shared/RuntimeIcon.jsx",
+#         "src/shared/cx.js",
+#         "src/shared/useProtectedAssetUrl.js",
+#         "src/student/state/StudentContext.jsx",
+#         "src/student/state/useConversationManager.js",
+#         "src/student/state/useStudentAiRuntime.js",
+#         "src/student/state/useStudentRuntime.js"
+#       ],
+#       "forbiddenImports": [],
+#       "storageReferences": [],
+#       "allowedStorageReferences": []
+#     }
+#   ]
+# }
+# Subtest: tests\\frontend\\runtime-import-scan.mjs
+ok 40 - tests\\frontend\\runtime-import-scan.mjs
+  ---
+  duration_ms: 331.3575
+  type: 'test'
+  ...
+# Subtest: 书架渲染集合等于数据源返回集合，年级筛选只做子集不过入新书
+ok 223 - 书架渲染集合等于数据源返回集合，年级筛选只做子集不过入新书
+  ---
+  duration_ms: 4.3466
+  type: 'test'
+  ...
+# Subtest: 学生书目适配器把投影字段 grade 带到前端书对象，缺失则为 null
+ok 224 - 学生书目适配器把投影字段 grade 带到前端书对象，缺失则为 null
+  ---
+  duration_ms: 2.1364
+  type: 'test'
+  ...
+# Subtest: 书籍详情年级胶囊在两级都缺失时不渲染，禁止当前年级 年级半截文案
+ok 225 - 书籍详情年级胶囊在两级都缺失时不渲染，禁止当前年级 年级半截文案
+  ---
+  duration_ms: 12.5762
+  type: 'test'
+  ...
+# Subtest: 书架页只渲染 runtime.books，筛选点击不请求书目、不导入演示书库
+ok 226 - 书架页只渲染 runtime.books，筛选点击不请求书目、不导入演示书库
+  ---
+  duration_ms: 3.9149
+  type: 'test'
+  ...
+# Subtest: 安全事件列表只请求真实工作空间 API
+ok 227 - 安全事件列表只请求真实工作空间 API
+  ---
+  duration_ms: 5.3351
+  type: 'test'
+  ...
+# Subtest: 班级列表由真实学生名单聚合且详情保持同一资源范围
+ok 228 - 班级列表由真实学生名单聚合且详情保持同一资源范围
+  ---
+  duration_ms: 30.3715
+  type: 'test'
+  ...
+# Subtest: 书目详情从真实书目列表选择，不生成演示兜底
+ok 229 - 书目详情从真实书目列表选择，不生成演示兜底
+  ---
+  duration_ms: 1.1308
+  type: 'test'
+  ...
+# Subtest: 缺少教师护眼与隐私 HTTP 契约时返回 unavailable 且不发伪请求
+ok 230 - 缺少教师护眼与隐私 HTTP 契约时返回 unavailable 且不发伪请求
+  ---
+  duration_ms: 0.7303
+  type: 'test'
+  ...
+# Subtest: 真实接口错误保持 error，不降级为空数据或 fixture
+ok 231 - 真实接口错误保持 error，不降级为空数据或 fixture
+  ---
+  duration_ms: 1.9377
+  type: 'test'
+  ...
+# Subtest: Stage 4 生产适配层不引用 fixture、mock、demo 或本地业务存储
+ok 232 - Stage 4 生产适配层不引用 fixture、mock、demo 或本地业务存储
+  ---
+  duration_ms: 14.5054
+  type: 'test'
+  ...
+# Subtest: 阅读器返回的书籍详情路由挂载真实 BookDetail，不回落统一 unavailable 页
+ok 233 - 阅读器返回的书籍详情路由挂载真实 BookDetail，不回落统一 unavailable 页
+  ---
+  duration_ms: 15.1123
+  type: 'test'
+  ...
+# Subtest: 安排详情路由挂载真实数据页，未实现写操作不得保留演示确认文案
+ok 234 - 安排详情路由挂载真实数据页，未实现写操作不得保留演示确认文案
+  ---
+  duration_ms: 4.5749
+  type: 'test'
+  ...
+# Subtest: ConsoleShell 将深路由计算结果传给二级导航高亮
+ok 235 - ConsoleShell 将深路由计算结果传给二级导航高亮
+  ---
+  duration_ms: 2.5299
+  type: 'test'
+  ...
+# Subtest: 学生个人入口挂载真实页面，页面不再导入静态演示数据
+ok 236 - 学生个人入口挂载真实页面，页面不再导入静态演示数据
+  ---
+  duration_ms: 13.3495
+  type: 'test'
+  ...
+# Subtest: 没有服务端设置契约时，个人主页保留原卡片内的诚实状态而不跳转静态设置页
+ok 237 - 没有服务端设置契约时，个人主页保留原卡片内的诚实状态而不跳转静态设置页
+  ---
+  duration_ms: 3.9105
+  type: 'test'
+  ...
+# Subtest: 阅读器和个人内容写入走正式阅读对象接口，不再声明收藏或批注不可用
+ok 238 - 阅读器和个人内容写入走正式阅读对象接口，不再声明收藏或批注不可用
+  ---
+  duration_ms: 4.6512
+  type: 'test'
+  ...
+# Subtest: 主站可见书籍入口先进入真实详情，AI 向导不再推荐旧壳静态书目
+ok 239 - 主站可见书籍入口先进入真实详情，AI 向导不再推荐旧壳静态书目
+  ---
+  duration_ms: 3.017
+  type: 'test'
+  ...
+# Subtest: 可达的无后端控件必须明确禁用，不能留下看似可点击的假动作
+ok 240 - 可达的无后端控件必须明确禁用，不能留下看似可点击的假动作
+  ---
+  duration_ms: 4.0277
+  type: 'test'
+  ...
+# Subtest: 学生和书目详情挂到真实权限端路由，班级总览接入新阅读统计状态
+ok 241 - 学生和书目详情挂到真实权限端路由，班级总览接入新阅读统计状态
+  ---
+  duration_ms: 8.7159
+  type: 'test'
+  ...
+# Subtest: 权限端只读或缺契约的动作必须局部禁用，不能弹出假成功确认框
+ok 242 - 权限端只读或缺契约的动作必须局部禁用，不能弹出假成功确认框
+  ---
+  duration_ms: 7.2066
+  type: 'test'
+  ...
+# Subtest: 被涉事回避的教师打开安全入口时显示真实权限边界，不回流安全列表 fixture
+ok 243 - 被涉事回避的教师打开安全入口时显示真实权限边界，不回流安全列表 fixture
+  ---
+  duration_ms: 3.6975
+  type: 'test'
+  ...
+# Subtest: 普通工作空间直达平台审计时显示前端权限空态，不依赖后端 403
+ok 244 - 普通工作空间直达平台审计时显示前端权限空态，不依赖后端 403
+  ---
+  duration_ms: 2.1774
+  type: 'test'
+  ...
+# Subtest: 社区与报告只暴露已有真实写接口，其余动作明确留在对应真实页面
+ok 245 - 社区与报告只暴露已有真实写接口，其余动作明确留在对应真实页面
+  ---
+  duration_ms: 4.0624
+  type: 'test'
+  ...
+# Subtest: 全新 AI 会话首次发送不携带旧会话并保留新选择的书页上下文
+ok 246 - 全新 AI 会话首次发送不携带旧会话并保留新选择的书页上下文
+  ---
+  duration_ms: 74.2545
+  type: 'test'
+  ...
+# Subtest: 新对话状态阻止旧会话回选并在服务端创建后刷新完整历史
+ok 247 - 新对话状态阻止旧会话回选并在服务端创建后刷新完整历史
+  ---
+  duration_ms: 6.7464
+  type: 'test'
+  ...
+# Subtest: 真实学生 AI 运行时把课堂广播映射为同一教师提问与同一回复
+ok 248 - 真实学生 AI 运行时把课堂广播映射为同一教师提问与同一回复
+  ---
+  duration_ms: 1.2937
+  type: 'test'
+  ...
+# Subtest: 学生端默认翻页效果不是 curl，且 curl 分支运行时不可达
+ok 249 - 学生端默认翻页效果不是 curl，且 curl 分支运行时不可达
+  ---
+  duration_ms: 12.8223
+  type: 'test'
+  ...
+# Subtest: Reader ready 态保留冻结翻页、AI、课堂、吉祥物与抽屉结构
+ok 250 - Reader ready 态保留冻结翻页、AI、课堂、吉祥物与抽屉结构
+  ---
+  duration_ms: 16.2289
+  type: 'test'
+  ...
+# Subtest: Home ready 态保留冻结五列书架、浮动书单与卡片结构
+ok 251 - Home ready 态保留冻结五列书架、浮动书单与卡片结构
+  ---
+  duration_ms: 9.2587
+  type: 'test'
+  ...
+# Subtest: 个人中心挂载 Me.jsx，并有调用 createAuthApi.logout 的退出登录入口
+ok 252 - 个人中心挂载 Me.jsx，并有调用 createAuthApi.logout 的退出登录入口
+  ---
+  duration_ms: 14.0325
+  type: 'test'
+  ...
+# Subtest: Me.jsx 退出路径不包含任何阅读计时处理
+ok 253 - Me.jsx 退出路径不包含任何阅读计时处理
+  ---
+  duration_ms: 3.0958
+  type: 'test'
+  ...
+# Subtest: Settings.jsx 伪退出入口保持只 Link 到登录页，不调 logout
+ok 254 - Settings.jsx 伪退出入口保持只 Link 到登录页，不调 logout
+  ---
+  duration_ms: 4.4713
+  type: 'test'
+  ...
+# Subtest: 学生阅读对象 API 只调用真实路由并透传工作空间与幂等键
+ok 255 - 学生阅读对象 API 只调用真实路由并透传工作空间与幂等键
+  ---
+  duration_ms: 44.7967
+  type: 'test'
+  ...
+# Subtest: 阅读对象空态来自真实接口结果，不导入 fixture 或 localStorage 业务真相
+ok 256 - 阅读对象空态来自真实接口结果，不导入 fixture 或 localStorage 业务真相
+  ---
+  duration_ms: 2.9363
+  type: 'test'
+  ...
+# Subtest: 服务端空响应规范化为六个真实空集合，旧足迹不能把空资源变为 ready
+ok 257 - 服务端空响应规范化为六个真实空集合，旧足迹不能把空资源变为 ready
+  ---
+  duration_ms: 0.9958
+  type: 'test'
+  ...
+# Subtest: 后台刷新成功时不进入 loading，且用服务端新进度覆盖旧 books
+ok 258 - 后台刷新成功时不进入 loading，且用服务端新进度覆盖旧 books
+  ---
+  duration_ms: 1.7185
+  type: 'test'
+  ...
+# Subtest: 从阅读器返回详情页：Provider 仍持旧 runtime，详情页挂载后台刷新后页码与有效阅读时长更新
+ok 259 - 从阅读器返回详情页：Provider 仍持旧 runtime，详情页挂载后台刷新后页码与有效阅读时长更新
+  ---
+  duration_ms: 1.1334
+  type: 'test'
+  ...
+# Subtest: 书架/书单页与详情页共用 runtime.books，后台刷新后 buildPersonalBookCollection 同步新进度
+ok 260 - 书架/书单页与详情页共用 runtime.books，后台刷新后 buildPersonalBookCollection 同步新进度
+  ---
+  duration_ms: 0.5996
+  type: 'test'
+  ...
+# Subtest: 后台刷新失败且已有旧数据时保持 ready，不把页面打回空态
+ok 261 - 后台刷新失败且已有旧数据时保持 ready，不把页面打回空态
+  ---
+  duration_ms: 0.3296
+  type: 'test'
+  ...
+# Subtest: 展示阅读进度的学生页在挂载时调用 useRefreshStudentRuntimeOnMount
+ok 262 - 展示阅读进度的学生页在挂载时调用 useRefreshStudentRuntimeOnMount
+  ---
+  duration_ms: 8.4765
+  type: 'test'
+  ...
+# Subtest: useRefreshStudentRuntimeOnMount 只在挂载时触发 refreshInBackground，不因 runtime 更新循环请求
+ok 263 - useRefreshStudentRuntimeOnMount 只在挂载时触发 refreshInBackground，不因 runtime 更新循环请求
+  ---
+  duration_ms: 1.3834
+  type: 'test'
+  ...
+# Subtest: Vite dev 只拦截 /books/*，不拦 logo 与其它公开静态资源
+ok 264 - Vite dev 只拦截 /books/*，不拦 logo 与其它公开静态资源
+  ---
+  duration_ms: 6.6881
+  type: 'test'
+  ...
+1..264
+# tests 264
+# suites 0
+# pass 264
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1086.7518
