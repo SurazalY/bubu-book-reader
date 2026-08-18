@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 import {
@@ -85,6 +86,48 @@ test('buildReadingClassOptions 对班级列表按自然数字序排序，一班�
   const displayNames = options.map((item) => item.displayName)
   assert.deepEqual(displayNames, ['一班', '二班', '三班', '十班', '十一班'])
   assert.deepEqual(options.map((item) => item.classId), ['c-1', 'c-2', 'c-3', 'c-10', 'c-11'])
+})
+
+test('buildReadingClassOptions 优先按结构化 entryYear 与 classNumber 排序，确保英汉混合命名下 class 1 依然排在 class 2 前', () => {
+  const payload = {
+    items: [
+      {
+        id: 's2',
+        displayName: '张三',
+        classId: 'class-2',
+        className: 'T89验收二班',
+        classStage: 'junior',
+        classEntryYear: 2024,
+        classNumber: 2,
+      },
+      {
+        id: 's1',
+        displayName: '李四',
+        classId: 'class-1',
+        className: '公共领域素材联调班级',
+        classStage: 'junior',
+        classEntryYear: 2024,
+        classNumber: 1,
+      },
+      {
+        id: 's0',
+        displayName: '王五',
+        classId: 'class-0',
+        className: '2023级实验班',
+        classStage: 'junior',
+        classEntryYear: 2023,
+        classNumber: 1,
+      },
+    ],
+  }
+
+  const options = buildReadingClassOptions(payload)
+  assert.deepEqual(options.map((item) => item.classId), ['class-0', 'class-1', 'class-2'])
+  assert.deepEqual(options.map((item) => item.displayName), ['2023级实验班', '公共领域素材联调班级', 'T89验收二班'])
+  assert.equal(options[1].entryYear, 2024)
+  assert.equal(options[1].classNumber, 1)
+  assert.equal(options[2].entryYear, 2024)
+  assert.equal(options[2].classNumber, 2)
 })
 
 function createMockScopeApi({ students = [], scopeData = {} } = {}) {
@@ -253,4 +296,12 @@ test('createSafeStorage 在非浏览器或无 localStorage 环境下安全静默
     safe.setItem('any-key', 'value')
     safe.removeItem('any-key')
   })
+})
+
+test('ConsoleContext 声明正确的 WORKSPACE_STORAGE_KEY 并在 switchWorkspace 与加载时持久化工作空间记忆', async () => {
+  const contextSource = await readFile(new URL('../../src/console/state/ConsoleContext.jsx', import.meta.url), 'utf8')
+  assert.match(contextSource, /WORKSPACE_STORAGE_KEY\s*=\s*'readmate:console:last_workspace'/)
+  assert.match(contextSource, /storage\.setItem\(\s*WORKSPACE_STORAGE_KEY,\s*workspaceId\s*\)/)
+  assert.match(contextSource, /storage\.getItem\(\s*WORKSPACE_STORAGE_KEY\s*\)/)
+  assert.match(contextSource, /createSafeStorage/)
 })

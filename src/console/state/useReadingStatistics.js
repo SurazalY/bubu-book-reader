@@ -315,6 +315,18 @@ export function compareClassNames(left, right) {
   return left.localeCompare(right, 'zh-CN')
 }
 
+function extractEntryYear(source) {
+  const val = source.classEntryYear ?? source.entryYear ?? source.class_entry_year
+  const num = Number(val)
+  return Number.isInteger(num) && num > 0 ? num : null
+}
+
+function extractClassNumber(source) {
+  const val = source.classNumber ?? source.class_number
+  const num = Number(val)
+  return Number.isInteger(num) && num > 0 ? num : null
+}
+
 export function buildReadingClassOptions(payload) {
   const classes = new Map()
   studentItems(payload).forEach((student, index) => {
@@ -324,13 +336,32 @@ export function buildReadingClassOptions(payload) {
     const displayName = typeof source.className === 'string' && source.className.trim()
       ? source.className.trim()
       : classId
+    const entryYear = extractEntryYear(source)
+    const classNumber = extractClassNumber(source)
+    const stage = typeof source.classStage === 'string' && source.classStage.trim()
+      ? source.classStage.trim()
+      : (typeof source.stage === 'string' && source.stage.trim() ? source.stage.trim() : null)
+
     const current = classes.get(classId)
     if (!current || compareClassNames(displayName, current.displayName) < 0) {
-      classes.set(classId, { classId, displayName })
+      classes.set(classId, {
+        classId,
+        displayName,
+        ...(entryYear !== null ? { entryYear } : {}),
+        ...(classNumber !== null ? { classNumber } : {}),
+        ...(stage !== null ? { stage } : {}),
+      })
     }
   })
-  return Object.freeze([...classes.values()].sort((left, right) =>
-    compareClassNames(left.displayName, right.displayName) || left.classId.localeCompare(right.classId, 'en')))
+  return Object.freeze([...classes.values()].sort((left, right) => {
+    if (left.entryYear !== undefined && right.entryYear !== undefined && left.entryYear !== right.entryYear) {
+      return left.entryYear - right.entryYear
+    }
+    if (left.classNumber !== undefined && right.classNumber !== undefined && left.classNumber !== right.classNumber) {
+      return left.classNumber - right.classNumber
+    }
+    return compareClassNames(left.displayName, right.displayName) || left.classId.localeCompare(right.classId, 'en')
+  }))
 }
 
 export const CLASS_STORAGE_KEY_PREFIX = 'readmate:console:last_class:'

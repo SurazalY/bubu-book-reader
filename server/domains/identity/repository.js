@@ -34,7 +34,7 @@ function toWorkspace(record) {
   }
 }
 
-function activeWorkspaceQuery(whereClause) {
+function activeWorkspaceQuery(whereClause, joinClause = '') {
   return `
     SELECT
       workspaces.id,
@@ -49,6 +49,7 @@ function activeWorkspaceQuery(whereClause) {
     JOIN workspace_memberships ON workspace_memberships.workspace_id = workspaces.id
     JOIN users ON users.id = workspace_memberships.user_id
     JOIN organizations ON organizations.id = users.organization_id
+    ${joinClause}
     WHERE workspace_memberships.user_id = ?
       AND workspace_memberships.status = 'active'
       AND users.status = 'active'
@@ -310,7 +311,14 @@ export function updateUserDisplayName(database, userId, displayName, expectedVer
 
 export function listWorkspacesForUser(database, userId) {
   const records = database
-    .prepare(`${activeWorkspaceQuery('')} ORDER BY workspaces.code, workspaces.name`)
+    .prepare(`
+      ${activeWorkspaceQuery('', `
+        LEFT JOIN classes
+          ON classes.id = workspaces.scope_id
+          AND workspaces.scope_type = 'class'
+      `)}
+      ORDER BY workspaces.code, classes.entry_year, classes.class_number, workspaces.name
+    `)
     .all(userId)
   return records.map(toWorkspace)
 }

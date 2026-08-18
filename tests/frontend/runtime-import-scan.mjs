@@ -11,6 +11,7 @@ const indexedDbPattern = /\bindexedDB\b/
 const allowedIndexedDbModule = 'src/student/reading-monitor/pendingStore.js'
 const allowedStorageModules = new Set([
   'src/student/reading-monitor/pendingStore.js',
+  'src/console/state/ConsoleContext.jsx',
   'src/console/state/useReadingStatistics.js',
 ])
 

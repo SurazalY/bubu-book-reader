@@ -622,7 +622,10 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
         student.id,
         student.display_name AS displayName,
         class.id AS classId,
-        class.name AS className
+        class.name AS className,
+        class.stage AS classStage,
+        class.entry_year AS classEntryYear,
+        class.class_number AS classNumber
       FROM users AS student
       JOIN class_memberships AS membership
         ON membership.user_id = student.id AND membership.membership_role = 'student' AND membership.status = 'active'
@@ -630,7 +633,7 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
         ON class.id = membership.class_id AND class.status = 'active'
       WHERE student.organization_id = ? AND student.status = 'active'
         AND class.organization_id = ? AND ${scopeSql}
-      ORDER BY student.display_name, student.id
+      ORDER BY class.entry_year, class.class_number, class.name, student.display_name, student.id
     `).all(req.workspace.organizationId, req.workspace.organizationId, scopeId)
     return sendData(res, { items: rows }, { requestId: req.requestId })
   }))
