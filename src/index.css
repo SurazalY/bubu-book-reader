@@ -1252,7 +1252,9 @@ select.console-input {
 
 /* ---- 固定排版书页 ---- */
 /* 关键：inner 永远是 PAGE_DESIGN 的设计尺寸，只靠 transform: scale() 等比缩放，
-   所以行数与断行位置永远不变，不存在重新折行。frame 负责裁掉缩放后的溢出。 */
+   所以行数与断行位置永远不变，不存在重新折行。
+   长文滚动在 .student-page-body 内完成（D-06），frame 只裁纸面圆角与缩放后的像素边，
+   不把 overflow 放到 frame，否则会把页眉页脚一起卷走。 */
 .student-page-frame {
   position: relative;
   overflow: hidden;
@@ -1335,14 +1337,40 @@ select.console-input {
 .student-page-body {
   flex: 1 1 auto;
   /* flex 子项默认 min-height:auto，正文一多就会把 body 撑大、
-     溢出跑到外层裁掉，结果「有没有裁到字」在 body 上量不出来。
-     min-height:0 把高度真的限制在剩余空间里，溢出可检测。 */
+     溢出跑到外层裁掉。min-height:0 把高度限制在页眉页脚之间的剩余空间，
+     overflow-y:auto 让超出的正文可以页内纵向滚完（D-06），不改画布、不缩字号。 */
   min-height: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* 纵向手势优先交给正文滚动；横向仍可由舞台手势判定翻页 */
+  touch-action: pan-y;
   padding-top: 12px;
   /* 正文允许选中：长按选文、Ctrl 拖选都依赖它 */
   user-select: text;
   -webkit-user-select: text;
+}
+.student-page-blank {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  user-select: none;
+  color: rgba(43, 42, 38, 0.42);
+}
+.student-page-blank-label {
+  font-family: theme('fontFamily.serif');
+  font-size: 16px;
+  letter-spacing: 0.08em;
+}
+.student-page-blank-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(43, 42, 38, 0.32);
 }
 .student-page-h {
   font-family: theme('fontFamily.serif');

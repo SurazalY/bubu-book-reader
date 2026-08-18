@@ -17,6 +17,7 @@ import {
 import AiPanel from '../components/AiPanel.jsx'
 import MascotDock from '../components/MascotDock.jsx'
 import { ClassroomAura, ClassroomBar } from '../components/ClassroomLayer.jsx'
+import { createStudentApi } from '../../api/student.js'
 import { useStudent } from '../state/StudentContext.jsx'
 import useReaderGesture from '../hooks/useReaderGesture.js'
 import useStudentReaderPages from '../state/useStudentReaderPages.js'
@@ -132,6 +133,26 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
   const library = useReadingLibrary({ workspaceId })
   const sourcePdf = useMemo(() => book.assets?.find((asset) => asset.kind === 'source_pdf') || null, [book.assets])
   const [readerMode, setReaderMode] = useState(sourcePdf ? 'original' : 'text')
+  const studentApi = useMemo(() => createStudentApi(), [])
+  const preferenceRestoredRef = useRef(false)
+
+  useLayoutEffect(() => {
+    if (preferenceRestoredRef.current) return
+    const preferred = book.preferredReaderMode
+    if (preferred !== 'original' && preferred !== 'text') return
+    if (preferred === 'original' && !sourcePdf) return
+    preferenceRestoredRef.current = true
+    setReaderMode(preferred)
+  }, [book.preferredReaderMode, sourcePdf])
+
+  const reportReaderPreference = useCallback((mode) => {
+    if (!workspaceId || !book.versionId) return
+    if (mode !== 'original' && mode !== 'text') return
+    studentApi.putReaderPreference(
+      { bookVersionId: book.versionId, mode },
+      { workspaceId },
+    ).catch(() => undefined)
+  }, [book.versionId, studentApi, workspaceId])
 
   // 字号偏好在固定排版里不能靠重排实现，所以走「放大就只看一页」：
   // 小／中字号 = 双页对开（像真的翻书），大字号 = 单页铺满（每个字都更大）。
@@ -843,6 +864,7 @@ function ReaderView({ book, bookId, pageNo, setPageNo, pageResource, workspaceId
                   setSelection(null)
                   window.getSelection?.()?.removeAllRanges()
                   setReaderMode(option.key)
+                  reportReaderPreference(option.key)
                 }}
               >
                 {option.label}

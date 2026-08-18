@@ -353,3 +353,17 @@ CREATE TABLE IF NOT EXISTS book_access_grants (
 - `class_memberships` / `studentResourceScope` / `repository.js` 238–276 行这条取班级 id 的链路，我只核到表结构存在，未逐行读封装。
 - 现有测试覆盖矩阵（§4.4）。「不存在班级 grants 守卫测试」这条我用全仓搜确认过，其余用例名与行号来自子 agent。
 - pdf.js 未设 `disableRange`（我核过 `PdfBookPage.jsx` 26–30 行确实只传了 url / httpHeaders / withCredentials），但「服务端 Range 206 已被测试覆盖」这条来自子 agent。
+
+---
+
+## 13. Phase 5 主控追加：本文两处已知失准（2026-08-18）
+
+按 08 文档归档要求追加，不改上文原文。
+
+**失准一：更正三写「无 `class_teacher` 角色、不需处理别名」。**  
+实测 `server/domains/identity/permissions.js` 有 `roleAliases` 表：`class_teacher: 'teacher'`、`grade_group: 'grade_manager'`。角色键列表里确实没有独立的 `class_teacher` 行，但别名存在，T4.2 给 `teacher` 加 `book.publish` 后，`class_teacher` 会经别名生效。附录「无 `class_teacher` 角色」那句同样过时。
+
+**失准二：更正四与 §11 写「D-18 / D-19 的改动未提交」。**  
+`git log` 显示已提交（Phase 4 开工前基线更正亦写过：`fb206c5` 源码、`ee8a527` 文档）。禁止 `checkout/reset/stash/clean` 的纪律仍在，理由改为「工作区堆着后续 Phase 的未提交成果」，不再是「D-18/D-19 会丢」。
+
+**另：更正二「新迁移从 046 起」是对的。** 08/09 初稿后来误写成 T5.1 取 030，未核目录；030 已被 `030_community_reports_delivery.sql` 占用。Phase 5 用户允许 T5.1 改回 **046**，Phase 8 从 **047** 起。见 `evidence/phase5/decisions.md` P5-03。

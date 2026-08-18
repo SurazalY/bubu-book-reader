@@ -143,6 +143,9 @@ function toBook(raw) {
     downloaded: booleanValue(source.downloaded, source.isDownloaded),
     lists: asArray(source.lists || source.collections).map(toBookListReference).filter((item) => item.id || item.name),
     classReading,
+    preferredReaderMode: source.preferredReaderMode === 'original' || source.preferredReaderMode === 'text'
+      ? source.preferredReaderMode
+      : null,
   }
 }
 
@@ -216,6 +219,10 @@ export function toReaderPageDto(raw) {
   if (!blocks.length && typeof plainText === 'string' && plainText.trim()) {
     blocks.push({ kind: 'paragraph', text: plainText })
   }
+  // 空串也要留下：导入空白页的 API 是 text:''（normalized_text），
+  // firstValue 会把 '' 当成「没有」，空白页判定必须看见这笔空文本。
+  const normalizedText = [source.normalizedText, source.text, content.text]
+    .find((value) => typeof value === 'string')
   const rawPageImage = source.pageImage || source.page_image || content.pageImage
     || (asRecord(source.illustration).kind === 'page_image' ? source.illustration : null)
   const pageImage = toAsset(rawPageImage)
@@ -226,6 +233,10 @@ export function toReaderPageDto(raw) {
     printedPageLabel: firstValue(source.printedPageLabel, source.printed_page_label),
     ...(firstValue(source.readRangeVersion, source.read_range_version)
       ? { readRangeVersion: firstValue(source.readRangeVersion, source.read_range_version) }
+      : {}),
+    ...(typeof normalizedText === 'string' ? { normalizedText } : {}),
+    ...(source.blank === true || source.kind === 'blank' || source.pageKind === 'blank'
+      ? { blank: true, kind: 'blank' }
       : {}),
     width: numberOrNull(source.width, content.width),
     height: numberOrNull(source.height, content.height),

@@ -24,6 +24,13 @@ function readingSummaryBody(input = {}) {
   return Object.fromEntries(READING_SUMMARY_FIELDS.map((field) => [field, summary?.[field]]))
 }
 
+function writeIdempotencyKey(prefix) {
+  if (typeof globalThis.crypto?.randomUUID !== 'function') {
+    throw new Error('当前浏览器无法生成安全请求标识')
+  }
+  return `${prefix}:${globalThis.crypto.randomUUID()}`
+}
+
 function requireReaderTargetPart(value, field) {
   if (typeof value !== 'string' || !value.trim()) {
     throw new TypeError(`${field} is required to build a reader URL`)
@@ -83,5 +90,13 @@ export function createStudentApi(client = createApiClient()) {
       client.post('/reading/session-summaries', { ...options, body: readingSummaryBody(input) }),
     getReadingStatisticsSelf: (options = {}) => client.get('/reading/statistics/self', options),
     submitReadingEvents: (body, options = {}) => client.post('/reading/events/batch', { ...options, body }),
+    putReaderPreference: (body = {}, options = {}) => client.put('/reading/reader-preference', {
+      ...options,
+      idempotencyKey: options.idempotencyKey || writeIdempotencyKey('reader-preference'),
+      body: {
+        bookVersionId: body.bookVersionId,
+        mode: body.mode,
+      },
+    }),
   }
 }

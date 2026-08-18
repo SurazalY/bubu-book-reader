@@ -16,6 +16,7 @@ import { createReadingDomain } from '../domains/reading/catalog.js'
 import { createEyeCareDomain } from '../domains/reading/eyecare.js'
 import { createStudentLibraryDomain } from '../domains/reading/library-objects.js'
 import { createReadingMonitoringDomain } from '../domains/reading/monitoring.js'
+import { createReaderPreferenceDomain } from '../domains/reading/reader-preference.js'
 import { createReadingStatisticsDomain } from '../domains/reading/statistics.js'
 import { createReportsDomain } from '../domains/reports/index.js'
 import { dispatchSafetyNotificationOutbox } from '../domains/safety/notifications.js'
@@ -376,6 +377,7 @@ function domainForRequest(req, database, identityService) {
     eyeCare: createEyeCareDomain(dependencies),
     library: createStudentLibraryDomain(dependencies),
     readingMonitoring: createReadingMonitoringDomain(dependencies),
+    readerPreference: createReaderPreferenceDomain(dependencies),
     readingStatistics: createReadingStatisticsDomain(dependencies),
     teaching: createTeachingDomain(dependencies),
     community: createCommunityDomain(dependencies),
@@ -823,6 +825,18 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
           throw asHttpError(error)
         }
       },
+    })
+    return sendOutcome(res, req, outcome)
+  }))
+
+  router.put('/reading/reader-preference', route(async (req, res) => {
+    const key = writeKey(req)
+    const { readerPreference } = domainForRequest(req, database, identityService)
+    const outcome = await executeIdempotentAsync(database, {
+      key,
+      scope: `reading.reader-preference:${req.workspace.organizationId}:${req.identitySession.user.id}:${req.workspace.id}`,
+      request: { bookVersionId: req.body?.bookVersionId, mode: req.body?.mode },
+      operation: () => domainWriteOutcome(200, () => readerPreference.upsertPreference(req.body || {})),
     })
     return sendOutcome(res, req, outcome)
   }))

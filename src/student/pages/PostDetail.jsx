@@ -270,7 +270,7 @@ function QuoteCard({ post, book, dup = false }) {
         <blockquote className="student-quote-block">{post.quote.text}</blockquote>
       )}
       {canJump ? (
-        <Link to={`/student/reader/${book.id}?page=${post.quote.page}`} className="student-primary-btn mt-3.5">
+        <Link to={`/student/reader/${book.id}?pageNo=${post.quote.page}`} className="student-primary-btn mt-3.5">
           <Icon name="BookOpen" className="h-4 w-4" strokeWidth={2} />
           去看这一页
         </Link>

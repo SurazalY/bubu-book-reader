@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { createAuthApi } from '../../api/auth.js'
 import { cx, Icon } from '../../components/ui.jsx'
 import { GlassCard, GlassPanel } from '../components/Glass.jsx'
 import Avatar from '../components/Avatar.jsx'
@@ -7,6 +9,8 @@ import useReadingLibrary from '../state/useReadingLibrary.js'
 import useReadingStatistics from '../state/useReadingStatistics.js'
 import useEyeCarePrivacy from '../state/useEyeCarePrivacy.js'
 import { useStudentCommunity } from '../community/CommunityRuntimeContext.jsx'
+
+const authApi = createAuthApi()
 
 function formatMinutes(value) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return '暂未返回'
@@ -22,8 +26,11 @@ function formatMinutes(value) {
 //   - 不显示 Token 与费用，AI 用量只给剩余次数与恢复时间；
 //   - 竹娃不在这一页（它只在阅读器）。
 export default function Me() {
+  const navigate = useNavigate()
   const { student: studentValue, prefs, runtime } = useStudent()
   const { community } = useStudentCommunity()
+  const [logoutError, setLogoutError] = useState('')
+  const [loggingOut, setLoggingOut] = useState(false)
   const workspaceId = runtime.data?.workspaceId
   const statistics = useReadingStatistics(workspaceId)
   const library = useReadingLibrary({ workspaceId })
@@ -46,6 +53,19 @@ export default function Me() {
   const teacherBadge = (privacy.data?.requests || []).filter((request) => request.status === 'pending').length
   const mineCount = Array.isArray(community.mine) ? community.mine.length : 0
   const savedCount = Array.isArray(community.savedPosts) ? community.savedPosts.length : 0
+
+  async function logout() {
+    if (loggingOut) return
+    setLogoutError('')
+    setLoggingOut(true)
+    try {
+      await authApi.logout()
+      navigate('/student/login', { replace: true })
+    } catch (error) {
+      setLogoutError(error?.message || '退出登录失败，请稍后重试')
+      setLoggingOut(false)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
@@ -88,6 +108,19 @@ export default function Me() {
           <Icon name="Settings" className="h-4 w-4" />
           设置服务端接入中
         </div>
+
+        <button
+          type="button"
+          onClick={logout}
+          disabled={loggingOut}
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-full border border-white/70 bg-white/72 px-4 py-2.5 text-caption font-semibold text-ink-700 transition hover:bg-white disabled:opacity-60"
+        >
+          <Icon name="LogOut" className="h-4 w-4" />
+          {loggingOut ? '正在退出…' : '退出登录'}
+        </button>
+        {logoutError ? (
+          <p className="mt-2 text-center text-micro text-[#D0492F]">{logoutError}</p>
+        ) : null}
       </GlassPanel>
 
       {/* 右：阅读数据 → 常用入口 → 我的内容 → 工具与设置 */}

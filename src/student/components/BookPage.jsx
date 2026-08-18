@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 import { cx } from '../../shared/cx.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
+import { isImportedBlankPage } from './book-page-blank.js'
 import PageArt from './PageArt.jsx'
 
 const PAGE_DESIGN = Object.freeze({ width: 468, height: 636, padX: 36, padY: 42 })
@@ -127,6 +128,7 @@ const BookPage = forwardRef(function BookPage(
 ) {
   const { width, height, padX, padY } = PAGE_DESIGN
   const figure = page.figure || page.illustration
+  const blank = isImportedBlankPage(page)
   return (
     <div className="student-book-page" ref={ref} data-density="soft">
       <div
@@ -149,27 +151,40 @@ const BookPage = forwardRef(function BookPage(
 
             {/* data-page 是页内坐标映射的最小实现：选区落在哪一页由它判定，
                 Stage 4 的引文卡片与未来接真实 PDF 的坐标映射都复用这个锚点。 */}
-            <div className="student-page-body" data-page={page.no}>
-              {page.blocks.map((b, i) =>
-                b.k === 'h' || b.kind === 'heading' || b.kind === 'h' ? (
-                  <h2 key={i} className="student-page-h">
-                    {b.t || b.text}
-                  </h2>
-                ) : (
-                  <MarkedParagraph
-                    key={b.blockId || b.id || i}
-                    blockId={b.blockId || b.id}
-                    text={b.t || b.text}
-                    marks={marks}
-                    className="student-page-p"
-                  />
-                ),
-              )}
-              {figure && (
-                <figure className="student-page-figure">
-                  <PageArt kind={figure.kind} src={figure.url} />
-                  <figcaption>{figure.caption || '正文插图'}</figcaption>
-                </figure>
+            <div
+              className="student-page-body"
+              data-page={page.no}
+              data-page-blank={blank ? '' : undefined}
+            >
+              {blank ? (
+                <div className="student-page-blank" role="status">
+                  <p className="student-page-blank-label">本页为空白页</p>
+                  <p className="student-page-blank-hint">导入时这一页没有正文，不是读取失败</p>
+                </div>
+              ) : (
+                <>
+                  {(page.blocks || []).map((b, i) =>
+                    b.k === 'h' || b.kind === 'heading' || b.kind === 'h' ? (
+                      <h2 key={i} className="student-page-h">
+                        {b.t || b.text}
+                      </h2>
+                    ) : (
+                      <MarkedParagraph
+                        key={b.blockId || b.id || i}
+                        blockId={b.blockId || b.id}
+                        text={b.t || b.text}
+                        marks={marks}
+                        className="student-page-p"
+                      />
+                    ),
+                  )}
+                  {figure && (
+                    <figure className="student-page-figure">
+                      <PageArt kind={figure.kind} src={figure.url} />
+                      <figcaption>{figure.caption || '正文插图'}</figcaption>
+                    </figure>
+                  )}
+                </>
               )}
             </div>
 

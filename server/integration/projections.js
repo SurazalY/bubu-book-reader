@@ -19,6 +19,21 @@ function publicAsset(row) {
   }
 }
 
+const PREFERRED_BOOK_MODE_FIELD = 'preferredReaderMode'
+
+function preferredBookModeByVersion(database, actorId) {
+  return new Map(database.prepare(`
+    SELECT book_version_id, mode
+    FROM reader_mode_preferences
+    WHERE user_id = ?
+  `).all(actorId).map((row) => [row.book_version_id, row.mode]))
+}
+
+function preferredBookModeValue(preferences, bookVersionId) {
+  const mode = preferences.get(bookVersionId)
+  return mode === 'original' || mode === 'text' ? mode : null
+}
+
 export function projectBooks(database, actorId, workspaceId, rows) {
   const progressStatement = database.prepare(`
     SELECT progress.last_page_no, progress.updated_from_event_at, version.page_count,
@@ -68,6 +83,7 @@ export function projectBooks(database, actorId, workspaceId, rows) {
     ORDER BY created_at DESC, id DESC
     LIMIT 1
   `)
+  const bookModePreferences = preferredBookModeByVersion(database, actorId)
   return rows.map((row) => {
     const progress = progressStatement.get(
       actorId, workspaceId, row.book_version_id,
@@ -100,6 +116,7 @@ export function projectBooks(database, actorId, workspaceId, rows) {
       progress: projectedProgress,
       access: { readable: true },
       lists: [],
+      [PREFERRED_BOOK_MODE_FIELD]: preferredBookModeValue(bookModePreferences, row.book_version_id),
       classReading: classroom ? {
         id: classroom.id,
         mode: classroom.mode,

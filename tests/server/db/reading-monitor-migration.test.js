@@ -105,7 +105,7 @@ test('044 在全新数据库顺序执行并由迁移账本重复启动校验和�
   t.after(() => fixture.close())
   const first = runMigrations(fixture.db, migrationDirectory, NOW)
   const second = runMigrations(fixture.db, migrationDirectory, NOW)
-  assert.equal(first.applied.at(-1), '045_book_catalog_grade_and_trusted_baseline.sql')
+  assert.equal(first.applied.at(-1), '046_reader_mode_preferences.sql')
   assert.equal(first.applied.length, listMigrationFiles(migrationDirectory).length)
   assert.equal(second.applied.length, 0)
   assert.equal(second.alreadyApplied.length, first.applied.length)

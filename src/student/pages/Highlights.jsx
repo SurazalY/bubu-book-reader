@@ -114,7 +114,7 @@ export default function Highlights() {
                   .map((item, i) => (
                     <Link
                       key={item.id}
-                      to={`/student/reader/${g.bookId}?page=${item.pageNo}`}
+                      to={`/student/reader/${g.bookId}?pageNo=${item.pageNo}`}
                       className="student-stagger inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3.5 py-2 text-caption text-ink-700 transition hover:bg-white"
                       style={{ '--i': i }}
                     >
@@ -143,7 +143,7 @@ export default function Highlights() {
                     <div className="mt-2.5 flex flex-wrap items-center gap-3">
                       <span className="text-micro text-ink-400 tabular-nums">第 {item.pageNo} 页</span>
                       <Link
-                        to={`/student/reader/${g.bookId}?page=${item.pageNo}`}
+                        to={`/student/reader/${g.bookId}?pageNo=${item.pageNo}`}
                         className="text-micro font-semibold text-ink-600 hover:text-ink-900"
                       >
                         去看这一页
