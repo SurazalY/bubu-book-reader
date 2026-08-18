@@ -94,10 +94,18 @@
 
 ## 7. 衍生问题排查与最小闭环（T6-Fix 留痕）
 
-1. **问题 1（控制台班级选择持久化与拼音排序）**：
+1. **问题 1（控制台班级选择持久化与拼音排序 -> V2 根治）**：
    - 现象：刷新页面后无法停留在上次选中的班级，且拼音排序导致“二班”排在“一班”前（E vs Y）。
-   - 修复：在 `src/console/state/useReadingStatistics.js` 中引入中文数字与阿拉伯数字自然数序比较算法（`compareClassNames`），并将选中班级按 `workspaceId` 写入/读取 `localStorage`。
-   - 验证：新增 `tests/frontend/console-class-selection-persistence.test.mjs`（8 个用例全部 PASS），前端总用例升至 283（全绿），构建 exit 0。
+   - 初版修复（V1）：在前端 `useReadingStatistics.js` 引入中文数字自然排序与 localStorage 记忆。
+   - 真实环境复测暴露深度根因（V2）：
+     * 后端 `listWorkspacesForUser` 仅按 `workspaces.code, workspaces.name` 排序，SQLite 中英文字符 'T'（T89验收二班）排在汉字 '公'（公共领域素材联调班级/一班）前，导致后端下发的第 0 个默认工作空间是二班；
+     * 前端 `ConsoleContext.jsx` 未持久化用户切换的工作空间，Ctrl+Shift+R 硬刷新后不可逆回落到默认工作空间（二班），且该工作空间只包含二班学生；
+     * 后端 `/students` 缺少结构化 `class_number`、`entry_year` 排序字段。
+   - 终版根治（V2）：
+     * 服务端 `listWorkspacesForUser` 与 `/students` LEFT JOIN `classes` 按 `classes.entry_year, classes.class_number` 结构化自然排序，确保一班物理居首；
+     * 前端 `ConsoleContext.jsx` 增加 `readmate:console:last_workspace` 存储记忆，硬刷新保持当前工作空间；
+     * 重启 5191 进程并实测 `/api/v1/students` 输出 `['三年级一班 (classNumber: 1)', 'T89验收二班 (classNumber: 2)']`；
+     * 测试：服务端 447/447，前端 285/285，构建 exit 0，检查点 `5e096a8`。
 2. **问题 2（跳读与回读行为判定机制明确）**：
    - 明确体系中仅有“跳读（hadSkip）”与“回读（hadReread）”两类行为。
    - 跳读：相邻翻页、停留 < 5s、连续 2 次触发；
@@ -105,6 +113,7 @@
    - 教师端正常在顶部指标卡片、学生列表筛选与状态标签中消费展示这两类指标。
 
 ---
+
 
 
 

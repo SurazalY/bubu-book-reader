@@ -11,9 +11,10 @@
 
 | 质量门 | 结果 | 耗时 | 备注 |
 |---|---|---|---|
-| `npm run test:server` | **445/445** passed, 0 fail | ~16.3s | 新增 8 个双模式监控与 D-23 隔离守卫 |
-| `npm run test:frontend` | **283/283** passed, 0 fail | ~0.55s | 新增 13 个遥测集成与选班持久化测试 |
-| `npm run build` | **EXIT 0** | 8.42s | 生产构建正常，1757 modules transformed |
+| `npm run test:server` | **447/447** passed, 0 fail | ~16.7s | 新增 10 个双模式监控、D-23 隔离与工作空间排序守卫 |
+| `npm run test:frontend` | **285/285** passed, 0 fail | ~0.60s | 新增 15 个遥测集成与控制台选班/工作空间持久化测试 |
+| `npm run build` | **EXIT 0** | 7.79s | 生产构建正常，1757 modules transformed |
+
 
 ---
 
