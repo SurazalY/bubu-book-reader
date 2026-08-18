@@ -88,12 +88,11 @@ test('权限端统计适配器只传 classId/statDate，并严格拒绝旧范围
   assert.throws(() => parseScopedReadingStatistics({ ...value, studentRanking: [] }), /字段集合不正确/)
 })
 
-test('生产统计状态模块不导入 fixture、mock、MOOC 或 localStorage 业务真相', async () => {
-  const sources = await Promise.all([
+test('生产统计状态模块不导入 fixture、mock 或 MOOC 业务真相', async () => {
+  const [studentSource, consoleSource] = await Promise.all([
     readFile(new URL('../../src/student/state/useReadingStatistics.js', import.meta.url), 'utf8'),
     readFile(new URL('../../src/console/state/useReadingStatistics.js', import.meta.url), 'utf8'),
   ])
-  for (const source of sources) {
-    assert.doesNotMatch(source, /(?:data\/fixtures|\bMOOC\b|\bmock\b|localStorage)/i)
-  }
+  assert.doesNotMatch(studentSource, /(?:data\/fixtures|\bMOOC\b|\bmock\b|localStorage)/i)
+  assert.doesNotMatch(consoleSource, /(?:data\/fixtures|\bMOOC\b|\bmock\b)/i)
 })

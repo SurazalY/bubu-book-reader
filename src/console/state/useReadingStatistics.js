@@ -218,6 +218,103 @@ function studentItems(payload) {
   return payload.items
 }
 
+const CHINESE_DIGIT_MAP = Object.freeze({
+  '零': 0, '〇': 0,
+  '一': 1, '壹': 1,
+  '二': 2, '两': 2, '贰': 2,
+  '三': 3, '叁': 3,
+  '四': 4, '肆': 4,
+  '五': 5, '伍': 5,
+  '六': 6, '陆': 6,
+  '七': 7, '柒': 7,
+  '八': 8, '捌': 8,
+  '九': 9, '玖': 9,
+})
+
+const CHINESE_UNIT_MAP = Object.freeze({
+  '十': 10, '拾': 10,
+  '百': 100, '佰': 100,
+  '千': 1000, '仟': 1000,
+  '万': 10000,
+})
+
+export function parseChineseNumberToken(token) {
+  if (typeof token !== 'string' || !token) return null
+  let total = 0
+  let current = 0
+  for (let i = 0; i < token.length; i++) {
+    const ch = token[i]
+    if (CHINESE_DIGIT_MAP[ch] !== undefined) {
+      current = CHINESE_DIGIT_MAP[ch]
+    } else if (CHINESE_UNIT_MAP[ch] !== undefined) {
+      const unit = CHINESE_UNIT_MAP[ch]
+      total += (current === 0 ? 1 : current) * unit
+      current = 0
+    } else {
+      return null
+    }
+  }
+  total += current
+  return total
+}
+
+const TOKEN_PATTERN = /(\d+|[零〇一壹二两贰三叁四肆五伍六陆七柒八捌九玖十拾百佰千仟]+)/g
+
+export function tokenizeClassName(name) {
+  if (typeof name !== 'string') return []
+  const tokens = []
+  let lastIndex = 0
+  let match
+  TOKEN_PATTERN.lastIndex = 0
+  while ((match = TOKEN_PATTERN.exec(name)) !== null) {
+    if (match.index > lastIndex) {
+      tokens.push({ isNumber: false, value: name.slice(lastIndex, match.index), raw: name.slice(lastIndex, match.index) })
+    }
+    const tokenStr = match[1]
+    if (/^\d+$/.test(tokenStr)) {
+      tokens.push({ isNumber: true, value: parseInt(tokenStr, 10), raw: tokenStr })
+    } else {
+      const parsedNum = parseChineseNumberToken(tokenStr)
+      if (parsedNum !== null) {
+        tokens.push({ isNumber: true, value: parsedNum, raw: tokenStr })
+      } else {
+        tokens.push({ isNumber: false, value: tokenStr, raw: tokenStr })
+      }
+    }
+    lastIndex = TOKEN_PATTERN.lastIndex
+  }
+  if (lastIndex < name.length) {
+    tokens.push({ isNumber: false, value: name.slice(lastIndex), raw: name.slice(lastIndex) })
+  }
+  return tokens
+}
+
+export function compareClassNames(left, right) {
+  if (left === right) return 0
+  const tokensLeft = tokenizeClassName(left)
+  const tokensRight = tokenizeClassName(right)
+  const minLen = Math.min(tokensLeft.length, tokensRight.length)
+  for (let i = 0; i < minLen; i++) {
+    const a = tokensLeft[i]
+    const b = tokensRight[i]
+    if (a.isNumber && b.isNumber) {
+      if (a.value !== b.value) {
+        return a.value - b.value
+      }
+    } else if (a.isNumber !== b.isNumber) {
+      const comp = a.raw.localeCompare(b.raw, 'zh-CN')
+      if (comp !== 0) return comp
+    } else {
+      const comp = a.value.localeCompare(b.value, 'zh-CN')
+      if (comp !== 0) return comp
+    }
+  }
+  if (tokensLeft.length !== tokensRight.length) {
+    return tokensLeft.length - tokensRight.length
+  }
+  return left.localeCompare(right, 'zh-CN')
+}
+
 export function buildReadingClassOptions(payload) {
   const classes = new Map()
   studentItems(payload).forEach((student, index) => {
@@ -228,12 +325,62 @@ export function buildReadingClassOptions(payload) {
       ? source.className.trim()
       : classId
     const current = classes.get(classId)
-    if (!current || displayName.localeCompare(current.displayName, 'zh-CN') < 0) {
+    if (!current || compareClassNames(displayName, current.displayName) < 0) {
       classes.set(classId, { classId, displayName })
     }
   })
   return Object.freeze([...classes.values()].sort((left, right) =>
-    left.displayName.localeCompare(right.displayName, 'zh-CN') || left.classId.localeCompare(right.classId, 'en')))
+    compareClassNames(left.displayName, right.displayName) || left.classId.localeCompare(right.classId, 'en')))
+}
+
+export const CLASS_STORAGE_KEY_PREFIX = 'readmate:console:last_class:'
+
+export function getClassStorageKey(workspaceId) {
+  return typeof workspaceId === 'string' && workspaceId.trim()
+    ? `${CLASS_STORAGE_KEY_PREFIX}${workspaceId.trim()}`
+    : ''
+}
+
+export function createSafeStorage(customStorage) {
+  if (customStorage) return customStorage
+  return {
+    getItem(key) {
+      if (!key) return null
+      try {
+        if (typeof window !== 'undefined' && window?.localStorage) {
+          return window.localStorage.getItem(key)
+        }
+        if (typeof globalThis !== 'undefined' && globalThis?.localStorage) {
+          return globalThis.localStorage.getItem(key)
+        }
+      } catch {}
+      return null
+    },
+    setItem(key, value) {
+      if (!key || typeof value !== 'string') return
+      try {
+        if (typeof window !== 'undefined' && window?.localStorage) {
+          window.localStorage.setItem(key, value)
+          return
+        }
+        if (typeof globalThis !== 'undefined' && globalThis?.localStorage) {
+          globalThis.localStorage.setItem(key, value)
+        }
+      } catch {}
+    },
+    removeItem(key) {
+      if (!key) return
+      try {
+        if (typeof window !== 'undefined' && window?.localStorage) {
+          window.localStorage.removeItem(key)
+          return
+        }
+        if (typeof globalThis !== 'undefined' && globalThis?.localStorage) {
+          globalThis.localStorage.removeItem(key)
+        }
+      } catch {}
+    },
+  }
 }
 
 export function statDateAtBeijingFour(now = Date.now()) {
@@ -276,10 +423,14 @@ export function createScopedReadingStatisticsController({
   clock = { now: () => Date.now() },
   scheduler = globalThis,
   visibility = defaultVisibility(),
+  storage = createSafeStorage(),
   pollIntervalMs = POLL_INTERVAL_MS,
 } = {}) {
   if (!api?.listStudents || !api?.getSummary) throw new TypeError('scope api listStudents/getSummary is required')
   if (!Number.isSafeInteger(pollIntervalMs) || pollIntervalMs < 1_000) throw new TypeError('pollIntervalMs must be at least one second')
+  const storageKey = getClassStorageKey(workspaceId)
+  const storedClassId = storageKey ? (storage?.getItem(storageKey) || '') : ''
+  const resolvedInitialClassId = initialClassId || storedClassId
   let active = false
   let requestVersion = 0
   let timer = null
@@ -287,7 +438,7 @@ export function createScopedReadingStatisticsController({
   let state = {
     resource: { status: 'loading', data: null, error: null, meta: {} },
     classOptions: Object.freeze([]),
-    selectedClassId: initialClassId,
+    selectedClassId: resolvedInitialClassId,
     statDate: initialStatDate || statDateAtBeijingFour(clock.now()),
     isRefreshing: false,
   }
@@ -351,9 +502,14 @@ export function createScopedReadingStatisticsController({
       const response = await api.listStudents({ workspaceId })
       if (!active) return
       const classOptions = buildReadingClassOptions(response.data)
-      const selectedClassId = classOptions.some((item) => item.classId === state.selectedClassId)
-        ? state.selectedClassId
+      const currentStored = storageKey ? (storage?.getItem(storageKey) || '') : ''
+      const candidateClassId = state.selectedClassId || currentStored
+      const selectedClassId = classOptions.some((item) => item.classId === candidateClassId)
+        ? candidateClassId
         : classOptions[0]?.classId || ''
+      if (storageKey && selectedClassId) {
+        storage?.setItem(storageKey, selectedClassId)
+      }
       emit({ ...state, classOptions, selectedClassId })
       if (!selectedClassId) {
         emit({ ...state, resource: { status: 'empty', data: null, error: null, meta: response.meta || {} }, isRefreshing: false })
@@ -374,6 +530,9 @@ export function createScopedReadingStatisticsController({
 
   const setClassId = (classId) => {
     if (!state.classOptions.some((item) => item.classId === classId) || state.selectedClassId === classId) return
+    if (storageKey && classId) {
+      storage?.setItem(storageKey, classId)
+    }
     requestVersion += 1
     emit({ ...state, selectedClassId: classId, resource: { status: 'loading', data: null, error: null, meta: {} }, isRefreshing: false })
     schedulePoll()
@@ -417,12 +576,13 @@ export function createScopedReadingStatisticsController({
     refresh,
     retry: refresh,
     setClassId,
+    selectClass: setClassId,
     setStatDate,
   }
 }
 
 export default function useReadingStatistics(workspaceId, options = {}) {
-  const { api: apiOverride, initialClassId = '', initialStatDate, clock, scheduler, visibility } = options
+  const { api: apiOverride, initialClassId = '', initialStatDate, clock, scheduler, visibility, storage } = options
   const api = useMemo(() => apiOverride || createConsoleReadingStatisticsApi(), [apiOverride])
   const controller = useMemo(() => createScopedReadingStatisticsController({
     api,
@@ -432,7 +592,8 @@ export default function useReadingStatistics(workspaceId, options = {}) {
     clock,
     scheduler,
     visibility,
-  }), [api, clock, initialClassId, initialStatDate, scheduler, visibility, workspaceId])
+    storage,
+  }), [api, clock, initialClassId, initialStatDate, scheduler, storage, visibility, workspaceId])
   const snapshot = useSyncExternalStore(controller.subscribe, controller.getState, controller.getState)
   useEffect(() => {
     controller.start()
@@ -447,6 +608,7 @@ export default function useReadingStatistics(workspaceId, options = {}) {
     statDate: snapshot.statDate,
     isRefreshing: snapshot.isRefreshing,
     onClassChange: controller.setClassId,
+    selectClass: controller.setClassId,
     onStatDateChange: controller.setStatDate,
     onRefresh: controller.refresh,
     onRetry: controller.retry,

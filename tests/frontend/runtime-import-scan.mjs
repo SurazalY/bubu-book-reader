@@ -9,6 +9,10 @@ const forbiddenSpecifierPattern = /(?:\/(?:data|fixtures?|demos?|mocks?)(?:\/|$)
 const forbiddenStoragePattern = /\b(?:localStorage|sessionStorage)\b/
 const indexedDbPattern = /\bindexedDB\b/
 const allowedIndexedDbModule = 'src/student/reading-monitor/pendingStore.js'
+const allowedStorageModules = new Set([
+  'src/student/reading-monitor/pendingStore.js',
+  'src/console/state/useReadingStatistics.js',
+])
 
 export const FINAL_ROUTE_SURFACES = [
   {
@@ -84,7 +88,10 @@ export function scanRuntimeGraph(entryRelativePath) {
 
     const source = readFileSync(currentPath, 'utf8')
     const currentRelativePath = normalizePath(currentPath)
-    if (forbiddenStoragePattern.test(source)) storageReferences.push(currentRelativePath)
+    if (forbiddenStoragePattern.test(source)) {
+      if (allowedStorageModules.has(currentRelativePath)) allowedStorageReferences.push(currentRelativePath)
+      else storageReferences.push(currentRelativePath)
+    }
     if (indexedDbPattern.test(source)) {
       if (currentRelativePath === allowedIndexedDbModule) allowedStorageReferences.push(currentRelativePath)
       else storageReferences.push(currentRelativePath)

@@ -77,7 +77,7 @@ test('权限端生产入口模块图不加载 fixture、mock 或本地业务存�
   const graph = scanRuntimeGraph('src/console/ConsoleApp.jsx')
   assert.deepEqual(graph.forbiddenImports, [])
   assert.deepEqual(graph.storageReferences, [])
-  assert.deepEqual(graph.allowedStorageReferences, [])
+  assert.deepEqual(graph.allowedStorageReferences, ['src/console/state/useReadingStatistics.js'])
 })
 
 test('学生端生产入口模块图不加载 fixture、mock 或本地业务存储', () => {

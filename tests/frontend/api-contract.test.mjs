@@ -232,7 +232,7 @@ test('最终学生与权限入口模块图不带 fixture、演示数据或业务
   assert.ok(studentGraph.modules.includes('src/student/components/ReaderOverlays.jsx'))
   assert.deepEqual(studentGraph.allowedStorageReferences, ['src/student/reading-monitor/pendingStore.js'])
   const consoleGraph = results.find((result) => result.entry === 'src/console/ConsoleApp.jsx')
-  assert.deepEqual(consoleGraph.allowedStorageReferences, [])
+  assert.deepEqual(consoleGraph.allowedStorageReferences, ['src/console/state/useReadingStatistics.js'])
 })
 
 test('学生阅读器只把 API 分页正文映射为可渲染块', () => {

@@ -241,8 +241,8 @@ test('scope controller composes classes, polls only while visible, refreshes imm
   controller.start()
   await flush()
   assert.deepEqual(controller.getState().classOptions, [
-    { classId: 'class-2', displayName: '六年级二班' },
     { classId: 'class-1', displayName: '五年级一班' },
+    { classId: 'class-2', displayName: '六年级二班' },
   ])
   assert.equal(controller.getState().resource.status, 'ready')
   assert.equal(pollMs, 300_000)
@@ -261,6 +261,7 @@ test('scope controller composes classes, polls only while visible, refreshes imm
   assert.equal(typeof timerCallback, 'function')
 
   controller.setClassId('class-2')
+  assert.equal(controller.getState().selectedClassId, 'class-2')
   assert.equal(controller.getState().resource.status, 'loading')
   assert.equal(controller.getState().resource.data, null)
   await flush()
@@ -287,8 +288,8 @@ test('class option and Beijing 04:00 helpers are deterministic', () => {
     { classId: 'a', className: '一班' },
     { classId: null, className: '无班级' },
   ] }), [
-    { classId: 'b', displayName: '二班' },
     { classId: 'a', displayName: '一班' },
+    { classId: 'b', displayName: '二班' },
   ])
   assert.equal(statDateAtBeijingFour(Date.parse('2026-08-09T19:59:59.000Z')), '2026-08-09')
   assert.equal(statDateAtBeijingFour(Date.parse('2026-08-09T20:00:00.000Z')), '2026-08-10')
