@@ -303,7 +303,7 @@ async function login(baseUrl, schoolCode, loginName, password, key) {
   return requestJson(baseUrl, '/auth/login', {
     method: 'POST',
     headers: { 'Idempotency-Key': key },
-    body: { schoolCode, loginName, password },
+    body: { loginName, password },
   })
 }
 

@@ -89,7 +89,7 @@ test('安全事件关闭适配器保留工作空间、幂等键和人工说明',
   }])
 })
 
-test('登录适配器只提交 schoolCode+loginName+password 并使用真实幂等写请求', async () => {
+test('登录适配器只提交 loginName+password 并使用真实幂等写请求', async () => {
   const calls = []
   const api = createAuthApi({
     post(path, options) {
@@ -99,7 +99,6 @@ test('登录适配器只提交 schoolCode+loginName+password 并使用真实幂�
   })
 
   const response = await api.login({
-    schoolCode: 'demo-school',
     loginName: 'student-1',
     password: 'secret-value',
   }, { idempotencyKey: 'auth-login-test' })
@@ -108,7 +107,7 @@ test('登录适配器只提交 schoolCode+loginName+password 并使用真实幂�
     path: '/auth/login',
     options: {
       idempotencyKey: 'auth-login-test',
-      body: { schoolCode: 'demo-school', loginName: 'student-1', password: 'secret-value' },
+      body: { loginName: 'student-1', password: 'secret-value' },
     },
   }])
 })

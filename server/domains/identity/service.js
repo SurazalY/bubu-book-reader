@@ -21,10 +21,10 @@ import {
   findActiveStudentMembership,
   findClassById,
   findClassWorkspace,
-  findCredentialBySchoolLogin,
+  findCredentialByLoginName,
   findEnrollmentRequestById,
   findGradeWorkspace,
-  findLoginNameInOrganization,
+  findLoginName,
   findOrganizationById,
   findPasswordResetByHash,
   findPendingEnrollmentForUser,
@@ -215,16 +215,15 @@ export function createIdentityService(options) {
   const cookieName = options.cookieName ?? 'readmate_session'
   const evaluatePermission = createPermissionEvaluator(options.permissionPolicy)
 
-  function login({ schoolCode, loginName, password, requestId, idempotencyKey, now }) {
+  function login({ loginName, password, requestId, idempotencyKey, now }) {
     if (!isPasswordInputAllowed(password)) {
       throw new HttpError(400, 'VALIDATION_FAILED', `password 必须为 1 到 ${MAX_PASSWORD_LENGTH} 个字符`)
     }
-    const normalizedSchool = trimString(schoolCode)
     const normalizedLogin = trimString(loginName)
-    if (!normalizedSchool || !normalizedLogin) {
-      throw validationFailed('schoolCode 与 loginName 均为必填项')
+    if (!normalizedLogin) {
+      throw validationFailed('loginName 为必填项')
     }
-    const credential = findCredentialBySchoolLogin(database, normalizedSchool, normalizedLogin)
+    const credential = findCredentialByLoginName(database, normalizedLogin)
     if (
       !credential ||
       credential.user.status !== 'active' ||
@@ -1032,7 +1031,7 @@ export function createIdentityService(options) {
     if (!isPasswordInputAllowed(body?.password)) {
       throw validationFailed(`password 必须为 1 到 ${MAX_PASSWORD_LENGTH} 个字符`, { field: 'password' })
     }
-    if (findLoginNameInOrganization(database, credential.organizationId, loginName)) {
+    if (findLoginName(database, loginName)) {
       throw resourceConflict('校内登录名已存在', {
         suggestions: loginNameSuggestions(loginName, listLoginNamesInOrganization(database, credential.organizationId)),
       })

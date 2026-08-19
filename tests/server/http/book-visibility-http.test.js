@@ -164,7 +164,7 @@ async function login(baseUrl, fixture, user) {
   const response = await request(baseUrl, jar, '/auth/login', {
     method: 'POST',
     idempotencyKey: `login-${user.id}-${randomUUID()}`,
-    body: { schoolCode: fixture.schoolCode, loginName: user.username, password: fixture.password },
+    body: { loginName: user.username, password: fixture.password },
   })
   assert.equal(response.status, 200, JSON.stringify(response.payload))
   return jar

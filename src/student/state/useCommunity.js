@@ -8,7 +8,6 @@ const emptyDraft = {
   bookId: '',
   title: '',
   text: '',
-  quote: null,
   cover: { type: 'text', tone: 'paper' },
   from: null,
 }
@@ -58,14 +57,15 @@ function toCommunityPost(source, studentId, booksById) {
     ? { bookId: source.quote.bookId, page: source.quote.page, text: source.quote.text }
     : null
   const authorId = source?.author?.id || null
+  const bookId = source?.bookId || null
   return {
     id: source?.id || null,
     authorId: authorId === studentId ? 'me' : authorId,
     author: source?.author || null,
     scope: source?.scope === 'school' ? 'school' : 'class',
     classId: source?.classId || null,
-    bookId: quote?.bookId || null,
-    book: booksById.get(quote?.bookId) || null,
+    bookId,
+    book: booksById.get(bookId) || null,
     title: source?.title || '',
     text: source?.body || '',
     quote,
@@ -174,7 +174,6 @@ export default function useCommunity({ workspaceId, studentId, books = [], api: 
       bookId: post.bookId || '',
       title: post.title,
       text: post.text,
-      quote: post.quote,
       cover: post.cover,
       from: post.status,
     })
@@ -188,8 +187,8 @@ export default function useCommunity({ workspaceId, studentId, books = [], api: 
   }, [])
 
   const publishDraft = useCallback(async () => {
-    if (!workspaceId || !draft.bookId || !draft.quote || !draft.title.trim() || !draft.text.trim()) {
-      setFlash({ tone: 'danger', text: '请选择书中引文，并补全标题和正文后再提交。' })
+    if (!workspaceId || !draft.bookId || !draft.title.trim() || !draft.text.trim()) {
+      setFlash({ tone: 'danger', text: '请选择书籍，并补全标题和正文后再提交。' })
       return false
     }
     try {
@@ -197,11 +196,7 @@ export default function useCommunity({ workspaceId, studentId, books = [], api: 
         scope: draft.scope,
         title: draft.title,
         body: draft.text,
-        quote: {
-          bookId: draft.bookId,
-          page: draft.quote.page,
-          text: draft.quote.text,
-        },
+        bookId: draft.bookId,
       }, writeOptions('community-post'))
       clearDraft()
       setFlash({ tone: 'success', text: '已提交给老师审核，刷新后会显示真实审核状态。' })
@@ -247,7 +242,7 @@ export default function useCommunity({ workspaceId, studentId, books = [], api: 
       if (range === 'today' && post.days !== 0) return false
       if (range === 'week' && post.days > 7) return false
       if (range === 'month' && post.days > 30) return false
-      return !keyword || `${post.title}\n${post.text}\n${post.quote?.text || ''}`.toLowerCase().includes(keyword)
+      return !keyword || `${post.title}\n${post.text}`.toLowerCase().includes(keyword)
     })
     return [...filtered].sort((left, right) => {
       if (sort === 'warm') return reactionTotal(right) - reactionTotal(left) || (right.createdAt || '').localeCompare(left.createdAt || '')

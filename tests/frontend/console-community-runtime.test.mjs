@@ -17,7 +17,7 @@ test('权限端社区 DTO 保留真实作者、书目和两级审核状态', () 
     status: 'submitted',
     scope: 'class',
     classId: 'class-1',
-    quote: { bookId: 'book-1', page: 2, text: '真实引文' },
+    bookId: 'book-1',
     author: { id: 'student-1', displayName: '学生一' },
     reactions: [{ type: 'clap', count: 2 }],
     reviews: [],

@@ -34,9 +34,10 @@ test('摘录页两处跳阅读器用 pageNo，不再写 ?page=', async () => {
   assert.doesNotMatch(highlights, READER_PAGE_QUERY)
 })
 
-test('社区帖详情跳阅读器用 pageNo，不再写 ?page=', async () => {
+test('社区帖详情不再用 quote 页码跳阅读器，书籍入口指向书详情', async () => {
   const postDetail = await source('../../src/student/pages/PostDetail.jsx')
-  assert.match(postDetail, /`\/student\/reader\/\$\{book\.id\}\?pageNo=\$\{post\.quote\.page\}`/)
+  assert.match(postDetail, /`\/student\/books\/\$\{book\.id\}`/)
+  assert.doesNotMatch(postDetail, /`\/student\/reader\/\$\{book\.id\}\?pageNo=\$\{post\.quote\.page\}`/)
   assert.doesNotMatch(postDetail, /`\/student\/reader\/\$\{book\.id\}\?page=\$\{post\.quote\.page\}`/)
   assert.doesNotMatch(postDetail, READER_PAGE_QUERY)
 })
@@ -52,7 +53,7 @@ test('src 里跳进学生阅读器的查询参数不得再用 ?page=', async () 
     READER_PAGE_NO_QUERY.lastIndex = 0
   }
   assert.deepEqual(offenders, [])
-  assert.ok(pageNoJumps >= 3, `至少应有摘录两处与帖详情一处 pageNo 跳转，实际 ${pageNoJumps}`)
+  assert.ok(pageNoJumps >= 2, `至少应有摘录两处 pageNo 跳转，实际 ${pageNoJumps}`)
 })
 
 test('阅读器位置解析只认 pageNo，与跳转参数对齐', async () => {

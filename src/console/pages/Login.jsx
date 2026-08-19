@@ -20,7 +20,6 @@ const authApi = createAuthApi()
 
 export default function Login() {
   const navigate = useNavigate()
-  const [school, setSchool] = useState('')
   const [account, setAccount] = useState('')
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd] = useState(false)
@@ -35,16 +34,15 @@ export default function Login() {
 
   async function submit(event) {
     event.preventDefault()
-    const schoolCode = school.trim()
     const loginName = account.trim()
-    if (!schoolCode || !loginName || !password) {
+    if (!loginName || !password) {
       setStatus('error')
-      setNote('请输入学校码、登录名和密码')
+      setNote('请输入账号和密码')
       return
     }
     setSubmitting(true)
     try {
-      const response = await authApi.login({ schoolCode, loginName, password })
+      const response = await authApi.login({ loginName, password })
       const destination = resolveLoginDestination(response.data?.navigation)
       clearFeedback()
       if (destination) navigate(destination, { replace: true })
@@ -86,29 +84,6 @@ export default function Login() {
                 : 'border-white/75 bg-white/62 focus-within:border-brand-300/70 focus-within:bg-white/75',
             )}
           >
-            <Icon name="User" className="w-5 h-5 text-ink-400 shrink-0" strokeWidth={1.6} />
-            <input
-              value={school}
-              onChange={(event) => {
-                setSchool(event.target.value)
-                clearFeedback()
-              }}
-              placeholder="学校码"
-              aria-label="学校码"
-              autoComplete="organization"
-              className="flex-1 bg-transparent text-base text-ink-800 placeholder:text-ink-400 outline-none"
-            />
-          </div>
-
-          <div
-            className={cx(
-              fieldBase,
-              'mt-5',
-              invalid
-                ? 'border-danger-500/45 bg-danger-50/45'
-                : 'border-white/75 bg-white/62 focus-within:border-brand-300/70 focus-within:bg-white/75',
-            )}
-          >
             <Icon name="IdCard" className="w-5 h-5 text-ink-400 shrink-0" strokeWidth={1.6} />
             <input
               value={account}
@@ -116,8 +91,8 @@ export default function Login() {
                 setAccount(event.target.value)
                 clearFeedback()
               }}
-              placeholder="登录名"
-              aria-label="登录名"
+              placeholder="账号"
+              aria-label="账号"
               autoComplete="username"
               className="flex-1 bg-transparent text-base text-ink-800 placeholder:text-ink-400 outline-none"
             />

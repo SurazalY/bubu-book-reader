@@ -7,22 +7,14 @@ const CommunityRuntimeContext = createContext(null)
 const EMPTY_BOOKS = Object.freeze([])
 
 export function StudentCommunityProvider({ children }) {
-  const { runtime, student, aiQuotes } = useStudent()
+  const { runtime, student } = useStudent()
   const books = runtime.data?.books || EMPTY_BOOKS
   const community = useCommunity({
     workspaceId: runtime.data?.workspaceId,
     studentId: student?.id,
     books,
   })
-  const reader = useMemo(() => ({
-    highlights: aiQuotes.reduce((groups, quote) => {
-      if (!quote.bookId) return groups
-      const current = groups[quote.bookId] || []
-      groups[quote.bookId] = [...current, { ...quote, key: quote.key || `${quote.bookId}:${quote.page}:${quote.text}` }]
-      return groups
-    }, {}),
-  }), [aiQuotes])
-  const value = useMemo(() => ({ community, reader, student, books }), [books, community, reader, student])
+  const value = useMemo(() => ({ community, student, books }), [books, community, student])
 
   return <CommunityRuntimeContext.Provider value={value}>{children}</CommunityRuntimeContext.Provider>
 }

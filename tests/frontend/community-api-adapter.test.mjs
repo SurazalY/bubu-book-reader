@@ -26,7 +26,7 @@ test('社区 API 适配器只调用真实路由并透传工作空间与幂等键
   const options = { workspaceId: 'workspace-1', idempotencyKey: 'community-write-1' }
 
   await student.listCommunityPosts({ workspaceId: 'workspace-1', query: { scope: 'school' } })
-  await student.createCommunityPost({ scope: 'class', title: '标题', body: '正文', quote: { bookId: 'book-1', page: 1, text: '引文' } }, options)
+  await student.createCommunityPost({ scope: 'class', title: '标题', body: '正文', bookId: 'book-1' }, options)
   await student.reactToCommunityPost('post-1', { reactionType: 'clap' }, options)
   await student.removeCommunityReaction('post-1', { reactionType: 'clap' }, options)
   await consoleApi.listCommunityPosts({ workspaceId: 'workspace-1', query: { scope: 'pending' } })
@@ -34,7 +34,7 @@ test('社区 API 适配器只调用真实路由并透传工作空间与幂等键
 
   assert.deepEqual(calls, [
     { method: 'GET', path: '/community/posts', options: { workspaceId: 'workspace-1', query: { limit: 100, scope: 'school' } } },
-    { method: 'POST', path: '/community/posts', options: { ...options, body: { scope: 'class', title: '标题', body: '正文', quote: { bookId: 'book-1', page: 1, text: '引文' } } } },
+    { method: 'POST', path: '/community/posts', options: { ...options, body: { scope: 'class', title: '标题', body: '正文', bookId: 'book-1' } } },
     { method: 'POST', path: '/community/posts/post-1/reactions', options: { ...options, body: { reactionType: 'clap' } } },
     { method: 'DELETE', path: '/community/posts/post-1/reactions', options: { ...options, body: { reactionType: 'clap' } } },
     { method: 'GET', path: '/community/posts', options: { workspaceId: 'workspace-1', query: { limit: 100, scope: 'pending' } } },

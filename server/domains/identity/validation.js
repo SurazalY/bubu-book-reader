@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 
 import { HttpError } from '../../db/errors.js'
 
-export const LOGIN_FAILURE_MESSAGE = '学校、账号或密码错误'
+export const LOGIN_FAILURE_MESSAGE = '账号或密码错误'
 export const ACCOUNT_NOT_FOUND_MESSAGE = '账号不存在'
 export const CLASS_NOT_FOUND_MESSAGE = '班级不存在'
 export const REGISTRATION_NOT_FOUND_MESSAGE = '注册凭据不存在'
@@ -145,6 +145,17 @@ export function rejectInjectedIdentityFields(body) {
   for (const field of ['role', 'organizationId', 'scopeId']) {
     if (Object.hasOwn(body, field)) {
       throw validationFailed('请求体不得声明 role、organizationId 或 scopeId', { field })
+    }
+  }
+}
+
+export function rejectUnknownLoginFields(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return
+  }
+  for (const field of Object.keys(body)) {
+    if (field !== 'loginName' && field !== 'password') {
+      throw validationFailed('请求体只允许 loginName 与 password', { field })
     }
   }
 }

@@ -3,13 +3,12 @@ import { BookCover, cx, Icon } from '../../components/ui.jsx'
 import { useProtectedAssetUrl } from '../../shared/useProtectedAssetUrl.js'
 import { GlassPanel } from '../components/Glass.jsx'
 import { ReactionRow, StatusChip } from '../components/Reactions.jsx'
-import { canJumpToPage, POST_STATUS, authorLabel, coverColors, postBook, scopeLabel } from '../community/presentation.js'
+import { POST_STATUS, authorLabel, coverColors, postBook, scopeLabel } from '../community/presentation.js'
 import { useStudentCommunity } from '../community/CommunityRuntimeContext.jsx'
 import { useStudent } from '../state/StudentContext.jsx'
 
-// 帖子详情（规格 §9.5，参考图 student_round1/07）：
-// 横屏左侧主要内容、右侧作者与互动分栏。
-// **没有评论区、没有关注、没有私聊**——参考图里那一整列评论是刻意删掉的。
+// 帖子详情：横屏左侧主要内容、右侧作者与互动分栏。
+// 没有评论区、没有关注、没有私聊。书籍入口跳该书详情页。
 export default function PostDetail({ community: injectedCommunity } = {}) {
   const { postId } = useParams()
   const navigate = useNavigate()
@@ -57,7 +56,6 @@ export default function PostDetail({ community: injectedCommunity } = {}) {
       </div>
 
       <div className="flex flex-col gap-4 lg:flex-row">
-        {/* 左：内容主体 */}
         <div className="min-w-0 flex-1 space-y-4">
           <GlassPanel tone="solid" className="student-enter overflow-hidden rounded-2xl">
             <Media post={post} book={book} />
@@ -67,16 +65,8 @@ export default function PostDetail({ community: injectedCommunity } = {}) {
               <p className="mt-4 whitespace-pre-wrap text-base leading-[1.9] text-ink-800">{post.text}</p>
             </div>
           </GlassPanel>
-
-          {/* 引文：保留书名、页码与原文，并能回到原文那一页（规格 §9.5 第三条）。
-              无图帖的顶部封面已经把这句原文摊成大字，此时这张卡只负责「它在哪一页」与跳转，
-              不再把同一句话抄第二遍（自检抓到）。 */}
-          {post.quote && book && (
-            <QuoteCard post={post} book={book} dup={post.cover?.type !== 'image'} />
-          )}
         </div>
 
-        {/* 右：作者、书籍、互动 */}
         <aside className="w-full shrink-0 space-y-4 lg:w-[300px]">
           <GlassPanel tone="card" className="student-enter rounded-2xl p-4">
             <div className="flex items-center gap-3">
@@ -118,7 +108,6 @@ export default function PostDetail({ community: injectedCommunity } = {}) {
             </GlassPanel>
           )}
 
-          {/* 互动：点赞、收藏、固定友好表情。没有点踩，也没有「谁点的」名单 */}
           <GlassPanel tone="card" className="student-enter rounded-2xl p-4">
             <h2 className="text-caption font-semibold text-ink-700">读完想说一句</h2>
             <div className="mt-2.5 flex items-center gap-2">
@@ -148,7 +137,6 @@ export default function PostDetail({ community: injectedCommunity } = {}) {
             </div>
           </GlassPanel>
 
-          {/* 自己的帖子：状态、原因与下一步 */}
           {mine && (
             <GlassPanel tone="card" className="student-enter rounded-2xl p-4">
               <div className="flex items-center gap-2">
@@ -170,13 +158,13 @@ export default function PostDetail({ community: injectedCommunity } = {}) {
                 <button
                   type="button"
                   onClick={() => {
-                    community.editPost(post.id)
+                    community.startDraft({ scope: post.scope })
                     navigate('/student/community/compose')
                   }}
                   className="student-mini-btn"
                 >
-                  <Icon name="Pencil" className="h-3.5 w-3.5" strokeWidth={2} />
-                  修改
+                  <Icon name="PenLine" className="h-3.5 w-3.5" strokeWidth={2} />
+                  重新写一篇
                 </button>
                 {post.status === 'pending' && (
                   <button
@@ -201,13 +189,13 @@ export default function PostDetail({ community: injectedCommunity } = {}) {
   )
 }
 
-// 顶部媒体：有图帖放这本书的真实封面（Codex Q4：不下载外部图），无图帖排版文字封面
 function Media({ post, book }) {
   const { runtime } = useStudent()
   const [c1, c2] = coverColors(post)
   const wantImage = post.cover?.type === 'image' && Boolean(book)
   const { objectUrl, failed } = useProtectedAssetUrl(wantImage ? book?.coverUrl : null, runtime.data?.workspaceId)
   const showImage = wantImage && Boolean(objectUrl) && !failed
+  const excerpt = String(post.text || '').trim().slice(0, 80)
   return (
     <div className="student-detail-media" style={{ backgroundImage: `linear-gradient(150deg, ${c1}, ${c2})` }}>
       {showImage ? (
@@ -224,16 +212,7 @@ function Media({ post, book }) {
         </>
       ) : (
         <div className="student-detail-textcover">
-          {post.quote ? (
-            <>
-              <p className="student-detail-quote">「{post.quote.text}」</p>
-              <p className="student-detail-quotefoot">
-                《{book?.title || '这本书'}》第 {post.quote.page} 页
-              </p>
-            </>
-          ) : (
-            <p className="student-detail-quote student-detail-quote--plain">{post.title}</p>
-          )}
+          <p className="student-detail-quote student-detail-quote--plain">{excerpt || post.title}</p>
         </div>
       )}
       {post.picked && (
@@ -243,43 +222,5 @@ function Media({ post, book }) {
         </span>
       )}
     </div>
-  )
-}
-
-// 引文卡：书名 + 页码 + 原文 + 回原文那一页。
-// 页码只有落在这本书已有内页里才给「去看这一页」，不给一个跳过去看不到的按钮。
-function QuoteCard({ post, book, dup = false }) {
-  const canJump = canJumpToPage(book, post.quote.page)
-  return (
-    <GlassPanel tone="card" className="student-enter rounded-2xl p-5">
-      <div className="flex items-center gap-2.5">
-        <Icon name="Quote" className="h-[18px] w-[18px] text-[#2FA38C]" strokeWidth={2} />
-        <h2 className="font-serif text-h3 font-bold text-ink-900">
-          {dup ? '这句话在书里的位置' : '书里的原文'}
-        </h2>
-        <span className="ml-auto text-micro text-ink-500">
-          《{book.title}》第 {post.quote.page} 页
-        </span>
-      </div>
-      {dup ? (
-        <p className="mt-2.5 text-caption leading-relaxed text-ink-500">
-          上面那句话出自《{book.title}》第 {post.quote.page} 页。
-          {canJump ? '想看看前后写了什么，就直接翻到那一页。' : '这本书的这一页现在还没有内页，可以先去书的页面看看。'}
-        </p>
-      ) : (
-        <blockquote className="student-quote-block">{post.quote.text}</blockquote>
-      )}
-      {canJump ? (
-        <Link to={`/student/reader/${book.id}?pageNo=${post.quote.page}`} className="student-primary-btn mt-3.5">
-          <Icon name="BookOpen" className="h-4 w-4" strokeWidth={2} />
-          去看这一页
-        </Link>
-      ) : (
-        <Link to={`/student/books/${book.id}`} className="student-mini-btn mt-3.5">
-          <Icon name="BookOpen" className="h-3.5 w-3.5" strokeWidth={2} />
-          去看这本书
-        </Link>
-      )}
-    </GlassPanel>
   )
 }

@@ -120,7 +120,7 @@ export default function Community({ community: injectedCommunity, student: injec
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜标题、内容或书里的原文"
+                placeholder="搜标题或内容"
                 aria-label="搜索社区内容"
                 className="min-w-0 flex-1 bg-transparent text-caption text-ink-800 placeholder:text-ink-300 focus:outline-none"
               />

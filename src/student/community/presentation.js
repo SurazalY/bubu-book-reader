@@ -1,9 +1,9 @@
 export const POST_STATUS = {
   draft: { label: '草稿', tone: 'muted', icon: 'FileEdit', hint: '只有你能看到，写完再决定要不要发出去' },
-  pending: { label: '等待老师审核', tone: 'warning', icon: 'Clock', hint: '老师看过之后才会出现在社区里，这段时间你还可以改或者撤回' },
-  published: { label: '老师已通过', tone: 'success', icon: 'CheckCircle2', hint: '同学们已经能看到了；改完会重新等老师看一次' },
-  returned: { label: '已退回修改', tone: 'accent', icon: 'Undo2', hint: '老师写了要改的地方，改好再发一次就行' },
-  offline: { label: '已下架', tone: 'muted', icon: 'ArchiveX', hint: '暂时不展示了，你可以按说明改好再发一次' },
+  pending: { label: '已提交，等老师通过', tone: 'warning', icon: 'Clock', hint: '本班老师看过之后才会出现在社区里' },
+  published: { label: '已通过', tone: 'success', icon: 'CheckCircle2', hint: '同学们已经能看到了' },
+  returned: { label: '未通过', tone: 'accent', icon: 'Undo2', hint: '老师没有通过，可以按说明重新写一篇' },
+  offline: { label: '已下架', tone: 'muted', icon: 'ArchiveX', hint: '暂时不展示了，你可以按说明重新写一篇' },
 }
 
 export const REACTIONS = [

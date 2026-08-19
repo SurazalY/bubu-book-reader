@@ -119,48 +119,66 @@ function assertOrganization(post, workspace) {
   return post
 }
 
-function quoteIsReadable(db, current, bookId) {
-  if (!bookId) return false
-  const audience = resolveBookAudience(db, {
-    organizationId: current.workspace.organizationId,
-    userId: current.actor.id,
-    workspaceId: current.workspace.id,
-  })
+function requirePublishedOrganizationBook(db, bookId, organizationId) {
+  const id = requireText(bookId, 'bookId', 255)
   const book = db.prepare(`
-    SELECT id, status FROM books
-    WHERE id = ? AND organization_id_at_creation = ?
-  `).get(bookId, current.workspace.organizationId)
-  if (!book) return false
-  if (book.status !== 'published' && !audience.allowUnpublished) return false
-  return isBookVisibleToAudience(db, {
-    bookId: book.id,
-    organizationId: current.workspace.organizationId,
+    SELECT id FROM books
+    WHERE id = ?
+      AND organization_id_at_creation = ?
+      AND status = 'published'
+  `).get(id, organizationId)
+  if (!book) {
+    throw new DomainError('VALIDATION_FAILED', '投稿必须关联当前组织已发布书目', { field: 'bookId' })
+  }
+  return id
+}
+
+function quoteIsReadable(db, current, bookId) {
+  const organizationId = current.workspace.organizationId
+  const hasRoleAssignments = Boolean(
+    db.prepare(`SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'role_assignments'`).get(),
+  )
+  const audience = hasRoleAssignments
+    ? resolveBookAudience(db, {
+        organizationId,
+        userId: current.actor.id,
+        workspaceId: current.workspace.id,
+      })
+    : { bypassClassGrants: false, allowUnpublished: false, classIds: [] }
+  const book = bookId
+    ? db.prepare(`
+        SELECT id, status FROM books
+        WHERE id = ? AND organization_id_at_creation = ?
+      `).get(bookId, organizationId)
+    : null
+  const visible = isBookVisibleToAudience(db, {
+    bookId,
+    organizationId,
     audience,
   })
+  if (!book) return false
+  if (book.status !== 'published' && !audience.allowUnpublished) return false
+  return visible
+}
+
+function projectPostBookId(post) {
+  return post.book_id || post.quote_book_id || null
 }
 
 function projectPostQuote(db, current, post) {
-  if (!post.quote_book_id) return { quote: null, quoteText: post.quote_text ?? null }
-  const readable = quoteIsReadable(db, current, post.quote_book_id)
-  if (!readable) {
-    return {
-      quote: {
-        bookId: post.quote_book_id,
-        page: post.quote_page,
-        text: null,
-        availability: 'unavailable',
-      },
-      quoteText: null,
-    }
-  }
+  const boundBookId = projectPostBookId(post)
+  const readable = quoteIsReadable(db, current, boundBookId)
+  const quoteText = readable ? (post.quote_text ?? null) : null
   return {
-    quote: {
-      bookId: post.quote_book_id,
-      page: post.quote_page,
-      text: post.quote_text,
-      availability: 'available',
-    },
-    quoteText: post.quote_text,
+    quote: post.quote_book_id
+      ? {
+          bookId: post.quote_book_id,
+          page: post.quote_page,
+          text: quoteText,
+          availability: readable ? 'available' : 'unavailable',
+        }
+      : null,
+    quoteText,
   }
 }
 
@@ -183,7 +201,7 @@ function reviewPlan(db, post, current, decision) {
     return {
       stage: 'class',
       classId,
-      nextStatus: decision === 'approved' && post.scope === 'school' ? 'class_approved' : decision,
+      nextStatus: decision,
     }
   }
   if (post.scope === 'school' && post.status === 'class_approved') {
@@ -219,18 +237,19 @@ export function createCommunityDomain({ db, actor, workspace, outbox, clock, idG
   const runInTransaction = transactionRunner || ((operation) => withTransaction(db, operation))
 
   return {
-    submitPost({ title, body, scope, quote, images = [], aiAssisted = false }) {
+    submitPost({ title, body, scope, bookId, images = [], aiAssisted = false }) {
       const current = context()
       requirePermission(current, 'community.submit')
       const classId = requireClassMembership(db, current, ['student'])
       const postScope = communityScope(scope)
-      const safeQuote = structuredQuote(db, quote, current.workspace.organizationId, current.workspace.scopeType !== undefined)
+      structuredQuote(db, null, current.workspace.organizationId, false)
+      const safeBookId = requirePublishedOrganizationBook(db, bookId, current.workspace.organizationId)
       if (!Array.isArray(images) || images.length > 4) throw new DomainError('VALIDATION_FAILED', '图片数量无效')
       const safeImages = images.map(imageAsset)
       const postId = runInTransaction(() => {
         const nextPostId = id()
         const createdAt = now()
-        db.prepare(`INSERT INTO community_posts (id, organization_id_at_creation, workspace_id_at_creation, class_id_at_creation, actor_id_at_creation, author_id, scope, title, body, quote_book_id, quote_page, quote_text, status, ai_assisted, organization_snapshot_json, workspace_snapshot_json, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted', ?, ?, ?, ?, ?, 1)`).run(nextPostId, current.workspace.organizationId, current.workspace.id, classId, current.actor.id, current.actor.id, postScope, requireText(title, 'title', 120), requireText(body, 'body', 5000), safeQuote?.bookId ?? null, safeQuote?.page ?? null, safeQuote?.text ?? null, aiAssisted ? 1 : 0, json(current.workspace.organizationSnapshot || {}), json(current.workspace.snapshot || {}), createdAt, createdAt)
+        db.prepare(`INSERT INTO community_posts (id, organization_id_at_creation, workspace_id_at_creation, class_id_at_creation, actor_id_at_creation, author_id, scope, title, body, quote_book_id, quote_page, quote_text, book_id, status, ai_assisted, organization_snapshot_json, workspace_snapshot_json, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL, ?, 'submitted', ?, ?, ?, ?, ?, 1)`).run(nextPostId, current.workspace.organizationId, current.workspace.id, classId, current.actor.id, current.actor.id, postScope, requireText(title, 'title', 120), requireText(body, 'body', 5000), safeBookId, aiAssisted ? 1 : 0, json(current.workspace.organizationSnapshot || {}), json(current.workspace.snapshot || {}), createdAt, createdAt)
         const insertAsset = db.prepare(`INSERT INTO post_assets (id, post_id, mime_type, size_bytes, sha256, original_name, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`)
         for (const asset of safeImages) insertAsset.run(id(), nextPostId, asset.mimeType, asset.sizeBytes, asset.sha256, asset.originalName, createdAt, createdAt)
         emit(db, outbox, 'community.post_submitted', { postId: nextPostId, scope: postScope, workspaceId: current.workspace.id, classId }, { aggregateType: 'community_post', aggregateId: nextPostId, dedupeKey: `community.post_submitted:${nextPostId}`, createdAt })
@@ -248,6 +267,7 @@ export function createCommunityDomain({ db, actor, workspace, outbox, clock, idG
       const projected = projectPostQuote(db, current, post)
       return {
         ...post,
+        bookId: projectPostBookId(post),
         quote_text: projected.quoteText,
         ai_assisted: Boolean(post.ai_assisted),
         quote: projected.quote,

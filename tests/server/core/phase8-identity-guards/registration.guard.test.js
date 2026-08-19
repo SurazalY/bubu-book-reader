@@ -122,7 +122,7 @@ test('E. 人数上限最后一名额并发只有一个成功；失败不计 use'
   assert.equal(after, before + 1, '失败不得增加 successful_use_count')
 })
 
-test('E. 同 loginName 跨校可注册；同校冲突 409 + details.suggestions 3 个', async (t) => {
+test('E. 同 loginName 跨校与同校一律冲突；同校冲突 409 + details.suggestions 3 个', async (t) => {
   const { fixture, baseUrl } = await startPhase8App(t)
   const conflict = await requestJson(baseUrl, `/registration/${fixture.studentRegister.rawToken}`, {
     method: 'POST',
@@ -153,8 +153,8 @@ test('E. 同 loginName 跨校可注册；同校冲突 409 + details.suggestions 
       classId: fixture.id.otherClass,
     },
   })
-  assertHttpStatus(cross, 201, '同 loginName 跨校必须可注册')
-  assert.notEqual(cross.payload.data.user?.id, fixture.id.enrolledStudent)
+  assertHttpStatus(cross, 409, '同 loginName 跨校必须被全局唯一拒绝')
+  assertErrorCode(cross, 'RESOURCE_CONFLICT', '跨校同名')
 })
 
 test('E. 教师/学生默认 TTL 与 max_uses 可被显式覆盖', async (t) => {

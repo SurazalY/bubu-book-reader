@@ -26,7 +26,7 @@ export const IDENTITY_SERVICE_PATH = join(projectRoot, 'server', 'domains', 'ide
 export const IDENTITY_PERMISSIONS_PATH = join(projectRoot, 'server', 'domains', 'identity', 'permissions.js')
 export const INTEGRATION_ROUTER_PATH = join(projectRoot, 'server', 'http', 'integration-router.js')
 
-export const LOGIN_FAILURE_MESSAGE = '学校、账号或密码错误'
+export const LOGIN_FAILURE_MESSAGE = '账号或密码错误'
 export const ONBOARDING_PATH = '/student/onboarding'
 export const SELECT_CLASS_PATH = '/console/select-class'
 
@@ -893,11 +893,11 @@ export function writeHeaders({ cookie, workspaceId, key, ifMatch } = {}) {
   return headers
 }
 
-export async function loginWithSchool(baseUrl, { schoolCode, loginName, password }, key = newIdempotencyKey('login')) {
+export async function loginWithSchool(baseUrl, { loginName, password }, key = newIdempotencyKey('login')) {
   return requestJson(baseUrl, '/auth/login', {
     method: 'POST',
     headers: { 'Idempotency-Key': key },
-    body: { schoolCode, loginName, password },
+    body: { loginName, password },
   })
 }
 

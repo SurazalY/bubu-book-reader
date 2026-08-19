@@ -50,16 +50,7 @@ export default function PostCard({ post, index = 0, onToggleReaction, showStatus
             </>
           ) : (
             <div className="student-post-textcover">
-              {post.quote ? (
-                <>
-                  <p className="student-post-quote">「{post.quote.text}」</p>
-                  <p className="student-post-quotefoot">
-                    《{book?.title || '这本书'}》第 {post.quote.page} 页
-                  </p>
-                </>
-              ) : (
-                <p className="student-post-plain">{post.text}</p>
-              )}
+              <p className="student-post-plain">{String(post.text || '').trim().slice(0, 80)}</p>
             </div>
           )}
           {post.picked && (
@@ -73,9 +64,9 @@ export default function PostCard({ post, index = 0, onToggleReaction, showStatus
         {/* 文字区 */}
         <div className="px-3.5 pb-3 pt-3">
           <h3 className="student-post-title">{post.title}</h3>
-          {/* 纯文字封面摊的就是正文，这里再写一遍等于同一段话在卡上出现两次（自检抓到），
-              所以摘要只在「封面是图片或引文」时才出现。 */}
-          {(isImage || post.quote) && <p className="student-post-text">{post.text}</p>}
+          {/* 纯文字封面摊的就是正文前若干字，这里再写一遍等于同一段话在卡上出现两次，
+              所以摘要只在「封面是图片」时才出现。 */}
+          {isImage && <p className="student-post-text">{post.text}</p>}
 
           <p className="mt-2.5 flex min-w-0 items-center gap-1.5 text-micro text-ink-500">
             <span className="student-post-avatar" aria-hidden="true">

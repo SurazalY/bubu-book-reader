@@ -69,39 +69,6 @@ function activeWorkspaceQuery(whereClause, joinClause = '') {
   `
 }
 
-export function findCredentialByUsername(database, username) {
-  const record = database
-    .prepare(`
-      SELECT
-        users.id,
-        users.organization_id,
-        users.username,
-        users.login_name,
-        users.account_code,
-        users.display_name,
-        users.status,
-        users.version,
-        users.created_at,
-        users.updated_at,
-        organizations.status AS organization_status,
-        credentials.password_hash
-      FROM users
-      JOIN organizations ON organizations.id = users.organization_id
-      JOIN credentials ON credentials.user_id = users.id
-      WHERE users.username = ?
-    `)
-    .get(username)
-
-  if (!record) {
-    return null
-  }
-  return {
-    user: toUser(record),
-    organizationStatus: record.organization_status,
-    passwordHash: record.password_hash,
-  }
-}
-
 export function findUserById(database, userId) {
   return toUser(
     database
@@ -393,7 +360,7 @@ const CLASS_COLUMNS = `
   id, organization_id, name, stage, entry_year, class_number, grade_id, status, version, created_at, updated_at
 `
 
-export function findCredentialBySchoolLogin(database, schoolCode, loginName) {
+export function findCredentialByLoginName(database, loginName) {
   const record = database
     .prepare(`
       SELECT
@@ -412,10 +379,9 @@ export function findCredentialBySchoolLogin(database, schoolCode, loginName) {
       FROM users
       JOIN organizations ON organizations.id = users.organization_id
       JOIN credentials ON credentials.user_id = users.id
-      WHERE organizations.school_code = ? COLLATE NOCASE
-        AND users.login_name = ? COLLATE NOCASE
+      WHERE users.login_name = ? COLLATE NOCASE
     `)
-    .get(schoolCode, loginName)
+    .get(loginName)
 
   if (!record) {
     return null
@@ -445,15 +411,15 @@ export function findClassById(database, classId) {
   return toClass(database.prepare(`SELECT ${CLASS_COLUMNS} FROM classes WHERE id = ?`).get(classId))
 }
 
-export function findLoginNameInOrganization(database, organizationId, loginName) {
+export function findLoginName(database, loginName) {
   return toUser(
     database
       .prepare(`
         SELECT id, organization_id, username, login_name, account_code, display_name, status, version, created_at, updated_at
         FROM users
-        WHERE organization_id = ? AND login_name = ? COLLATE NOCASE
+        WHERE login_name = ? COLLATE NOCASE
       `)
-      .get(organizationId, loginName),
+      .get(loginName),
   )
 }
 

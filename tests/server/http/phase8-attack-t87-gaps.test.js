@@ -50,12 +50,12 @@ async function requestJson(baseUrl, jar, path, options = {}) {
   return { status: response.status, payload }
 }
 
-async function loginWithSchool(baseUrl, { schoolCode, loginName, password }) {
+async function loginWithSchool(baseUrl, { loginName, password }) {
   const jar = new Map()
   const response = await requestJson(baseUrl, jar, '/auth/login', {
     method: 'POST',
     idempotencyKey: `t87-login-${randomUUID()}`,
-    body: { schoolCode, loginName, password },
+    body: { loginName, password },
   })
   assert.equal(response.status, 200, JSON.stringify(response.payload))
   return jar

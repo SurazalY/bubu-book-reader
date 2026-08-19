@@ -197,14 +197,14 @@ export async function requestJson(baseUrl, jar, path, options = {}) {
   return { status: response.status, payload, text }
 }
 
-export async function loginWithSchool(baseUrl, { schoolCode, loginName, password }, key = newIdempotencyKey('login')) {
+export async function loginWithSchool(baseUrl, { loginName, password }, key = newIdempotencyKey('login')) {
   const jar = new Map()
   const response = await requestJson(baseUrl, jar, '/auth/login', {
     method: 'POST',
     idempotencyKey: key,
-    body: { schoolCode, loginName, password },
+    body: { loginName, password },
   })
-  assertHttpStatus(response, 200, `schoolCode+loginName 登录 ${loginName}`)
+  assertHttpStatus(response, 200, `loginName 登录 ${loginName}`)
   return jar
 }
 

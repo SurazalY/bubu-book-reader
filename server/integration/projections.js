@@ -323,28 +323,31 @@ export function projectCommunityPosts(database, { organizationId, workspace, act
       ? (canReviewClass && row.status === 'submitted' && row.class_id_at_creation === classId) || (canReviewSchool && row.scope === 'school' && row.status === 'class_approved')
       : row.scope === scope))
     .map((row) => {
-      let quote = null
-      if (row.quote_book_id) {
-        const book = database.prepare(`
+      const bookId = row.book_id || row.quote_book_id || null
+      const book = bookId
+        ? database.prepare(`
           SELECT id, status FROM books
           WHERE id = ? AND organization_id_at_creation = ?
-        `).get(row.quote_book_id, organizationId)
-        const readable = Boolean(
-          book
-          && (book.status === 'published' || audience.allowUnpublished)
-          && isBookVisibleToAudience(database, {
-            bookId: book.id,
-            organizationId,
-            audience,
-          }),
-        )
-        quote = {
-          bookId: row.quote_book_id,
-          page: row.quote_page,
-          text: readable ? row.quote_text : null,
-          availability: readable ? 'available' : 'unavailable',
-        }
-      }
+        `).get(bookId, organizationId)
+        : null
+      const visible = isBookVisibleToAudience(database, {
+        bookId,
+        organizationId,
+        audience,
+      })
+      const readable = Boolean(
+        book
+        && (book.status === 'published' || audience.allowUnpublished)
+        && visible,
+      )
+      const quote = row.quote_book_id
+        ? {
+            bookId: row.quote_book_id,
+            page: row.quote_page,
+            text: readable ? row.quote_text : null,
+            availability: readable ? 'available' : 'unavailable',
+          }
+        : null
       return {
         id: row.id,
         title: row.title,
@@ -353,6 +356,7 @@ export function projectCommunityPosts(database, { organizationId, workspace, act
         scope: row.scope,
         classId: row.class_id_at_creation,
         workspaceId: row.workspace_id_at_creation,
+        bookId,
         quote,
         aiAssisted: Boolean(row.ai_assisted),
         author: { id: row.author_id, displayName: row.author_name },

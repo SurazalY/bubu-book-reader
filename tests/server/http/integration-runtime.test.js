@@ -495,7 +495,7 @@ test('真实 HTTP 链路持久化阅读、社区、报告和 outbox，并允许�
       scope: 'class',
       title: '真实读书心得',
       body: '我注意到了白兔出现前后的变化。',
-      quote: { bookId: book.bookId, page: 1, text: '爱丽丝坐在姐姐身旁，开始好奇地望向那只白兔。' },
+      bookId: book.bookId,
     },
   })
   assert.equal(submitted.status, 201, JSON.stringify(submitted.payload))
@@ -654,7 +654,7 @@ test('受保护 manual_demo_test 走正式安全复核并执行涉事教师回�
   assert.equal(stored.audit_count >= 1, true)
 })
 
-test('学校社区必须经过班级教师一审和学校管理员二审，且真实 SQLite 状态、审计与 outbox 一致', async (t) => {
+test('学校社区经本班教师一审通过后即可出现在学校 feed，且真实 SQLite 状态、审计与 outbox 一致', async (t) => {
   const { application, baseUrl, book, fixture } = await startHarness(t)
   assert.equal(application.database instanceof DatabaseSync, true)
 
@@ -673,15 +673,19 @@ test('学校社区必须经过班级教师一审和学校管理员二审，且�
       scope: 'school',
       title: '白兔出现前后的变化',
       body: '我注意到白兔出现前后，爱丽丝对未知世界的态度发生了变化。',
-      quote: {
-        bookId: book.bookId,
-        page: 1,
-        text: '爱丽丝坐在姐姐身旁，开始好奇地望向那只白兔。',
-      },
+      bookId: book.bookId,
     },
   })
   assert.equal(submitted.status, 201, JSON.stringify(submitted.payload))
   const postId = submitted.payload.data.id
+
+  const skippedClassReview = await requestJson(baseUrl, adminJar, `/community/posts/${postId}/review`, {
+    method: 'POST',
+    workspaceId: fixture.schoolWorkspaceId,
+    idempotencyKey: 'community-school-skipped-class-review-1',
+    body: { decision: 'approved', reason: '不能跳过班级教师一审' },
+  })
+  assert.equal(skippedClassReview.status, 403, JSON.stringify(skippedClassReview.payload))
 
   const classReview = await requestJson(baseUrl, teacherJar, `/community/posts/${postId}/review`, {
     method: 'POST',
@@ -690,34 +694,12 @@ test('学校社区必须经过班级教师一审和学校管理员二审，且�
     body: { decision: 'approved', reason: '班级教师人工审核通过' },
   })
   assert.equal(classReview.status, 200, JSON.stringify(classReview.payload))
-  assert.equal(classReview.payload.data.status, 'class_approved')
+  assert.equal(classReview.payload.data.status, 'approved')
 
-  const wrongReviewWorkspace = await requestJson(baseUrl, adminJar, `/community/posts/${postId}/review`, {
-    method: 'POST',
-    workspaceId: fixture.workspaceId,
-    idempotencyKey: 'community-school-wrong-workspace-review-1',
-    body: { decision: 'approved', reason: '学校管理员不能在班级工作空间二审' },
-  })
-  assert.equal(wrongReviewWorkspace.status, 403, JSON.stringify(wrongReviewWorkspace.payload))
-
-  const studentBeforeSchoolReview = await requestJson(baseUrl, studentJar, '/community/posts?scope=school', {
+  const studentAfterClassReview = await requestJson(baseUrl, studentJar, '/community/posts?scope=school', {
     workspaceId: fixture.workspaceId,
   })
-  assert.equal(studentBeforeSchoolReview.payload.data.items.some((item) => item.id === postId), false)
-
-  const schoolReview = await requestJson(baseUrl, adminJar, `/community/posts/${postId}/review`, {
-    method: 'POST',
-    workspaceId: fixture.schoolWorkspaceId,
-    idempotencyKey: 'community-school-admin-review-1',
-    body: { decision: 'approved', reason: '学校管理员二审通过' },
-  })
-  assert.equal(schoolReview.status, 200, JSON.stringify(schoolReview.payload))
-  assert.equal(schoolReview.payload.data.status, 'approved')
-
-  const studentAfterSchoolReview = await requestJson(baseUrl, studentJar, '/community/posts?scope=school', {
-    workspaceId: fixture.workspaceId,
-  })
-  assert.equal(studentAfterSchoolReview.payload.data.items.some((item) => item.id === postId), true)
+  assert.equal(studentAfterClassReview.payload.data.items.some((item) => item.id === postId), true)
 
   const reaction = await requestJson(baseUrl, studentJar, `/community/posts/${postId}/reactions`, {
     method: 'POST',
@@ -736,20 +718,21 @@ test('学校社区必须经过班级教师一审和学校管理员二审，且�
   assert.equal(negativeReaction.status, 422, JSON.stringify(negativeReaction.payload))
 
   const stored = application.database.prepare(`
-    SELECT scope, class_id_at_creation, quote_book_id, quote_page, quote_text, status
+    SELECT scope, class_id_at_creation, quote_book_id, quote_page, quote_text, book_id, status
     FROM community_posts WHERE id = ?
   `).get(postId)
   assert.deepEqual({ ...stored }, {
     scope: 'school',
     class_id_at_creation: fixture.classId,
-    quote_book_id: book.bookId,
-    quote_page: 1,
-    quote_text: '爱丽丝坐在姐姐身旁，开始好奇地望向那只白兔。',
+    quote_book_id: null,
+    quote_page: null,
+    quote_text: null,
+    book_id: book.bookId,
     status: 'approved',
   })
-  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM post_reviews WHERE post_id = ? AND review_stage IN ('class', 'school')").get(postId).count, 2)
-  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM audit_events WHERE resource_id = ? AND event_type IN ('community.post.submitted', 'community.post.reviewed', 'community.post.reacted')").get(postId).count, 4)
-  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM outbox_events WHERE aggregate_id = ? AND topic IN ('community.post_submitted', 'community.post_reviewed', 'community.post_reacted')").get(postId).count, 4)
+  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM post_reviews WHERE post_id = ? AND review_stage IN ('class', 'school')").get(postId).count, 1)
+  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM audit_events WHERE resource_id = ? AND event_type IN ('community.post.submitted', 'community.post.reviewed', 'community.post.reacted')").get(postId).count, 3)
+  assert.equal(application.database.prepare("SELECT COUNT(*) AS count FROM outbox_events WHERE aggregate_id = ? AND topic IN ('community.post_submitted', 'community.post_reviewed', 'community.post_reacted')").get(postId).count, 3)
 })
 
 test('真实 HTTP 管理员创建班级和学生后，学生重新登录并在新工作空间读取书目', async (t) => {

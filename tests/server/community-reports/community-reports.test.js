@@ -19,6 +19,7 @@ const migrations = [
   { path: new URL('../../../server/db/migrations/031_summary_link_revocations.sql', import.meta.url) },
   { path: new URL('../../../server/db/migrations/032_contact_workspace_delivery_claims.sql', import.meta.url) },
   { path: new URL('../../../server/db/migrations/033_community_multistage_review.sql', import.meta.url) },
+  { path: new URL('../../../server/db/migrations/052_community_post_book.sql', import.meta.url) },
 ]
 const pngBytes = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 const pngSha256 = createHash('sha256').update(pngBytes).digest('hex')
@@ -48,6 +49,17 @@ function createFixture({ permissions = communitySubmitPermissions, adapterMode =
   const db = new DatabaseSync(databasePath)
   applyMigrationSequence(db)
   applyMigrationSequence(db)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS books (
+      id TEXT PRIMARY KEY,
+      organization_id_at_creation TEXT NOT NULL,
+      status TEXT NOT NULL
+    )
+  `)
+  db.prepare(`
+    INSERT OR IGNORE INTO books (id, organization_id_at_creation, status)
+    VALUES ('book-1', 'school-1', 'published')
+  `).run()
   let activeActor = { id: 'student-1', permissions: [...permissions] }
   let activeNow = initialNow ? new Date(initialNow) : null
   const authorizedStudents = new Set(['student-1', 'student-2'])
@@ -90,7 +102,7 @@ test('业务写入与 outbox 同事务，事件入队失败时不留下半成品
 
   const communityFixture = createFixture({ outboxFactory: failingOutbox('community.post_submitted') })
   context.after(() => communityFixture.close())
-  assert.throws(() => communityFixture.community.submitPost({ title: '原子投稿', body: '事件失败时不保留投稿' }), /forced outbox failure/)
+  assert.throws(() => communityFixture.community.submitPost({ title: '原子投稿', body: '事件失败时不保留投稿', bookId: 'book-1' }), /forced outbox failure/)
   assert.equal(communityFixture.db.prepare('SELECT COUNT(*) AS count FROM community_posts').get().count, 0)
 
   const deliveryFixture = createFixture({ permissions: reportPermissions, outboxFactory: failingOutbox('report.delivery_queued') })
@@ -139,9 +151,9 @@ test('032 前向迁移保留旧投递数据并将旧联系人隔离为未归属'
 test('学生投稿经过基础图片校验、人工审核后才能轻互动或收藏', async (context) => {
   const fixture = createFixture()
   context.after(() => fixture.close())
-  await expectDomainError(() => fixture.community.submitPost({ title: '读书心得', body: '内容', images: [{ mimeType: 'image/svg+xml', sizeBytes: 100, sha256: 'a'.repeat(64), originalName: 'unsafe.svg' }] }), 'VALIDATION_FAILED')
-  await expectDomainError(() => fixture.community.submitPost({ title: '读书心得', body: '内容', images: [{ mimeType: 'image/png', sizeBytes: pngBytes.length, sha256: 'a'.repeat(64), originalName: 'forged.png', bytes: pngBytes }] }), 'VALIDATION_FAILED')
-  const post = await fixture.community.submitPost({ title: '读书心得', body: '我读到了新的细节', images: [{ mimeType: 'image/png', sizeBytes: pngBytes.length, sha256: pngSha256, originalName: 'note.png', bytes: pngBytes }] })
+  await expectDomainError(() => fixture.community.submitPost({ title: '读书心得', body: '内容', bookId: 'book-1', images: [{ mimeType: 'image/svg+xml', sizeBytes: 100, sha256: 'a'.repeat(64), originalName: 'unsafe.svg' }] }), 'VALIDATION_FAILED')
+  await expectDomainError(() => fixture.community.submitPost({ title: '读书心得', body: '内容', bookId: 'book-1', images: [{ mimeType: 'image/png', sizeBytes: pngBytes.length, sha256: 'a'.repeat(64), originalName: 'forged.png', bytes: pngBytes }] }), 'VALIDATION_FAILED')
+  const post = await fixture.community.submitPost({ title: '读书心得', body: '我读到了新的细节', bookId: 'book-1', images: [{ mimeType: 'image/png', sizeBytes: pngBytes.length, sha256: pngSha256, originalName: 'note.png', bytes: pngBytes }] })
   await expectDomainError(() => fixture.community.react({ postId: post.id, reactionType: 'bookmark' }), 'VERSION_CONFLICT')
   fixture.become('teacher-1', ['community.moderate'])
   await fixture.community.reviewPost({ postId: post.id, decision: 'approved', reason: '人工复核通过' })
@@ -160,7 +172,7 @@ test('学生投稿经过基础图片校验、人工审核后才能轻互动或�
 test('权限默认拒绝且跨工作空间操作被拒绝', async (context) => {
   const fixture = createFixture({ permissions: communitySubmitPermissions })
   context.after(() => fixture.close())
-  const post = await fixture.community.submitPost({ title: '读书心得', body: '内容' })
+  const post = await fixture.community.submitPost({ title: '读书心得', body: '内容', bookId: 'book-1' })
   await expectDomainError(() => fixture.community.reviewPost({ postId: post.id, decision: 'approved', reason: '越权' }), 'PERMISSION_DENIED')
   fixture.become('teacher-1', ['community.moderate'])
   const foreignCommunity = createCommunityDomain({ db: fixture.db, actor: () => ({ id: 'teacher-1', permissions: ['community.moderate'] }), workspace: { id: 'class-2', organizationId: 'school-1' } })

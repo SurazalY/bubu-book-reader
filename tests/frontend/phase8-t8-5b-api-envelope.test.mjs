@@ -5,7 +5,7 @@ import { createAuthApi } from '../../src/api/auth.js'
 import { createConsoleApi } from '../../src/api/console.js'
 import { createStudentApi } from '../../src/api/student.js'
 
-test('T8.5B login envelope 只提交 schoolCode+loginName+password', async () => {
+test('T8.5B login envelope 只提交 loginName+password', async () => {
   const calls = []
   const api = createAuthApi({
     post(path, options) {
@@ -14,14 +14,14 @@ test('T8.5B login envelope 只提交 schoolCode+loginName+password', async () =>
     },
   })
   await api.login(
-    { schoolCode: 'internal-demo', loginName: 'teacher-a', password: 'secret' },
+    { loginName: 'teacher-a', password: 'secret' },
     { idempotencyKey: 'auth-login-t85b' },
   )
   assert.deepEqual(calls, [{
     path: '/auth/login',
     options: {
       idempotencyKey: 'auth-login-t85b',
-      body: { schoolCode: 'internal-demo', loginName: 'teacher-a', password: 'secret' },
+      body: { loginName: 'teacher-a', password: 'secret' },
     },
   }])
 })

@@ -20,7 +20,6 @@ const authApi = createAuthApi()
 
 export default function Login() {
   const nav = useNavigate()
-  const [school, setSchool] = useState('')
   const [account, setAccount] = useState('')
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd] = useState(false)
@@ -35,16 +34,15 @@ export default function Login() {
 
   async function submit(event) {
     event.preventDefault()
-    const schoolCode = school.trim()
     const loginName = account.trim()
-    if (!schoolCode || !loginName || !password) {
+    if (!loginName || !password) {
       setStatus('error')
-      setFeedback('请输入学校码、登录名和密码')
+      setFeedback('请输入账号和密码')
       return
     }
     setSubmitting(true)
     try {
-      const response = await authApi.login({ schoolCode, loginName, password })
+      const response = await authApi.login({ loginName, password })
       const destination = resolveLoginDestination(response.data?.navigation)
       clearFeedback()
       if (destination) nav(destination, { replace: true })
@@ -76,25 +74,11 @@ export default function Login() {
 
         <form className="mt-9 space-y-4" onSubmit={submit}>
           <div className="relative">
-            <Icon name="School" className="pointer-events-none absolute left-6 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-400" />
-            <input
-              className={FIELD}
-              placeholder="学校码"
-              aria-label="学校码"
-              value={school}
-              onChange={(event) => {
-                setSchool(event.target.value)
-                clearFeedback()
-              }}
-              autoComplete="organization"
-            />
-          </div>
-          <div className="relative">
             <Icon name="User" className="pointer-events-none absolute left-6 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-400" />
             <input
               className={FIELD}
-              placeholder="登录名"
-              aria-label="登录名"
+              placeholder="账号"
+              aria-label="账号"
               value={account}
               onChange={(event) => {
                 setAccount(event.target.value)

@@ -28,7 +28,7 @@ export function listMigrationFiles(migrationDirectory) {
   return filenames
     .sort((left, right) => left.localeCompare(right))
     .map((filename) => {
-      const source = readFileSync(join(migrationDirectory, filename), 'utf8')
+      const source = readFileSync(join(migrationDirectory, filename), 'utf8').replace(/\r\n/g, '\n').replace(/\r/g, '\n')
       return {
         id: filename,
         source,

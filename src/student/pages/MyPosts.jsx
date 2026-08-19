@@ -16,7 +16,7 @@ export default function MyPosts({ community: injectedCommunity } = {}) {
     <div className="flex flex-1 flex-col gap-4">
       <PageHead
         title="我的发布与收藏"
-        desc="你写过的每一篇都在这里，包括还在等老师看的和需要改一改的。收藏的同学内容也在下面。"
+        desc="你写过的每一篇都在这里。审核状态只有三种：已提交等老师通过、已通过、未通过。"
       >
         <button
           type="button"

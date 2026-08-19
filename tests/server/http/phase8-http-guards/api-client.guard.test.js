@@ -23,11 +23,11 @@ test('F. console.js 必须有 class-local shelf API，并删除 visibility 写',
   assert.match(source, /\/classes\/.*\/shelf/, 'console.js shelf API 必须打 /classes/:classId/shelf')
 })
 
-test('F. auth.js 登录体必须是 schoolCode+loginName，不得再发 username-only', () => {
+test('F. auth.js 登录体必须是 loginName+password，不得再发 username-only 或 schoolCode', () => {
   const source = readSource(AUTH_API_PATH)
   const api = createAuthApi()
   assert.equal(typeof api.login, 'function')
-  assert.match(source, /schoolCode/, 'login body 必须含 schoolCode')
+  assert.equal(source.includes('schoolCode'), false, 'login body 不得含 schoolCode')
   assert.match(source, /loginName/, 'login body 必须含 loginName')
   assert.equal(
     /body:\s*\{\s*username\s*,\s*password\s*\}/.test(source),

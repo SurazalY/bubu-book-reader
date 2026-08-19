@@ -21,7 +21,7 @@ import {
 
 import { computeClassLifecycle, computeGradeId } from './lifecycle.js'
 import { createIdentityService, workspaceResourceScope } from './service.js'
-import { RESOURCE_NOT_FOUND_MESSAGE, notFound } from './validation.js'
+import { RESOURCE_NOT_FOUND_MESSAGE, notFound, rejectUnknownLoginFields } from './validation.js'
 
 export { computeClassLifecycle, computeGradeId } from './lifecycle.js'
 
@@ -64,9 +64,9 @@ function idempotencyKey(req) {
   return value
 }
 
-function loginScope(schoolCode, loginName) {
+function loginScope(loginName) {
   const fingerprint = createHash('sha256')
-    .update(`${schoolCode.trim().toLowerCase()}:${loginName.trim().toLowerCase()}`, 'utf8')
+    .update(loginName.trim().toLowerCase(), 'utf8')
     .digest('hex')
   return `auth.login:${fingerprint}`
 }
@@ -195,11 +195,11 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
   router.post(
     '/auth/login',
     route((req, res) => {
-      const schoolCode = typeof req.body?.schoolCode === 'string' ? req.body.schoolCode.trim() : ''
+      rejectUnknownLoginFields(req.body)
       const loginName = typeof req.body?.loginName === 'string' ? req.body.loginName.trim() : ''
       const password = typeof req.body?.password === 'string' ? req.body.password : ''
-      if (!schoolCode || !loginName || !password) {
-        throw new HttpError(400, 'VALIDATION_FAILED', 'schoolCode、loginName 与 password 均为必填项')
+      if (!loginName || !password) {
+        throw new HttpError(400, 'VALIDATION_FAILED', 'loginName 与 password 均为必填项')
       }
       if (password.length > MAX_PASSWORD_LENGTH) {
         throw new HttpError(400, 'VALIDATION_FAILED', `password 不能超过 ${MAX_PASSWORD_LENGTH} 个字符`)
@@ -208,16 +208,14 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
       const key = idempotencyKey(req)
       const outcome = executeIdempotent(database, {
         key,
-        scope: loginScope(schoolCode, loginName),
-        request: { schoolCode, loginName },
+        scope: loginScope(loginName),
+        request: { loginName },
         requestHash: createRuntimeKeyedRequestHash(sessionSecret, {
-          schoolCode: schoolCode.toLowerCase(),
           loginName: loginName.toLowerCase(),
           password,
         }),
         operation: ({ createdAt }) =>
           service.login({
-            schoolCode,
             loginName,
             password,
             requestId: req.requestId,

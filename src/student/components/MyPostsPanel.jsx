@@ -6,15 +6,16 @@ import { StatusChip } from './Reactions.jsx'
 import { POST_STATUS, postBook } from '../community/presentation.js'
 import { useStudentCommunity } from '../community/CommunityRuntimeContext.jsx'
 
-// 我的发布与收藏：草稿、等待审核、已通过、退回修改、已下架都在这里，
-// 每一条都要给「现在在哪一步」和「我能做什么」（规格 §9.3）。
-//
-// 这一块被两个地方用：共读社区的「我的发布」视图，和个人主页的 `#/student/me/posts`。
-// 所以它在 Stage 6 从 Community.jsx 里搬到组件层——同一份数据（community.mine /
-// community.savedPosts）配同一份界面，两处永远不会长得不一样。
+const REVIEW_STATES = ['pending', 'published', 'returned']
+
 export default function MyPostsPanel() {
   const { community } = useStudentCommunity()
   const navigate = useNavigate()
+  const counts = useMemo(() => ({
+    pending: community.mine.filter((p) => p.status === 'pending').length,
+    published: community.mine.filter((p) => p.status === 'published').length,
+    returned: community.mine.filter((p) => p.status === 'returned' || p.status === 'offline').length,
+  }), [community.mine])
   const groups = useMemo(() => {
     const order = ['returned', 'offline', 'pending', 'draft', 'published']
     return order
@@ -23,6 +24,10 @@ export default function MyPostsPanel() {
   }, [community.mine])
 
   const saved = community.savedPosts
+  const writeNew = () => {
+    community.startDraft({ scope: 'class' })
+    navigate('/student/community/compose')
+  }
 
   if (!community.mine.length) {
     return (
@@ -34,13 +39,10 @@ export default function MyPostsPanel() {
           <Icon name="PenLine" className="h-6 w-6" strokeWidth={1.8} />
         </span>
         <p className="mt-3 text-title font-semibold text-ink-800">你还没有写过</p>
-        <p className="mt-1.5 text-caption text-ink-500">读到想说的地方就写一篇，可以带上书里的原文。</p>
+        <p className="mt-1.5 text-caption text-ink-500">选一本书，写下标题和正文，交给本班老师看。</p>
         <button
           type="button"
-          onClick={() => {
-            community.startDraft({ scope: 'class' })
-            navigate('/student/community/compose')
-          }}
+          onClick={writeNew}
           className="student-primary-btn mt-4"
         >
           <Icon name="Plus" className="h-4 w-4" strokeWidth={2.4} />
@@ -52,21 +54,21 @@ export default function MyPostsPanel() {
 
   return (
     <div className="flex flex-1 flex-col gap-3">
-      {/* 概览：分组多的时候页面很长，先用一行告诉学生「哪些事在等我」（Stage 5 自检抓到）。 */}
       <GlassPanel
         tone="card"
         className="student-enter flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl px-4 py-3"
       >
-        {groups.map((g) => (
-          <span key={g.status} className="inline-flex items-center gap-1.5 text-caption text-ink-600">
-            <StatusChip status={g.status} />
-            <span className="font-semibold text-ink-800 tabular-nums">{g.list.length}</span>
+        {REVIEW_STATES.map((status) => (
+          <span key={status} className="inline-flex items-center gap-1.5 text-caption text-ink-600">
+            <StatusChip status={status} />
+            <span className="font-semibold text-ink-800 tabular-nums">{counts[status]}</span>
             篇
           </span>
         ))}
-        <span className="ml-auto text-micro text-ink-400">
-          共 {community.mine.length} 篇，收藏 {saved.length} 篇
-        </span>
+        <button type="button" onClick={writeNew} className="student-mini-btn ml-auto">
+          <Icon name="PenLine" className="h-3.5 w-3.5" strokeWidth={2} />
+          重新写一篇
+        </button>
       </GlassPanel>
 
       {groups.map((g) => (
@@ -145,13 +147,13 @@ function MyPostRow({ post }) {
           <button
             type="button"
             onClick={() => {
-              community.editPost(post.id)
+              community.startDraft({ scope: post.scope })
               navigate('/student/community/compose')
             }}
             className="student-mini-btn"
           >
-            <Icon name="Pencil" className="h-3.5 w-3.5" strokeWidth={2} />
-            {post.status === 'published' ? '修改' : '继续写'}
+            <Icon name="PenLine" className="h-3.5 w-3.5" strokeWidth={2} />
+            重新写一篇
           </button>
           {canWithdraw && (
             <button type="button" onClick={() => community.withdrawPost(post.id)} className="student-mini-btn">
@@ -162,7 +164,6 @@ function MyPostRow({ post }) {
         </div>
       </div>
 
-      {/* 退回与下架必须给可理解的原因，并写清下一步怎么做 */}
       {post.review && (
         <p className="student-review">
           <Icon name="MessageSquareQuote" className="mt-px h-3.5 w-3.5 shrink-0" strokeWidth={2} />
@@ -172,11 +173,6 @@ function MyPostRow({ post }) {
             </span>
             <span className="mt-0.5 block leading-relaxed">{post.review.reason}</span>
           </span>
-        </p>
-      )}
-      {post.status === 'published' && (
-        <p className="mt-1.5 text-micro text-ink-400">
-          修改已发布的内容会重新等老师看一次，这段时间同学们看到的还是原来那一篇。
         </p>
       )}
     </li>

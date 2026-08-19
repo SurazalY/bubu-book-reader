@@ -295,7 +295,6 @@ async function login(baseUrl, fixture, person) {
     method: 'POST',
     idempotencyKey: `login-${person.id}-${randomUUID()}`,
     body: {
-      schoolCode: person.schoolCode,
       loginName: person.loginName ?? person.username,
       password: fixture.password,
     },

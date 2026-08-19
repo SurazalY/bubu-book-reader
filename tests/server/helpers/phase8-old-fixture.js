@@ -4,7 +4,6 @@ import { resolveCurrentBookVersionId } from '../../../server/domains/reading/vis
 
 export function loginBody(fixture, user) {
   return {
-    schoolCode: fixture.schoolCode || user.schoolCode || fixture.organizationId,
     loginName: user.loginName || user.username,
     password: fixture.password,
   }

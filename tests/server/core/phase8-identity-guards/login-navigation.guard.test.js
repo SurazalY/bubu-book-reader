@@ -14,14 +14,13 @@ import {
   startPhase8App,
 } from './harness.guard.test.js'
 
-test('A. POST /auth/login 只接受 {schoolCode, loginName, password} 且登录成功', async (t) => {
+test('A. POST /auth/login 只接受 {loginName, password} 且登录成功', async (t) => {
   const { fixture, baseUrl } = await startPhase8App(t)
   const response = await loginWithSchool(baseUrl, {
-    schoolCode: fixture.schoolCodeA,
     loginName: fixture.login.schoolAdmin,
     password: fixture.password,
   })
-  assertHttpStatus(response, 200, 'schoolCode+loginName 登录')
+  assertHttpStatus(response, 200, 'loginName+password 登录')
   assert.equal(response.payload.data.user.id, fixture.id.schoolAdmin)
   assert.ok(response.cookie, '登录必须下发 session cookie')
 })
@@ -35,20 +34,16 @@ test('A. username-only 登录不得再成功', async (t) => {
   assert.notEqual(response.status, 200, 'username-only 不得再登录成功')
 })
 
-test('A. 登录失败统一 401「学校、账号或密码错误」', async (t) => {
+test('A. 登录失败统一 401「账号或密码错误」', async (t) => {
   const { fixture, baseUrl } = await startPhase8App(t)
   const cases = [
     {
       title: '错密码',
-      body: { schoolCode: fixture.schoolCodeA, loginName: fixture.login.schoolAdmin, password: 'wrong-password' },
+      body: { loginName: fixture.login.schoolAdmin, password: 'wrong-password' },
     },
     {
       title: '错 loginName',
-      body: { schoolCode: fixture.schoolCodeA, loginName: 'no-such-login', password: fixture.password },
-    },
-    {
-      title: '错 schoolCode',
-      body: { schoolCode: 'no-such-school', loginName: fixture.login.schoolAdmin, password: fixture.password },
+      body: { loginName: 'no-such-login', password: fixture.password },
     },
   ]
   const messages = []
@@ -68,7 +63,6 @@ test('A. pending 学生登录 200，defaultPath=/student/onboarding，activeWork
   assert.equal(navigation.defaultPath, ONBOARDING_PATH, 'navigationForUser 必须产出 pending 学生路径')
 
   const response = await loginWithSchool(baseUrl, {
-    schoolCode: fixture.schoolCodeA,
     loginName: fixture.login.pendingStudent,
     password: fixture.password,
   })
@@ -83,7 +77,6 @@ test('A. V 成立且零 active 教师班：defaultPath=/console/select-class', a
   assert.equal(navigation.defaultPath, SELECT_CLASS_PATH, 'navigationForUser 必须产出零班教师路径')
 
   const response = await loginWithSchool(baseUrl, {
-    schoolCode: fixture.schoolCodeA,
     loginName: fixture.login.zeroWsTeacher,
     password: fixture.password,
   })
@@ -95,7 +88,6 @@ test('A. V 成立且零 active 教师班：defaultPath=/console/select-class', a
 test('A. 不得把空 defaultPath 当成登录失败', async (t) => {
   const { fixture, baseUrl } = await startPhase8App(t)
   const pending = await loginWithSchool(baseUrl, {
-    schoolCode: fixture.schoolCodeA,
     loginName: fixture.login.pendingStudent,
     password: fixture.password,
   })

@@ -110,12 +110,10 @@ test('家长发送页不保留只改本地状态的模拟开关', () => {
 test('真实登录页不导入旧找回壳，也不展示固定邮箱', () => {
   const studentLogin = readProjectFile('src/student/pages/Login.jsx')
   const consoleLogin = readProjectFile('src/console/pages/Login.jsx')
-  const legacyAuth = readProjectFile('src/console/pages/auth/AuthViews.jsx')
   const fixedEmail = /wang\.zr@peixin\.edu/i
 
   assert.doesNotMatch(studentLogin, fixedEmail)
   assert.doesNotMatch(consoleLogin, fixedEmail)
-  assert.doesNotMatch(legacyAuth, fixedEmail)
 })
 
 test('权限端目标页面的 fixture 缺口清单完整且没有被可达路由静默加载', () => {

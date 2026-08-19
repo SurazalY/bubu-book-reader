@@ -29,6 +29,7 @@ function reviewHistory(reviews) {
 
 export function toConsoleCommunityPost(source, { booksById = new Map(), className = '' } = {}) {
   const quote = source?.quote && typeof source.quote === 'object' ? source.quote : null
+  const bookId = source?.bookId || null
   const reactions = Array.isArray(source?.reactions) ? source.reactions : []
   const history = reviewHistory(source?.reviews)
   return {
@@ -39,7 +40,7 @@ export function toConsoleCommunityPost(source, { booksById = new Map(), classNam
     serverStatus: source?.status || 'submitted',
     scope: source?.scope === 'school' ? 'school' : 'class',
     classId: source?.classId || null,
-    bookId: quote?.bookId || null,
+    bookId,
     quote,
     cover: { type: 'text', tone: 'paper' },
     author: {
@@ -47,7 +48,7 @@ export function toConsoleCommunityPost(source, { booksById = new Map(), classNam
       name: source?.author?.displayName || source?.author?.name || '学生',
     },
     class: source?.classId ? { id: source.classId, name: className || '当前班级' } : null,
-    book: booksById.get(quote?.bookId) || null,
+    book: booksById.get(bookId) || null,
     kudos: reactions.reduce((total, reaction) => total + (Number(reaction?.count) || 0), 0),
     pinned: false,
     featured: false,
