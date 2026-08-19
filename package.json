@@ -1,7 +1,7 @@
 {
   "name": "book-reader-app",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "读伴前后端一体化阅读与学校权限应用",
   "type": "module",
   "engines": {
