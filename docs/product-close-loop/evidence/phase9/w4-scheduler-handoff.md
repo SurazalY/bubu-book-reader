@@ -17,7 +17,7 @@ W4 **已收口**。代码、守卫、独立抽查、回归、产品负责人真�
 | 工作区 | `D:\Project\readmate-w4`（独立 git worktree） |
 | 分支 | `feat/w4-grade-scope` |
 | 基线 | `ef0df7f`（开工时与 `feat/optional-upgrade` HEAD 相同） |
-| 收口 HEAD | 以该分支最新 docs 提交为准（开工后共 7 颗：5 业务 + 2 文档；若还有修订收口文档的提交，算在文档侧） |
+| 收口 HEAD | 该分支最新提交。5 颗业务 + 其后 docs 提交（收口报告、台账、调度交接稿） |
 | 主工作区 W2 | `D:\Project\整书8.15`，分支 `feat/optional-upgrade` |
 | 收口报告 | `docs/product-close-loop/evidence/phase9/w4-close-report.md` |
 | 台账 | `docs/product-close-loop/11_六项体验改造任务台账.md`（W4 工作区拷贝已更新；主工作区拷贝会冲突，预期内） |
