@@ -101,13 +101,16 @@ export default function Me() {
         </Link>
 
         <p className="mt-4 rounded-xl bg-white/52 px-3.5 py-3 text-micro leading-relaxed text-ink-500">
-          姓名、学校和班级由学校下发，不能自己改。头像可以在设置里换。
+          学校和班级由学校下发，不能自己改。
         </p>
 
-        <div className="mt-4 flex items-center justify-center gap-1.5 rounded-full border border-white/70 bg-white/72 px-4 py-2.5 text-caption font-semibold text-ink-700" aria-disabled="true">
+        <Link
+          to="/student/me/settings"
+          className="mt-4 flex items-center justify-center gap-1.5 rounded-full border border-white/70 bg-white/72 px-4 py-2.5 text-caption font-semibold text-ink-700 transition hover:bg-white"
+        >
           <Icon name="Settings" className="h-4 w-4" />
-          设置服务端接入中
-        </div>
+          设置
+        </Link>
 
         <button
           type="button"
@@ -206,7 +209,13 @@ export default function Me() {
         </Section>
 
         <Section title="工具与设置">
-          <Entry unavailable icon="Settings" tone="mint" title="设置" desc="服务端设置契约尚未开放，当前不会假装保存" />
+          <Entry
+            to="/student/me/settings"
+            icon="Settings"
+            tone="mint"
+            title="设置"
+            desc="修改密码、显示名，或退出登录"
+          />
           <Entry
             unavailable
             icon="LifeBuoy"

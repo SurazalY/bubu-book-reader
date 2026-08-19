@@ -20,5 +20,19 @@ export function createAuthApi(client = createApiClient()) {
         ...options,
         idempotencyKey: options.idempotencyKey || idempotencyKey('auth-logout'),
       }),
+    changeOwnPassword: ({ oldPassword, newPassword } = {}, options = {}) =>
+      client.post('/me/password', {
+        ...options,
+        workspaceId: undefined,
+        idempotencyKey: options.idempotencyKey || idempotencyKey('me-password'),
+        body: { oldPassword, newPassword },
+      }),
+    updateOwnProfile: ({ displayName } = {}, options = {}) =>
+      client.patch('/me/profile', {
+        ...options,
+        workspaceId: undefined,
+        idempotencyKey: options.idempotencyKey || idempotencyKey('me-profile'),
+        body: { displayName },
+      }),
   }
 }

@@ -22,6 +22,16 @@ export function isPasswordInputAllowed(password) {
   return typeof password === 'string' && password.length > 0 && password.length <= MAX_PASSWORD_LENGTH
 }
 
+export const MIN_CHOSEN_PASSWORD_LENGTH = 6
+
+export function isChosenPasswordAllowed(password) {
+  return (
+    typeof password === 'string' &&
+    password.length >= MIN_CHOSEN_PASSWORD_LENGTH &&
+    password.length <= MAX_PASSWORD_LENGTH
+  )
+}
+
 export function hashPassword(password) {
   if (!isPasswordInputAllowed(password)) {
     throw new Error(`密码必须为 1 到 ${MAX_PASSWORD_LENGTH} 个字符`)

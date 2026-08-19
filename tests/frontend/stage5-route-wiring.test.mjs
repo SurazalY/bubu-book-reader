@@ -42,14 +42,15 @@ test('学生个人入口挂载真实页面，页面不再导入静态演示数�
   for (const page of pages) assert.doesNotMatch(page, /from ['"]\.\.\/data\//)
 })
 
-test('没有服务端设置契约时，个人主页保留原卡片内的诚实状态而不跳转静态设置页', async () => {
+test('学生端挂载真实设置页，个人主页入口指向 /student/me/settings', async () => {
   const app = await source('../../src/student/StudentApp.jsx')
   const me = await source('../../src/student/pages/Me.jsx')
   const level = await source('../../src/student/pages/Level.jsx')
 
-  assert.doesNotMatch(app, /import Settings/)
-  assert.doesNotMatch(me, /to="\/student\/settings"/)
-  assert.match(me, /设置服务端接入中/)
+  assert.match(app, /import AccountSettings from '\.\/pages\/settings\/AccountSettings\.jsx'/)
+  assert.match(app, /path="me\/settings"/)
+  assert.match(me, /to="\/student\/me\/settings"/)
+  assert.doesNotMatch(me, /设置服务端接入中/)
   assert.doesNotMatch(level, /useReadingStatistics|totalEffectiveReadingSeconds/)
   assert.doesNotMatch(level, /\.\.\/data\//)
 })

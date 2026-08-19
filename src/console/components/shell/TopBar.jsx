@@ -11,7 +11,7 @@ const authApi = createAuthApi()
 // 个人菜单锁在胶囊下方右侧；第二层挂在父菜单内侧左侧，向页面中央展开。
 // 打开子层时父菜单保持展开且不位移，两层共享同一个头像锚点。
 export default function TopBar({ pendingTotal }) {
-  const { workspace, workspaces, switchWorkspace, prefs, togglePref, setPref } = useConsole()
+  const { workspace, workspaces, operator, switchWorkspace, prefs, togglePref, setPref } = useConsole()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -112,7 +112,7 @@ export default function TopBar({ pendingTotal }) {
             <div className="flex items-center gap-3 px-3.5 py-2.5">
               <Avatar size={38} />
               <div className="min-w-0">
-                <div className="text-[13.5px] font-semibold text-ink-900 truncate">{workspace.person.name}</div>
+                <div className="text-[13.5px] font-semibold text-ink-900 truncate">{operator?.name || '当前会话'}</div>
                 <button
                   type="button"
                   disabled
@@ -141,6 +141,15 @@ export default function TopBar({ pendingTotal }) {
               onClick={() => {
                 close()
                 navigate('/console/select-class')
+              }}
+              onMouseEnter={() => setSubOpen(false)}
+            />
+            <MenuRow
+              icon="Settings"
+              label="设置"
+              onClick={() => {
+                close()
+                navigate('/console/settings')
               }}
               onMouseEnter={() => setSubOpen(false)}
             />
@@ -270,8 +279,8 @@ const MenuRow = forwardRef(function MenuRow({ icon, label, chevron, active, onCl
 
 // 头像：前端壳阶段用渐变底 + 首字，正式素材到位后整体替换
 export function Avatar({ size = 32 }) {
-  const { workspace } = useConsole()
-  const name = workspace?.person?.name || '当前会话'
+  const { operator } = useConsole()
+  const name = operator?.name || '当前会话'
   return (
     <span
       className="console-avatar shrink-0 inline-flex items-center justify-center rounded-full text-white font-semibold"

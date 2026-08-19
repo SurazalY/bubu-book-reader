@@ -66,6 +66,56 @@ test('写请求拒绝缺少 Idempotency-Key 的本地伪提交', async () => {
   )
 })
 
+test('改密、改名与入班申请走 session-only，不带 X-Workspace-Id，但仍带 Idempotency-Key', async () => {
+  const calls = []
+  const client = createApiClient({
+    fetchImpl: async (url, options) => {
+      calls.push({ url, options })
+      return response({ payload: { data: { ok: true }, meta: {} } })
+    },
+  })
+  const api = createAuthApi(client)
+
+  await api.changeOwnPassword(
+    { oldPassword: 'old-secret', newPassword: 'new-secret' },
+    { workspaceId: 'must-not-be-sent', idempotencyKey: 'me-password-test' },
+  )
+  await api.updateOwnProfile(
+    { displayName: '新名字' },
+    { workspaceId: 'must-not-be-sent', idempotencyKey: 'me-profile-test' },
+  )
+  await client.post('/onboarding/enrollment-requests', {
+    workspaceId: 'must-not-be-sent',
+    idempotencyKey: 'enrollment-request-test',
+    body: { classId: 'class-1' },
+  })
+  await client.post('/reading/events/batch', {
+    workspaceId: 'workspace-1',
+    idempotencyKey: 'reading-events-test',
+    body: { events: [] },
+  })
+
+  assert.equal(calls[0].url, '/api/v1/me/password')
+  assert.equal(calls[1].url, '/api/v1/me/profile')
+  assert.equal(calls[2].url, '/api/v1/onboarding/enrollment-requests')
+  assert.equal(calls[3].url, '/api/v1/reading/events/batch')
+  for (const call of calls.slice(0, 3)) {
+    assert.equal(Object.hasOwn(call.options.headers, 'X-Workspace-Id'), false, `${call.url} 不得带 X-Workspace-Id`)
+    assert.ok(call.options.headers['Idempotency-Key'], `${call.url} 必须带 Idempotency-Key`)
+  }
+  assert.equal(calls[3].options.headers['X-Workspace-Id'], 'workspace-1')
+  assert.equal(calls[3].options.headers['Idempotency-Key'], 'reading-events-test')
+
+  await assert.rejects(
+    () => client.post('/me/password', { body: { oldPassword: 'old-secret', newPassword: 'new-secret' } }),
+    (error) => error instanceof ApiError && error.code === 'VALIDATION_FAILED' && /Idempotency-Key/.test(error.message),
+  )
+  await assert.rejects(
+    () => client.patch('/me/profile', { body: { displayName: '新名字' } }),
+    (error) => error instanceof ApiError && error.code === 'VALIDATION_FAILED' && /Idempotency-Key/.test(error.message),
+  )
+})
+
 test('安全事件关闭适配器保留工作空间、幂等键和人工说明', async () => {
   const calls = []
   const api = createConsoleApi({

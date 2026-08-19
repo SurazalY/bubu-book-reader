@@ -285,6 +285,59 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
     }),
   )
 
+  router.post(
+    '/me/password',
+    requireSession,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const userId = req.identitySession.user.id
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.me.password:${userId}`,
+        request: {},
+        requestHash: createRuntimeKeyedRequestHash(sessionSecret, {
+          userId,
+          oldPassword: req.body?.oldPassword,
+          newPassword: req.body?.newPassword,
+        }),
+        operation: ({ createdAt }) =>
+          service.changeOwnPassword({
+            actor: req.identitySession.user,
+            sessionId: req.identitySession.id,
+            oldPassword: req.body?.oldPassword,
+            newPassword: req.body?.newPassword,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
+  router.patch(
+    '/me/profile',
+    requireSession,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const userId = req.identitySession.user.id
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.me.profile:${userId}`,
+        request: { displayName: req.body?.displayName },
+        operation: ({ createdAt }) =>
+          service.updateOwnProfile({
+            actor: req.identitySession.user,
+            displayName: req.body?.displayName,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
   router.get(
     '/workspaces',
     requireSession,

@@ -21,6 +21,8 @@ const SESSION_ONLY = [
   ['get', '/teacher/class-directory'],
   ['put', '/teacher/classes/:classId'],
   ['delete', '/teacher/classes/:classId'],
+  ['post', '/me/password'],
+  ['patch', '/me/profile'],
 ]
 
 test('C. session-only 路由只挂 identity router，且不经过 requireWorkspace', () => {

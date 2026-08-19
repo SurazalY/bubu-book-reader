@@ -5,6 +5,7 @@ import StudentShell from './components/StudentShell.jsx'
 import Home from './pages/Home.jsx'
 import Shelf from './pages/Shelf.jsx'
 import Me from './pages/Me.jsx'
+import AccountSettings from './pages/settings/AccountSettings.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Onboarding from './pages/Onboarding.jsx'
@@ -50,6 +51,7 @@ function StudentRuntime() {
           <Route path="books/:bookId" element={<FullPage><BookDetail /></FullPage>} />
           <Route path="community/compose" element={<FullPage><Compose /></FullPage>} />
           <Route path="community/:postId" element={<FullPage><PostDetail /></FullPage>} />
+          <Route path="me/settings" element={<FullPage><AccountSettings /></FullPage>} />
           <Route element={<StudentShell />}>
             <Route path="home" element={<Home />} />
             <Route path="shelf" element={<Shelf />} />

@@ -10,7 +10,7 @@ test('学生端默认翻页效果不是 curl，且 curl 分支运行时不可达
   const [context, reader, settings] = await Promise.all([
     source('../../src/student/state/StudentContext.jsx'),
     source('../../src/student/pages/Reader.jsx'),
-    source('../../src/student/pages/Settings.jsx'),
+    source('../../src/student/pages/settings/AccountSettings.jsx'),
   ])
 
   assert.match(context, /flipStyle:\s*'slide'/)

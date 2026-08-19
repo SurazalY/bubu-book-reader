@@ -276,6 +276,18 @@ export function updateUserDisplayName(database, userId, displayName, expectedVer
   return result.changes === 1 ? findUserById(database, userId) : null
 }
 
+export function updateOwnDisplayName(database, userId, displayName, now) {
+  const result = database
+    .prepare(`
+      UPDATE users
+      SET display_name = ?, updated_at = ?, version = version + 1
+      WHERE id = ?
+    `)
+    .run(displayName, now, userId)
+
+  return result.changes === 1 ? findUserById(database, userId) : null
+}
+
 export function listWorkspacesForUser(database, userId) {
   const records = database
     .prepare(`
@@ -391,6 +403,11 @@ export function findCredentialByLoginName(database, loginName) {
     organizationStatus: record.organization_status,
     passwordHash: record.password_hash,
   }
+}
+
+export function findPasswordHashByUserId(database, userId) {
+  const record = database.prepare('SELECT password_hash FROM credentials WHERE user_id = ?').get(userId)
+  return record?.password_hash ?? null
 }
 
 export function findOrganizationById(database, organizationId) {
@@ -884,6 +901,25 @@ export function revokeAllSessionsForUser(database, userId, now) {
       WHERE user_id = ? AND revoked_at IS NULL
     `)
     .run(now, now, userId)
+}
+
+export function revokeOtherSessionsForUser(database, userId, keepSessionId, now) {
+  database
+    .prepare(`
+      UPDATE sessions
+      SET revoked_at = ?, updated_at = ?, version = version + 1
+      WHERE user_id = ? AND id != ? AND revoked_at IS NULL
+    `)
+    .run(now, now, userId, keepSessionId)
+}
+
+/**
+ * T3-2 锚点：学生自助改密成功后清除 issued_temp_passwords 中该用户的明文行。
+ * 表由迁移 053 创建；W2 不建表、不发 SQL。T3-2 将本函数体替换为 DELETE。
+ */
+export function clearIssuedTempPasswordForUser(database, userId) {
+  void database
+  void userId
 }
 
 export function updatePasswordHash(database, userId, passwordHash, now) {

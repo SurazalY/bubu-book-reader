@@ -43,9 +43,9 @@ test('Me.jsx 退出路径不包含任何阅读计时处理', async () => {
   }
 })
 
-test('Settings.jsx 伪退出入口保持只 Link 到登录页，不调 logout', async () => {
-  const settings = await source('../../src/student/pages/Settings.jsx')
-  assert.match(settings, /<Link to="\/student\/login"/)
-  assert.doesNotMatch(settings, /createAuthApi/)
-  assert.doesNotMatch(settings, /authApi\.logout/)
+test('设置页退出登录调用 authApi.logout()', async () => {
+  const settings = await source('../../src/student/pages/settings/AccountSettings.jsx')
+  assert.match(settings, /createAuthApi\(/)
+  assert.match(settings, /authApi\.logout\(/)
+  assert.doesNotMatch(settings, /<Link[^>]*to=["']\/student\/login["']/)
 })

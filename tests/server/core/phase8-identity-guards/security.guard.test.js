@@ -29,7 +29,7 @@ test('J. session-only 与公开注册必须打 identity router，禁止 integrat
   const integration = readSource(INTEGRATION_ROUTER_PATH)
   assert.match(identity, /export function createIdentityTestApp/)
   assert.match(identity, /app\.use\(\s*['"]\/api\/v1['"]\s*,\s*module\.router/)
-  for (const path of ['/onboarding/me', '/teacher/class-directory', '/registration/', '/password-resets/']) {
+  for (const path of ['/onboarding/me', '/teacher/class-directory', '/registration/', '/password-resets/', '/me/password', '/me/profile']) {
     assert.equal(
       new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(integration),
       false,

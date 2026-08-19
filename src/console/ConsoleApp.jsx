@@ -3,6 +3,7 @@ import Backdrop from './components/Backdrop.jsx'
 import { ConsoleProvider } from './state/ConsoleContext.jsx'
 import ConsoleShell from './components/shell/ConsoleShell.jsx'
 import Home from './pages/Home.jsx'
+import Settings from './pages/Settings.jsx'
 import Login from './pages/Login.jsx'
 import ParentSend from './pages/reports/ParentSend.jsx'
 import ReportCenter from './pages/reports/ReportCenter.jsx'
@@ -52,6 +53,7 @@ function ConsoleRuntime() {
         <Route element={<ConsoleShell />}>
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<ConsoleHome />} />
+          <Route path="settings" element={<Settings />} />
           <Route path="platform/audit" element={<PlatformAuditRoute />} />
           <Route path="teaching/arrangements" element={<ArrangeList />} />
           <Route path="teaching/arrangements/:planId" element={<ArrangeDetail />} />

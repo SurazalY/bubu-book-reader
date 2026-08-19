@@ -30,7 +30,6 @@ const EXPECTED_FIXTURE_IMPORTS = {
 const LEGACY_FIXTURE_MODULES = [
   'src/console/components/AssistRequestToast.jsx',
   'src/console/data/nav.js',
-  'src/console/pages/Me.jsx',
   'src/console/pages/accounts/RoleConfig.jsx',
   'src/console/pages/auth/AuthViews.jsx',
   'src/console/pages/ops/Ops.jsx',

@@ -3,7 +3,14 @@ import { randomBytes, randomUUID } from 'node:crypto'
 import { HttpError } from '../../db/errors.js'
 import { appendAuditEvent, enqueueOutboxEvent, readCoreHealth } from '../../db/reliability.js'
 import { importIdentitySeed } from '../../db/seed.js'
-import { hashPassword, isPasswordInputAllowed, MAX_PASSWORD_LENGTH, verifyPassword } from '../../auth/password.js'
+import {
+  hashPassword,
+  isChosenPasswordAllowed,
+  isPasswordInputAllowed,
+  MAX_PASSWORD_LENGTH,
+  MIN_CHOSEN_PASSWORD_LENGTH,
+  verifyPassword,
+} from '../../auth/password.js'
 import {
   assertSessionSecret,
   createServerSession,
@@ -16,6 +23,7 @@ import { computeClassLifecycle, computeGradeId } from './lifecycle.js'
 import { createPermissionEvaluator, normalizeRoleCode } from './permissions.js'
 import {
   accountCodeExists,
+  clearIssuedTempPasswordForUser,
   countActiveTeacherClasses,
   createClassWithWorkspace,
   findActiveStudentMembership,
@@ -27,6 +35,7 @@ import {
   findLoginName,
   findOrganizationById,
   findPasswordResetByHash,
+  findPasswordHashByUserId,
   findPendingEnrollmentForUser,
   findRegistrationByHash,
   findRegistrationById,
@@ -50,6 +59,8 @@ import {
   loadStudentTriple,
   loadTeacherTriple,
   revokeAllSessionsForUser,
+  revokeOtherSessionsForUser,
+  updateOwnDisplayName,
   updatePasswordHash,
   updateUserDisplayName,
 } from './repository.js'
@@ -1858,6 +1869,66 @@ export function createIdentityService(options) {
     }
   }
 
+  function changeOwnPassword({ actor, sessionId, oldPassword, newPassword, requestId, idempotencyKey, now }) {
+    const passwordHash = findPasswordHashByUserId(database, actor.id)
+    if (!passwordHash || !verifyPassword(oldPassword, passwordHash)) {
+      throw new HttpError(401, 'AUTH_REQUIRED', '旧密码不正确')
+    }
+    if (!isChosenPasswordAllowed(newPassword)) {
+      throw validationFailed(`newPassword 必须为 ${MIN_CHOSEN_PASSWORD_LENGTH} 到 ${MAX_PASSWORD_LENGTH} 个字符`, {
+        field: 'newPassword',
+      })
+    }
+    updatePasswordHash(database, actor.id, hashPassword(newPassword), now)
+    // T3-2 锚点调用：表 issued_temp_passwords 尚不存在，clearIssuedTempPasswordForUser 目前为空实现。
+    clearIssuedTempPasswordForUser(database, actor.id)
+    revokeOtherSessionsForUser(database, actor.id, sessionId, now)
+    appendAuditEvent(database, {
+      eventType: 'identity.me.password.changed',
+      actorUserId: actor.id,
+      workspaceId: null,
+      requestId,
+      idempotencyKey,
+      resourceType: 'user',
+      resourceId: actor.id,
+      scopeSnapshot: { organizationId: actor.organizationId },
+      createdAt: now,
+    })
+    return { statusCode: 200, payload: { data: { changed: true } } }
+  }
+
+  function updateOwnProfile({ actor, displayName, requestId, idempotencyKey, now }) {
+    const nextDisplayName = parseDisplayName(displayName)
+    const before = findUserById(database, actor.id)
+    if (!before) {
+      throw opaqueAccountNotFound()
+    }
+    const after = updateOwnDisplayName(database, actor.id, nextDisplayName, now)
+    if (!after) {
+      throw opaqueAccountNotFound()
+    }
+    appendAuditEvent(database, {
+      eventType: 'identity.me.profile.updated',
+      actorUserId: actor.id,
+      workspaceId: null,
+      requestId,
+      idempotencyKey,
+      resourceType: 'user',
+      resourceId: after.id,
+      scopeSnapshot: { organizationId: actor.organizationId },
+      beforeVersion: before.version,
+      afterVersion: after.version,
+      createdAt: now,
+    })
+    return {
+      statusCode: 200,
+      payload: {
+        data: publicUser(after),
+        meta: { version: after.version },
+      },
+    }
+  }
+
   return {
     cookieName,
     sessionTtlMs,
@@ -1875,6 +1946,8 @@ export function createIdentityService(options) {
     updateClass,
     setClassDisabled,
     updateUser,
+    changeOwnPassword,
+    updateOwnProfile,
     logout,
     joinTeacherClass,
     leaveTeacherClass,

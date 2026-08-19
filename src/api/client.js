@@ -2,6 +2,26 @@ import { ApiError, asApiError, unwrapApiEnvelope } from './envelope.js'
 
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 
+// session-only：只要 cookie，不要 X-Workspace-Id。学生可能没有工作空间。
+// 与 POST /onboarding/enrollment-requests 同一通道；禁止把改密/改名当成受保护写请求去补工作空间头。
+const SESSION_ONLY_PATHS = new Set([
+  '/auth/login',
+  '/auth/logout',
+  '/session',
+  '/onboarding/me',
+  '/onboarding/enrollment-requests',
+  '/me/password',
+  '/me/profile',
+])
+
+function requestPathname(path) {
+  return String(path || '').split('?')[0]
+}
+
+function isSessionOnlyPath(path) {
+  return SESSION_ONLY_PATHS.has(requestPathname(path))
+}
+
 function joinUrl(baseUrl, path) {
   if (/^https?:\/\//i.test(path)) return path
   return `${baseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
@@ -48,7 +68,8 @@ export function createApiClient({ fetchImpl = globalThis.fetch, baseUrl = '/api/
       Accept: 'application/json',
       ...(options.headers || {}),
     }
-    if (options.workspaceId) headers['X-Workspace-Id'] = options.workspaceId
+    if (options.workspaceId && !isSessionOnlyPath(path)) headers['X-Workspace-Id'] = options.workspaceId
+    if (isSessionOnlyPath(path) && headers['X-Workspace-Id']) delete headers['X-Workspace-Id']
     if (options.idempotencyKey) headers['Idempotency-Key'] = options.idempotencyKey
     if (options.body !== undefined) headers['Content-Type'] = 'application/json'
 
