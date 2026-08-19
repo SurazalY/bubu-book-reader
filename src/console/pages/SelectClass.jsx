@@ -20,6 +20,8 @@ import { BrandMark } from '../components/BrandMark.jsx'
 const identityApi = createIdentityConsoleApi()
 const consoleApi = createConsoleApi()
 
+const GRADE_LABELS = Object.freeze(['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'])
+
 export default function SelectClass() {
   const navigate = useNavigate()
   const load = useCallback(async () => {
@@ -43,13 +45,21 @@ export default function SelectClass() {
   const [leavingId, setLeavingId] = useState(null)
   const [error, setError] = useState('')
   const [joined, setJoined] = useState(false)
+  const [selectedGrade, setSelectedGrade] = useState('')
 
   const classes = items ?? resource.data?.classes ?? []
   const joinedSet = joinedIds ?? new Set(resource.data?.joinedClassIds ?? [])
 
-  const visible = useMemo(
+  const joinable = useMemo(
     () => classes.filter((klass) => klass.lifecycle !== 'graduated' && klass.status === 'active'),
     [classes],
+  )
+  const visible = useMemo(
+    () => {
+      if (!selectedGrade) return []
+      return joinable.filter((klass) => klass.currentGrade === selectedGrade)
+    },
+    [joinable, selectedGrade],
   )
 
   function currentClasses() {
@@ -115,49 +125,79 @@ export default function SelectClass() {
 
         {resource.status === 'error' ? (
           <EmptyState icon="TriangleAlert" title="班级目录加载失败" desc={resource.error?.message || '服务端拒绝了这次请求。'} />
-        ) : visible.length === 0 ? (
+        ) : joinable.length === 0 ? (
           <EmptyState
             icon="Users"
             title={resource.status === 'loading' ? '正在读取可加入班级' : '当前没有可加入的班级'}
             desc={resource.status === 'loading' ? '正在读取本校未毕业班级。' : '请联系校长或年级主任先预制班级。'}
           />
         ) : (
-          <ul className="mt-6 space-y-2.5">
-            {visible.map((klass) => {
-              const isJoined = joinedSet.has(klass.id)
-              return (
-                <li key={klass.id} className="flex items-center gap-3 rounded-xl border border-ink-150 bg-white/70 px-4 py-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[14px] font-semibold text-ink-900">{klass.name}</div>
-                    <div className="text-[11.5px] text-ink-500 mt-0.5">
-                      {stageLabel(klass.stage)} · {klass.entryYear} 届 · {klass.classNumber} 班
-                    </div>
-                    <div className="text-[11.5px] text-ink-600 mt-1">{teacherCountLabel(klass.teacherCount)}</div>
-                  </div>
-                  {isJoined ? (
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[12px] font-medium text-[#3E9E8F]">已加入</span>
-                      <Btn
-                        tone="danger"
-                        disabled={leavingId === klass.id}
-                        onClick={() => putLeave(klass)}
-                      >
-                        {leavingId === klass.id ? '退出中…' : '退出'}
-                      </Btn>
-                    </div>
-                  ) : (
-                    <Btn
-                      tone="primary"
-                      disabled={joiningId === klass.id}
-                      onClick={() => requestJoin(klass)}
-                    >
-                      {joiningId === klass.id ? '加入中…' : '加入'}
-                    </Btn>
-                  )}
-                </li>
+          <>
+            <label className="mt-6 block">
+              <span className="mb-2 block text-[12.5px] text-ink-500">选择年级</span>
+              <select
+                className="h-10 w-full rounded-xl border border-ink-150 bg-white/70 px-3 text-[13px] text-ink-800 outline-none"
+                value={selectedGrade === '' ? '' : String(selectedGrade)}
+                onChange={(event) => {
+                  const raw = event.target.value
+                  setSelectedGrade(raw === '' ? '' : Number(raw))
+                }}
+                aria-label="选择年级"
+              >
+                <option value="">请选择年级</option>
+                {GRADE_LABELS.map((label, index) => (
+                  <option key={label} value={index + 1}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {!selectedGrade && (
+              <p className="mt-3 text-[12.5px] text-ink-500">请先选择年级，再加入该年级的班级。</p>
+            )}
+            {selectedGrade && (
+              visible.length === 0 ? (
+                <EmptyState icon="Users" title="该年级没有可加入的班级" desc="可改选其他年级，或联系校长、年级主任先预制班级。" />
+              ) : (
+                <ul className="mt-6 space-y-2.5">
+                  {visible.map((klass) => {
+                    const isJoined = joinedSet.has(klass.id)
+                    return (
+                      <li key={klass.id} className="flex items-center gap-3 rounded-xl border border-ink-150 bg-white/70 px-4 py-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[14px] font-semibold text-ink-900">{klass.name}</div>
+                          <div className="text-[11.5px] text-ink-500 mt-0.5">
+                            {stageLabel(klass.stage)} · {klass.entryYear} 届 · {klass.classNumber} 班
+                          </div>
+                          <div className="text-[11.5px] text-ink-600 mt-1">{teacherCountLabel(klass.teacherCount)}</div>
+                        </div>
+                        {isJoined ? (
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-[12px] font-medium text-[#3E9E8F]">已加入</span>
+                            <Btn
+                              tone="danger"
+                              disabled={leavingId === klass.id}
+                              onClick={() => putLeave(klass)}
+                            >
+                              {leavingId === klass.id ? '退出中…' : '退出'}
+                            </Btn>
+                          </div>
+                        ) : (
+                          <Btn
+                            tone="primary"
+                            disabled={joiningId === klass.id}
+                            onClick={() => requestJoin(klass)}
+                          >
+                            {joiningId === klass.id ? '加入中…' : '加入'}
+                          </Btn>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
               )
-            })}
-          </ul>
+            )}
+          </>
         )}
         {error && <p className="mt-3 text-[12.5px] text-danger-600">{error}</p>}
         {(joined || joinedSet.size > 0) && (
