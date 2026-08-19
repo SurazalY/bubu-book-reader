@@ -18,6 +18,7 @@ import { createStudentLibraryDomain } from '../domains/reading/library-objects.j
 import { createReadingMonitoringDomain } from '../domains/reading/monitoring.js'
 import { createReaderPreferenceDomain } from '../domains/reading/reader-preference.js'
 import { createReadingStatisticsDomain } from '../domains/reading/statistics.js'
+import { computeClassLifecycle } from '../domains/identity/lifecycle.js'
 import { createReportsDomain } from '../domains/reports/index.js'
 import { dispatchSafetyNotificationOutbox } from '../domains/safety/notifications.js'
 import { createTeachingDomain } from '../domains/teaching/classroom.js'
@@ -625,7 +626,8 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
         class.name AS className,
         class.stage AS classStage,
         class.entry_year AS classEntryYear,
-        class.class_number AS classNumber
+        class.class_number AS classNumber,
+        class.grade_id AS gradeId
       FROM users AS student
       JOIN class_memberships AS membership
         ON membership.user_id = student.id AND membership.membership_role = 'student' AND membership.status = 'active'
@@ -635,7 +637,16 @@ export function createIntegrationRouter({ database, identityService, sessionSecr
         AND class.organization_id = ? AND ${scopeSql}
       ORDER BY class.entry_year, class.class_number, class.name, student.display_name, student.id
     `).all(req.workspace.organizationId, req.workspace.organizationId, scopeId)
-    return sendData(res, { items: rows }, { requestId: req.requestId })
+    const now = new Date()
+    const items = rows.map((row) => ({
+      ...row,
+      currentGrade: computeClassLifecycle({
+        stage: row.classStage,
+        entryYear: row.classEntryYear,
+        now,
+      }).currentGrade,
+    }))
+    return sendData(res, { items }, { requestId: req.requestId })
   }))
 
   router.get('/books', route(async (req, res) => {

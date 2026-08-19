@@ -4,6 +4,8 @@ import {
   readingStatDateStart,
 } from './monitoring.js'
 
+import { computeClassLifecycle } from '../identity/lifecycle.js'
+
 const CHECK_IN_MS = 300_000
 const SCOPE_ROLE_CODES = new Set([
   'teacher',
@@ -217,19 +219,136 @@ function requireStudentSelf(database, scope) {
   return row.class_id
 }
 
+function parseScopeLevel(value) {
+  if (value === undefined || value === null || value === '') return 'class'
+  if (value === 'class' || value === 'grade' || value === 'school') return value
+  throw validationError('scopeLevel 必须是 class、grade 或 school', { fields: ['scopeLevel'] })
+}
+
+function parseGrade(value) {
+  if (typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 6) {
+    return value
+  }
+  if (typeof value === 'string' && /^[1-6]$/.test(value.trim())) {
+    return Number(value.trim())
+  }
+  throw validationError('grade 必须是 1 到 6 的整数', { fields: ['grade'] })
+}
+
+function hasPresent(input, key) {
+  if (!Object.hasOwn(input, key)) return false
+  const value = input[key]
+  return value !== undefined && value !== null && value !== ''
+}
+
+function requireScopeRole(database, scope) {
+  const roleRows = database.prepare(`SELECT role_code FROM role_assignments
+    WHERE organization_id = ? AND user_id = ? AND workspace_id = ? AND status = 'active'`)
+    .all(scope.organizationId, scope.userId, scope.workspaceId)
+  if (!roleRows.some((row) => SCOPE_ROLE_CODES.has(row.role_code))) {
+    throw domainError('PERMISSION_DENIED', '当前账号角色无权查看教师阅读统计')
+  }
+}
+
+function currentGradeForGradeWorkspace(database, scope, now) {
+  const row = database.prepare(`
+    SELECT stage, entry_year FROM classes
+    WHERE organization_id = ? AND grade_id = ? AND status = 'active'
+    LIMIT 1
+  `).get(scope.organizationId, scope.scopeId)
+  if (row) {
+    return computeClassLifecycle({ stage: row.stage, entryYear: row.entry_year, now }).currentGrade
+  }
+  if (typeof scope.scopeId === 'string' && scope.scopeId.includes(':')) {
+    const [stage, yearText] = scope.scopeId.split(':')
+    const entryYear = Number(yearText)
+    if (stage && Number.isInteger(entryYear)) {
+      return computeClassLifecycle({ stage, entryYear, now }).currentGrade
+    }
+  }
+  return null
+}
+
+function assertScopeLevelAllowed(database, scope, query, now) {
+  if (scope.scopeType === 'class' && query.scopeLevel !== 'class') {
+    throw domainError('PERMISSION_DENIED', '当前工作空间无权读取阅读统计')
+  }
+  if (scope.scopeType === 'grade' && query.scopeLevel === 'school') {
+    throw domainError('PERMISSION_DENIED', '当前工作空间无权读取阅读统计')
+  }
+  if (scope.scopeType === 'grade' && query.scopeLevel === 'grade') {
+    const allowedGrade = currentGradeForGradeWorkspace(database, scope, now)
+    if (allowedGrade === null || allowedGrade !== query.grade) {
+      throw domainError('PERMISSION_DENIED', '当前工作空间无权读取阅读统计')
+    }
+  }
+}
+
+const GRADE_HANZI = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六' }
+
+function syntheticClassView(query) {
+  if (query.scopeLevel === 'school') {
+    return { classId: 'school', displayName: '全校' }
+  }
+  return {
+    classId: `grade:${query.grade}`,
+    displayName: `${GRADE_HANZI[query.grade]}年级（全年级）`,
+  }
+}
+
+function listOrganizationClasses(database, organizationId) {
+  return database.prepare(`
+    SELECT id, name, grade_id, stage, entry_year
+    FROM classes
+    WHERE organization_id = ? AND status = 'active'
+    ORDER BY id
+  `).all(organizationId)
+}
+
+function resolveScopeClasses(database, organizationId, query, now) {
+  const classes = listOrganizationClasses(database, organizationId)
+  if (query.scopeLevel === 'school') return classes
+  return classes.filter((klass) =>
+    computeClassLifecycle({ stage: klass.stage, entryYear: klass.entry_year, now }).currentGrade === query.grade)
+}
+
 function normalizeScopeInput(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
     throw validationError('scope query 必须是对象')
   }
-  const allowed = new Set(['classId', 'statDate'])
+  const allowed = new Set(['classId', 'statDate', 'scopeLevel', 'grade'])
   const unknown = Object.keys(input).filter((key) => !allowed.has(key))
   if (unknown.length > 0) throw validationError('scope query 包含未知字段', { fields: unknown })
-  if (!Object.hasOwn(input, 'classId') || !Object.hasOwn(input, 'statDate')) {
+  if (!Object.hasOwn(input, 'statDate')) {
+    throw validationError('scope query 必须同时提供 classId 和 statDate')
+  }
+  const statDate = exactStatDate(input.statDate)
+  const scopeLevel = parseScopeLevel(input.scopeLevel)
+  if (hasPresent(input, 'grade') && scopeLevel !== 'grade') {
+    throw validationError('grade 仅在 scopeLevel 为 grade 时允许出现', { fields: ['grade'] })
+  }
+  if (scopeLevel === 'grade') {
+    return {
+      scopeLevel,
+      grade: parseGrade(input.grade),
+      statDate,
+      classId: null,
+    }
+  }
+  if (scopeLevel === 'school') {
+    return {
+      scopeLevel,
+      statDate,
+      classId: null,
+    }
+  }
+  if (!Object.hasOwn(input, 'classId')) {
     throw validationError('scope query 必须同时提供 classId 和 statDate')
   }
   return {
+    scopeLevel: 'class',
     classId: requiredText(input.classId, 'classId'),
-    statDate: exactStatDate(input.statDate),
+    statDate,
   }
 }
 
@@ -238,12 +357,7 @@ function requireScopeClass(database, scope, classId) {
     FROM classes WHERE id = ? AND organization_id = ? AND status = 'active'`)
     .get(classId, scope.organizationId)
   if (!classRow) throw domainError('RESOURCE_NOT_FOUND', '班级不属于当前组织或不存在')
-  const roleRows = database.prepare(`SELECT role_code FROM role_assignments
-    WHERE organization_id = ? AND user_id = ? AND workspace_id = ? AND status = 'active'`)
-    .all(scope.organizationId, scope.userId, scope.workspaceId)
-  if (!roleRows.some((row) => SCOPE_ROLE_CODES.has(row.role_code))) {
-    throw domainError('PERMISSION_DENIED', '当前账号角色无权查看教师阅读统计')
-  }
+  requireScopeRole(database, scope)
   const inWorkspaceScope = (scope.scopeType === 'class' && scope.scopeId === classId)
     || (scope.scopeType === 'grade' && scope.scopeId === classRow.grade_id)
     || (scope.scopeType === 'school' && scope.scopeId === scope.organizationId)
@@ -347,27 +461,52 @@ function selfStatistics(database, scope, current) {
   }
 }
 
-function activeClassStudents(database, organizationId, classId) {
+function activeClassStudents(database, organizationId, classIds) {
+  if (!Array.isArray(classIds) || classIds.length === 0) return []
+  if (classIds.length === 1) {
+    return database.prepare(`SELECT DISTINCT actor.id AS student_id, actor.display_name
+      FROM class_memberships AS membership
+      JOIN users AS actor
+        ON actor.id = membership.user_id
+        AND actor.organization_id = :organizationId
+        AND actor.status = 'active'
+      JOIN classes AS class
+        ON class.id = membership.class_id
+        AND class.organization_id = :organizationId
+        AND class.status = 'active'
+      WHERE membership.class_id = :classId
+        AND membership.membership_role = 'student'
+        AND membership.status = 'active'`).all({ organizationId, classId: classIds[0] })
+  }
+  const placeholders = classIds.map(() => '?').join(', ')
   return database.prepare(`SELECT DISTINCT actor.id AS student_id, actor.display_name
     FROM class_memberships AS membership
     JOIN users AS actor
       ON actor.id = membership.user_id
-      AND actor.organization_id = :organizationId
+      AND actor.organization_id = ?
       AND actor.status = 'active'
     JOIN classes AS class
       ON class.id = membership.class_id
-      AND class.organization_id = :organizationId
+      AND class.organization_id = ?
       AND class.status = 'active'
-    WHERE membership.class_id = :classId
+    WHERE membership.class_id IN (${placeholders})
       AND membership.membership_role = 'student'
-      AND membership.status = 'active'`).all({ organizationId, classId })
+      AND membership.status = 'active'`).all(organizationId, organizationId, ...classIds)
 }
 
-function selectClassRows(database, organizationId, classId, statDate) {
+function selectClassRows(database, organizationId, classIds, statDate) {
+  if (!Array.isArray(classIds) || classIds.length === 0) return []
+  if (classIds.length === 1) {
+    return database.prepare(`SELECT * FROM reading_daily_book_summaries
+      WHERE organization_id_at_creation = ? AND class_id_at_creation = ? AND stat_date <= ?
+      ORDER BY actor_id_at_creation, stat_date, last_read_at, id`)
+      .all(organizationId, classIds[0], statDate)
+  }
+  const placeholders = classIds.map(() => '?').join(', ')
   return database.prepare(`SELECT * FROM reading_daily_book_summaries
-    WHERE organization_id_at_creation = ? AND class_id_at_creation = ? AND stat_date <= ?
+    WHERE organization_id_at_creation = ? AND class_id_at_creation IN (${placeholders}) AND stat_date <= ?
     ORDER BY actor_id_at_creation, stat_date, last_read_at, id`)
-    .all(organizationId, classId, statDate)
+    .all(organizationId, ...classIds, statDate)
 }
 
 function groupRows(rows, keyFor) {
@@ -437,9 +576,9 @@ function studentDto(database, scope, classId, student, rows, statDate) {
   }
 }
 
-function scopeStatistics(database, scope, classRow, statDate, current) {
-  const students = activeClassStudents(database, scope.organizationId, classRow.id)
-  const rows = selectClassRows(database, scope.organizationId, classRow.id, statDate)
+function scopeStatistics(database, scope, classIds, classView, statDate, current) {
+  const students = activeClassStudents(database, scope.organizationId, classIds)
+  const rows = selectClassRows(database, scope.organizationId, classIds, statDate)
   const currentStudentIds = new Set(students.map((student) => student.student_id))
   const rowsByStudent = groupRows(
     rows.filter((row) => currentStudentIds.has(row.actor_id_at_creation)),
@@ -466,10 +605,11 @@ function scopeStatistics(database, scope, classRow, statDate, current) {
         : Math.floor(metrics.perCapitaEffectiveReadingMs / 1000),
     }
   })
+  const lastReadingClassId = classIds.length === 1 ? classIds[0] : null
   const studentDtos = students.map((student) => studentDto(
     database,
     scope,
-    classRow.id,
+    lastReadingClassId,
     student,
     rowsByStudent.get(student.student_id) || [],
     statDate,
@@ -482,8 +622,8 @@ function scopeStatistics(database, scope, classRow, statDate, current) {
     dataUpdatedAt: maxUpdatedAt(rows),
     statDate,
     class: {
-      classId: classRow.id,
-      displayName: classRow.name,
+      classId: classView.classId,
+      displayName: classView.displayName,
       activeStudentCount: students.length,
     },
     summary: {
@@ -535,22 +675,46 @@ export function createReadingStatisticsDomain(dependencies = {}) {
     async getScopedSummary(authContext, input) {
       const scope = requireAuthScope(database, authContext)
       const query = normalizeScopeInput(input)
-      const classRow = requireScopeClass(database, scope, query.classId)
-      await requireAuthorized(authorize, 'reading.read_scope', scope, {
-        organizationId: scope.organizationId,
-        workspaceId: scope.workspaceId,
-        scopeType: scope.scopeType,
-        scopeId: scope.scopeId,
-        classId: query.classId,
-      })
       const suppliedNow = now()
       const current = suppliedNow instanceof Date ? suppliedNow : new Date(suppliedNow)
       if (Number.isNaN(current.getTime())) throw validationError('now 必须是有效时间')
-      const result = scopeStatistics(database, scope, classRow, query.statDate, current)
+      assertScopeLevelAllowed(database, scope, query, current)
+      let classIds
+      let classView
+      let authorizeResource
+      let auditResourceId
+      if (query.scopeLevel === 'class') {
+        const classRow = requireScopeClass(database, scope, query.classId)
+        classIds = [classRow.id]
+        classView = { classId: classRow.id, displayName: classRow.name }
+        auditResourceId = query.classId
+        authorizeResource = {
+          organizationId: scope.organizationId,
+          workspaceId: scope.workspaceId,
+          scopeType: scope.scopeType,
+          scopeId: scope.scopeId,
+          classId: query.classId,
+        }
+      } else {
+        requireScopeRole(database, scope)
+        const classRows = resolveScopeClasses(database, scope.organizationId, query, current)
+        classIds = classRows.map((row) => row.id)
+        classView = syntheticClassView(query)
+        auditResourceId = classView.classId
+        authorizeResource = {
+          organizationId: scope.organizationId,
+          workspaceId: scope.workspaceId,
+          scopeType: scope.scopeType,
+          scopeId: scope.scopeId,
+          classIds,
+        }
+      }
+      await requireAuthorized(authorize, 'reading.read_scope', scope, authorizeResource)
+      const result = scopeStatistics(database, scope, classIds, classView, query.statDate, current)
       await audit({
         eventType: 'reading.statistics.scope_viewed',
         resourceType: 'reading_statistics_scope',
-        resourceId: query.classId,
+        resourceId: auditResourceId,
       })
       return result
     },

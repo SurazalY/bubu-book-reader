@@ -418,6 +418,16 @@ test('/scope 严格校验必填 query、组织 404、同组织越权 403 和 stu
     classId: 'class-a', statDate: '2026-08-10', search: 'student',
   }), { code: 'VALIDATION_FAILED' })
   await assert.rejects(() => fixture.domain.getScopedSummary(teacherAuth, {
+    classId: 'class-a', statDate: '2026-08-10', studentId: 'student-01',
+  }), { code: 'VALIDATION_FAILED' })
+  await assert.rejects(() => fixture.domain.getScopedSummary(teacherAuth, {
+    classId: 'class-a', statDate: '2026-08-10', grade: 3,
+  }), { code: 'VALIDATION_FAILED' })
+  const explicitClassLevel = await fixture.domain.getScopedSummary(teacherAuth, {
+    classId: 'class-a', statDate: '2026-08-10', scopeLevel: 'class',
+  })
+  assert.equal(explicitClassLevel.class.classId, 'class-a')
+  await assert.rejects(() => fixture.domain.getScopedSummary(teacherAuth, {
     classId: 'class-b', statDate: '2026-08-10',
   }), { code: 'RESOURCE_NOT_FOUND' })
   await assert.rejects(() => fixture.domain.getScopedSummary(teacherAuth, {
