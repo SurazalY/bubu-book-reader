@@ -23,29 +23,88 @@ function StatusSurface({ icon, title, description, action }) {
 }
 
 export function ReadingStatisticsToolbar({
-  classOptions,
+  classOptions = [],
   selectedClassId,
   statDate,
   onClassChange,
   onStatDateChange,
   onRefresh,
   refreshDisabled = false,
+  showScopeSwitcher = false,
+  scopeLevel = 'class',
+  selectedGrade = null,
+  gradeOptions = [],
+  onScopeLevelChange,
+  onSelectedGradeChange,
 }) {
   const options = classOptions.length > 0
     ? classOptions.map((item) => ({ value: item.classId, label: item.displayName }))
     : [{ value: '', label: '选择班级' }]
+  const gradeSelectOptions = gradeOptions.length > 0
+    ? gradeOptions.map((item) => ({ value: String(item.grade), label: item.displayName }))
+    : [{ value: '', label: '选择年级' }]
 
   return (
-    <div className="grid w-full min-w-0 grid-cols-1 gap-2.5 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
-      <label className="min-w-0">
-        <span className="sr-only">班级</span>
-        <Select
-          value={selectedClassId}
-          onChange={onClassChange || (() => {})}
-          options={options}
-          width="w-full"
-        />
-      </label>
+    <div className="flex w-full min-w-0 flex-wrap items-center gap-2.5">
+      {showScopeSwitcher && (
+        <>
+          <div className="flex h-8 shrink-0 rounded-lg border border-ink-200 bg-white/85" role="group" aria-label="统计范围">
+            <button
+              type="button"
+              aria-pressed={scopeLevel === 'school'}
+              onClick={() => onScopeLevelChange?.('school')}
+              className={cx(
+                'h-full px-3 text-[12.5px] font-medium transition',
+                scopeLevel === 'school' ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-white',
+              )}
+            >
+              全校
+            </button>
+            <button
+              type="button"
+              aria-pressed={scopeLevel === 'grade'}
+              onClick={() => onScopeLevelChange?.('grade')}
+              className={cx(
+                'h-full px-3 text-[12.5px] font-medium transition',
+                scopeLevel === 'grade' ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-white',
+              )}
+            >
+              年级
+            </button>
+            <button
+              type="button"
+              aria-pressed={scopeLevel === 'class'}
+              onClick={() => onScopeLevelChange?.('class')}
+              className={cx(
+                'h-full px-3 text-[12.5px] font-medium transition',
+                scopeLevel === 'class' ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-white',
+              )}
+            >
+              班级
+            </button>
+          </div>
+          {scopeLevel === 'grade' && (
+            <label className="min-w-0 sm:w-[160px]" aria-label="选择年级">
+              <Select
+                value={selectedGrade == null ? '' : String(selectedGrade)}
+                onChange={(value) => onSelectedGradeChange?.(value === '' ? '' : Number(value))}
+                options={gradeSelectOptions}
+                width="w-full"
+              />
+            </label>
+          )}
+        </>
+      )}
+      {(!showScopeSwitcher || scopeLevel === 'class') && (
+        <label className="min-w-[160px] flex-1" aria-label="班级">
+          <Select
+            value={selectedClassId}
+            onChange={onClassChange || (() => {})}
+            options={options}
+            width="w-full"
+          />
+        </label>
+      )}
       <label className="sr-only" htmlFor="reading-monitor-stat-date">统计日期</label>
       <input
         id="reading-monitor-stat-date"

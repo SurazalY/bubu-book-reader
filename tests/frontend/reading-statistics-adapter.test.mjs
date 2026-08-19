@@ -49,17 +49,29 @@ test('学生阅读统计适配器只读取严格 self，不兼容旧等级、按
   assert.throws(() => parseStudentReadingStatistics({ ...value, levelInput: {} }), /字段集合不正确/)
 })
 
-test('权限端统计适配器只传 classId/statDate，并严格拒绝旧范围和竞争排名字段', async () => {
+test('权限端统计适配器按档位发送 query，并严格拒绝旧范围和竞争排名字段', async () => {
   const calls = []
   const client = {
     get(path, options) { calls.push({ path, options }); return Promise.resolve({ data: {}, meta: {} }) },
   }
   const api = createConsoleReadingStatisticsApi(client)
   await api.getSummary({ workspaceId: 'workspace-a', classId: 'class-a', statDate: '2026-08-10' })
-  assert.deepEqual(calls, [{
-    path: '/reading/statistics/scope',
-    options: { workspaceId: 'workspace-a', signal: undefined, query: { classId: 'class-a', statDate: '2026-08-10' } },
-  }])
+  await api.getSummary({ workspaceId: 'workspace-a', scopeLevel: 'grade', grade: 3, statDate: '2026-08-10' })
+  await api.getSummary({ workspaceId: 'workspace-a', scopeLevel: 'school', statDate: '2026-08-10' })
+  assert.deepEqual(calls, [
+    {
+      path: '/reading/statistics/scope',
+      options: { workspaceId: 'workspace-a', signal: undefined, query: { classId: 'class-a', statDate: '2026-08-10' } },
+    },
+    {
+      path: '/reading/statistics/scope',
+      options: { workspaceId: 'workspace-a', signal: undefined, query: { statDate: '2026-08-10', scopeLevel: 'grade', grade: 3 } },
+    },
+    {
+      path: '/reading/statistics/scope',
+      options: { workspaceId: 'workspace-a', signal: undefined, query: { statDate: '2026-08-10', scopeLevel: 'school' } },
+    },
+  ])
 
   const value = parseScopedReadingStatistics({
     generatedAt: '2026-08-10T09:00:00.000Z',

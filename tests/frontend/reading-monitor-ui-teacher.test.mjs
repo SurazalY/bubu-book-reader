@@ -161,6 +161,11 @@ test('ClassOverview 接入真实 scope state，展示所有状态、双趋势与
   assert.match(page, /onRetry=\{statistics\.onRetry\}/)
   assert.match(page, /statistics\.onClassChange\(classId\)/)
   assert.match(page, /statistics\.onStatDateChange\(nextDate\)/)
+  assert.match(page, /workspace\.scopeType/)
+  assert.match(page, /scopeType\s*===\s*['"]school['"]/)
+  assert.match(page, /showScopeSwitcher=/)
+  assert.doesNotMatch(page, /全校/)
+  assert.match(component, /showScopeSwitcher\s*&&/)
   assert.match(page, /max-md:fixed[^\n]*max-md:left-\[76px\]/)
   assert.doesNotMatch(page, /resource = null|data\/fixtures/)
   for (const status of ['loading', 'forbidden', 'error', 'empty', 'ready', 'stale']) {

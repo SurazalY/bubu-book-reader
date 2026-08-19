@@ -57,7 +57,12 @@ export function createConsoleApi(client = createApiClient()) {
     listAuditEvents: (options = {}) => client.get('/audit/events', options),
     getReadingStatisticsScope: (input = {}, options = {}) => client.get('/reading/statistics/scope', {
       ...options,
-      query: { classId: input.classId, statDate: input.statDate },
+      query: {
+        ...(input.classId ? { classId: input.classId } : {}),
+        ...(input.statDate ? { statDate: input.statDate } : {}),
+        ...(input.scopeLevel ? { scopeLevel: input.scopeLevel } : {}),
+        ...(input.grade !== undefined && input.grade !== null && input.grade !== '' ? { grade: input.grade } : {}),
+      },
     }),
     listCommunityPosts: (options = {}) => client.get('/community/posts', { ...options, query: { limit: 100, ...(options.query || {}) } }),
     reviewCommunityPost: (postId, body, options = {}) =>

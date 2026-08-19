@@ -138,6 +138,8 @@ test('self/scope API 只发送冻结查询，scope 搜索筛选和身份字段�
   await consoleApi.getReadingStatisticsScope({
     classId: 'class-a',
     statDate: '2026-08-10',
+    scopeLevel: 'grade',
+    grade: 3,
     studentId: 'student-a',
     search: 'name',
     organizationId: 'organization-a',
@@ -154,7 +156,12 @@ test('self/scope API 只发送冻结查询，scope 搜索筛选和身份字段�
     path: '/reading/statistics/scope',
     options: {
       workspaceId: 'workspace-a',
-      query: { classId: 'class-a', statDate: '2026-08-10' },
+      query: {
+        classId: 'class-a',
+        statDate: '2026-08-10',
+        scopeLevel: 'grade',
+        grade: 3,
+      },
     },
   }])
 })

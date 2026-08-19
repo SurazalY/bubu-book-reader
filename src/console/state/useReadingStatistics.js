@@ -327,10 +327,25 @@ function extractClassNumber(source) {
   return Number.isInteger(num) && num > 0 ? num : null
 }
 
-export function buildReadingClassOptions(payload) {
+const GRADE_LABELS = Object.freeze(['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'])
+
+function extractCurrentGrade(source) {
+  const grade = Number(source?.currentGrade)
+  return Number.isInteger(grade) && grade >= 1 && grade <= 6 ? grade : null
+}
+
+export function buildReadingScopeOptions(payload) {
   const classes = new Map()
+  const grades = new Map()
   studentItems(payload).forEach((student, index) => {
     const source = requireRecord(student, `studentOptions[${index}]`)
+    const currentGrade = extractCurrentGrade(source)
+    if (currentGrade !== null && !grades.has(currentGrade)) {
+      grades.set(currentGrade, Object.freeze({
+        grade: currentGrade,
+        displayName: GRADE_LABELS[currentGrade - 1],
+      }))
+    }
     if (typeof source.classId !== 'string' || !source.classId.trim()) return
     const classId = source.classId.trim()
     const displayName = typeof source.className === 'string' && source.className.trim()
@@ -347,28 +362,46 @@ export function buildReadingClassOptions(payload) {
       classes.set(classId, {
         classId,
         displayName,
-        ...(entryYear !== null ? { entryYear } : {}),
-        ...(classNumber !== null ? { classNumber } : {}),
-        ...(stage !== null ? { stage } : {}),
+        entryYear,
+        classNumber,
+        stage,
       })
     }
   })
-  return Object.freeze([...classes.values()].sort((left, right) => {
-    if (left.entryYear !== undefined && right.entryYear !== undefined && left.entryYear !== right.entryYear) {
+  const classOptions = Object.freeze([...classes.values()].sort((left, right) => {
+    if (left.entryYear !== null && right.entryYear !== null && left.entryYear !== right.entryYear) {
       return left.entryYear - right.entryYear
     }
-    if (left.classNumber !== undefined && right.classNumber !== undefined && left.classNumber !== right.classNumber) {
+    if (left.classNumber !== null && right.classNumber !== null && left.classNumber !== right.classNumber) {
       return left.classNumber - right.classNumber
     }
     return compareClassNames(left.displayName, right.displayName) || left.classId.localeCompare(right.classId, 'en')
-  }))
+  }).map((item) => Object.freeze({
+    classId: item.classId,
+    displayName: item.displayName,
+  })))
+  const gradeOptions = Object.freeze(
+    [...grades.values()].sort((left, right) => left.grade - right.grade),
+  )
+  return Object.freeze({ classOptions, gradeOptions })
+}
+
+export function buildReadingClassOptions(payload) {
+  return buildReadingScopeOptions(payload).classOptions
 }
 
 export const CLASS_STORAGE_KEY_PREFIX = 'readmate:console:last_class:'
+export const SCOPE_STORAGE_KEY_PREFIX = 'readmate:console:reading_scope:'
 
 export function getClassStorageKey(workspaceId) {
   return typeof workspaceId === 'string' && workspaceId.trim()
     ? `${CLASS_STORAGE_KEY_PREFIX}${workspaceId.trim()}`
+    : ''
+}
+
+export function getScopeStorageKey(workspaceId) {
+  return typeof workspaceId === 'string' && workspaceId.trim()
+    ? `${SCOPE_STORAGE_KEY_PREFIX}${workspaceId.trim()}`
     : ''
 }
 
@@ -424,11 +457,32 @@ export function createConsoleReadingStatisticsApi(client) {
   const api = createConsoleApi(client)
   return {
     listStudents: (options = {}) => api.listStudents(options),
-    getSummary: ({ workspaceId, classId, statDate, signal } = {}) => api.getReadingStatisticsScope(
-      { classId, statDate },
+    getSummary: ({ workspaceId, classId, statDate, scopeLevel, grade, signal } = {}) => api.getReadingStatisticsScope(
+      { classId, statDate, scopeLevel, grade },
       { workspaceId, signal },
     ),
   }
+}
+
+function parseStoredReadingScope(raw) {
+  if (typeof raw !== 'string' || !raw.trim()) {
+    return { scopeLevel: 'class', selectedGrade: null }
+  }
+  try {
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const scopeLevel = ['class', 'grade', 'school'].includes(parsed.scopeLevel)
+        ? parsed.scopeLevel
+        : 'class'
+      const grade = Number(parsed.selectedGrade)
+      const selectedGrade = Number.isInteger(grade) && grade >= 1 && grade <= 6 ? grade : null
+      return { scopeLevel, selectedGrade }
+    }
+  } catch {}
+  if (raw === 'class' || raw === 'grade' || raw === 'school') {
+    return { scopeLevel: raw, selectedGrade: null }
+  }
+  return { scopeLevel: 'class', selectedGrade: null }
 }
 
 function defaultVisibility() {
@@ -460,7 +514,9 @@ export function createScopedReadingStatisticsController({
   if (!api?.listStudents || !api?.getSummary) throw new TypeError('scope api listStudents/getSummary is required')
   if (!Number.isSafeInteger(pollIntervalMs) || pollIntervalMs < 1_000) throw new TypeError('pollIntervalMs must be at least one second')
   const storageKey = getClassStorageKey(workspaceId)
+  const scopeStorageKey = getScopeStorageKey(workspaceId)
   const storedClassId = storageKey ? (storage?.getItem(storageKey) || '') : ''
+  const storedScope = parseStoredReadingScope(scopeStorageKey ? storage?.getItem(scopeStorageKey) : null)
   const resolvedInitialClassId = initialClassId || storedClassId
   let active = false
   let requestVersion = 0
@@ -469,7 +525,10 @@ export function createScopedReadingStatisticsController({
   let state = {
     resource: { status: 'loading', data: null, error: null, meta: {} },
     classOptions: Object.freeze([]),
+    gradeOptions: Object.freeze([]),
     selectedClassId: resolvedInitialClassId,
+    scopeLevel: storedScope.scopeLevel,
+    selectedGrade: storedScope.selectedGrade,
     statDate: initialStatDate || statDateAtBeijingFour(clock.now()),
     isRefreshing: false,
   }
@@ -482,17 +541,40 @@ export function createScopedReadingStatisticsController({
     if (timer !== null) scheduler.clearInterval(timer)
     timer = null
   }
+  const persistScope = (scopeLevel, selectedGrade) => {
+    if (!scopeStorageKey) return
+    storage?.setItem(scopeStorageKey, JSON.stringify({
+      scopeLevel,
+      selectedGrade: selectedGrade ?? null,
+    }))
+  }
+
+  const canRequestCurrentScope = () => {
+    if (!active || !workspaceId) return false
+    if (state.scopeLevel === 'school') return true
+    if (state.scopeLevel === 'grade') {
+      return Number.isInteger(state.selectedGrade) && state.selectedGrade >= 1 && state.selectedGrade <= 6
+    }
+    return Boolean(state.selectedClassId)
+  }
+
   const schedulePoll = () => {
     clearPoll()
-    if (!active || visibility.getState() !== 'visible' || !state.selectedClassId) return
+    if (!canRequestCurrentScope() || visibility.getState() !== 'visible') return
     timer = scheduler.setInterval(() => void refresh(), pollIntervalMs)
   }
 
   const refresh = async ({ replace = false } = {}) => {
-    if (!active || !workspaceId || !state.selectedClassId) return null
+    if (!canRequestCurrentScope()) return null
     const version = ++requestVersion
     const previousResource = state.resource
     const previousData = replace ? null : previousResource.data
+    const scopeLevel = state.scopeLevel === 'grade' || state.scopeLevel === 'school' ? state.scopeLevel : 'class'
+    const query = scopeLevel === 'grade'
+      ? { scopeLevel: 'grade', grade: state.selectedGrade, statDate: state.statDate }
+      : scopeLevel === 'school'
+        ? { scopeLevel: 'school', statDate: state.statDate }
+        : { classId: state.selectedClassId, statDate: state.statDate }
     emit({
       ...state,
       resource: previousData
@@ -503,12 +585,16 @@ export function createScopedReadingStatisticsController({
     try {
       const response = await api.getSummary({
         workspaceId,
-        classId: state.selectedClassId,
-        statDate: state.statDate,
+        ...query,
       })
       if (!active || version !== requestVersion) return null
       const data = parseScopedReadingStatistics(response.data)
-      if (data.class.classId !== state.selectedClassId || data.statDate !== state.statDate) {
+      const expectedClassId = scopeLevel === 'grade'
+        ? `grade:${state.selectedGrade}`
+        : scopeLevel === 'school'
+          ? 'school'
+          : state.selectedClassId
+      if (data.class.classId !== expectedClassId || data.statDate !== state.statDate) {
         invalidResponse('响应范围与当前班级或统计日不一致')
       }
       emit({ ...state, resource: { status: data.class.activeStudentCount === 0 ? 'empty' : 'ready', data, error: null, meta: response.meta || {} }, isRefreshing: false })
@@ -532,17 +618,25 @@ export function createScopedReadingStatisticsController({
     try {
       const response = await api.listStudents({ workspaceId })
       if (!active) return
-      const classOptions = buildReadingClassOptions(response.data)
+      const { classOptions, gradeOptions } = buildReadingScopeOptions(response.data)
       const currentStored = storageKey ? (storage?.getItem(storageKey) || '') : ''
       const candidateClassId = state.selectedClassId || currentStored
       const selectedClassId = classOptions.some((item) => item.classId === candidateClassId)
         ? candidateClassId
         : classOptions[0]?.classId || ''
+      const selectedGrade = gradeOptions.some((item) => item.grade === state.selectedGrade)
+        ? state.selectedGrade
+        : (gradeOptions[0]?.grade ?? null)
       if (storageKey && selectedClassId) {
         storage?.setItem(storageKey, selectedClassId)
       }
-      emit({ ...state, classOptions, selectedClassId })
-      if (!selectedClassId) {
+      persistScope(state.scopeLevel, selectedGrade)
+      emit({ ...state, classOptions, gradeOptions, selectedClassId, selectedGrade })
+      if (state.scopeLevel === 'class' && !selectedClassId) {
+        emit({ ...state, resource: { status: 'empty', data: null, error: null, meta: response.meta || {} }, isRefreshing: false })
+        return
+      }
+      if (state.scopeLevel === 'grade' && !(Number.isInteger(selectedGrade) && selectedGrade >= 1)) {
         emit({ ...state, resource: { status: 'empty', data: null, error: null, meta: response.meta || {} }, isRefreshing: false })
         return
       }
@@ -566,6 +660,41 @@ export function createScopedReadingStatisticsController({
     }
     requestVersion += 1
     emit({ ...state, selectedClassId: classId, resource: { status: 'loading', data: null, error: null, meta: {} }, isRefreshing: false })
+    schedulePoll()
+    void refresh({ replace: true })
+  }
+
+  const setScopeLevel = (nextLevel) => {
+    if (!['class', 'grade', 'school'].includes(nextLevel) || state.scopeLevel === nextLevel) return
+    let selectedClassId = state.selectedClassId
+    let selectedGrade = state.selectedGrade
+    if (nextLevel === 'class' && !selectedClassId) {
+      selectedClassId = state.classOptions[0]?.classId || ''
+    }
+    if (nextLevel === 'grade' && !(Number.isInteger(selectedGrade) && selectedGrade >= 1)) {
+      selectedGrade = state.gradeOptions[0]?.grade ?? null
+    }
+    persistScope(nextLevel, selectedGrade)
+    requestVersion += 1
+    emit({
+      ...state,
+      scopeLevel: nextLevel,
+      selectedClassId,
+      selectedGrade,
+      resource: { status: 'loading', data: null, error: null, meta: {} },
+      isRefreshing: false,
+    })
+    schedulePoll()
+    void refresh({ replace: true })
+  }
+
+  const setSelectedGrade = (grade) => {
+    const nextGrade = Number(grade)
+    if (!Number.isInteger(nextGrade) || nextGrade < 1 || nextGrade > 6 || state.selectedGrade === nextGrade) return
+    if (!state.gradeOptions.some((item) => item.grade === nextGrade)) return
+    persistScope(state.scopeLevel, nextGrade)
+    requestVersion += 1
+    emit({ ...state, selectedGrade: nextGrade, resource: { status: 'loading', data: null, error: null, meta: {} }, isRefreshing: false })
     schedulePoll()
     void refresh({ replace: true })
   }
@@ -608,6 +737,8 @@ export function createScopedReadingStatisticsController({
     retry: refresh,
     setClassId,
     selectClass: setClassId,
+    setScopeLevel,
+    setSelectedGrade,
     setStatDate,
   }
 }
@@ -635,11 +766,16 @@ export default function useReadingStatistics(workspaceId, options = {}) {
     resource: snapshot.resource,
     scopeResource: snapshot.resource,
     classOptions: snapshot.classOptions,
+    gradeOptions: snapshot.gradeOptions,
     selectedClassId: snapshot.selectedClassId,
+    scopeLevel: snapshot.scopeLevel,
+    selectedGrade: snapshot.selectedGrade,
     statDate: snapshot.statDate,
     isRefreshing: snapshot.isRefreshing,
     onClassChange: controller.setClassId,
     selectClass: controller.setClassId,
+    onScopeLevelChange: controller.setScopeLevel,
+    onSelectedGradeChange: controller.setSelectedGrade,
     onStatDateChange: controller.setStatDate,
     onRefresh: controller.refresh,
     onRetry: controller.retry,
