@@ -18,11 +18,11 @@
 | T4-2 年级字段与聚合接口 · 实现（后端） | 实现 | T4-1 守卫 13/13 绿。抽查 PASS | `b1442d3` |
 | T4-3 注册与选班二级筛选 · 实现（前端） | 实现 | grade-filter 守卫全绿。抽查 PASS | `148b1e7` |
 | T4-4 校长范围切换器 · 实现（前端） | 实现 | scope-switcher 守卫全绿。抽查 PASS | `4c19ed6` |
-| T4-5 护眼管理年级筛选 | 选做 | **本波次未做**，已问产品负责人是否推迟 | — |
+| T4-5 护眼管理年级筛选 | 选做 | **本波次不做**，产品负责人确认推迟 | — |
 
 执行顺序按交接说明：A 并行两个守卫 → B 串行 T4-2 → C 串行 T4-3 → D 串行 T4-4 → E 回归。T4-3 与 T4-4 文件集不重叠，但为抽查归因选择串行。未调换。
 
-文档提交（本报告与台账进度）见同分支后续 commit。
+文档提交：台账、本收口报告、调度交接稿，见 `git log --oneline ef0df7f..HEAD` 里业务五颗之后的 docs 提交。
 
 ---
 
@@ -153,7 +153,7 @@ T4-2 实现前，守卫实测纠正了契约 3.4.1 对 `scopeAllows` 的乐观�
 4. **`permissions.js` 必须仍无 diff。** 若合并后出现权限文件改动，先停下来。
 5. 前端契约补丁：阅读统计 query 的实际组装点在 `src/api/console.js` 的 `getReadingStatisticsScope`，不只是 `useReadingStatistics.js`。已实现转发，合并时不要回退成只发 `classId/statDate`。
 
-提交列表（相对 `ef0df7f`，不含本收口文档提交）：
+业务五颗（相对 `ef0df7f`，不要丢）：
 
 ```
 4c19ed6 feat(grade-scope): 校长阅读统计增加年级与全校范围切换 (T4-4)
@@ -162,3 +162,7 @@ b1442d3 feat(grade-scope): 阅读统计支持年级与全校聚合 (T4-2)
 3160e68 test(grade-scope): 钉死注册选班与范围切换器前端契约 (T4-3a)
 69bf411 test(grade-scope): 钉死年级维度后端契约 (T4-1)
 ```
+
+文档提交（台账、收口报告、调度交接稿）在这五颗之后，以 `git log --oneline ef0df7f..HEAD` 为准。
+
+给任务调度 agent 的汇报稿见同目录 `w4-scheduler-handoff.md`。可直接复制给调度会话。
