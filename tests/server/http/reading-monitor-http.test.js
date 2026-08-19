@@ -483,6 +483,12 @@ test('G2-18 HTTP self/scope 严格返回新 DTO，并区分空态、权限、跨
   assert.deepEqual(unknownQuery.payload.error.details.fields, ['studentId'])
   assertRequestId(unknownQuery)
 
+  const classLevelQuery = await requestJson(harness.baseUrl, teacherJar, `${scopePath}&scopeLevel=class`, {
+    workspaceId: harness.fixture.workspaceId,
+  })
+  assert.equal(classLevelQuery.status, 200, JSON.stringify(classLevelQuery.payload))
+  assertRequestId(classLevelQuery)
+
   const studentScope = await requestJson(harness.baseUrl, studentJar, scopePath, {
     workspaceId: harness.fixture.workspaceId,
   })

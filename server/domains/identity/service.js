@@ -1016,6 +1016,11 @@ export function createIdentityService(options) {
         entryYear: klass.entryYear,
         classNumber: klass.classNumber,
         gradeId: klass.gradeId,
+        currentGrade: computeClassLifecycle({
+          stage: klass.stage,
+          entryYear: klass.entryYear,
+          now,
+        }).currentGrade,
       })),
     }
   }

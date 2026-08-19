@@ -124,10 +124,10 @@ test('buildReadingClassOptions 优先按结构化 entryYear 与 classNumber 排�
   const options = buildReadingClassOptions(payload)
   assert.deepEqual(options.map((item) => item.classId), ['class-0', 'class-1', 'class-2'])
   assert.deepEqual(options.map((item) => item.displayName), ['2023级实验班', '公共领域素材联调班级', 'T89验收二班'])
-  assert.equal(options[1].entryYear, 2024)
-  assert.equal(options[1].classNumber, 1)
-  assert.equal(options[2].entryYear, 2024)
-  assert.equal(options[2].classNumber, 2)
+  assert.deepEqual(Object.keys(options[1]).sort(), ['classId', 'displayName'])
+  assert.deepEqual(Object.keys(options[2]).sort(), ['classId', 'displayName'])
+  assert.equal(Object.hasOwn(options[1], 'entryYear'), false)
+  assert.equal(Object.hasOwn(options[1], 'classNumber'), false)
 })
 
 function createMockScopeApi({ students = [], scopeData = {} } = {}) {

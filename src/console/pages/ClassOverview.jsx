@@ -10,6 +10,7 @@ import useReadingStatistics from '../state/useReadingStatistics.js'
 export default function ClassOverview() {
   const { workspace } = useConsole()
   const statistics = useReadingStatistics(workspace?.id)
+  const showScopeSwitcher = workspace && workspace.scopeType === 'school'
   const [keyword, setKeyword] = useState('')
   const [filter, setFilter] = useState('all')
   const [selectedStudentId, setSelectedStudentId] = useState(null)
@@ -34,6 +35,16 @@ export default function ClassOverview() {
     statistics.onStatDateChange(nextDate)
   }, [statistics.onStatDateChange])
 
+  const handleScopeLevelChange = useCallback((nextLevel) => {
+    setSelectedStudentId(null)
+    statistics.onScopeLevelChange(nextLevel)
+  }, [statistics.onScopeLevelChange])
+
+  const handleSelectedGradeChange = useCallback((nextGrade) => {
+    setSelectedStudentId(null)
+    statistics.onSelectedGradeChange(nextGrade)
+  }, [statistics.onSelectedGradeChange])
+
   return (
     <PagePanel
       title="班级阅读统计"
@@ -43,6 +54,12 @@ export default function ClassOverview() {
     >
       <div className="mb-4 min-w-0">
         <ReadingStatisticsToolbar
+          showScopeSwitcher={showScopeSwitcher}
+          scopeLevel={statistics.scopeLevel}
+          selectedGrade={statistics.selectedGrade}
+          gradeOptions={statistics.gradeOptions}
+          onScopeLevelChange={handleScopeLevelChange}
+          onSelectedGradeChange={handleSelectedGradeChange}
           classOptions={statistics.classOptions}
           selectedClassId={statistics.selectedClassId}
           statDate={statistics.statDate}

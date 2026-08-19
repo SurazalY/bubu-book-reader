@@ -11,6 +11,8 @@ import { stageLabel } from '../../console/pages/accounts/identityUi.js'
 const FIELD =
   'student-field h-16 w-full rounded-[24px] border border-white/70 bg-white/55 px-6 text-title text-ink-800 placeholder:text-ink-400 outline-none transition focus:border-white/90 focus:bg-white/70'
 
+const GRADE_LABELS = Object.freeze(['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'])
+
 const studentApi = createStudentApi()
 
 export default function Register() {
@@ -22,6 +24,7 @@ export default function Register() {
   const [tokenError, setTokenError] = useState('')
   const [form, setForm] = useState({ loginName: '', displayName: '', password: '', classId: '' })
   const [teacherClassIds, setTeacherClassIds] = useState([])
+  const [selectedGrade, setSelectedGrade] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [suggestions, setSuggestions] = useState([])
@@ -58,6 +61,14 @@ export default function Register() {
     ))
   }
 
+  function handleGradeChange(event) {
+    const raw = event.target.value
+    setSelectedGrade(raw === '' ? '' : Number(raw))
+    setForm((current) => ({ ...current, classId: '' }))
+    setTeacherClassIds([])
+    setError('')
+  }
+
   function confirmToken(event) {
     event.preventDefault()
     const next = draftToken.trim()
@@ -68,6 +79,9 @@ export default function Register() {
     setTokenError('')
     setError('')
     setCreated(null)
+    setSelectedGrade('')
+    setTeacherClassIds([])
+    setForm((current) => ({ ...current, classId: '' }))
     setActiveToken(next)
   }
 
@@ -77,6 +91,9 @@ export default function Register() {
     setTokenError('')
     setError('')
     setCreated(null)
+    setSelectedGrade('')
+    setTeacherClassIds([])
+    setForm((current) => ({ ...current, classId: '' }))
   }
 
   async function submit(event) {
@@ -194,32 +211,70 @@ export default function Register() {
         <input className={FIELD} type="password" placeholder="密码" aria-label="密码" value={form.password} onChange={setField('password')} autoComplete="new-password" />
 
         {expectedRole === 'student' ? (
-          <label className="block">
-            <span className="mb-2 block pl-2 text-caption text-ink-500">选择班级</span>
-            <select className={FIELD} value={form.classId} onChange={setField('classId')} aria-label="选择班级">
-              <option value="">请选择预制班级</option>
-              {classes.map((klass) => (
-                <option key={klass.id} value={klass.id}>
-                  {klass.name} · {stageLabel(klass.stage)} {klass.entryYear} 届 {klass.classNumber} 班
-                </option>
-              ))}
-            </select>
-          </label>
+          <>
+            <label className="block">
+              <span className="mb-2 block pl-2 text-caption text-ink-500">选择年级</span>
+              <Select
+                className={FIELD}
+                value={selectedGrade === '' ? '' : String(selectedGrade)}
+                onChange={handleGradeChange}
+                aria-label="选择年级"
+              >
+                <option value="">请选择年级</option>
+                {GRADE_LABELS.map((label, index) => (
+                  <option key={label} value={index + 1}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            {selectedGrade && (
+              <label className="block">
+                <span className="mb-2 block pl-2 text-caption text-ink-500">选择班级</span>
+                <select className={FIELD} value={form.classId} onChange={setField('classId')} aria-label="选择班级">
+                  <option value="">请选择预制班级</option>
+                  {classes.filter((klass) => klass.currentGrade === selectedGrade).map((klass) => (
+                    <option key={klass.id} value={klass.id}>
+                      {klass.name} · {stageLabel(klass.stage)} {klass.entryYear} 届 {klass.classNumber} 班
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </>
         ) : expectedRole === 'teacher' ? (
           <fieldset className="rounded-[24px] border border-white/70 bg-white/55 px-5 py-4">
             <legend className="px-1 text-caption text-ink-500">可先选任教班级，也可登录后再选</legend>
-            {classes.length === 0 ? (
-              <p className="text-caption text-ink-500">当前没有可选班级，登录后会进入选班页。</p>
-            ) : classes.map((klass) => (
-              <label key={klass.id} className="mt-2 flex items-center gap-2 text-caption text-ink-700">
-                <input
-                  type="checkbox"
-                  checked={teacherClassIds.includes(klass.id)}
-                  onChange={() => toggleTeacherClass(klass.id)}
-                />
-                {klass.name} · {stageLabel(klass.stage)} {klass.entryYear} 届
-              </label>
-            ))}
+            <label className="mt-2 block">
+              <span className="mb-2 block text-caption text-ink-500">选择年级</span>
+              <select
+                className={FIELD}
+                value={selectedGrade === '' ? '' : String(selectedGrade)}
+                onChange={handleGradeChange}
+                aria-label="选择年级"
+              >
+                <option value="">请选择年级</option>
+                {GRADE_LABELS.map((label, index) => (
+                  <option key={label} value={index + 1}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {selectedGrade && (
+              classes.filter((klass) => klass.currentGrade === selectedGrade).length === 0 ? (
+                <p className="mt-3 text-caption text-ink-500">当前没有可选班级，登录后会进入选班页。</p>
+              ) : classes.filter((klass) => klass.currentGrade === selectedGrade).map((klass) => (
+                <label key={klass.id} className="mt-2 flex items-center gap-2 text-caption text-ink-700">
+                  <input
+                    type="checkbox"
+                    checked={teacherClassIds.includes(klass.id)}
+                    onChange={() => toggleTeacherClass(klass.id)}
+                  />
+                  {klass.name} · {stageLabel(klass.stage)} {klass.entryYear} 届
+                </label>
+              ))
+            )}
           </fieldset>
         ) : null}
 
@@ -266,4 +321,8 @@ function Shell({ children, schoolName, expectedRole }) {
       </GlassPanel>
     </div>
   )
+}
+
+function Select({ children, ...props }) {
+  return <select {...props}>{children}</select>
 }
