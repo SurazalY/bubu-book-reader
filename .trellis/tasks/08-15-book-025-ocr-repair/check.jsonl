@@ -1,0 +1,7 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Audit round-trip binding from source image through OCR, review, package, import and Reader consumers."}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Verify tests and quality gates without reducing assertions or converting warnings to success."}
+{"file":".trellis/spec/backend/error-handling.md","reason":"Check that every model, schema, asset and import failure remains explicit."}
+{"file":"docs/ocr-remediation-investigation.md","reason":"Compare implementation claims against the verified root-cause evidence and known unknowns."}
+{"file":".trellis/tasks/08-15-book-025-ocr-repair/prd.md","reason":"Verify every acceptance criterion and non-goal."}
+{"file":".trellis/tasks/08-15-book-025-ocr-repair/design.md","reason":"Check immutable attempts, hash binding, independent review and no-geometry boundaries."}
+{"file":".trellis/tasks/08-15-book-025-ocr-repair/implement.md","reason":"Confirm the task stops after the 12-page calibration report and does not enter full-book, release, import or G2 work."}

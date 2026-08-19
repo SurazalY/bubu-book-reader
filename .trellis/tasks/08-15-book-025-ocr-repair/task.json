@@ -1,0 +1,36 @@
+{
+  "id": "book-025-ocr-repair",
+  "name": "book-025-ocr-repair",
+  "title": "book-025 OCR 12页校准",
+  "description": "建立精简的单页哈希绑定 OCR/审核流程，并对 Luna、MinerU 3.4.4 + PP-OCRv6 Torch、Gemini 3.7 Flash Low 三个候选完成固定 12 页校准；全书重跑、发布和 G2 属于后续任务。",
+  "status": "in_progress",
+  "dev_type": "feature",
+  "scope": "book-025 12-page calibration only: keep completed Luna and MinerU evidence unchanged; directly OCR the same 12 page images with Agy Gemini 3.7 Flash Low in independent sessions, freeze and manually verify the outputs, compare and stop; no full-book OCR, release/import, or G2",
+  "package": "book-parser",
+  "priority": "P1",
+  "creator": "yak",
+  "assignee": "yak",
+  "createdAt": "2026-08-15",
+  "completedAt": null,
+  "branch": "codex/reader-ocr-checkpoint-20260815",
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "docs/ocr-remediation-investigation.md",
+    "docs/reader-dual-mode-pilot-plan.md",
+    "docs/reader-dual-mode-pilot-implementation.md",
+    "book-parser/pilot-books.json",
+    "book-parser/pipeline/build_book_package_v2.py"
+  ],
+  "notes": "User authorized implementation on 2026-08-15, limited to 12-page calibration. The completed Luna and MinerU runs remain immutable evidence. On 2026-08-16 the user explicitly added one direct OCR pass with Agy Gemini 3.7 Flash Low on the same 12 images to assess whether future review can be reduced. Stop after the comparison report; do not start 162-page/full-corpus OCR, release/import, or G2.",
+  "meta": {
+    "planningMode": "manual-because-trellis-scripts-and-skills-are-not-restored",
+    "calibrationPageCount": 12,
+    "fullRunRequiresUserApprovalAfterCalibration": true
+  }
+}

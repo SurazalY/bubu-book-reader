@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reader.local/schemas/ocr-page-attempt-v2.schema.json",
+  "title": "Immutable page-scoped Luna OCR attempt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "attemptId", "workUnitId", "bookId", "pageNo", "sourcePdfSha256", "inputImageSha256", "promptVersion", "promptSha256", "outputSha256", "status", "paragraphs", "executionTrace", "createdAt"],
+  "properties": {
+    "schemaVersion": {"const": "ocr-page-attempt/v2"},
+    "attemptId": {"type": "string", "minLength": 1},
+    "workUnitId": {"type": "string", "pattern": "^book-025-p[0-9]{4}-a01$"},
+    "bookId": {"const": "book-025"},
+    "pageNo": {"type": "integer", "minimum": 1, "maximum": 162},
+    "sourcePdfSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "inputImageSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "promptVersion": {"type": "string", "minLength": 1},
+    "promptSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "outputSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "status": {"enum": ["ok", "failed"]},
+    "paragraphs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["order", "rawText"],
+        "properties": {
+          "order": {"type": "integer", "minimum": 1},
+          "rawText": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "selfReportedPageNo": {"type": "integer", "minimum": 1, "maximum": 162},
+    "failureReason": {"type": "string", "minLength": 1},
+    "executionTrace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "model", "reasoningEffort", "taskSourceThreadId"],
+      "properties": {
+        "system": {"const": "codex"},
+        "model": {"const": "gpt-5.6-luna"},
+        "reasoningEffort": {"const": "xhigh"},
+        "taskSourceThreadId": {"type": "string", "minLength": 1},
+        "threadId": {"type": "string", "minLength": 1},
+        "turnId": {"type": "string", "minLength": 1}
+      }
+    },
+    "createdAt": {"type": "string", "minLength": 1}
+  }
+}

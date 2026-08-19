@@ -1,0 +1,4 @@
+interface:
+  display_name: "导入步步电子教材"
+  short_description: "将教材 PDF 导入白板并生成可框选 OCR 文字图层"
+  default_prompt: "Use $import-bubu-textbook to import these textbook PDFs into the Bubu whiteboard and generate verified OCR text layers."

@@ -1,0 +1,10 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Keep page image, work unit, OCR attempt, review, package and Reader contracts aligned across boundaries."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse deterministic package and correction helpers instead of creating divergent contract logic."}
+{"file":".trellis/spec/backend/error-handling.md","reason":"Propagate OCR, CLI, schema, import and authorization failures explicitly without fallback behavior."}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"Preserve import idempotency and transaction boundaries during the real G2 vertical slice."}
+{"file":"docs/ocr-remediation-investigation.md","reason":"Use the verified batch-binding evidence and avoid repeating unsupported Gemini estimates."}
+{"file":"docs/reader-dual-mode-pilot-plan.md","reason":"Preserve the frozen physical-page, dual-mode and AI-scope product decisions."}
+{"file":"docs/reader-dual-mode-pilot-implementation.md","reason":"Continue from the current G1-blocked implementation and do not claim G2/G4 prematurely."}
+{"file":".trellis/tasks/08-15-book-025-ocr-repair/prd.md","reason":"Implement only the reviewed requirements and acceptance criteria."}
+{"file":".trellis/tasks/08-15-book-025-ocr-repair/design.md","reason":"Follow the page-bound OCR and independent-review contracts."}
+{"file":".trellis/tasks/08-15-book-025-ocr-repair/implement.md","reason":"Execute gates in order and stop after calibration until user approval."}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reader.local/schemas/page-work-unit-v1.schema.json",
+  "title": "Page-bound OCR work unit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "workUnitId", "bookId", "pageNo", "sourcePdfSha256", "imagePath", "inputImageSha256", "render"],
+  "properties": {
+    "schemaVersion": {"const": "page-work-unit/v1"},
+    "workUnitId": {"type": "string", "pattern": "^book-025-p[0-9]{4}-a01$"},
+    "bookId": {"const": "book-025"},
+    "pageNo": {"type": "integer", "minimum": 1, "maximum": 162},
+    "sourcePdfSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "imagePath": {"type": "string", "minLength": 1},
+    "inputImageSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "render": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dpi", "width", "height", "rendererVersion"],
+      "properties": {
+        "dpi": {"const": 200},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1},
+        "rendererVersion": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "ocr-structure-page-check/v1",
+  "bookId": "book-025",
+  "pageNo": 162,
+  "sourcePdfSha256": "5c419590e69f1d00d276acd16e157bdb0c8f3e2fc0d25183484cdf65faced6cd",
+  "inputImageSha256": "af8da3a38093206ba6aa02588d727d25a2b54970ad97becf65363fce0421685d",
+  "renderedImagePath": "render/page-0162.png",
+  "visualInspection": "completed",
+  "visuallyBlank": false,
+  "ocrAttemptCreated": false,
+  "note": "Physical page 162 is a back-cover structure page with visible text; it was checked only for the historical empty-page condition and was not OCR processed."
+}

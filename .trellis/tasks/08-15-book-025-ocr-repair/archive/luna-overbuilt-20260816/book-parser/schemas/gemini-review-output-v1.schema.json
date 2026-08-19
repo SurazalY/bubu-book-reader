@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reader.local/schemas/gemini-review-output-v1.schema.json",
+  "title": "Narrow Gemini OCR review output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "findings"],
+  "properties": {
+    "verdict": {"enum": ["passed", "failed"]},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "severity", "detail", "imageEvidence", "ocrEvidence"],
+        "properties": {
+          "type": {"enum": ["page-text-mismatch", "substantial-omission", "cross-page-contamination", "duplicate-content", "reading-order-error", "substantial-addition"]},
+          "severity": {"enum": ["blocking", "major", "minor"]},
+          "detail": {"type": "string", "minLength": 1},
+          "imageEvidence": {"type": "string", "minLength": 1},
+          "ocrEvidence": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}
