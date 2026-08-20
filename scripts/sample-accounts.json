@@ -1,0 +1,184 @@
+{
+  "_readme": [
+    "这是一份完全虚构的联调示例账号清单，只用于对接方从空库走通登录。",
+    "姓名、学校、班级均为占位数据，禁止改成任何真实师生或学校信息。",
+    "所有账号共用 defaultPassword。首次登录后请立即修改口令。",
+    "本文件不能直接交给 npm run seed:identity：官方导入器只接受 scrypt 哈希，不接受明文口令。",
+    "请使用：node scripts/import-sample-accounts.mjs --database <sqlite路径>",
+    "npm run bootstrap:internal 不会读取本文件；那条命令在脚本里写死了另一套账号，并且 --manifest 是书目清单而不是账号清单。"
+  ],
+  "defaultPassword": "ChangeMe#Sample1",
+  "organizations": [
+    {
+      "id": "sample-organization",
+      "name": "示例学校",
+      "schoolCode": "sample-school"
+    }
+  ],
+  "users": [
+    {
+      "id": "sample-principal",
+      "organizationId": "sample-organization",
+      "username": "sample-principal",
+      "displayName": "示例校长",
+      "loginName": "sample-principal"
+    },
+    {
+      "id": "sample-teacher",
+      "organizationId": "sample-organization",
+      "username": "sample-teacher",
+      "displayName": "示例教师",
+      "loginName": "sample-teacher"
+    },
+    {
+      "id": "sample-student-1",
+      "organizationId": "sample-organization",
+      "username": "sample-student-1",
+      "displayName": "示例学生一",
+      "loginName": "sample-student-1"
+    },
+    {
+      "id": "sample-student-2",
+      "organizationId": "sample-organization",
+      "username": "sample-student-2",
+      "displayName": "示例学生二",
+      "loginName": "sample-student-2"
+    },
+    {
+      "id": "sample-student-3",
+      "organizationId": "sample-organization",
+      "username": "sample-student-3",
+      "displayName": "示例学生三",
+      "loginName": "sample-student-3"
+    }
+  ],
+  "workspaces": [
+    {
+      "id": "sample-class-workspace",
+      "organizationId": "sample-organization",
+      "code": "class-teacher",
+      "name": "示例班级工作空间",
+      "scopeType": "class",
+      "scopeId": "sample-class"
+    },
+    {
+      "id": "sample-school-workspace",
+      "organizationId": "sample-organization",
+      "code": "school-admin",
+      "name": "示例学校工作空间",
+      "scopeType": "school",
+      "scopeId": "sample-organization"
+    }
+  ],
+  "workspaceMemberships": [
+    {
+      "id": "membership-sample-principal",
+      "userId": "sample-principal",
+      "workspaceId": "sample-school-workspace"
+    },
+    {
+      "id": "membership-sample-teacher",
+      "userId": "sample-teacher",
+      "workspaceId": "sample-class-workspace"
+    },
+    {
+      "id": "membership-sample-student-1",
+      "userId": "sample-student-1",
+      "workspaceId": "sample-class-workspace"
+    },
+    {
+      "id": "membership-sample-student-2",
+      "userId": "sample-student-2",
+      "workspaceId": "sample-class-workspace"
+    },
+    {
+      "id": "membership-sample-student-3",
+      "userId": "sample-student-3",
+      "workspaceId": "sample-class-workspace"
+    }
+  ],
+  "classes": [
+    {
+      "id": "sample-class",
+      "organizationId": "sample-organization",
+      "gradeId": "primary:2023",
+      "name": "示例班级",
+      "stage": "primary",
+      "entryYear": 2023,
+      "classNumber": 1
+    }
+  ],
+  "classMemberships": [
+    {
+      "id": "class-member-sample-teacher",
+      "classId": "sample-class",
+      "userId": "sample-teacher",
+      "membershipRole": "teacher"
+    },
+    {
+      "id": "class-member-sample-student-1",
+      "classId": "sample-class",
+      "userId": "sample-student-1",
+      "membershipRole": "student"
+    },
+    {
+      "id": "class-member-sample-student-2",
+      "classId": "sample-class",
+      "userId": "sample-student-2",
+      "membershipRole": "student"
+    },
+    {
+      "id": "class-member-sample-student-3",
+      "classId": "sample-class",
+      "userId": "sample-student-3",
+      "membershipRole": "student"
+    }
+  ],
+  "roleAssignments": [
+    {
+      "id": "role-sample-principal",
+      "organizationId": "sample-organization",
+      "userId": "sample-principal",
+      "workspaceId": "sample-school-workspace",
+      "roleCode": "school_admin",
+      "scopeType": "school",
+      "scopeId": "sample-organization"
+    },
+    {
+      "id": "role-sample-teacher",
+      "organizationId": "sample-organization",
+      "userId": "sample-teacher",
+      "workspaceId": "sample-class-workspace",
+      "roleCode": "teacher",
+      "scopeType": "class",
+      "scopeId": "sample-class"
+    },
+    {
+      "id": "role-sample-student-1",
+      "organizationId": "sample-organization",
+      "userId": "sample-student-1",
+      "workspaceId": "sample-class-workspace",
+      "roleCode": "student",
+      "scopeType": "class",
+      "scopeId": "sample-class"
+    },
+    {
+      "id": "role-sample-student-2",
+      "organizationId": "sample-organization",
+      "userId": "sample-student-2",
+      "workspaceId": "sample-class-workspace",
+      "roleCode": "student",
+      "scopeType": "class",
+      "scopeId": "sample-class"
+    },
+    {
+      "id": "role-sample-student-3",
+      "organizationId": "sample-organization",
+      "userId": "sample-student-3",
+      "workspaceId": "sample-class-workspace",
+      "roleCode": "student",
+      "scopeType": "class",
+      "scopeId": "sample-class"
+    }
+  ]
+}
