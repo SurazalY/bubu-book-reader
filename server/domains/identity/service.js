@@ -26,12 +26,15 @@ import {
   clearIssuedTempPasswordForUser,
   countActiveTeacherClasses,
   createClassWithWorkspace,
+  deleteIssuedTempPasswordClearMarker,
   findActiveStudentMembership,
   findClassById,
   findClassWorkspace,
   findCredentialByLoginName,
   findEnrollmentRequestById,
   findGradeWorkspace,
+  findIssuedTempPasswordByTargetUserId,
+  findIssuedTempPasswordClearMarker,
   findLoginName,
   findOrganizationById,
   findPasswordResetByHash,
@@ -63,6 +66,7 @@ import {
   updateOwnDisplayName,
   updatePasswordHash,
   updateUserDisplayName,
+  upsertIssuedTempPassword,
 } from './repository.js'
 import {
   ACCOUNT_NOT_FOUND_MESSAGE,
@@ -107,6 +111,24 @@ function publicUser(user) {
     status: user.status,
     version: user.version,
   }
+}
+
+const ISSUED_TEMP_PASSWORD_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789'
+const ISSUED_TEMP_PASSWORD_LENGTH = 6
+
+function generateIssuedTempPassword() {
+  const alphabetLength = ISSUED_TEMP_PASSWORD_ALPHABET.length
+  const rejectThreshold = 256 - (256 % alphabetLength)
+  let password = ''
+  while (password.length < ISSUED_TEMP_PASSWORD_LENGTH) {
+    const bytes = randomBytes(ISSUED_TEMP_PASSWORD_LENGTH - password.length)
+    for (const value of bytes) {
+      if (value >= rejectThreshold) continue
+      password += ISSUED_TEMP_PASSWORD_ALPHABET[value % alphabetLength]
+      if (password.length === ISSUED_TEMP_PASSWORD_LENGTH) break
+    }
+  }
+  return password
 }
 
 function invalidCredentialsOutcome() {
@@ -1674,6 +1696,88 @@ export function createIdentityService(options) {
     return { statusCode: 200, payload: { data: { reset: true } } }
   }
 
+  function authorizeIssuedTempPasswordAccess({ actor, workspace, targetUserId }) {
+    const target = findUserById(database, targetUserId)
+    if (!target || (workspace.scopeType !== 'platform' && target.organizationId !== workspace.organizationId)) {
+      throw opaqueAccountNotFound()
+    }
+    const kind = resolveTargetAccountKind(target)
+    const action =
+      kind === 'school_admin'
+        ? 'password_reset.school_admin.issue'
+        : kind === 'teacher'
+          ? 'password_reset.teacher.issue'
+          : 'password_reset.student.issue'
+    if (kind === 'student') {
+      const membership = findActiveStudentMembership(database, target.id)
+      if (!membership) throw permissionDenied()
+      const klass = knownClass(membership.classId, target.organizationId)
+      requireAuthorized({ actor, workspace, action, resourceScope: classResourceScope(klass) })
+    } else if (kind === 'teacher') {
+      authorizeOrGradeManagerTeacherException({
+        actor,
+        workspace,
+        action,
+        resourceScope: schoolResourceScope(workspace.organizationId),
+      })
+    } else {
+      requireAuthorized({
+        actor,
+        workspace,
+        action,
+        resourceScope: schoolResourceScope(target.organizationId),
+      })
+    }
+    return { target, kind }
+  }
+
+  function issueVisibleTempPassword({ actor, workspace, targetUserId, requestId, idempotencyKey, now }) {
+    const { target, kind } = authorizeIssuedTempPasswordAccess({ actor, workspace, targetUserId })
+    const newPassword = generateIssuedTempPassword()
+    const issuedAt = now
+    const id = randomUUID()
+    updatePasswordHash(database, target.id, hashPassword(newPassword), now)
+    upsertIssuedTempPassword(database, {
+      id,
+      organizationId: target.organizationId,
+      targetUserId: target.id,
+      plaintext: newPassword,
+      issuedByUserId: actor.id,
+      issuedWorkspaceId: workspace.id,
+      issuedAt,
+    })
+    deleteIssuedTempPasswordClearMarker(database, target.id)
+    revokeAllSessionsForUser(database, target.id, now)
+    appendAuditEvent(database, {
+      eventType: 'identity.temp_password.issued',
+      actorUserId: actor.id,
+      workspaceId: workspace.id,
+      requestId,
+      idempotencyKey,
+      resourceType: 'issued_temp_password',
+      resourceId: target.id,
+      scopeSnapshot: { organizationId: target.organizationId, targetUserId: target.id, kind },
+      createdAt: now,
+    })
+    return { statusCode: 201, payload: { data: { newPassword, issuedAt } } }
+  }
+
+  function getIssuedTempPassword({ actor, workspace, targetUserId }) {
+    const { target } = authorizeIssuedTempPasswordAccess({ actor, workspace, targetUserId })
+    const issued = findIssuedTempPasswordByTargetUserId(database, target.id)
+    if (issued) {
+      return {
+        status: 'available',
+        password: issued.plaintext,
+        issuedAt: issued.issuedAt,
+      }
+    }
+    if (findIssuedTempPasswordClearMarker(database, target.id)) {
+      return { status: 'cleared' }
+    }
+    return { status: 'none' }
+  }
+
   function upsertAdminAssignment({ userId, workspaceId, organizationId, roleCode, scopeType, scopeId, now, status }) {
     const existingMembership = database
       .prepare('SELECT id, status FROM workspace_memberships WHERE user_id = ? AND workspace_id = ?')
@@ -1973,6 +2077,8 @@ export function createIdentityService(options) {
     issuePasswordReset,
     listPasswordResetCredentials,
     consumePasswordReset,
+    issueVisibleTempPassword,
+    getIssuedTempPassword,
     assignSchoolAdmin,
     assignGradeManager,
     computeClassLifecycle,

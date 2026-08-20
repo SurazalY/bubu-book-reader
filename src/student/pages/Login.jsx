@@ -128,16 +128,9 @@ export default function Login() {
         </form>
 
         <div className="mt-5 flex items-center justify-between text-caption">
-          <button
-            type="button"
-            onClick={() => {
-              setStatus('normal')
-              setFeedback('请联系班主任或学校管理员重置密码')
-            }}
-            className="text-ink-500 transition hover:text-ink-800"
-          >
+          <Link to="/student/forgot-password" className="text-ink-500 transition hover:text-ink-800">
             忘记密码
-          </button>
+          </Link>
           <span className="h-4 w-px bg-ink-200" />
           <button
             type="button"

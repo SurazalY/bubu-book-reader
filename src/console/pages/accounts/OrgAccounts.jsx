@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createConsoleApi } from '../../../api/console.js'
 import { useApiResource } from '../../../api/useApiResource.js'
 import { PagePanel } from '../../components/PagePanel.jsx'
@@ -27,6 +27,56 @@ async function copyPlainText(text) {
   await navigator.clipboard.writeText(text)
 }
 
+function studentAliasValues(student) {
+  return [student?.loginName, student?.login_name, student?.username, student?.displayName]
+    .filter((value) => typeof value === 'string' && value.trim())
+    .map((value) => value.trim())
+}
+
+function resolveStudentUserId(input, students) {
+  const needle = String(input || '').trim()
+  if (!needle || !Array.isArray(students)) return null
+  const lower = needle.toLowerCase()
+  const exactId = students.find((student) => student?.id === needle)
+  if (exactId?.id) return exactId.id
+  const aliasMatches = students.filter((student) => (
+    studentAliasValues(student).some((value) => value.toLowerCase() === lower)
+  ))
+  if (aliasMatches.length === 1 && aliasMatches[0]?.id) return aliasMatches[0].id
+  return null
+}
+
+function renderTempPasswordStatus(record, onCopy) {
+  if (!record) {
+    return <span className="text-[12px] text-ink-400">读取中…</span>
+  }
+  if (record.readFailed) {
+    return <span className="text-[12px] text-danger-600">状态读取失败</span>
+  }
+  if (record.status === 'available') {
+    return (
+      <div className="text-[12px] text-ink-700">
+        <p>
+          当前临时密码：
+          <span className="font-mono">{record.password}</span>
+        </p>
+        {record.password ? (
+          <Btn size="sm" tone="primary" className="mt-1.5" onClick={() => onCopy(record.password, '已复制新密码')}>
+            复制
+          </Btn>
+        ) : null}
+      </div>
+    )
+  }
+  if (record.status === 'cleared') {
+    return <span className="text-[12px] text-ink-600">学生已自行修改</span>
+  }
+  if (record.status === 'none') {
+    return <span className="text-[12px] text-ink-400">未重置过</span>
+  }
+  return <span className="text-[12px] text-danger-600">状态读取失败</span>
+}
+
 export default function OrgAccounts() {
   const { workspace } = useConsole()
   const workspaceId = workspace?.id
@@ -40,6 +90,8 @@ export default function OrgAccounts() {
   const [resetIssued, setResetIssued] = useState(null)
   const [resetError, setResetError] = useState('')
   const [resetting, setResetting] = useState(false)
+  const [tempByUserId, setTempByUserId] = useState({})
+  const tempFetchSeq = useRef(0)
   const [revokeReason, setRevokeReason] = useState('定向撤销')
   const [copyNote, setCopyNote] = useState('')
 
@@ -48,6 +100,31 @@ export default function OrgAccounts() {
     return { data: unwrapList(response.data), meta: response.meta }
   }, [workspaceId])
   const students = useApiResource(loadStudents)
+  const studentList = Array.isArray(students.data) ? students.data : []
+  const studentIdsKey = studentList.map((item) => item.id).join(',')
+
+  useEffect(() => {
+    if (!workspaceId || students.status !== 'ready') return undefined
+    let cancelled = false
+    const seq = tempFetchSeq.current + 1
+    tempFetchSeq.current = seq
+    const list = studentList
+    ;(async () => {
+      const entries = await Promise.all(list.map(async (student) => {
+        try {
+          const response = await identityApi.getTempPassword(student.id, { workspaceId })
+          return [student.id, response.data]
+        } catch {
+          return [student.id, { readFailed: true }]
+        }
+      }))
+      if (cancelled || seq !== tempFetchSeq.current) return
+      setTempByUserId(Object.fromEntries(entries))
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [studentIdsKey, students.status, workspaceId])
 
   const loadCredentials = useCallback(async () => {
     const response = await identityApi.listRegistrationCredentials({ workspaceId, expectedRole })
@@ -96,9 +173,14 @@ export default function OrgAccounts() {
   }
 
   async function issueReset(userId) {
-    const targetUserId = userId || resetUserId.trim()
-    if (!targetUserId) {
+    const rawTarget = String(userId || resetUserId).trim()
+    if (!rawTarget) {
       setResetError('请选择或填写要重置的账号')
+      return
+    }
+    const targetUserId = resolveStudentUserId(rawTarget, studentList)
+    if (!targetUserId) {
+      setResetError('找不到该学生')
       return
     }
     setResetting(true)
@@ -106,10 +188,17 @@ export default function OrgAccounts() {
     setResetIssued(null)
     setCopyNote('')
     try {
-      const response = await identityApi.issuePasswordResetCredential(targetUserId, { workspaceId })
-      setResetIssued(response.data)
+      const response = await identityApi.issueTempPassword(targetUserId, { workspaceId })
+      const newPassword = response.data?.newPassword
+      const issuedAt = response.data?.issuedAt
+      tempFetchSeq.current += 1
+      setResetIssued({ userId: targetUserId, newPassword, issuedAt })
+      setTempByUserId((current) => ({
+        ...current,
+        [targetUserId]: { status: 'available', password: newPassword, issuedAt },
+      }))
     } catch (cause) {
-      setResetError(cause?.message || '签发重置码失败')
+      setResetError(cause?.message || '重置密码失败')
     } finally {
       setResetting(false)
     }
@@ -229,23 +318,25 @@ export default function OrgAccounts() {
 
       {canIssueStudentPasswordReset(scopeType) && (
         <section className="mt-6">
-          <SubHead icon="KeyRound" title="密码重置码" />
-          <p className="text-[12px] text-ink-500 mb-3">重置码原文只显示一次。用户编号用来指定账号，不是重置码。</p>
+          <SubHead icon="KeyRound" title="重置密码" />
+          <p className="text-[12px] text-ink-500 mb-3">
+            重置后会生成 6 位新密码，可随时回来查看。学生自行修改后不再显示明文。
+          </p>
           <div className="flex flex-wrap items-end gap-2.5 mb-3">
             <label className="text-[12px] text-ink-600">
               目标账号
-              <input className="console-input mt-1 w-[240px]" value={resetUserId} onChange={(event) => setResetUserId(event.target.value)} placeholder="用户编号" />
+              <input className="console-input mt-1 w-[240px]" value={resetUserId} onChange={(event) => setResetUserId(event.target.value)} placeholder="登录名" />
             </label>
-            <Btn tone="primary" disabled={resetting} onClick={() => issueReset()}>{resetting ? '签发中…' : '签发重置码'}</Btn>
+            <Btn tone="primary" disabled={resetting} onClick={() => issueReset()}>{resetting ? '重置中…' : '重置密码'}</Btn>
           </div>
           {canIssueTeacherAccountSupport(scopeType) && scopeType === 'grade' && (
             <p className="text-[11.5px] text-ink-500 mb-3">可以重置本校教师密码，这不扩大到其他届别班级或书架。</p>
           )}
-          {resetIssued?.rawToken && (
+          {resetIssued?.newPassword && (
             <div className="mb-3 rounded-xl border border-brand-100 bg-brand-50/70 px-3 py-2.5 text-[12.5px] text-ink-800">
-              <p>重置码只显示这一次，请立即复制。这不是用户编号。</p>
-              <p className="mt-1 font-mono break-all">{resetIssued.rawToken}</p>
-              <Btn size="sm" tone="primary" className="mt-2" onClick={() => copyText(resetIssued.rawToken, '已复制重置码')}>复制重置码</Btn>
+              <p>新密码已生成，请转告学生。</p>
+              <p className="mt-1 font-mono break-all">{resetIssued.newPassword}</p>
+              <Btn size="sm" tone="primary" className="mt-2" onClick={() => copyText(resetIssued.newPassword, '已复制新密码')}>复制</Btn>
             </div>
           )}
           {resetError && <p className="mb-3 text-[12.5px] text-danger-600">{resetError}</p>}
@@ -257,23 +348,29 @@ export default function OrgAccounts() {
                 <thead>
                   <tr className="bg-ink-50/70 text-[11.5px] text-ink-500">
                     <th className="px-3 py-2.5 font-medium">学生</th>
+                    <th className="px-2 py-2.5 font-medium">展示名</th>
                     <th className="px-2 py-2.5 font-medium">班级</th>
-                    <th className="px-2 py-2.5 font-medium w-[88px] text-right">操作</th>
+                    <th className="px-2 py-2.5 font-medium">临时密码</th>
+                    <th className="px-2 py-2.5 font-medium w-[108px] text-right">操作</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(students.data || []).map((student) => (
-                    <tr key={student.id} className="border-t border-ink-150/70">
+                  {studentList.map((student) => (
+                    <tr key={student.id} className="border-t border-ink-150/70 align-top">
                       <td className="px-3 py-2.5 text-[13px]">{student.displayName || student.id}</td>
+                      <td className="px-2 py-2.5 text-[13px]">{student.displayName || '—'}</td>
                       <td className="px-2 py-2.5 text-[12.5px] text-ink-600">{student.className || student.classId || '—'}</td>
+                      <td className="px-2 py-2.5">
+                        {renderTempPasswordStatus(tempByUserId[student.id], copyText)}
+                      </td>
                       <td className="px-2 py-2.5 text-right">
-                        <Btn size="sm" onClick={() => issueReset(student.id)}>签发</Btn>
+                        <Btn size="sm" disabled={resetting} onClick={() => issueReset(student.id)}>重置密码</Btn>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              {(students.data || []).length === 0 && students.status !== 'loading' && (
+              {studentList.length === 0 && students.status !== 'loading' && (
                 <p className="px-3 py-3 text-[12px] text-ink-500">当前范围没有可重置的学生。</p>
               )}
             </div>

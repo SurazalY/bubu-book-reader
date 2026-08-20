@@ -60,18 +60,18 @@ export function createIdentityConsoleApi(client = createApiClient()) {
         `/registration-credentials/${encodeURIComponent(id)}/revoke`,
         withWrite(options, 'registration-revoke', body),
       ),
-    listPasswordResetCredentials: (userId, options = {}) =>
-      client.get(`/users/${encodeURIComponent(userId)}/password-reset-credentials`, options),
     issuePasswordResetCredential: (userId, options = {}) =>
       client.post(
         `/users/${encodeURIComponent(userId)}/password-reset-credentials`,
         withWrite(options, 'password-reset-issue'),
       ),
-    revokePasswordResetCredential: (id, body, options = {}) =>
+    issueTempPassword: (userId, options = {}) =>
       client.post(
-        `/password-reset-credentials/${encodeURIComponent(id)}/revoke`,
-        withWrite(options, 'password-reset-revoke', body),
+        `/users/${encodeURIComponent(userId)}/password-reset`,
+        withWrite(options, 'temp-password-issue'),
       ),
+    getTempPassword: (userId, options = {}) =>
+      client.get(`/users/${encodeURIComponent(userId)}/temp-password`, options),
   }
 }
 

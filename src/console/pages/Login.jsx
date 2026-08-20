@@ -144,7 +144,7 @@ export default function Login() {
             type="button"
             onClick={() => {
               setStatus('normal')
-              setNote('请联系学校管理员重置密码')
+              setNote('教师或校长请联系学校管理员重置密码，管理员会把新密码告诉你')
             }}
             className="justify-self-start text-ink-500 hover:text-brand-600 transition"
           >

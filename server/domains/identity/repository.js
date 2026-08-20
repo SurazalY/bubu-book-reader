@@ -913,13 +913,88 @@ export function revokeOtherSessionsForUser(database, userId, keepSessionId, now)
     .run(now, now, userId, keepSessionId)
 }
 
+export function findIssuedTempPasswordByTargetUserId(database, targetUserId) {
+  return database
+    .prepare(`
+      SELECT
+        id,
+        organization_id AS organizationId,
+        target_user_id AS targetUserId,
+        plaintext,
+        issued_by_user_id AS issuedByUserId,
+        issued_workspace_id AS issuedWorkspaceId,
+        issued_at AS issuedAt,
+        version
+      FROM issued_temp_passwords
+      WHERE target_user_id = ?
+    `)
+    .get(targetUserId)
+}
+
+export function findIssuedTempPasswordClearMarker(database, targetUserId) {
+  return database
+    .prepare(`
+      SELECT
+        target_user_id AS targetUserId,
+        organization_id AS organizationId,
+        cleared_at AS clearedAt
+      FROM issued_temp_password_clear_markers
+      WHERE target_user_id = ?
+    `)
+    .get(targetUserId)
+}
+
+export function upsertIssuedTempPassword(database, row) {
+  database
+    .prepare(`
+      INSERT INTO issued_temp_passwords (
+        id, organization_id, target_user_id, plaintext,
+        issued_by_user_id, issued_workspace_id, issued_at, version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+      ON CONFLICT(target_user_id) DO UPDATE SET
+        plaintext = excluded.plaintext,
+        issued_by_user_id = excluded.issued_by_user_id,
+        issued_workspace_id = excluded.issued_workspace_id,
+        issued_at = excluded.issued_at,
+        organization_id = excluded.organization_id,
+        version = issued_temp_passwords.version + 1
+    `)
+    .run(
+      row.id,
+      row.organizationId,
+      row.targetUserId,
+      row.plaintext,
+      row.issuedByUserId,
+      row.issuedWorkspaceId,
+      row.issuedAt,
+    )
+}
+
+export function deleteIssuedTempPasswordClearMarker(database, targetUserId) {
+  database
+    .prepare('DELETE FROM issued_temp_password_clear_markers WHERE target_user_id = ?')
+    .run(targetUserId)
+}
+
 /**
  * T3-2 锚点：学生自助改密成功后清除 issued_temp_passwords 中该用户的明文行。
- * 表由迁移 053 创建；W2 不建表、不发 SQL。T3-2 将本函数体替换为 DELETE。
+ * 仅当存在明文行时才删除并写入 clear marker；从未签发过则保持 none。
  */
 export function clearIssuedTempPasswordForUser(database, userId) {
-  void database
-  void userId
+  const existing = findIssuedTempPasswordByTargetUserId(database, userId)
+  if (!existing) {
+    return
+  }
+  database.prepare('DELETE FROM issued_temp_passwords WHERE target_user_id = ?').run(userId)
+  database
+    .prepare(`
+      INSERT INTO issued_temp_password_clear_markers (target_user_id, organization_id, cleared_at)
+      VALUES (?, ?, ?)
+      ON CONFLICT(target_user_id) DO UPDATE SET
+        organization_id = excluded.organization_id,
+        cleared_at = excluded.cleared_at
+    `)
+    .run(userId, existing.organizationId, new Date().toISOString())
 }
 
 export function updatePasswordHash(database, userId, passwordHash, now) {

@@ -7,6 +7,7 @@ import Shelf from './pages/Shelf.jsx'
 import Me from './pages/Me.jsx'
 import AccountSettings from './pages/settings/AccountSettings.jsx'
 import Login from './pages/Login.jsx'
+import ForgotPassword from './pages/ForgotPassword.jsx'
 import Register from './pages/Register.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 import Reader from './pages/Reader.jsx'
@@ -32,6 +33,7 @@ export default function StudentApp() {
       <Backdrop />
       <Routes>
         <Route path="login" element={<Login />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="register" element={<Register />} />
         <Route path="register/:token" element={<Register />} />
         <Route path="onboarding" element={<Onboarding />} />

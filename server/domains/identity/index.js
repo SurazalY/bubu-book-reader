@@ -924,6 +924,47 @@ function createIdentityModuleWithDatabase({ options, sessionSecret, sessionTtlMs
     }),
   )
 
+  router.get(
+    '/users/:userId/temp-password',
+    requireSession,
+    requireWorkspace,
+    route((req, res) =>
+      sendData(
+        res,
+        service.getIssuedTempPassword({
+          actor: req.identitySession.user,
+          workspace: req.workspace,
+          targetUserId: req.params.userId,
+        }),
+        { requestId: req.requestId },
+      ),
+    ),
+  )
+
+  router.post(
+    '/users/:userId/password-reset',
+    requireSession,
+    requireWorkspace,
+    route((req, res) => {
+      const key = idempotencyKey(req)
+      const outcome = executeIdempotent(database, {
+        key,
+        scope: `identity.temp_password.issue:${req.identitySession.user.id}:${req.params.userId}`,
+        request: { targetUserId: req.params.userId },
+        operation: ({ createdAt }) =>
+          service.issueVisibleTempPassword({
+            actor: req.identitySession.user,
+            workspace: req.workspace,
+            targetUserId: req.params.userId,
+            requestId: req.requestId,
+            idempotencyKey: key,
+            now: createdAt,
+          }),
+      })
+      return sendIdempotentOutcome(res, req, outcome)
+    }),
+  )
+
   router.put(
     '/organizations/:organizationId/school-admins/:userId',
     requireSession,
