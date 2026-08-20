@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>培新教育品牌资产预览</title>
+  <style>
+    :root {
+      --bg-page: #eceff3;
+      --bg-dark: #1a1a1a;
+      --text: #222;
+      --muted: #667;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg-page);
+      color: var(--text);
+      padding: 32px 24px 64px;
+      line-height: 1.5;
+    }
+    .header {
+      max-width: 1120px;
+      margin: 0 auto 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #d8dee6;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header p { margin-top: 6px; font-size: 14px; color: var(--muted); }
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e5e9f0;
+      overflow: hidden;
+    }
+    .card-title {
+      padding: 14px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      background: #f7f8fa;
+      border-bottom: 1px solid #edf2f7;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .card-title span { font-size: 12px; font-weight: 400; color: #6b7280; }
+    .stage {
+      padding: 28px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 28px 32px;
+    }
+    .item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .item img { display: block; }
+    .label {
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #888;
+    }
+    .stage-white { background: #ffffff; }
+    .stage-dark { background: var(--bg-dark); }
+    .stage-dark .label { color: #b0b0b0; }
+    .stage-scene {
+      background-image: url("/bg/reading-scene.png");
+      background-size: cover;
+      background-position: center;
+      padding: 24px;
+    }
+    .glass {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border-radius: 16px;
+      padding: 28px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 28px 32px;
+    }
+    .note {
+      max-width: 1120px;
+      margin: 20px auto 0;
+      font-size: 13px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>培新教育品牌资产预览</h1>
+    <p>PNG-32 去白底资产。三种背景：纯白 #FFFFFF、深色 #1A1A1A、半透明白玻璃叠在 /bg/reading-scene.png。路径均以 /brand/ 为根，供 Vite dev server 访问。</p>
+  </div>
+
+  <div class="container">
+
+    <section class="card">
+      <div class="card-title">① 纯白背景 #FFFFFF <span>mark 16–120px · wordmark 40/80px · lockup 180/280/480px</span></div>
+      <div class="stage stage-white">
+        <div class="item"><img src="/brand/peixin-mark.png" width="16" height="16" alt="mark 16"><span class="label">mark 16</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="24" height="24" alt="mark 24"><span class="label">mark 24</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="32" height="32" alt="mark 32"><span class="label">mark 32</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="40" height="40" alt="mark 40"><span class="label">mark 40</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="64" height="64" alt="mark 64"><span class="label">mark 64</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="120" height="120" alt="mark 120"><span class="label">mark 120</span></div>
+        <div class="item"><img src="/brand/peixin-wordmark.png" height="40" alt="wordmark 40"><span class="label">wordmark 40</span></div>
+        <div class="item"><img src="/brand/peixin-wordmark.png" height="80" alt="wordmark 80"><span class="label">wordmark 80</span></div>
+        <div class="item"><img src="/brand/peixin-lockup.png" width="180" alt="lockup 180"><span class="label">lockup 180</span></div>
+        <div class="item"><img src="/brand/peixin-lockup.png" width="280" alt="lockup 280"><span class="label">lockup 280</span></div>
+        <div class="item"><img src="/brand/peixin-lockup.png" width="480" alt="lockup 480"><span class="label">lockup 480</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">② 深色背景 #1A1A1A <span>主要用于检查徽标边缘是否残留白边；黑字字标在深色底上对比度会很低，属原图特性</span></div>
+      <div class="stage stage-dark">
+        <div class="item"><img src="/brand/peixin-mark.png" width="16" height="16" alt="mark 16"><span class="label">mark 16</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="24" height="24" alt="mark 24"><span class="label">mark 24</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="32" height="32" alt="mark 32"><span class="label">mark 32</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="40" height="40" alt="mark 40"><span class="label">mark 40</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="64" height="64" alt="mark 64"><span class="label">mark 64</span></div>
+        <div class="item"><img src="/brand/peixin-mark.png" width="120" height="120" alt="mark 120"><span class="label">mark 120</span></div>
+        <div class="item"><img src="/brand/peixin-wordmark.png" height="40" alt="wordmark 40"><span class="label">wordmark 40</span></div>
+        <div class="item"><img src="/brand/peixin-wordmark.png" height="80" alt="wordmark 80"><span class="label">wordmark 80</span></div>
+        <div class="item"><img src="/brand/peixin-lockup.png" width="180" alt="lockup 180"><span class="label">lockup 180</span></div>
+        <div class="item"><img src="/brand/peixin-lockup.png" width="280" alt="lockup 280"><span class="label">lockup 280</span></div>
+        <div class="item"><img src="/brand/peixin-lockup.png" width="480" alt="lockup 480"><span class="label">lockup 480</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">③ 玻璃卡片叠在 /bg/reading-scene.png <span>backdrop-filter: blur(16px)</span></div>
+      <div class="stage stage-scene">
+        <div class="glass">
+          <div class="item"><img src="/brand/peixin-mark.png" width="16" height="16" alt="mark 16"><span class="label">mark 16</span></div>
+          <div class="item"><img src="/brand/peixin-mark.png" width="24" height="24" alt="mark 24"><span class="label">mark 24</span></div>
+          <div class="item"><img src="/brand/peixin-mark.png" width="32" height="32" alt="mark 32"><span class="label">mark 32</span></div>
+          <div class="item"><img src="/brand/peixin-mark.png" width="40" height="40" alt="mark 40"><span class="label">mark 40</span></div>
+          <div class="item"><img src="/brand/peixin-mark.png" width="64" height="64" alt="mark 64"><span class="label">mark 64</span></div>
+          <div class="item"><img src="/brand/peixin-mark.png" width="120" height="120" alt="mark 120"><span class="label">mark 120</span></div>
+          <div class="item"><img src="/brand/peixin-wordmark.png" height="40" alt="wordmark 40"><span class="label">wordmark 40</span></div>
+          <div class="item"><img src="/brand/peixin-wordmark.png" height="80" alt="wordmark 80"><span class="label">wordmark 80</span></div>
+          <div class="item"><img src="/brand/peixin-lockup.png" width="180" alt="lockup 180"><span class="label">lockup 180</span></div>
+          <div class="item"><img src="/brand/peixin-lockup.png" width="280" alt="lockup 280"><span class="label">lockup 280</span></div>
+          <div class="item"><img src="/brand/peixin-lockup.png" width="480" alt="lockup 480"><span class="label">lockup 480</span></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+  <p class="note">专用档位文件：/brand/peixin-mark@128.png、/brand/peixin-favicon.png（32×32）、/brand/peixin-lockup@720.png。本页阶梯尺寸用 512 徽标 / 200 字标 / 1440 横版由浏览器缩放展示。</p>
+</body>
+</html>
