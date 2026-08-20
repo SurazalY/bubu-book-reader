@@ -4,7 +4,7 @@ import { createAuthApi } from '../../api/auth.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 import { cx } from '../../shared/cx.js'
 import { GlassPanel } from '../components/Glass.jsx'
-import { BrandMark, DiamondRule } from '../components/BrandMark.jsx'
+import { DiamondRule } from '../components/BrandMark.jsx'
 import { resolveLoginDestination } from '../../console/pages/accounts/identityUi.js'
 
 const FIELD =
@@ -17,6 +17,8 @@ const STATES = {
 }
 
 const authApi = createAuthApi()
+const lockupSrc = `${import.meta.env.BASE_URL}brand/peixin-lockup@720.png`
+const lockupSrcSet = `${import.meta.env.BASE_URL}brand/peixin-lockup.png 2x`
 
 export default function Login() {
   const nav = useNavigate()
@@ -64,7 +66,13 @@ export default function Login() {
         className="student-crystal-card student-enter w-[620px] max-w-full rounded-[40px] px-12 py-11"
       >
         <div className="flex justify-center">
-          <BrandMark size={30} textClass="text-h2" />
+          <img
+            src={lockupSrc}
+            srcSet={lockupSrcSet}
+            width={240}
+            height={74}
+            alt="培新教育"
+          />
         </div>
 
         <h1 className="mt-7 text-center font-serif text-[40px] font-bold leading-tight text-ink-900 tracking-[0.16em]">

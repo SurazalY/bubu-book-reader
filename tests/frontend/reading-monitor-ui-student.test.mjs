@@ -143,5 +143,5 @@ test('Home 接入真实 self resource，继续阅读只使用 hook 的精确 URL
   assert.match(bottomNav, /px-3[^\n]*sm:px-8/)
   assert.match(bottomNav, /min-w-0[^\n]*gap-1[^\n]*sm:gap-2\.5/)
   assert.match(bottomNav, /whitespace-nowrap[^\n]*text-\[11px\]/)
-  assert.match(documentHtml, /<link rel="icon" type="image\/svg\+xml" href="\/logo\.svg" \/>/)
+  assert.match(documentHtml, /<link rel="icon" type="image\/png" href="\/brand\/peixin-favicon\.png" \/>/)
 })

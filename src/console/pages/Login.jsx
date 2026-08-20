@@ -4,7 +4,7 @@ import { createAuthApi } from '../../api/auth.js'
 import { RuntimeIcon as Icon } from '../../shared/RuntimeIcon.jsx'
 import { cx } from '../../shared/cx.js'
 import { GlassPanel } from '../components/Glass.jsx'
-import { BrandMark, DiamondRule } from '../components/BrandMark.jsx'
+import { DiamondRule } from '../components/BrandMark.jsx'
 import { resolveLoginDestination } from './accounts/identityUi.js'
 
 const states = {
@@ -17,6 +17,8 @@ const fieldBase =
   'console-field flex items-center gap-3.5 rounded-[24px] border px-6 h-16 transition backdrop-blur-sm'
 
 const authApi = createAuthApi()
+const lockupSrc = `${import.meta.env.BASE_URL}brand/peixin-lockup@720.png`
+const lockupSrcSet = `${import.meta.env.BASE_URL}brand/peixin-lockup.png 2x`
 
 export default function Login() {
   const navigate = useNavigate()
@@ -65,7 +67,13 @@ export default function Login() {
         className="console-enter console-login-card w-full max-w-[620px] rounded-[40px] px-8 pb-10 pt-16 sm:px-10"
       >
         <div className="flex flex-col items-center text-center">
-          <BrandMark size={46} textClass="text-[38px] leading-none" />
+          <img
+            src={lockupSrc}
+            srcSet={lockupSrcSet}
+            width={240}
+            height={74}
+            alt="培新教育"
+          />
           <h1
             className="font-serif text-[40px] leading-tight font-bold text-ink-900 mt-8"
             style={{ letterSpacing: '0.16em' }}

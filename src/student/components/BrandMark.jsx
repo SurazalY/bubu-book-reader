@@ -1,36 +1,20 @@
 import { cx } from '../../shared/cx.js'
 
-// 读伴品牌标识（母版 01）：摊开的双瓣书页，左瓣淡紫→蓝、右瓣青→蓝绿，
-// 面状填充无描边无底块；右侧「读伴」宋体深墨蓝。与权限端保持同一标识，
-// id 加 student- 前缀避免两端合并后 SVG 渐变 id 撞名。
+const markSrc = `${import.meta.env.BASE_URL}brand/peixin-mark@128.png`
+const wordmarkSrc = `${import.meta.env.BASE_URL}brand/peixin-wordmark.png`
+
 export function BrandMark({ size = 40, showText = true, textClass, className }) {
   return (
     <div className={cx('inline-flex items-center gap-3', className)}>
-      <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
-        <defs>
-          <linearGradient id="student-brandmark-left" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#C9B8F2" />
-            <stop offset="100%" stopColor="#7FA9F0" />
-          </linearGradient>
-          <linearGradient id="student-brandmark-right" x1="1" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7FD3E0" />
-            <stop offset="100%" stopColor="#6FB6D9" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M23 15.5C19.6 11.4 14.9 9.2 9.2 8.4c-1 -.15 -1.9 .6 -1.9 1.6v20.4c0 .85 .64 1.55 1.5 1.63C14 32.6 19 34.6 23 38.4Z"
-          fill="url(#student-brandmark-left)"
-        />
-        <path
-          d="M25 15.5C28.4 11.4 33.1 9.2 38.8 8.4c1 -.15 1.9 .6 1.9 1.6v20.4c0 .85 -.64 1.55 -1.5 1.63C34 32.6 29 34.6 25 38.4Z"
-          fill="url(#student-brandmark-right)"
-        />
-        <path d="M23.1 16.4h1.8v22.6h-1.8Z" fill="#8FB4E8" opacity=".55" />
-      </svg>
+      <img src={markSrc} alt="培新教育" width={size} height={size} />
       {showText && (
-        <span className={cx('font-serif font-bold text-ink-900 tracking-tightish', textClass || 'text-display')}>
-          读伴
-        </span>
+        <img
+          src={wordmarkSrc}
+          alt="培新教育"
+          width={84}
+          height={24}
+          className={textClass}
+        />
       )}
     </div>
   )
