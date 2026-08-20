@@ -4,7 +4,7 @@
 
 ## 架构
 - **前端**：React 18 + Vite 5 + Tailwind（BrowserRouter），`npm run build` → `dist/`。页面地址是真实路径，例如 `/student/login`、`/console/login`，不是 `#/student/login` 这种 hash 路径。
-- **后端**：Node + Express（`server/`），同时 ① serve `dist/` 静态站 ② 提供 `POST /api/chat`（页面感知 AI）+ `GET /api/health`
+- **后端**：Node + Express（`server/`），同时 ① serve `dist/` 静态站 ② 提供 `POST /api/v1/ai/messages`（页面感知 AI）+ `GET /api/v1/health`
 - **生产同源**：后端 serve dist，前端相对 `/api` 直达，无需跨域 / 代理
 - **前端路由回退**：BrowserRouter 下刷新或直达深链时，服务端必须把未命中静态文件的前端路径回退到 `index.html`，否则会 404。本仓库 Express 在默认开启静态托管时已经这样做：先托管 `dist/` 静态文件，再把其余 `GET` 回退到 `dist/index.html`（`/books` 固定 404，不回退）。因此用下文的 `npm run server` 同源部署时，刷新 `http://127.0.0.1:5191/student/login` 即可打开登录页。若前面另挂 Nginx 自己托管静态文件、不把未知路径转给 Express，必须配置 `try_files $uri $uri/ /index.html;`，不能按 HashRouter 省略这条规则。
 
@@ -55,7 +55,7 @@ npm run server
 > 正式问答和安全二次复核复用同一个外部 provider；未配置时会明确标为确定性降级，不能把降级结果当成外部 AI。
 
 ## 四、验证
-- `GET /api/health` → `{ok:true, ai:{...}}` 即后端 + AI 配置就绪
+- `GET /api/v1/health` → `{ok:true, ai:{...}}` 即后端 + AI 配置就绪
 - 学生登录：`/student/login`；控制台登录：`/console/login`（刷新这两个地址应仍返回页面，而不是 404）
 - 书架页：AI 找书向导；阅读页：**按住 Ctrl 拖选**正文 → 浮层「解释 / 问 AI / 标注」+ 右侧 AI 学伴结合当前页陪读
 
